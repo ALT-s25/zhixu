@@ -1,4 +1,4 @@
-const $=s=>document.querySelector(s),KEY='zhixu-progress-v1',all=[...new Map(GROUPS.flatMap(g=>g.items).map(i=>[i.id,i])).values()];let state={},chapter=-1,noteId;
+const $=s=>document.querySelector(s),KEY='zhixu-progress-v1',all=[...new Map(GROUPS.flatMap(g=>g.items).map(i=>[i.id,i])).values()];let state={},chapter=-1,noteId,scope='all';const opened=new Set();
 const aliases={'LCR 049.':'LCR 49','LCR 170.':'LCR 170','LCR 155.':'LCR 155'};
 function mergeAliases(progress){
  for(const [oldId,id] of Object.entries(aliases)){
@@ -18,34 +18,45 @@ function matches(i){
  const s=state[i.id]||{},m=meta(i),q=$('#search').value.trim().toLowerCase(),d=+$('#difficulty').value,f=$('#status').value,focus=$('#focus').value;
  return (!q||(i.id+' '+i.title+' '+m.tags.join(' ')+' '+(i.category||'')).toLowerCase().includes(q))&&(!d||i.level===d)&&(f==='all'||f==='done'&&s.done||f==='todo'&&!s.done||f==='star'&&s.star)&&(focus==='all'||focus==='hot'&&m.hot100||focus==='exam'&&m.exam==='高'||focus==='interview'&&m.interview==='高');
 }
-function visibleItems(){return [...new Map(GROUPS.filter((g,k)=>chapter<0||k===chapter).flatMap(g=>g.items).filter(matches).map(i=>[i.id,i])).values()]}
+function inScope(g,k){return (scope==='all'||g.source===scope)&&(chapter<0||k===chapter)}
+function visibleItems(){return [...new Map(GROUPS.filter(inScope).flatMap(g=>g.items).filter(matches).map(i=>[i.id,i])).values()]}
 function row(i){
  const s=state[i.id]||{},m=meta(i);
  return `<div class="row ${s.done?'completed':''}" data-question="${esc(i.id)}"><input type="checkbox" data-done="${esc(i.id)}" aria-label="完成 ${esc(i.title)}" ${s.done?'checked':''}><div class="question-body"><div class="question-heading"><a href="${esc(i.url)}" target="_blank" rel="noopener"><span class="id">${esc(i.id)}</span>${esc(i.title)} ↗</a>${m.hot100?'<span class="hot-badge">HOT 100</span>':''}<span class="badge l${i.level}">${['','简单','中等','困难'][i.level]}</span></div><div class="question-topics"><span class="meta-label">考点</span>${m.tags.map(t=>`<span class="topic">${esc(t)}</span>`).join('')}</div><div class="question-frequency"><span class="frequency ${m.exam==='高'?'priority-high':''}" title="${esc(m.examReason)}">考试参考 <b>${m.exam}</b></span><span class="frequency ${m.interview==='高'?'priority-high':''}" title="${esc(m.interviewReason)}">面试参考 <b>${m.interview}</b></span><details class="basis"><summary aria-label="${esc(i.title)}的考频依据">考频依据 ⓘ</summary><div><p>考试：${esc(m.examReason)}</p><p>面试：${esc(m.interviewReason)}</p><p>以上为备考优先级估计，不是实际出题频次。</p><a href="${esc(i.url)}" target="_blank" rel="noopener">查看题目及官方标签 ↗</a></div></details></div></div><div class="row-actions"><button data-star="${esc(i.id)}" class="${s.star?'selected':''}" aria-label="收藏 ${esc(i.title)}" aria-pressed="${!!s.star}">${s.star?'★':'☆'}</button><button data-note="${esc(i.id)}" aria-label="笔记 ${esc(i.title)}">${s.note?'▣':'✎'}</button></div></div>`;
 }
 function groupContent(g,items){
- if(!g.hot100)return items.map(row).join('');
+ if(!g.hot100&&g.source!=='reference')return items.map(row).join('');
  return [...new Set(items.map(i=>i.category))].map(c=>`<div class="topic-heading">${esc(c)}<span>${items.filter(i=>i.category===c).length} 题</span></div>${items.filter(i=>i.category===c).map(row).join('')}`).join('');
 }
+function chapterBody(g,items,k){return `<p class="tip">✧ 思路提示 · ${esc(g.description||tips[k]||'按子分类循序练习，先理解方法，再提高熟练度。')}</p>${g.keyPoints?'<details class="knowledge"><summary>展开专题知识笔记 ↗</summary><div>'+esc(g.keyPoints).replace(/\*\*/g,'')+'</div></details>':''}${groupContent(g,items)}`}
 function render(){
  const done=all.filter(i=>state[i.id]?.done).length,p=Math.round(done/all.length*100);
  $('#total').textContent=all.length;$('#done').textContent=done;$('#left').textContent=all.length-done;$('#percent').textContent=p+'%';$('#ring').style.setProperty('--progress',p+'%');
- $('#heading').textContent=chapter<0?'全部章节':GROUPS[chapter].name;
- $('#nav').innerHTML=['全部题目',...GROUPS.map(g=>g.name.replace(/第\d章 /,''))].map((n,j)=>`<button class="${chapter===j-1?'active':''} ${j===8?'hot-nav':''}" data-chapter="${j-1}">${j===0?'◈':String(j+1).padStart(2,'0')} &nbsp; ${esc(n)} <small>${j===0?all.length:GROUPS[j-1].items.length}</small></button>`).join('');
+ $('#group-total').textContent=GROUPS.length;
+ $('#heading').textContent=chapter<0?({all:'全部题单',course:'课程章节',hot:'LeetCode Hot 100',reference:'算法专题题单'}[scope]):GROUPS[chapter].name;
+ document.querySelectorAll('[data-source]').forEach(b=>{const selected=b.dataset.source===scope;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',selected)});
+ for(const source of ['course','hot','reference']){const entries=[...new Map(GROUPS.filter(g=>g.source===source).flatMap(g=>g.items).map(i=>[i.id,i])).values()],n=entries.filter(i=>state[i.id]?.done).length;document.querySelector('[data-source-count="'+source+'"]').textContent=n+' / '+entries.length+' 已完成';document.querySelector('[data-source-progress="'+source+'"]').style.width=(n/entries.length*100)+'%'}
+ $('#nav').innerHTML='<button class="'+(chapter<0?'active':'')+'" data-chapter="-1">◈ &nbsp; 当前范围全部 <small>'+visibleItems().length+'</small></button>'+GROUPS.map((g,k)=>{if(scope!=='all'&&g.source!==scope)return '';const label=(k===0?'课程基础':k===7?'经典热题':k===8?'算法专题':'');return (label?'<div class="nav-label">'+label+'</div>':'')+`<button class="${chapter===k?'active':''} ${g.hot100?'hot-nav':''}" data-chapter="${k}"><span class="nav-number">${String(k+2).padStart(2,'0')}</span> ${esc(g.name.replace(/第\d章 /,''))} <small>${g.items.length}</small></button>`}).join('');
  let count=0;
  $('#list').innerHTML=GROUPS.map((g,k)=>{
-  if(chapter>=0&&chapter!==k)return '';
+  if(!inScope(g,k))return '';
   const items=g.items.filter(matches);count+=items.length;if(!items.length)return '';
-  return `<details class="chapter-group ${g.hot100?'hot-group':''}" open><summary>${esc(g.name)}<span>${g.items.filter(i=>state[i.id]?.done).length} / ${g.items.length} 已完成</span></summary><p class="tip">✧ 思路提示 · ${tips[k]}</p>${groupContent(g,items)}</details>`;
+  const completed=g.items.filter(i=>state[i.id]?.done).length,isOpen=opened.has(k);
+  return `<details class="chapter-group ${g.hot100?'hot-group':''}" data-group="${k}" ${isOpen?'open':''}><summary><span class="chapter-number">${String(k+2).padStart(2,'0')}</span><div class="chapter-title"><b>${esc(g.name)}</b><small>${esc(g.description||tips[k]||'循序练习，积累解题方法')}</small></div><span class="chapter-progress"><b>${completed}<em> / ${g.items.length}</em></b><i style="--chapter-progress:${completed/g.items.length*100}%"></i></span><span class="chapter-arrow">⌄</span></summary><div class="chapter-content">${isOpen?chapterBody(g,items,k):''}</div></details>`;
+
  }).join('')||'<div class="empty">没有找到匹配的题目，试试其他筛选条件。</div>';
  $('#count').textContent=visibleItems().length+' 道独立题 · '+count+' 条章节练习';
 }
-$('#nav').onclick=e=>{let b=e.target.closest('[data-chapter]');if(b){chapter=+b.dataset.chapter;render()}};
+document.querySelectorAll('[data-source]').forEach(b=>b.onclick=()=>{scope=b.dataset.source;chapter=-1;opened.clear();render();$('#practice').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+$('#list').addEventListener('toggle',e=>{const d=e.target;if(!d.matches('[data-group]'))return;const k=+d.dataset.group;if(d.open){opened.add(k);if(!d.querySelector('.chapter-content').innerHTML)d.querySelector('.chapter-content').innerHTML=chapterBody(GROUPS[k],GROUPS[k].items.filter(matches),k)}else opened.delete(k)},true);
+$('#expand-all').onclick=()=>{const groups=GROUPS.map((g,k)=>({g,k})).filter(({g,k})=>inScope(g,k));const expand=groups.some(({k})=>!opened.has(k));groups.forEach(({k})=>expand?opened.add(k):opened.delete(k));render();$('#expand-all').textContent=expand?'收起全部':'展开全部'};
+$('#nav').onclick=e=>{let b=e.target.closest('[data-chapter]');if(b){chapter=+b.dataset.chapter;if(chapter>=0)opened.add(chapter);render();$('#practice').scrollIntoView({block:'start'})}};
 $('#list').onclick=e=>{let b=e.target.closest('button');if(!b)return;let id=b.dataset.star||b.dataset.note;state[id]??={};if(b.dataset.star){state[id].star=!state[id].star;persist();render()}else{noteId=id;$('#note-title').textContent=all.find(i=>i.id===id).title;$('#note').value=state[id].note||'';$('#modal').showModal()}};
 $('#list').onchange=e=>{let id=e.target.dataset.done;if(id){state[id]??={};state[id].done=e.target.checked;persist();render();if(state[id].done)toast('又完成一道，继续积累 ✨')}};
 $('#save-note').onclick=()=>{state[noteId].note=$('#note').value;persist();render()};['search','difficulty','status','focus'].forEach(id=>$('#'+id).addEventListener(id==='search'?'input':'change',render));
 try{document.body.classList.toggle('dark',localStorage.getItem('zhixu-theme')==='dark')}catch{}$('#theme').onclick=()=>{let dark=document.body.classList.toggle('dark');try{localStorage.setItem('zhixu-theme',dark?'dark':'light')}catch{}};
-$('#random').onclick=()=>{let a=[...new Map(GROUPS.filter((g,k)=>chapter<0||k===chapter).flatMap(g=>g.items).filter(i=>matches(i)&&!state[i.id]?.done).map(i=>[i.id,i])).values()];if(!a.length)return toast('当前筛选下没有未完成题目');let i=a[Math.floor(Math.random()*a.length)];window.open(i.url,'_blank','noopener')};
+$('#random').onclick=()=>{let a=[...new Map(GROUPS.filter(inScope).flatMap(g=>g.items).filter(i=>matches(i)&&!state[i.id]?.done).map(i=>[i.id,i])).values()];if(!a.length)return toast('当前筛选下没有未完成题目');let i=a[Math.floor(Math.random()*a.length)];window.open(i.url,'_blank','noopener')};
 $('#export').onclick=()=>{let url=URL.createObjectURL(new Blob([JSON.stringify({version:1,progress:state},null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='知序-进度备份.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('#import').onclick=()=>$('#file').click();$('#file').onchange=async e=>{try{let file=e.target.files[0];if(!file)return;if(file.size>5000000)throw Error();let d=JSON.parse(await file.text());if(d.version!==1||!d.progress||typeof d.progress!=='object'||Array.isArray(d.progress))throw Error();mergeAliases(d.progress);let clean={};for(let i of all){let s=d.progress[i.id];if(s){if(typeof s!=='object'||Array.isArray(s))throw Error();clean[i.id]={done:s.done===true,star:s.star===true,note:typeof s.note==='string'?s.note:''}}}if(!confirm('导入会覆盖对应题目的现有进度和笔记，是否继续？'))return;state={...state,...clean};persist();render();toast('备份已导入')}catch{toast('无法导入：请选择有效的知序 JSON 备份')}finally{e.target.value=''}};render();
+
 
