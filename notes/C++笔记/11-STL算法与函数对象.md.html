@@ -1,0 +1,481 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>11-STL算法与函数对象</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 11 &#183; STL 算法与函数对象 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**algorithm 头文件常用算法、lambda、std::function、std::bind**
+
+---
+
+## 一、知识框架
+
+```
+STL 算法与函数对象
+├── 11.1 算法总览
+├── 11.2 非修改算法 ⭐
+│   ├── find、count
+│   ├── for_each
+│   ├── equal、min、max
+├── 11.3 修改算法 ⭐⭐
+│   ├── copy、replace、remove
+│   ├── transform
+│   ├── fill、generate
+├── 11.4 排序相关 ⭐⭐
+│   ├── sort、stable_sort
+│   ├── partial_sort
+│   ├── nth_element
+├── 11.5 查找算法 ⭐
+│   ├── binary_search
+│   ├── lower_bound、upper_bound
+├── 11.6 函数对象（Functor）⭐
+├── 11.7 Lambda 表达式深入 ⭐⭐
+├── 11.8 std::function 与 std::bind ⭐
+└── 11.9 常用算法速查表
+```
+
+---
+
+## 二、算法总览
+
+所有 STL 算法都在 `&lt;algorithm&gt;` 中，是**函数模板**，通过迭代器操作容器。
+
+```cpp
+#include &lt;algorithm&gt;
+```
+
+**特点**：
+- 与容器**解耦**（不关心底层）
+- 通过**迭代器**操作
+- 可用 lambda / 函数对象定制行为
+
+---
+
+## 三、非修改算法 ⭐
+
+### 3.1 find / count
+
+```cpp
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};
+
+auto it = std::find(v.begin(), v.end(), 3);     // 找 3，返回迭代器
+if (it != v.end()) std::cout &lt;&lt; *it;             // 3
+
+int n = std::count(v.begin(), v.end(), 3);     // 计数
+```
+
+### 3.2 for_each
+
+```cpp
+std::for_each(v.begin(), v.end(), [](int x) {
+    std::cout &lt;&lt; x &lt;&lt; &quot; &quot;;
+});
+
+// C++11 后更推荐 range-for
+for (int x : v) std::cout &lt;&lt; x &lt;&lt; &quot; &quot;;
+```
+
+### 3.3 min / max / minmax
+
+```cpp
+int a = 3, b = 5;
+std::min(a, b);                          // 3
+std::max(a, b);                          // 5
+std::min({1, 2, 3});                     // 1（初始化列表）
+auto [lo, hi] = std::minmax(3, 5);       // 解构（C++11）
+```
+
+### 3.4 equal / mismatch
+
+```cpp
+std::vector&lt;int&gt; a = {1, 2, 3};
+std::vector&lt;int&gt; b = {1, 2, 4};
+std::equal(a.begin(), a.end(), b.begin());     // false
+```
+
+---
+
+## 四、修改算法 ⭐⭐
+
+### 4.1 copy
+
+```cpp
+std::vector&lt;int&gt; src = {1, 2, 3, 4, 5};
+std::vector&lt;int&gt; dst(5);
+std::copy(src.begin(), src.end(), dst.begin());
+
+// C++11 推荐
+std::vector&lt;int&gt; dst2(src.begin(), src.end());
+```
+
+### 4.2 replace
+
+```cpp
+std::replace(v.begin(), v.end(), 3, 99);   // 所有 3 替换为 99
+```
+
+### 4.3 remove（erase-remove 惯用法）⭐
+
+```cpp
+// remove 不是真的删除，而是把不要的元素移到末尾，返回新的 end
+auto it = std::remove(v.begin(), v.end(), 3);
+v.erase(it, v.end());     // 真的删除
+
+// C++20 之前最简洁写法（erase-remove idiom）
+v.erase(std::remove(v.begin(), v.end(), 3), v.end());
+```
+
+&gt; &#128161; **C++20** 提供 `std::erase()` / `std::erase_if()`，直接完成两步。
+
+### 4.4 transform（重要）⭐⭐
+
+```cpp
+std::vector&lt;int&gt; v = {1, 2, 3, 4};
+std::vector&lt;int&gt; result(4);
+
+// 1. 一元变换
+std::transform(v.begin(), v.end(), result.begin(),
+               [](int x) { return x * 2; });
+// result = {2, 4, 6, 8}
+
+// 2. 二元变换
+std::vector&lt;int&gt; v2 = {10, 20, 30, 40};
+std::vector&lt;int&gt; sum(4);
+std::transform(v.begin(), v.end(), v2.begin(), sum.begin(),
+               std::plus&lt;int&gt;());
+// sum = {11, 22, 33, 44}
+```
+
+### 4.5 fill / generate
+
+```cpp
+std::fill(v.begin(), v.end(), 0);     // 全部填充 0
+
+std::generate(v.begin(), v.end(), []() { return rand() % 100; });
+```
+
+### 4.6 reverse / rotate
+
+```cpp
+std::reverse(v.begin(), v.end());
+std::rotate(v.begin(), v.begin() + 2, v.end());
+```
+
+---
+
+## 五、排序相关 ⭐⭐
+
+### 5.1 sort
+
+```cpp
+std::vector&lt;int&gt; v = {3, 1, 4, 1, 5, 9, 2, 6};
+
+// 默认升序
+std::sort(v.begin(), v.end());
+
+// 自定义排序
+std::sort(v.begin(), v.end(), std::greater&lt;int&gt;());   // 降序
+
+// lambda
+std::sort(v.begin(), v.end(), [](int a, int b) {
+    return a &gt; b;       // 降序
+});
+```
+
+### 5.2 stable_sort
+
+**保持相等元素的相对顺序**（稳定的排序）。
+
+```cpp
+std::stable_sort(v.begin(), v.end());
+```
+
+### 5.3 partial_sort
+
+**部分排序**，只排前 k 个。
+
+```cpp
+std::partial_sort(v.begin(), v.begin() + 3, v.end());
+// 前 3 个元素排好，其他顺序不定
+```
+
+### 5.4 nth_element ⭐
+
+**第 k 小的元素**（快选算法）。
+
+```cpp
+std::nth_element(v.begin(), v.begin() + k, v.end());
+// v[k] 是第 k 小的元素
+```
+
+&gt; &#128161; 求 Top K 问题：**`nth_element` 比 `sort` 快得多**。
+
+---
+
+## 六、查找算法 ⭐
+
+### 6.1 binary_search（二分）
+
+```cpp
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};      // 必须有序！
+bool found = std::binary_search(v.begin(), v.end(), 3);  // true
+```
+
+### 6.2 lower_bound / upper_bound
+
+```cpp
+std::vector&lt;int&gt; v = {1, 2, 2, 2, 3};
+
+auto lo = std::lower_bound(v.begin(), v.end(), 2);   // 指向第一个 2
+auto hi = std::upper_bound(v.begin(), v.end(), 2);   // 指向第一个 &gt; 2
+int count = hi - lo;                                  // 3（2 的个数）
+```
+
+### 6.3 equal_range
+
+```cpp
+auto [lo, hi] = std::equal_range(v.begin(), v.end(), 2);
+```
+
+---
+
+## 七、函数对象（Functor）⭐
+
+### 7.1 什么是函数对象
+
+**重载了 `operator()` 的类**，行为类似函数。
+
+```cpp
+struct Square {
+    int operator()(int x) const {
+        return x * x;
+    }
+};
+
+Square sq;
+std::cout &lt;&lt; sq(5);   // 25
+
+// 用于 STL
+std::transform(v.begin(), v.end(), v.begin(), Square{});
+```
+
+### 7.2 预定义函数对象（&lt;functional&gt;）⭐
+
+```cpp
+#include &lt;functional&gt;
+
+std::plus&lt;int&gt;();          // a + b
+std::minus&lt;int&gt;();          // a - b
+std::multiplies&lt;int&gt;();     // a * b
+std::divides&lt;int&gt;();        // a / b
+std::modulus&lt;int&gt;();        // a % b
+std::negate&lt;int&gt;();         // -a
+
+std::equal_to&lt;int&gt;();       // a == b
+std::not_equal_to&lt;int&gt;();   // a != b
+std::greater&lt;int&gt;();        // a &gt; b
+std::less&lt;int&gt;();            // a &lt; b
+std::greater_equal&lt;int&gt;();  // a &gt;= b
+std::less_equal&lt;int&gt;();     // a &lt;= b
+
+std::logical_and&lt;int&gt;();    // a &amp;&amp; b
+std::logical_or&lt;int&gt;();     // a || b
+std::logical_not&lt;int&gt;();    // !a
+```
+
+```cpp
+// 用于 sort
+std::sort(v.begin(), v.end(), std::greater&lt;int&gt;());
+
+// 用于 transform
+std::transform(v.begin(), v.end(), v2.begin(), out.begin(), std::plus&lt;int&gt;());
+```
+
+---
+
+## 八、Lambda 深入 ⭐⭐
+
+### 8.1 完整语法
+
+```cpp
+[capture-list](params) mutable constexpr exception -&gt; return_type {
+    body
+}
+```
+
+| 部分 | 说明 |
+|------|------|
+| `capture-list` | 捕获列表：`[]`、`[=]`、`[&amp;]`、`[x]`、`[&amp;x]` |
+| `params` | 参数列表（可省略为空） |
+| `mutable` | 允许修改值捕获的变量（默认 const） |
+| `constexpr` | 显式声明 constexpr |
+| `exception` | 异常规范（C++20 已废弃） |
+| `return-type` | 返回类型（可省略自动推导） |
+
+### 8.2 捕获方式
+
+```cpp
+int x = 10, y = 20;
+
+auto f1 = []() { /* 不捕获 */ };
+auto f2 = [x, y]() { return x + y; };      // 值捕获（副本）
+auto f3 = [&amp;x, &amp;y]() { x++; y++; };       // 引用捕获
+auto f4 = [=]() { return x + y; };          // 全部值捕获
+auto f5 = [&amp;]() { x++; };                    // 全部引用捕获
+auto f6 = [=, &amp;y]() { /* x 值，y 引用 */ };
+auto f7 = [&amp;, x]() { /* 其他引用，x 值 */ };
+auto f8 = [this]() { /* 捕获当前对象的 this */ };
+```
+
+### 8.3 mutable（允许修改值捕获）
+
+```cpp
+int x = 10;
+auto f = [x]() mutable {
+    x++;        // 允许修改副本
+    return x;
+};
+std::cout &lt;&lt; f();   // 11
+std::cout &lt;&lt; x;     // 10（原值未变）
+```
+
+### 8.4 泛型 Lambda（C++14）⭐
+
+```cpp
+auto print = [](auto x) {
+    std::cout &lt;&lt; x;
+};
+
+print(42);          // int
+print(&quot;hello&quot;);     // const char*
+print(3.14);        // double
+```
+
+### 8.5 Lambda 的实际类型
+
+Lambda 实际上是一个**匿名类**，含一个 `operator()`。
+
+```cpp
+auto lambda = [](int a, int b) { return a + b; };
+std::cout &lt;&lt; typeid(lambda).name();  // 类似 &quot;Z4mainEUliiE_&quot;
+```
+
+---
+
+## 九、std::function 与 std::bind ⭐
+
+### 9.1 std::function（函数包装器）⭐
+
+```cpp
+#include &lt;functional&gt;
+
+// 1. 包装普通函数
+std::function&lt;int(int, int)&gt; f1 = [](int a, int b) { return a + b; };
+std::cout &lt;&lt; f1(3, 5);    // 8
+
+// 2. 包装成员函数
+struct Calculator {
+    int add(int a, int b) { return a + b; }
+};
+Calculator c;
+std::function&lt;int(Calculator*, int, int)&gt; f2 = &amp;Calculator::add;
+std::cout &lt;&lt; f2(&amp;c, 3, 5);     // 8
+
+// 3. 包装函数对象
+std::function&lt;int(int)&gt; f3 = Square{};
+std::cout &lt;&lt; f3(5);              // 25
+```
+
+### 9.2 std::bind（参数绑定）⭐
+
+```cpp
+int add(int a, int b, int c) { return a + b + c; }
+
+// 绑定部分参数
+auto f = std::bind(add, 10, std::placeholders::_1, 20);
+std::cout &lt;&lt; f(30);    // add(10, 30, 20) = 60
+
+// 调整顺序
+auto g = std::bind(add, std::placeholders::_2, 100, std::placeholders::_1);
+std::cout &lt;&lt; g(1, 2);   // add(2, 100, 1) = 103
+```
+
+&gt; &#128161; **C++11 之后**：很多场景用 **lambda 替代 std::bind**（更清晰）。
+
+---
+
+## 十、常用算法速查表
+
+| 类别 | 算法 |
+|------|------|
+| 查找 | find、count、binary_search、lower_bound |
+| 排序 | sort、stable_sort、partial_sort、nth_element |
+| 修改 | copy、remove、replace、transform、fill |
+| 数值 | accumulate、iota（`&lt;numeric&gt;`） |
+| 集合 | set_intersection、set_union（需排序） |
+| 堆 | make_heap、push_heap、pop_heap |
+
+```cpp
+// accumulate（求和）
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};
+int sum = std::accumulate(v.begin(), v.end(), 0);     // 15
+
+// iota（递增填充）
+std::vector&lt;int&gt; v2(5);
+std::iota(v2.begin(), v2.end(), 1);     // {1, 2, 3, 4, 5}
+```
+
+---
+
+## 十一、面试常问 ⭐⭐
+
+&gt; &#128161; **sort 和 stable_sort 的区别？**
+&gt; - sort：不保证相等元素的相对顺序
+&gt; - stable_sort：保证（基于归并排序）
+
+&gt; &#128161; **erase-remove 惯用法？**
+&gt; ```cpp
+&gt; v.erase(std::remove(v.begin(), v.end(), 3), v.end());
+&gt; ```
+&gt; remove 不能真的删除，需要配合 erase 才能真正移除。
+
+&gt; &#128161; **Lambda 捕获方式？**
+&gt; - `[=]` 值捕获全部
+&gt; - `[&amp;]` 引用捕获全部
+&gt; - 默认值捕获的变量是 const（mutable 解除）
+
+&gt; &#128161; **`std::function` vs `std::bind` vs Lambda？**
+&gt; | std::function | std::bind | Lambda |
+&gt; |---------------|-----------|--------|
+&gt; | 类型擦除包装 | 参数绑定 | 匿名函数 |
+&gt; | 有运行开销 | 复杂 | **推荐** |
+&gt; | 可存储回调 | 兼容老代码 | C++11+ 推荐 |
+
+&gt; &#128161; **`nth_element` 的应用？**
+&gt; - 求 Top K 问题（比 sort 快得多）
+&gt; - O(n) 平均复杂度
+
+&gt; &#128161; **泛型 Lambda 怎么写？**
+&gt; ```cpp
+&gt; auto f = [](auto x) { return x * 2; };
+&gt; ```
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] **algorithm 头文件** 常用算法
+- [ ] 非修改算法：find、count、for_each
+- [ ] 修改算法：copy、remove、replace、transform
+- [ ] **排序算法**：sort、stable_sort、nth_element
+- [ ] **查找算法**：binary_search、lower_bound
+- [ ] 函数对象（Functor）与预定义函数对象
+- [ ] **Lambda 完整语法**（含 mutable、泛型）
+- [ ] **std::function** 函数包装器
+- [ ] std::bind 参数绑定
+
+✅ 易错点：
+- [ ] remove 不真删除，要配合 erase
+- [ ] binary_search 要求有序
+- [ ] Lambda 值捕获默认 const（mutable 解除）
+- [ ] std::function 有运行开销（类型擦除）
+
+下一章：[12-智能指针与内存管理.md](./12-智能指针与内存管理.md) — 现代 C++ 核心！</pre>

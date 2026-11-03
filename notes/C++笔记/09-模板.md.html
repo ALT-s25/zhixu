@@ -1,0 +1,398 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>09-模板</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 09 &#183; 模板 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**函数模板、类模板、模板特化、C++11 模板新特性**
+
+---
+
+## 一、知识框架
+
+```
+模板
+├── 9.1 模板基础 ⭐⭐
+│   ├── 为什么需要模板
+│   └── 编译期多态
+├── 9.2 函数模板 ⭐⭐
+├── 9.3 类模板 ⭐⭐
+├── 9.4 模板特化 ⭐⭐
+├── 9.5 模板参数推导
+├── 9.6 可变参数模板 ⭐
+└── 9.7 模板元编程（了解）
+```
+
+---
+
+## 二、模板基础 ⭐⭐
+
+### 2.1 为什么需要模板
+
+**实现泛型**，编写与类型无关的代码。
+
+```cpp
+// 不使用模板：每种类型都要写一个
+int max(int a, int b) { return a &gt; b ? a : b; }
+double max(double a, double b) { return a &gt; b ? a : b; }
+std::string max(std::string a, std::string b) { return a &gt; b ? a : b; }
+
+// 使用模板：一个搞定
+template &lt;typename T&gt;
+T max(T a, T b) { return a &gt; b ? a : b; }
+```
+
+### 2.2 两种模板
+
+- **函数模板**：通用函数
+- **类模板**：通用类
+
+### 2.3 模板分类 ⭐
+
+- **编译时多态**（静态）：模板（本章）
+- **运行时多态**（动态）：虚函数（前章）
+
+---
+
+## 三、函数模板 ⭐⭐
+
+### 3.1 基本语法
+
+```cpp
+template &lt;typename T&gt;      // 声明模板
+T max(T a, T b) {          // T 是类型参数
+    return a &gt; b ? a : b;
+}
+
+max(3, 5);                 // 自动推导 T = int
+max(3.14, 1.5);            // T = double
+max&lt;double&gt;(3, 5.5);       // 显式指定
+```
+
+### 3.2 多个模板参数
+
+```cpp
+template &lt;typename T, typename U&gt;
+auto add(T a, U b) -&gt; decltype(a + b) {
+    return a + b;
+}
+
+add(3, 5.5);      // auto = double
+```
+
+### 3.3 非类型模板参数
+
+```cpp
+template &lt;typename T, int N&gt;
+class Array {
+    T data_[N];
+public:
+    int size() const { return N; }
+};
+
+Array&lt;int, 10&gt; a;        // 10 个 int 的数组
+```
+
+### 3.4 函数模板 vs 函数重载 ⭐
+
+```cpp
+// 函数模板
+template &lt;typename T&gt;
+T max(T a, T b) { return a &gt; b ? a : b; }
+
+// 函数重载
+int max(int a, int b) { return a &gt; b ? a : b; }
+double max(double a, double b) { return a &gt; b ? a : b; }
+```
+
+&gt; &#128161; **模板更通用**（一个模板适用所有类型），但**重载更精确**（可为特定类型定制）。
+
+### 3.5 模板实例化
+
+**编译器根据调用自动生成具体类型的代码**（模板实例化）。
+
+```cpp
+max(3, 5);           // 实例化 max&lt;int&gt;(int, int)
+max(3.14, 1.5);      // 实例化 max&lt;double&gt;(double, double)
+```
+
+---
+
+## 四、类模板 ⭐⭐
+
+### 4.1 基本语法
+
+```cpp
+template &lt;typename T&gt;
+class Stack {
+    std::vector&lt;T&gt; data_;
+
+public:
+    void push(const T&amp; x) { data_.push_back(x); }
+    void pop() { data_.pop_back(); }
+    const T&amp; top() const { return data_.back(); }
+    bool empty() const { return data_.empty(); }
+    size_t size() const { return data_.size(); }
+};
+
+Stack&lt;int&gt; s;
+s.push(1);
+s.pop();
+```
+
+### 4.2 类模板的成员函数
+
+```cpp
+template &lt;typename T&gt;
+class MyClass {
+public:
+    void func();           // 类内定义（隐式 inline）
+
+    void func2();          // 类内声明
+};
+
+// 类外定义
+template &lt;typename T&gt;
+void MyClass&lt;T&gt;::func2() {
+    // ...
+}
+```
+
+### 4.3 多模板参数类
+
+```cpp
+template &lt;typename K, typename V&gt;
+class Pair {
+    K key_;
+    V value_;
+
+public:
+    Pair(const K&amp; k, const V&amp; v) : key_(k), value_(v) {}
+    K getKey() const { return key_; }
+    V getValue() const { return value_; }
+};
+
+Pair&lt;std::string, int&gt; p(&quot;age&quot;, 18);
+```
+
+### 4.4 默认模板参数
+
+```cpp
+template &lt;typename T = int, int N = 10&gt;
+class Array {
+    T data_[N];
+};
+
+Array&lt;&gt; a;           // 默认 T=int, N=10
+Array&lt;double&gt; b;     // T=double, N=10
+```
+
+### 4.5 模板别名（C++11）
+
+```cpp
+template &lt;typename T&gt;
+using Vec = std::vector&lt;T&gt;;
+
+Vec&lt;int&gt; v;          // 等价 std::vector&lt;int&gt;
+```
+
+---
+
+## 五、模板特化 ⭐⭐
+
+### 5.1 为什么需要特化
+
+某些类型需要特殊处理（如 `const char*` 不能直接比较）。
+
+```cpp
+template &lt;typename T&gt;
+bool compare(const T&amp; a, const T&amp; b) {
+    return a == b;
+}
+
+// 字符串特化
+template &lt;&gt;
+bool compare&lt;const char*&gt;(const char* const&amp; a, const char* const&amp; b) {
+    return strcmp(a, b) == 0;
+}
+```
+
+### 5.2 函数模板特化
+
+```cpp
+template &lt;typename T&gt;
+void print(const T&amp; x) {
+    std::cout &lt;&lt; x;
+}
+
+template &lt;&gt;
+void print&lt;bool&gt;(const bool&amp; x) {       // bool 特化
+    std::cout &lt;&lt; (x ? &quot;true&quot; : &quot;false&quot;);
+}
+```
+
+### 5.3 类模板特化 ⭐
+
+```cpp
+template &lt;typename T&gt;
+class MyClass {
+public:
+    void print() { std::cout &lt;&lt; &quot;通用版本\n&quot;; }
+};
+
+// 全特化
+template &lt;&gt;
+class MyClass&lt;bool&gt; {
+public:
+    void print() { std::cout &lt;&lt; &quot;bool 特化\n&quot;; }
+};
+
+MyClass&lt;int&gt; a;
+MyClass&lt;bool&gt; b;
+a.print();    // 通用版本
+b.print();    // bool 特化
+```
+
+### 5.4 偏特化（部分特化）⭐
+
+```cpp
+// 针对指针类型的偏特化
+template &lt;typename T&gt;
+class MyClass&lt;T*&gt; {
+    T* p_;
+public:
+    void print() { std::cout &lt;&lt; &quot;指针版本\n&quot;; }
+};
+
+int x = 10;
+MyClass&lt;int*&gt; p;
+p.print();    // 指针版本
+```
+
+---
+
+## 六、模板参数推导 ⭐
+
+### 6.1 推导规则
+
+```cpp
+template &lt;typename T&gt;
+void func(T x);
+
+int a = 10;
+const int b = 20;
+int&amp; ref = a;
+
+func(a);        // T = int
+func(b);        // T = int（去 const）
+func(ref);      // T = int（去引用）
+```
+
+### 6.2 显式指定模板参数
+
+```cpp
+template &lt;typename T&gt;
+T max(T a, T b);
+
+max&lt;double&gt;(3, 5.5);   // 显式指定 T = double
+```
+
+---
+
+## 七、可变参数模板 ⭐（了解）
+
+C++11 引入，支持**任意数量**的模板参数。
+
+```cpp
+// 递归终止
+void print() { }
+
+// 递归调用
+template &lt;typename T, typename... Args&gt;
+void print(T first, Args... rest) {
+    std::cout &lt;&lt; first &lt;&lt; &quot; &quot;;
+    print(rest...);
+}
+
+print(1, &quot;hello&quot;, 3.14, &#39;a&#39;);    // 1 hello 3.14 a
+```
+
+---
+
+## 八、模板元编程（了解）
+
+**用模板实现编译期计算**。
+
+```cpp
+// 编译期计算阶乘
+template &lt;int N&gt;
+struct Factorial {
+    static const int value = N * Factorial&lt;N-1&gt;::value;
+};
+
+template &lt;&gt;
+struct Factorial&lt;0&gt; {
+    static const int value = 1;
+};
+
+constexpr int x = Factorial&lt;5&gt;::value;   // 120（编译期计算）
+```
+
+---
+
+## 九、常见模板实例：std::pair 与 std::tuple
+
+```cpp
+std::pair&lt;std::string, int&gt; p(&quot;age&quot;, 18);
+std::cout &lt;&lt; p.first &lt;&lt; &quot;: &quot; &lt;&lt; p.second;
+
+std::tuple&lt;int, double, std::string&gt; t(1, 3.14, &quot;hi&quot;);
+std::cout &lt;&lt; std::get&lt;0&gt;(t);    // 1
+
+// C++17 结构化绑定
+auto [a, b, c] = t;
+std::cout &lt;&lt; a &lt;&lt; b &lt;&lt; c;
+```
+
+---
+
+## 十、面试常问 ⭐⭐
+
+&gt; &#128161; **模板的实例化发生在什么时候？**
+&gt; **编译时**。编译器根据调用生成具体类型的代码。
+
+&gt; &#128161; **模板与宏的区别？**
+&gt; | 模板 | 宏 |
+&gt; |------|-----|
+&gt; | 有类型检查 | | 文本替换 |
+&gt; | 调试友好 | | 难调试 |
+&gt; | 编译期实例化 | | 预编译期展开 |
+
+&gt; &#128161; **什么是全特化、偏特化？**
+&gt; - **全特化**：所有模板参数都指定
+&gt; - **偏特化**：部分模板参数指定（如指针、引用版本）
+
+&gt; &#128161; **函数模板 vs 类模板？**
+&gt; - 函数模���：参数自动推导
+&gt; - 类模板：必须显式指定（除非有默认值）
+
+&gt; &#128161; **`typename` 和 `class` 区别？**
+&gt; 在模板中**完全等价**，都是声明类型参数。**推荐 `typename`**（语义更清晰）。
+
+---
+
+## 十一、本章小结
+
+✅ 已掌握：
+- [ ] 模板的作用与分类
+- [ ] **函数模板**的定义与使用
+- [ ] **类模板**的定义与使用
+- [ ] 非类型模板参数
+- [ ] **模板特化**（全特化、偏特化）
+- [ ] 模板参数推导规则
+- [ ] 可变参数模板（了解）
+
+✅ 易错点：
+- [ ] 类模板必须显式指定类型
+- [ ] 模板的实现通常放在头文件（编译器需要看定义）
+- [ ] 偏特化只对**类模板**有效
+- [ ] 函数模板特化可能被 inline overload 替代
+
+下一章：[10-STL容器.md](./10-STL容器.md) — STL 实战！</pre>

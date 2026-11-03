@@ -1,0 +1,445 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>07-继承多态</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 07 &#183; 继承多态 ⭐⭐⭐⭐
+
+&gt; **难度**：高 | **学习建议**：2 天
+&gt; **C++ 三大特性中最难的**。虚函数表、动态绑定是面试必问。
+
+---
+
+## 一、知识框架
+
+```
+继承多态
+├── 7.1 继承基础 ⭐⭐
+│   ├── 单继承
+│   ├── 多继承
+│   ├── 菱形继承
+│   └── 派生类构造/析构
+├── 7.2 访问控制
+├── 7.3 隐藏、重定义、重载
+├── 7.4 多态 ⭐⭐⭐⭐
+│   ├── 虚函数
+│   ├── override / final
+│   ├── 抽象类
+│   ├── 虚函数表（vtable）⭐⭐⭐
+│   └── 动态绑定原理
+└── 7.5 纯虚函数与抽象类
+```
+
+---
+
+## 二、继承基础 ⭐⭐
+
+### 2.1 单继承
+
+```cpp
+class Animal {
+protected:
+    std::string name_;
+
+public:
+    Animal(const std::string&amp; name) : name_(name) {}
+
+    void eat() {
+        std::cout &lt;&lt; name_ &lt;&lt; &quot; is eating.\n&quot;;
+    }
+};
+
+class Dog : public Animal {       // public 继承
+public:
+    Dog(const std::string&amp; name) : Animal(name) {}    // 调用父类构造
+
+    void bark() {
+        std::cout &lt;&lt; name_ &lt;&lt; &quot; is barking.\n&quot;;
+    }
+};
+
+Dog d(&quot;旺财&quot;);
+d.eat();        // 继承自 Animal
+d.bark();       // Dog 自己的
+```
+
+### 2.2 三种继承方式 ⭐
+
+| 父类成员 | public 继承 | protected 继承 | private 继承 |
+|---------|------------|---------------|--------------|
+| public | public | protected | private |
+| protected | protected | protected | private |
+| private | 不可见 | 不可见 | 不可见 |
+
+&gt; &#128161; **几乎只用 public 继承**。
+
+### 2.3 派生类构造与析构 ⭐
+
+```cpp
+class Base {
+public:
+    Base() { std::cout &lt;&lt; &quot;Base 构造\n&quot;; }
+    ~Base() { std::cout &lt;&lt; &quot;Base 析构\n&quot;; }
+};
+
+class Derived : public Base {
+public:
+    Derived() { std::cout &lt;&lt; &quot;Derived 构造\n&quot;; }
+    ~Derived() { std::cout &lt;&lt; &quot;Derived 析构\n&quot;; }
+};
+
+Derived d;
+// 输出顺序：
+// Base 构造
+// Derived 构造
+// Derived 析构
+// Base 析构
+```
+
+&gt; &#128161; **先构造父类、再构造子类；先析构子类、再析构父类**。
+
+### 2.4 多继承 ⭐
+
+```cpp
+class A { public: void funcA() {} };
+class B { public: void funcB() {} };
+class C : public A, public B { };     // 多继承
+
+C c;
+c.funcA();
+c.funcB();
+```
+
+### 2.5 菱形继承 ⭐⭐⭐
+
+```
+       A
+      / \
+     B   C
+      \ /
+       D
+```
+
+```cpp
+class A { public: int x = 10; };
+class B : public A { };
+class C : public A { };
+class D : public B, public C { };
+
+D d;
+d.x;       // ❌ 二义性！B::x 还是 C::x？
+d.B::x;    // ✅
+d.C::x;    // ✅
+```
+
+### 2.6 虚继承（解决菱形继承）
+
+```cpp
+class A { public: int x = 10; };
+class B : virtual public A { };   // 虚继承
+class C : virtual public A { };
+class D : public B, public C { };
+
+D d;
+d.x;       // ✅ 解决了二义性
+```
+
+---
+
+## 三、隐藏、重定义、重载
+
+### 3.1 重定义（隐藏）
+
+子类定义了与父类**同名**的成员，**隐藏**父类的。
+
+```cpp
+class Base {
+public:
+    void func(int x) { std::cout &lt;&lt; &quot;Base::func\n&quot;; }
+};
+
+class Derived : public Base {
+public:
+    void func(double x) { std::cout &lt;&lt; &quot;Derived::func\n&quot;; }  // 隐藏 Base::func
+};
+
+Derived d;
+d.func(3);       // 走 Derived::func（double）
+d.func(3, 5);    // ❌ 错误！Base::func 被隐藏
+```
+
+### 3.2 using 解除隐藏
+
+```cpp
+class Derived : public Base {
+public:
+    using Base::func;        // 把 Base::func 引入
+};
+```
+
+---
+
+## 四、多态 ⭐⭐⭐⭐（核心）
+
+### 4.1 什么是多态
+
+**同样的调用**（父类指针/引用 + 同一方法），**实际执行不同**的代码。
+
+```cpp
+Animal* p = new Dog();
+p-&gt;speak();   // 期望调 Dog::speak（如果 speak 是虚函数）
+```
+
+### 4.2 三要素
+
+1. **继承**
+2. **虚函数重写**
+3. **父类指针/引用指向子类对象**
+
+### 4.3 虚函数 ⭐⭐⭐
+
+```cpp
+class Animal {
+public:
+    virtual void speak() {           // virtual 关键字
+        std::cout &lt;&lt; &quot;Animal::speak\n&quot;;
+    }
+};
+
+class Dog : public Animal {
+public:
+    void speak() override {          // override 关键字（推荐）
+        std::cout &lt;&lt; &quot;Dog::speak\n&quot;;
+    }
+};
+
+Animal* p = new Dog();
+p-&gt;speak();   // 输出 &quot;Dog::speak&quot;（动态绑定！）
+```
+
+### 4.4 override 与 final（C++11）⭐⭐
+
+```cpp
+class Base {
+public:
+    virtual void func() { }
+};
+
+class Derived : public Base {
+public:
+    void func() override { }         // 显式声明重写（编译期检查）
+
+    // void func() override final { }  // final 表示不能再被重写
+};
+
+// class Sub : public Derived {
+// public:
+//     void func() override { }      // ❌ final 阻止重写
+// };
+```
+
+### 4.5 纯虚函数与抽象类 ⭐⭐
+
+```cpp
+class Shape {
+public:
+    virtual double area() const = 0;     // 纯虚函数（=0）
+
+    virtual ~Shape() {}                  // 虚析构（重要）
+};
+
+class Circle : public Shape {
+    double r_;
+public:
+    Circle(double r) : r_(r) {}
+    double area() const override { return 3.14 * r_ * r_; }
+};
+
+// Shape s;          // ❌ 错误！抽象类不能实例化
+Circle c(5);
+std::cout &lt;&lt; c.area();    // 78.5
+```
+
+&gt; &#128161; **抽象类 = 含纯虚函数的类**，不能实例化，作为接口使用。
+
+---
+
+## 五、虚函数表（vtable）⭐⭐⭐（面试必问）
+
+### 5.1 虚函数的实现原理
+
+**含有虚函数的类会有一个隐藏的虚函数表指针 `vptr`**，指向虚函数表 `vtable`。
+
+```
+对象布局（32位示例）：
+┌──────────┐
+│ vptr ──────────→  vtable
+├──────────┤         │
+│ 成员1    │         ├─→ Animal::speak
+│ 成员2    │         └─→ Animal::eat
+└──────────┘
+```
+
+### 5.2 派生类重写虚函数
+
+```
+Dog 对象布局：
+┌──────────┐
+│ vptr ──────────→  Dog 的 vtable
+├──────────┤         │
+│ name_    │         ├─→ Dog::speak    （覆盖父类）
+└──────────┘         └─→ Animal::eat
+```
+
+### 5.3 动态绑定过程
+
+```cpp
+Animal* p = new Dog();
+p-&gt;speak();
+
+// 调用过程：
+// 1. 取出 p 指向对象的 vptr
+// 2. 查 vptr 指向的 vtable
+// 3. 找到 speak 项的函数指针
+// 4. 调用该函数
+```
+
+### 5.4 vptr 的特性
+
+- 每个对象**第一个成员**（通常）是 `vptr`
+- 构造时设置，指向**当前类的 vtable**
+- 析构时还原到父类的 vtable（防止析构错误）
+
+### 5.5 虚函数表面试回答模板
+
+&gt; &#128161; **面试回答思路**：
+&gt; 1. 含虚函数的类有一个隐藏的 vptr（在对象头部）
+&gt; 2. vptr 指向该类的 vtable（每个类一份）
+&gt; 3. vtable 记录所有虚函数的函数指针
+&gt; 4. 子类继承父类时，**复制**父类的 vtable
+&gt; 5. 子类重写虚函数时，**覆盖**对应项
+&gt; 6. 调用虚函数时，**通过对象 vptr 查 vtable**找到函数指针，再调用
+
+---
+
+## 六、虚析构函数 ⭐⭐⭐
+
+**多态的父类必须有虚析构函数**，否则子类的析构不会被调用！
+
+```cpp
+class Base {
+public:
+    ~Base() { std::cout &lt;&lt; &quot;Base 析构\n&quot;; }       // ❌ 不是虚析构
+};
+
+class Derived : public Base {
+    int* data_;
+public:
+    Derived() { data_ = new int[100]; }
+    ~Derived() { std::cout &lt;&lt; &quot;Derived 析构\n&quot;; delete[] data_; }
+};
+
+Base* p = new Derived();
+delete p;
+// 输出：Base 析构
+// ⚠️ Derived 析构没调用，内存泄漏！
+```
+
+**正确做法**：
+
+```cpp
+class Base {
+public:
+    virtual ~Base() { std::cout &lt;&lt; &quot;Base 析构\n&quot;; }
+};
+
+// delete p 后：
+// Derived 析构   ← 子类先析构
+// Base 析构      ← 父类后析构
+```
+
+---
+
+## 七、多态的经典应用
+
+### 7.1 多态 + 智能指针
+
+```cpp
+std::unique_ptr&lt;Shape&gt; p = std::make_unique&lt;Circle&gt;(5.0);
+std::cout &lt;&lt; p-&gt;area();    // 多态调用
+```
+
+### 7.2 多态 + 容器
+
+```cpp
+std::vector&lt;std::unique_ptr&lt;Shape&gt;&gt; shapes;
+shapes.push_back(std::make_unique&lt;Circle&gt;(5.0));
+shapes.push_back(std::make_unique&lt;Rectangle&gt;(3.0, 4.0));
+
+for (auto&amp; s : shapes) {
+    std::cout &lt;&lt; s-&gt;area() &lt;&lt; &quot;\n&quot;;
+}
+```
+
+### 7.3 多态 + 引用参数
+
+```cpp
+void draw(Shape&amp; s) {
+    s.draw();    // 多态调用
+}
+
+Circle c(5);
+draw(c);          // 走 Circle::draw
+```
+
+---
+
+## 八、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **什么是多态？怎么实现？**
+&gt; - **静态多态**：函数重载、模板
+&gt; - **动态多态**：虚函数 + 父类指针/引用 + 子类重写
+&gt; - 实现原理：虚函数表（vtable）
+
+&gt; &#128161; **虚函数表的实现？**
+&gt; - 每个含虚函数的类有一份 vtable
+&gt; - 每个对象有一个 vptr（指向 vtable）
+&gt; - 调用虚函数时，通过 vptr 查 vtable 找到函数指针
+
+&gt; &#128161; **为什么需要虚析构？**
+&gt; 多态 delete 父类指针时，只调用父类析构，**子类析构不调用 → 内存泄漏**
+
+&gt; &#128161; **`override` 关键字的作用？**
+&gt; 让编译器检查是否真的重写了父类的虚函数（拼写错误也能被发现）
+
+&gt; &#128161; **构造函数能否是虚函数？**
+&gt; **不能**！构造函数执行时对象还未完全构造，没有 vptr。
+
+&gt; &#128161; **菱形继承的问题？虚继承如何解决？**
+&gt; - 问题：二义性 + 数据冗余
+&gt; - 解决：虚继承，让共同基类只有一份
+
+&gt; &#128161; **`virtual` 关键字其他用途？**
+&gt; - `virtual 函数` ：虚函数
+&gt; - `virtual 继承` ：虚继承
+&gt; - `virtual ~函数` ：虚析构
+&gt; - `virtual = 0` ：纯虚函数
+
+---
+
+## 九、本章小结
+
+✅ 已掌握：
+- [ ] **3 种继承方式**（public/protected/private）
+- [ ] 派生类的构造与析构顺序
+- [ ] 多继承与菱形继承
+- [ ] **虚函数与 override**
+- [ ] **纯虚函数与抽象类**
+- [ ] **虚函数表（vtable）的原理**
+- [ ] 动态绑定过程
+- [ ] **虚析构函数**的重要性
+- [ ] 多态的 3 种应用方式
+
+✅ 易错点：
+- [ ] 多态父类必须有虚析构
+- [ ] 子类构造函数必须显式调父类构造
+- [ ] 隐藏 vs 重写 vs 重载 区别
+- [ ] 构造函数不能是虚函数
+- [ ] 虚函数不能是模板函数（部分编译器支持）
+
+下一章：[08-运算符重载与友元.md](./08-运算符重载与友元.md)</pre>

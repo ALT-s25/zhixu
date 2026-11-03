@@ -1,0 +1,438 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>12-智能指针与内存管理</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 12 &#183; 智能指针与内存管理 ⭐⭐⭐⭐
+
+&gt; **难度**：中高 | **学习建议**：2 天
+&gt; **现代 C++ 的灵魂**。能彻底解决 C++ 内存泄漏的&quot;老大难&quot;问题。
+
+---
+
+## 一、知识框架
+
+```
+智能指针与内存管理
+├── 12.1 内存管理基础 ⭐
+│   ├── 栈 vs 堆
+│   ├── new / delete
+│   └── 常见内存问题
+├── 12.2 RAII 思想 ⭐⭐
+├── 12.3 auto_ptr（已废弃）
+├── 12.4 unique_ptr ⭐⭐⭐
+├── 12.5 shared_ptr ⭐⭐⭐⭐
+├── 12.6 weak_ptr ⭐⭐⭐
+└── 12.7 自定义删除器 ⭐⭐
+```
+
+---
+
+## 二、内存管理基础 ⭐
+
+### 2.1 栈 vs 堆
+
+| 维度 | 栈 | 堆 |
+|------|----|----|
+| 速度 | 快 | 慢 |
+| 分配 | 自动 | 手动 |
+| 大小 | 有限 | 大 |
+| 生命周期 | 作用域结束自动释放 | 必须手动 delete |
+| 适用 | 局部变量 | 大对象、动态大小 |
+
+### 2.2 new / delete
+
+```cpp
+// 分配单个对象
+int* p = new int(10);    // 分配 + 构造
+delete p;                  // 析�� + 释放
+
+// 分配数组
+int* arr = new int[5];
+delete[] arr;              // 注意：数组用 delete[]
+
+// 分配对象
+MyClass* obj = new MyClass(&quot;hi&quot;);
+delete obj;
+```
+
+### 2.3 常见内存问题 ⭐
+
+```cpp
+// 1. 内存泄漏：new 了没 delete
+void leak() {
+    int* p = new int[100];
+    return;     // p 被销毁，内存丢失
+}
+
+// 2. 悬空指针：指向已释放的内存
+int* p = new int(10);
+delete p;
+*p;  // ❌ 危险！
+
+// 3. 双重释放
+int* p = new int(10);
+delete p;
+delete p;  // ❌ 崩溃
+
+// 4. 分配后忘记初始化
+int* p = new int;  // 值未定义
+```
+
+### 2.4 malloc / free vs new / delete
+
+| 维度 | malloc/free | new/delete |
+|------|-------------|------------|
+| 类型 | 函数 | 运算符 |
+| 类型转换 | 需要 | 不需要 |
+| 构造/析构 | ❌ | ✅ |
+| 失败 | 返回 NULL | 抛 bad_alloc |
+| 重载 | ❌ | ✅ |
+
+&gt; &#128161; **C++ 优先用 new/delete**，malloc 不调用构造函数。
+
+---
+
+## 三、RAII 思想 ⭐⭐
+
+**RAII** = **Resource Acquisition Is Initialization**（资源获取即初始化）
+
+**核心**：将资源的生命周期绑定到对象的生命周期。
+- 构造函数获取资源
+- 析构函数释放资源
+- 离开作用域自动析构
+
+```cpp
+// 不使用 RAII
+void unsafe() {
+    FILE* f = fopen(&quot;test.txt&quot;, &quot;r&quot;);
+    // ... 中途抛异常或 return，文件未关闭
+    fclose(f);
+}
+
+// 使用 RAII（智能指针就是这个思路）
+void safe() {
+    std::unique_ptr&lt;FILE, decltype(&amp;fclose)&gt; f(fopen(&quot;test.txt&quot;, &quot;r&quot;), fclose);
+    // 离开作用域自动 fclose
+}
+```
+
+---
+
+## 四、unique_ptr ⭐⭐⭐
+
+**独占所有权**：一个对象只能有一个 unique_ptr 拥有。
+
+### 4.1 基本使用
+
+```cpp
+#include &lt;memory&gt;
+
+std::unique_ptr&lt;int&gt; p1(new int(10));
+std::unique_ptr&lt;int&gt; p2 = std::make_unique&lt;int&gt;(10);    // 推荐（C++14）
+
+// 使用
+std::cout &lt;&lt; *p1;       // 10
+p1.reset();             // 释放原对象（可置空）
+p1.reset(new int(20));  // 释放后接管新对象
+int* raw = p1.release(); // 释放所有权，返回裸指针（指针仍可用）
+
+// 数组（C++11）
+std::unique_ptr&lt;int[]&gt; arr = std::make_unique&lt;int[]&gt;(10);
+arr[0] = 1;
+```
+
+### 4.2 转移所有权
+
+```cpp
+std::unique_ptr&lt;int&gt; p1 = std::make_unique&lt;int&gt;(10);
+std::unique_ptr&lt;int&gt; p2 = std::move(p1);    // 转移所有权
+// p1 现在为空，p2 拥有对象
+```
+
+&gt; ⚠ **不能拷贝**：```p2 = p1``` 是错误，只能 `std::move`。
+
+### 4.3 作为函数参数和返回值
+
+```cpp
+std::unique_ptr&lt;int&gt; create(int val) {
+    return std::make_unique&lt;int&gt;(val);    // ✅ 返回 OK
+}
+
+void consume(std::unique_ptr&lt;int&gt; p) {
+    // ...
+}
+
+consume(create(10));       // ✅ 临时对象可移动
+auto p = create(10);
+consume(std::move(p));     // ✅ 显式 move
+// consume(p);             // ❌ 不能拷贝
+```
+
+&gt; &#128161; **现代 C++ 推荐**：函数**参数用引用**，**返回 unique_ptr**。
+
+```cpp
+// 最佳实践：函数不直接接受 unique_ptr，而是接受裸指针 / 引用
+void consume(int* p) { /* ... */ }
+auto p = create(10);
+consume(p.get());    // 显式放弃所有权
+```
+
+---
+
+## 五、shared_ptr ⭐⭐⭐⭐
+
+**共享所有权**：多个指针可指向同一对象，**引用计数**管理。
+
+### 5.1 基本使用
+
+```cpp
+std::shared_ptr&lt;int&gt; p1 = std::make_shared&lt;int&gt;(10);   // 推荐
+std::shared_ptr&lt;int&gt; p2 = p1;                          // 共享所有权
+
+std::cout &lt;&lt; p1.use_count();    // 2（p1 + p2）
+p2.reset();
+std::cout &lt;&lt; p1.use_count();    // 1
+p1.reset();                       // 引用计数为 0，释放对象
+```
+
+### 5.2 自定义删除器
+
+```cpp
+std::shared_ptr&lt;FILE&gt; p(fopen(&quot;test.txt&quot;, &quot;r&quot;), fclose);
+
+// C++11 用 lambda
+std::shared_ptr&lt;FILE&gt; p2(fopen(&quot;test.txt&quot;, &quot;r&quot;),
+                          [](FILE* f) { if (f) fclose(f); });
+```
+
+### 5.3 shared_ptr 的坑 ⚠️
+
+#### 坑 1：循环引用 → 内存泄漏
+
+```cpp
+struct Node {
+    std::shared_ptr&lt;Node&gt; next;
+    std::shared_ptr&lt;Node&gt; prev;
+};
+
+auto a = std::make_shared&lt;Node&gt;();
+auto b = std::make_shared&lt;Node&gt;();
+
+a-&gt;next = b;       // b 的引用计数 = 2
+b-&gt;prev = a;       // a 的引用计数 = 2
+
+a.reset();           // a 引用计数 = 1（prev 还有）
+b.reset();           // b 引用计数 = 1（next 还有）
+// 都没释放！循环引用！⚠️
+```
+
+#### 解决：用 weak_ptr 打破循环 ⭐⭐⭐
+
+---
+
+## 六、weak_ptr ⭐⭐⭐
+
+**不增加引用计数**，但能访问对象。**专用于打破循环引用**。
+
+### 6.1 基本使用
+
+```cpp
+std::shared_ptr&lt;int&gt; sp = std::make_shared&lt;int&gt;(10);
+std::weak_ptr&lt;int&gt; wp = sp;       // 不增加引用计数
+
+std::cout &lt;&lt; sp.use_count();       // 1
+std::cout &lt;&lt; wp.use_count();       // 1（不算）
+
+// 访问：需要先 lock()
+if (auto p = wp.lock()) {
+    std::cout &lt;&lt; *p;               // 10（lock 返回 shared_ptr）
+} else {
+    std::cout &lt;&lt; &quot;对象已释放&quot;;
+}
+```
+
+### 6.2 解决循环引用
+
+```cpp
+struct Node {
+    std::shared_ptr&lt;Node&gt; next;     // 共享（指向下一个）
+    std::weak_ptr&lt;Node&gt; prev;       // 弱引用（指向上一个）
+};
+
+auto a = std::make_shared&lt;Node&gt;();
+auto b = std::make_shared&lt;Node&gt;();
+a-&gt;next = b;       // b 引用计数 = 2
+b-&gt;prev = a;       // a 引用计数 = 1（weak_ptr 不计）
+
+a.reset();           // a 释放
+b.reset();           // b 释放
+// 全部释放 ✅
+```
+
+### 6.3 weak_ptr 用法总结
+
+| 方法 | 作用 |
+|------|------|
+| `lock()` | 返回 shared_ptr（过期则为空） |
+| `expired()` | 对象是否已释放 |
+| `use_count()` | shared_ptr 的引用计数 |
+
+---
+
+## 七、unique_ptr / shared_ptr / weak_ptr 对比 ⭐⭐⭐
+
+| 维度 | unique_ptr | shared_ptr | weak_ptr |
+|------|------------|------------|----------|
+| 所有权 | 独占 | 共享 | 无（观察者） |
+| 引用计数 | 无 | 有 | 不增加 |
+| 拷贝 | ❌ | ✅ | ✅ |
+| 移动 | ✅ | ✅ | ✅ |
+| 适用 | 默认选择 | 需要共享时 | 打破循环引用 |
+| 开销 | 几乎零 | 引用计数开销 | 引用计数开销 |
+
+&gt; &#128161; **选择原则**：
+&gt; - 默认用 **unique_ptr**
+&gt; - 需要共享时用 **shared_ptr**
+&gt; - 双向关系用 **weak_ptr**
+
+---
+
+## 八、自定义删除器 ⭐⭐
+
+### 8.1 unique_ptr 自定义删除器
+
+unique_ptr 的删除器**是类型的一部分**。
+
+```cpp
+// 函数指针
+std::unique_ptr&lt;FILE, decltype(&amp;fclose)&gt; p1(fopen(&quot;a.txt&quot;, &quot;r&quot;), fclose);
+
+// Lambda（C++20 起支持）
+auto closer = [](FILE* f) { if (f) fclose(f); };
+std::unique_ptr&lt;FILE, decltype(closer)&gt; p2(fopen(&quot;a.txt&quot;, &quot;r&quot;), closer);
+```
+
+### 8.2 shared_ptr 自定义删除器
+
+shared_ptr 的删除器**不是类型的一部分**（更灵活）。
+
+```cpp
+std::shared_ptr&lt;FILE&gt; p(fopen(&quot;a.txt&quot;, &quot;r&quot;), fclose);
+std::shared_ptr&lt;FILE&gt; p2 = p;      // OK，删除器类型不影响共享
+```
+
+---
+
+## 九、enable_shared_from_this
+
+**让类安全地获取自己的 shared_ptr**。
+
+```cpp
+class MyClass : public std::enable_shared_from_this&lt;MyClass&gt; {
+public:
+    std::shared_ptr&lt;MyClass&gt; getptr() {
+        return shared_from_this();    // ✅ 安全
+    }
+};
+
+auto p = std::make_shared&lt;MyClass&gt;();
+auto p2 = p-&gt;getptr();    // p 和 p2 共享同一个对象
+```
+
+&gt; ⚠ **不能用 `this` 直接构造 shared_ptr**（会导致双重释放）：
+&gt; ```cpp
+&gt; std::shared_ptr&lt;MyClass&gt; p(this);  // ❌ 危险！
+&gt; ```
+
+---
+
+## 十、内存管理最佳实践 ⭐⭐
+
+### 10.1 黄金法则
+
+- **优先用栈对象**
+- **优先用智能指针**
+- **尽量不用裸指针**
+
+### 10.2 替代裸指针的场景
+
+```cpp
+// ❌ 不要这样
+int* p = new int(10);
+delete p;
+
+// ✅ 推荐
+auto p = std::make_unique&lt;int&gt;(10);
+```
+
+### 10.3 容器中存放智能指针
+
+```cpp
+std::vector&lt;std::unique_ptr&lt;Shape&gt;&gt; shapes;
+shapes.push_back(std::make_unique&lt;Circle&gt;(5));
+shapes.push_back(std::make_unique&lt;Rectangle&gt;(3, 4));
+```
+
+### 10.4 现代 C++ 资源管理
+
+```cpp
+// 文件 I/O（C++17）
+std::ifstream f(&quot;test.txt&quot;);
+
+// 锁（C++11）
+std::lock_guard&lt;std::mutex&gt; lock(mtx);
+
+// 互斥（C++11）
+std::scoped_lock lock(mtx1, mtx2);
+```
+
+---
+
+## 十一、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **智能指针的原理？**
+&gt; RAII（构造函数获取资源，析构函数释放资源）。
+
+&gt; &#128161; **unique_ptr vs shared_ptr？**
+&gt; | 维度 | unique_ptr | shared_ptr |
+&gt; |------|------------|------------|
+&gt; | 所有权 | 独占 | 共享 |
+&gt; | 开销 | 几乎零 | 引用计数 |
+&gt; | 线程安全 | - | 引用计数原子操作 |
+
+&gt; &#128161; **shared_ptr 的循环引用？如何解决？**
+&gt; 两个 shared_ptr 互相引用，引用计数永远不为 0，无法释放。
+&gt; 用 **weak_ptr** 打破循环。
+
+&gt; &#128161; **`make_shared` vs `new`？**
+&gt; - `make_shared`：一次内存分配（对象 + 控制块），**更快**
+&gt; - `new`：两次分配（对象 + 控制块分开）
+&gt; - 推荐 `make_shared`
+
+&gt; &#128161; **`shared_from_this` 为什么不能直接用 `this`？**
+&gt; 直接 `shared_ptr&lt;MyClass&gt; p(this)` 会创建独立的所有权，**双重释放**。
+
+&gt; &#128161; **智能指针的使用场景？**
+&gt; - 默认：unique_ptr
+&gt; - 共享所有权：shared_ptr
+&gt; - 打破循环：weak_ptr
+&gt; - 观察者模式：weak_ptr
+&gt; - 工厂函数返回值：unique_ptr
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] new / delete 与常见内存问题
+- [ ] **RAII 思想**
+- [ ] **unique_ptr** 的使用与转移
+- [ ] **shared_ptr** 引用计数原理
+- [ ] **weak_ptr** 打破循环引用
+- [ ] 自定义删除器
+- [ ] enable_shared_from_this
+- [ ] **make_shared / make_unique** 的推荐用法
+
+✅ 易错点：
+- [ ] shared_ptr 循环引用导致内存泄漏
+- [ ] 不要用裸指针（new）后再用智能指针接管
+- [ ] unique_ptr 不能拷贝，只能移动
+- [ ] 自定义类需 enable_shared_from_this 才能安全获取 self shared_ptr
+
+下一章：[13-类型转换与关键字.md](./13-类型转换与关键字.md)</pre>

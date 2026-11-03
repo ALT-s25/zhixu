@@ -1,0 +1,413 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>13-类型转换与关键字</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 13 &#183; 类型转换与关键字 ⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**const 修饰、static 用法、explicit、enum class、C++ 类型转换**
+
+---
+
+## 一、知识框架
+
+```
+类型转换与关键字
+├── 13.1 C++ 4 种类型转换 ⭐⭐
+├── 13.2 const 关键字深入 ⭐⭐
+├── 13.3 static 关键字深入 ⭐⭐
+├── 13.4 explicit 关键字 ⭐⭐
+├── 13.5 enum class（强类型枚举）⭐⭐
+├── 13.6 sizeof / decltype / typeid
+├── 13.7 inline / volatile / extern
+└── 13.8 using 关键字
+```
+
+---
+
+## 二、C++ 4 种类型转换 ⭐⭐
+
+详见 [02-基础语法.md](./02-基础语法.md)，这里复习巩固。
+
+### 2.1 static_cast
+
+**常规转换**（编译期）。
+
+```cpp
+// 1. 基础类型转换
+int i = static_cast&lt;int&gt;(3.14);
+
+// 2. 父子类指针转换（不走虚函数表）
+class Base {};
+class Derived : public Base {};
+Base* b = new Derived();
+Derived* d = static_cast&lt;Derived*&gt;(b);    // ⚠ 不安全（编译期）
+
+// 3. void* 转其他指针
+void* p = malloc(sizeof(int));
+int* ip = static_cast&lt;int*&gt;(p);
+```
+
+### 2.2 const_cast
+
+**去 const / volatile**。
+
+```cpp
+const int x = 10;
+int* p = const_cast&lt;int*&gt;(&amp;x);
+*p = 20;        // ⚠ 未定义行为！
+```
+
+&gt; ⚠ **慎用**：修改 const 对象是未定义行为。
+
+### 2.3 dynamic_cast ⭐⭐
+
+**运行时类型转换**，需要多态（有虚函数）。
+
+```cpp
+class Base {
+public:
+    virtual ~Base() {}     // 必须有虚函数
+};
+
+class Derived : public Base {};
+
+Base* b = new Derived();
+
+// 安全向下转型：失败返回 nullptr
+Derived* d = dynamic_cast&lt;Derived*&gt;(b);
+if (d) {
+    // 转换成功
+} else {
+    // 不是 Derived
+}
+```
+
+### 2.4 reinterpret_cast ⭐
+
+**底层重新解释**（危险）。
+
+```cpp
+int x = 0x12345678;
+char* p = reinterpret_cast&lt;char*&gt;(&amp;x);   // 把 int* 当 char*
+```
+
+&gt; ⚠ **尽量避免**：依赖具体实现，不可移植。
+
+### 2.5 对比 ⭐⭐
+
+| 转换 | 时机 | 安全性 | 用途 |
+|------|------|--------|------|
+| `static_cast` | 编译期 | ⚠ | 常规转换 |
+| `const_cast` | 编译期 | ⚠ | 去 const |
+| `dynamic_cast` | 运行时 | ✅ | 多态类型转换 |
+| `reinterpret_cast` | 编译期 | ❌ | 底层 reinterpret |
+
+---
+
+## 三、const 关键字深入 ⭐⭐
+
+### 3.1 const 修饰位置 ⭐⭐⭐
+
+```cpp
+const int x = 10;              // 顶层 const
+int const y = 10;              // 同上（等价）
+
+const int* p1;                 // 指向常量的指针（底层 const）
+int* const p2;                 // 指针本身是常量（顶层 const）
+const int* const p3;           // 两者都是
+```
+
+**记忆口诀**：
+- `const` 在 `*` **左边**：所指对象是 const
+- `const` 在 `*` **右边**：指针本身是 const
+
+### 3.2 const 成员函数 ⭐
+
+详见 [06-面向对象基础.md](./06-面向对象基础.md)。
+
+```cpp
+class Student {
+    std::string name_;
+
+public:
+    std::string getName() const {       // 不修改成员
+        return name_;
+    }
+};
+```
+
+### 3.3 const 与函数重载
+
+```cpp
+class MyClass {
+    int get() const { return 1; }        // const 版本
+    int get() { return 2; }              // 非 const 版本
+};
+
+const MyClass c;
+std::cout &lt;&lt; c.get();     // 1
+
+MyClass m;
+std::cout &lt;&lt; m.get();     // 2
+```
+
+### 3.4 constexpr（C++11）⭐⭐
+
+**编译期常量**。
+
+```cpp
+constexpr int SIZE = 100;
+constexpr double PI = 3.14159;
+
+constexpr int square(int x) { return x * x; }
+constexpr int arr[square(3)];   // 编译期数组大小：int arr[9]
+```
+
+### 3.5 const 与 constexpr 的区别
+
+| 维度 | const | constexpr |
+|------|-------|-----------|
+| 求值时机 | 运行期（也可编译期） | **强制编译期** |
+| 修饰函数 | ❌ | ✅（C++11） |
+| 修饰变量 | ✅ | ✅ |
+
+---
+
+## 四、static 关键字深入 ⭐⭐
+
+### 4.1 static 修饰局部变量
+
+**生命周期延长**，作用域不变。
+
+```cpp
+void counter() {
+    static int count = 0;      // 只初始化一次，函数多次调用共享
+    count++;
+    std::cout &lt;&lt; count;
+}
+
+counter(); counter(); counter();    // 1 2 3
+```
+
+### 4.2 static 修饰全局变量
+
+**限制作用域为当前文件**。
+
+```cpp
+// file1.cpp
+static int x = 10;       // 只在本文件可见
+
+// file2.cpp
+extern int x;            // ❌ 链接错误！
+```
+
+### 4.3 static 修饰成员变量
+
+详见 [06-面向对象基础.md](./06-面向对象基础.md)。所有对象共享。
+
+### 4.4 static 修饰成员函数
+
+无 this 指针，只能访问 static 成员。
+
+### 4.5 static 在 C++ 中的总结
+
+| 用法 | 含义 |
+|------|------|
+| 静态局部变量 | 生命周期延长，作用域不变 |
+| 静态全局变量 | 文件作用域 |
+| 静态成员变量 | 类共享 |
+| 静态成员函数 | 不依赖对象 |
+
+---
+
+## 五、explicit 关键字 ⭐⭐
+
+**禁止隐式转换**。
+
+### 5.1 不使用 explicit
+
+```cpp
+class MyString {
+public:
+    MyString(int n) : size_(n) { }       // 不加 explicit
+};
+
+void print(const MyString&amp; s) { }
+
+print(10);       // ✅ 隐式转换：int → MyString（可能不期望）
+MyString s = 5;  // ✅ 同样隐式转换
+```
+
+### 5.2 使用 explicit
+
+```cpp
+class MyString {
+public:
+    explicit MyString(int n) : size_(n) { }
+};
+
+print(10);       // ❌ 不允许隐式转换
+MyString s(5);   // ✅ 显式构造
+MyString s = 5;  // ❌ 同样不允许
+```
+
+&gt; &#128161; **现代 C++ 建议**：单参数构造函数都加 `explicit`，避免意外的隐式转换。
+
+---
+
+## 六、enum class（强类型枚举）⭐⭐
+
+C++11 引入，**强类型**，不会隐式转 int。
+
+### 6.1 传统 enum 的问题
+
+```cpp
+enum Color { RED, GREEN, BLUE };
+enum Feeling { HAPPY, SAD };     // ❌ 命名冲突！
+
+int x = RED;                      // 隐式转 int
+```
+
+### 6.2 enum class
+
+```cpp
+enum class Color { Red, Green, Blue };
+enum class Feeling { Happy, Sad };    // ✅ 不会冲突
+
+Color c = Color::Red;
+int x = c;                            // ❌ 不隐式转 int
+int x = static_cast&lt;int&gt;(c);          // ✅ 显式转换
+
+// 指定底层类型
+enum class Small : uint8_t { A, B };
+```
+
+---
+
+## 七、其他关键字
+
+### 7.1 sizeof
+
+```cpp
+sizeof(int);             // 4
+sizeof(std::string);     // 通常 32（SSO）
+sizeof(p);               // 指针大小（8/4）
+sizeof(arr);             // 数组总大小
+sizeof(arr) / sizeof(int);  // 元素个数
+```
+
+### 7.2 decltype（C++11）
+
+详见 [02-基础语法.md](./02-基础语法.md)。推导表达式类型，不使用。
+
+### 7.3 typeid
+
+```cpp
+#include &lt;typeinfo&gt;
+
+int x = 10;
+std::cout &lt;&lt; typeid(x).name();       // &quot;int&quot;
+std::cout &lt;&lt; typeid(x).hash_code();
+
+// 用于多态类型
+Base* p = new Derived();
+std::cout &lt;&lt; typeid(*p).name();      // &quot;Derived&quot;（运行时类型）
+```
+
+### 7.4 inline
+
+详见 [03-流程控制与函数.md](./03-流程控制与函数.md)。建议编译器内联展开。
+
+### 7.5 volatile
+
+```cpp
+volatile int x = 10;       // 告诉编译器不要优化，每次都从内存读取
+```
+
+&gt; &#128161; 用于硬件寄存器、多线程共享变量（但 volatile 不解决并发问题）。
+
+### 7.6 extern
+
+```cpp
+// 声明（不定义）
+extern int global_var;
+
+// &quot;C&quot; 链接（避免 C++ 名字修饰）
+extern &quot;C&quot; {
+    #include &lt;stdio.h&gt;
+    void c_function();
+}
+```
+
+### 7.7 using
+
+```cpp
+// 命名空间
+using namespace std;
+
+// 类型别名
+using String = std::string;
+
+// 模板别名
+template &lt;typename T&gt;
+using Vec = std::vector&lt;T&gt;;
+
+// 继承中隐藏基类成员
+class Derived : public Base {
+public:
+    using Base::func;        // 引入基类所有 func 重载
+};
+```
+
+---
+
+## 八、面试常问 ⭐⭐
+
+&gt; &#128161; **C++ 4 种类型转换的区别？**
+&gt; | 转换 | 时机 | 安全性 |
+&gt; |------|------|--------|
+&gt; | static_cast | 编译期 | ⚠ |
+&gt; | const_cast | 编译期 | ⚠ |
+&gt; | dynamic_cast | 运行时 | ✅ |
+&gt; | reinterpret_cast | 编译期 | ❌ |
+
+&gt; &#128161; **`const` 在 `*` 左右两侧的区别？**
+&gt; - 左边：所指对象是 const
+&gt; - 右边：指针本身是 const
+
+&gt; &#128161; **static_cast vs dynamic_cast？**
+&gt; - static_cast：编译期，不检查
+&gt; - dynamic_cast：运行时，安全检查（需要虚函数）
+
+&gt; &#128161; **enum class vs enum？**
+&gt; - enum class 强类型，不会隐式转 int
+&gt; - 作用域限定，不会命名冲突
+
+&gt; &#128161; **explicit 的作用？**
+&gt; 禁止单参数构造函数的隐式转换。
+
+&gt; &#128161; **`const` vs `constexpr`？**
+&gt; - const：运行期不变（也可编译期）
+&gt; - constexpr：强制编译期
+
+&gt; &#128161; **`using namespace std;` 有什么问题？**
+&gt; 把 std 全部引入全局，可能命名冲突，**头文件不要用**。
+
+---
+
+## 九、本章小结
+
+✅ 已掌握：
+- [ ] **C++ 4 种类型转换**（static_cast 等）
+- [ ] **const 修饰位置**（左 vs 右）
+- [ ] **static 修饰** 各种用法
+- [ ] **explicit** 禁止隐式转换
+- [ ] **enum class** 强类型枚举
+- [ ] sizeof / decltype / typeid
+- [ ] volatile / extern / using
+
+✅ 易错点：
+- [ ] const_cast 修改 const 是未定义行为
+- [ ] dynamic_cast 需要基类有虚函数
+- [ ] reinterpret_cast 不可移植
+- [ ] 单参数构造建议加 explicit
+- [ ] enum class 不隐式转 int
+
+下一章：[14-现代C++新特性.md](./14-现代C++新特性.md) — 现代 C++ 核心！</pre>

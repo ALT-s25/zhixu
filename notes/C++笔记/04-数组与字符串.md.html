@@ -1,0 +1,336 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>04-数组与字符串</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 04 &#183; 数组与字符串 ⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**C 风格字符串 vs string、数组与指针关系、vector 入门**
+
+---
+
+## 一、知识框架
+
+```
+数组与字符串
+├── 4.1 C 风格数组 ⭐
+│   ├── 一维数组
+│   ├── 多维数组
+│   └── 数组与指针 ⭐⭐
+├── 4.2 C 风格字符串
+│   └── char 数组、str 系列函数
+├── 4.3 std::string（C++）⭐⭐
+└── 4.4 std::vector（入门）⭐⭐
+```
+
+---
+
+## 二、C 风格数组 ⭐
+
+### 2.1 一维数组
+
+```cpp
+// 声明 + 初始化
+int arr[5];                       // 未初始化（栈上）
+int arr[5] = {1, 2, 3, 4, 5};      // 全部初始化
+int arr[5] = {1, 2};               // 部分初始化，剩余为 0
+int arr[] = {1, 2, 3, 4, 5};       // 自动推导长度
+int arr[5] = {0};                   // 全部初始化为 0
+
+// 访问
+arr[0];      // 首元素
+arr[4];      // 末元素
+arr[-1];     // ⚠ 不检查下标，越界访问！
+```
+
+### 2.2 二维数组
+
+```cpp
+int arr[3][4] = {
+    {1, 2, 3, 4},
+    {5, 6, 7, 8},
+    {9, 10, 11, 12}
+};
+
+arr[1][2];    // 7
+```
+
+### 2.3 数组大小
+
+```cpp
+int arr[] = {1, 2, 3, 4, 5};
+int n = sizeof(arr) / sizeof(arr[0]);   // 5
+```
+
+### 2.4 数组的局限
+
+- **大小固定**，编译期确定
+- **越界访问不检查**（安全隐患）
+- 不能直接赋值、拷贝、比较
+
+&gt; &#128161; **现代 C++ 推荐 `std::vector`**，避免使用 C 数组。
+
+---
+
+## 三、数组与指针 ⭐⭐（重要）
+
+### 3.1 数组名 = 首元素地址
+
+```cpp
+int arr[5] = {1, 2, 3, 4, 5};
+int* p = arr;        // 等价于 &amp;arr[0]
+
+cout &lt;&lt; arr;         // 输出地址
+cout &lt;&lt; *arr;        // 1
+cout &lt;&lt; *(arr + 1);  // 2
+cout &lt;&lt; arr[2];      // 3（等价于 *(arr + 2)）
+```
+
+### 3.2 指针运算 ⭐
+
+```cpp
+int* p = arr;
+p++;           // p + sizeof(int)，指向下一个元素
+p + i;         // 指向下 i 个元素
+p - i;         // 指向下 i 个元素
+p1 - p2;       // 两指针间元素个数（同数组）
+```
+
+### 3.3 数组作为函数参数 ⭐⭐
+
+```cpp
+// 数组传参退化为指针
+void func(int arr[], int n) {  // arr 等价于 int* arr
+    // sizeof(arr) = 8（指针大小）
+}
+
+// 推荐：传数组 + 长度
+void print(int* arr, int n) {
+    for (int i = 0; i &lt; n; i++) {
+        cout &lt;&lt; arr[i] &lt;&lt; &quot; &quot;;
+    }
+}
+```
+
+### 3.4 数组遍历
+
+```cpp
+int arr[] = {1, 2, 3, 4, 5};
+int n = sizeof(arr) / sizeof(int);
+
+// 1. 下标访问
+for (int i = 0; i &lt; n; i++) cout &lt;&lt; arr[i];
+
+// 2. 指针
+for (int* p = arr; p &lt; arr + n; p++) cout &lt;&lt; *p;
+
+// 3. 范围 for（C++11）
+for (int x : arr) cout &lt;&lt; x;
+```
+
+---
+
+## 四、C 风格字符串
+
+```cpp
+// C 风格字符串：以 &#39;\0&#39; 结尾的 char 数组
+char str[] = &quot;hello&quot;;   // 长度 6（含 &#39;\0&#39;）
+char str2[6] = {&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39;\0&#39;};
+char str3[10] = &quot;hi&quot;;   // 长度 10，未初始化为 0
+```
+
+### 4.1 常用操作（&lt;cstring&gt;）⭐
+
+```cpp
+#include &lt;cstring&gt;
+
+strlen(str);              // 长度（不含 \0）
+strcpy(dest, src);        // 拷贝（⚠ dest 要够大）
+strncpy(dest, src, n);    // 拷贝 n 个字符
+strcat(dest, src);        // 拼接（⚠ dest 要够大）
+strcmp(s1, s2);           // 比较：&lt;0 / 0 / &gt;0
+strchr(str, &#39;e&#39;);         // 查找字符
+strstr(s1, s2);           // 查找子串
+```
+
+### 4.2 C 字符串的坑
+
+```cpp
+char s1[10] = &quot;hi&quot;;
+char s2[10] = &quot;world&quot;;
+
+strcat(s1, s2);  // ⚠ 越界！s1 太小
+```
+
+&gt; &#128161; **现代 C++ 推荐 `std::string`**，避免 C 字符串的安全问题。
+
+---
+
+## 五、std::string（C++）⭐⭐⭐（重点）
+
+### 5.1 基本用法
+
+```cpp
+#include &lt;string&gt;
+
+std::string s1 = &quot;hello&quot;;
+std::string s2(&quot;world&quot;);
+std::string s3(5, &#39;a&#39;);          // &quot;aaaaa&quot;
+std::string s4 = s1 + &quot; &quot; + s2;  // &quot;hello world&quot;
+
+// 常用操作
+cout &lt;&lt; s1.size();        // 长度（不含 \0）
+cout &lt;&lt; s1.length();      // 同上
+cout &lt;&lt; s1.empty();       // 是否为空
+cout &lt;&lt; s1[0];            // &#39;h&#39;（不检查越界）
+cout &lt;&lt; s1.at(0);         // &#39;h&#39;（越界抛异常）
+
+// 拼接
+s1 += &quot; world&quot;;
+s1.append(&quot;!&quot;);
+
+// 子串
+s1.substr(0, 5);          // &quot;hello&quot;
+
+// 查找
+s1.find(&quot;world&quot;);         // 找到返回位置，找不到返回 std::string::npos
+s1.rfind(&quot;o&quot;);            // 反向查找
+
+// 替换
+s1.replace(0, 5, &quot;hi&quot;);   // &quot;hi world&quot;
+
+// 比较
+if (s1 == s2) { }
+if (s1.compare(s2) &lt; 0) { }
+```
+
+### 5.2 string vs C 字符串 ⭐
+
+| 维度 | C 字符串 `char*` | `std::string` |
+|------|---------------|---------------|
+| 长度 | 需 `strlen` | `.length()` O(1) |
+| 拼接 | strcat（危险） | `+` / `+=`（安全） |
+| 拷贝 | strcpy（危险） | `=` （安全） |
+| 比较 | strcmp | `==` / `&lt;` |
+| 安全性 | 易越界 | 自动管理内存 |
+
+### 5.3 string 与 C 字符串互转
+
+```cpp
+// string → C 字符串
+const char* cstr = s.c_str();
+
+// string → C 字符串（非 const，C++17）
+char* cstr = s.data();    // C++17 可写
+
+// C 字符串 → string
+std::string s(cstr);
+```
+
+### 5.4 字符串输入 ⭐
+
+```cpp
+// 1. cin &gt;&gt; s（遇到空格停止）
+string s;
+cin &gt;&gt; s;
+
+// 2. getline（读整行）
+getline(cin, s);
+
+// 3. 读多个单词
+while (cin &gt;&gt; s) {
+    cout &lt;&lt; s;
+}
+```
+
+---
+
+## 六、std::vector（入门）⭐⭐
+
+`vector` 是 C++ 的**动态数组**，**强烈推荐**替代 C 数组。
+
+```cpp
+#include &lt;vector&gt;
+
+// 创建
+std::vector&lt;int&gt; v1;                   // 空 vector
+std::vector&lt;int&gt; v2(5);                 // 5 个 0
+std::vector&lt;int&gt; v3(5, 10);             // 5 个 10
+std::vector&lt;int&gt; v4 = {1, 2, 3, 4, 5};  // 初始化列表
+std::vector&lt;int&gt; v5(v4);                // 拷贝构造
+
+// 添加
+v.push_back(6);     // 末尾添加
+v.emplace_back(7);  // 原地构造（更高效）
+v.insert(v.begin() + 2, 99);  // 指定位置插入
+
+// 访问
+v[0];               // 不检查越界
+v.at(0);            // 检查越界，抛异常
+v.front();          // 首元素
+v.back();           // 末元素
+
+// 删除
+v.pop_back();                      // 删末尾
+v.erase(v.begin());                 // 删指定位置
+v.erase(v.begin(), v.begin() + 2);  // 删区间
+v.clear();                          // 清空
+
+// 大小
+v.size();       // 元素个数
+v.empty();      // 是否为空
+v.capacity();   // 容量
+v.shrink_to_fit();  // 缩容到 size
+
+// 遍历
+for (int x : v) cout &lt;&lt; x;
+for (auto it = v.begin(); it != v.end(); ++it) cout &lt;&lt; *it;
+for (size_t i = 0; i &lt; v.size(); i++) cout &lt;&lt; v[i];
+```
+
+&gt; &#128161; **vector 扩容**：通常 1.5 倍或 2 倍；扩容会重新分配内存 + 拷贝元素。
+
+---
+
+## 七、面试常问 ⭐⭐
+
+&gt; &#128161; **数组名和指针的区别？**
+&gt; - 数组名是**常量指针**（不能 `arr++`）
+&gt; - 指针是**变量**（可以 `p++`）
+&gt; - `sizeof(arr)` 得到数组大小；`sizeof(p)` 得到指针大小
+
+&gt; &#128161; **`strlen` 和 `sizeof` 的区别？**
+&gt; - `strlen(s)`：运行时计算，**遇 \0 停止**，不含 \0
+&gt; - `sizeof(s)`：编译期计算，**数组总大小**，含 \0
+
+```cpp
+char s[] = &quot;hello&quot;;
+strlen(s);      // 5
+sizeof(s);      // 6（含 \0）
+
+char* p = &quot;hello&quot;;
+strlen(p);      // 5
+sizeof(p);      // 8（指针大小）
+```
+
+&gt; &#128161; **`std::string` 的大小？**
+&gt; 一般 32 字节（SSO 短字符串优化），超过则堆分配。
+
+&gt; &#128161; **`vector` 的底层实现？**
+&gt; 3 个指针：begin、end、capacity_end。扩容策略 1.5x 或 2x。
+
+---
+
+## 八、本章小结
+
+✅ 已掌握：
+- [ ] C 数组的声明、初始化、访问
+- [ ] **数组名 = 首元素地址**（数组与指针的关系）
+- [ ] 数组作为函数参数退化为指针
+- [ ] C 字符串 vs `std::string`
+- [ ] **std::string 常用方法**
+- [ ] **std::vector 入门**（替代 C 数组）
+
+✅ 易错点：
+- [ ] 数组越界不检查
+- [ ] `strlen` 不含 `\0`，`sizeof` 含
+- [ ] C 字符串拼接/拷贝要保证目标数组足够大
+- [ ] `cin &gt;&gt; s` 遇空格停止
+
+下一章：[05-指���与引用.md](./05-指针与引用.md) — **C++ 难点**！</pre>

@@ -1,0 +1,332 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>04-方法与数组</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 04 &#183; 方法与数组 ⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**数组内存分析、方法重载、值传递 vs 引用传递**
+
+---
+
+## 一、知识框架
+
+```
+方法与数组
+├── 4.1 方法
+│   ├── 方法定义
+│   ├── 方法调用
+│   ├── 方法重载 ⭐
+│   ├── 可变参数 ⭐
+│   └── 递归 ⭐
+└── 4.2 数组 ⭐⭐
+    ├── 声明与初始化
+    ├── 内存分析（栈、堆）⭐⭐⭐
+    ├── 数组操作（遍历、查找、排序）
+    ├── 多维数组
+    └── Arrays 工具类
+```
+
+---
+
+## 二、方法
+
+### 2.1 方法定义
+
+```java
+修饰符 返回类型 方法名(参数列表) {
+    // 方法体
+    return 返回值;
+}
+
+public static int add(int a, int b) {
+    return a + b;
+}
+```
+
+### 2.2 方法调用
+
+```java
+// 静态方法：类名.方法名() 或直接方法名()
+int result = Math.max(10, 20);   // 调用静态方法
+
+// 实例方法：对象.方法名()
+String s = &quot;hello&quot;;
+int len = s.length();            // 调用实例方法
+```
+
+### 2.3 方法重载 ⭐⭐
+
+**定义**：同一个类中，**方法名相同，参数列表不同**（参数类型、个数、顺序），与返回值无关。
+
+```java
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    public double add(double a, double b) {  // 参数类型不同
+        return a + b;
+    }
+
+    public int add(int a, int b, int c) {   // 参数个数不同
+        return a + b + c;
+    }
+}
+```
+
+&gt; ⚠ **常见坑**：
+&gt; 1. **返回值不同不构成重载**（会报错&quot;已定义方法&quot;）
+&gt; 2. 仅参数名称不同**不构成重载**
+&gt; 3. 重载方法在**编译时**根据参数类型决定调用哪个
+
+### 2.4 可变参数 ⭐
+
+```java
+public int sum(int... nums) {       // 可传 0 个或多个 int
+    int total = 0;
+    for (int n : nums) total += n;
+    return total;
+}
+
+sum(1, 2, 3);     // OK
+sum();            // OK（不传参）
+sum(new int[]{1, 2}); // OK（数组）
+```
+
+&gt; &#128161; **底层**：可变参数本质是数组。
+
+### 2.5 递归 ⭐⭐
+
+**定义**：方法自己调用自己。
+
+**三要素**：
+1. **递归出口**：何时停止递归
+3. **递归式子**：如何分解问题
+4. **递归方向**：向出口推进
+
+```java
+// 阶乘
+public static int factorial(int n) {
+    if (n == 1) return 1;          // 递归出口
+    return n * factorial(n - 1);    // 递归式
+}
+
+// 斐波那契
+public static int fib(int n) {
+    if (n &lt; 2) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+```
+
+&gt; ⚠ **常见坑**：
+&gt; 1. **没有递归出口 → 栈溢出（StackOverflowError）**
+&gt; 2. 递归层数太深效率低（可改为循环）
+&gt; 3. 不要在递归里修改静态变量（线程不安全）
+
+---
+
+## 三、数组 ⭐⭐⭐
+
+### 3.1 数组定义与初始化
+
+```java
+// 1. 静态初始化：直接赋值
+int[] arr1 = {1, 2, 3, 4, 5};
+String[] arr2 = {&quot;a&quot;, &quot;b&quot;, &quot;c&quot;};
+
+// 2. 动态初始化：指定长度
+int[] arr3 = new int[5];          // 默认值全 0
+String[] arr4 = new String[3];    // 默认值全 null
+
+// 3. 混合（先指定长度再赋值）
+int[] arr5 = new int[]{1, 2, 3};  // 注意：不能再写长度
+```
+
+### 3.2 数组内存分析 ⭐⭐⭐
+
+```
+栈（Stack）            堆（Heap）
+┌────────────┐        ┌──────────────┐
+│  arr1 ─────────────→│ 0x1000: [1][2][3][4][5] │
+│  (引用)   │        │              │
+└────────────┘        └──────────────┘
+                                  ↑
+                           数组对象
+```
+
+**关键点**：
+- 数组是**引用类型**，变量存的是内存地址
+- 数组对象存在**堆**中，变量在**栈**中
+- 一旦创建，**长度不可变**
+
+### 3.3 数组遍历
+
+```java
+int[] arr = {1, 2, 3, 4, 5};
+
+// 1. 普通 for
+for (int i = 0; i &lt; arr.length; i++) {
+    System.out.println(arr[i]);
+}
+
+// 2. 增强 for
+for (int n : arr) {
+    System.out.println(n);
+}
+
+// 3. Arrays.toString
+System.out.println(Arrays.toString(arr));  // [1, 2, 3, 4, 5]
+```
+
+### 3.4 值传递 vs 引用传递 ⭐⭐⭐
+
+```java
+// 基本类型：值传递（形参改变不影响实参）
+public static void change1(int a) {
+    a = 100;
+}
+int x = 1;
+change1(x);
+System.out.println(x);  // 1（x 没变）
+
+// 引用类型：传递的是地址（形参可改变对象内容）
+public static void change2(int[] arr) {
+    arr[0] = 100;
+}
+int[] arr = {1, 2, 3};
+change2(arr);
+System.out.println(arr[0]);  // 100（被修改了）
+```
+
+&gt; &#128161; **面试常问**：
+&gt; - Java **只有值传递**
+&gt; - 引用类型的&quot;值&quot;就是地址，所以传递的是地址的副本
+&gt; - 形参改对象内容会影响实参，但形参指向新对象不影响实参
+
+### 3.5 多维数组 ⭐
+
+```java
+// 二维数组
+int[][] arr = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+System.out.println(arr[1][2]);  // 6
+System.out.println(Arrays.deepToString(arr));  // [[1,2,3],[4,5,6],[7,8,9]]
+
+// 不规则的二维数组（每行长度可以不同）
+int[][] arr2 = new int[3][];
+arr2[0] = new int[]{1, 2};
+arr2[1] = new int[]{3, 4, 5};
+arr2[2] = new int[]{6};
+```
+
+### 3.6 Arrays 工具类 ⭐
+
+```java
+import java.util.Arrays;
+
+int[] arr = {5, 3, 1, 4, 2};
+
+// 打印
+System.out.println(Arrays.toString(arr));  // [5, 3, 1, 4, 2]
+
+// 排序（升序）
+Arrays.sort(arr);
+System.out.println(Arrays.toString(arr));  // [1, 2, 3, 4, 5]
+
+// 二分查找（要求数组已排序）
+int idx = Arrays.binarySearch(arr, 3);    // 2
+
+// 填充
+int[] arr2 = new int[5];
+Arrays.fill(arr2, 10);    // [10, 10, 10, 10, 10]
+
+// 比较
+int[] a = {1, 2, 3}, b = {1, 2, 3};
+System.out.println(Arrays.equals(a, b));   // true
+
+// 拷贝
+int[] c = Arrays.copyOf(arr, arr.length);
+int[] c = Arrays.copyOfRange(arr, 1, 3);   // [2, 3]
+```
+
+### 3.7 稀疏数组 ⭐（了解）
+
+当数组中大部分元素为同一个值（如 0）时，可以用稀疏数组压缩存储：
+
+```java
+// 普通棋盘 11x11 = 121 个位置，但只���几个棋子
+// 稀疏数组：行、列、值 → 只存非零元素
+```
+
+---
+
+## 四、内存图详解 ⭐⭐⭐
+
+### 4.1 Java 内存划分
+
+| 区域 | 存放内容 | 特点 |
+|------|---------|------|
+| **栈（Stack）** | 基本类型变量、对象引用、方法调用 | 自动分配释放，速度快 |
+| **堆���Heap）** | 对象实例、数组 | GC 管理，垃圾回收 |
+| **方法区** | 类信息、常量、静态变量 | 共享 |
+| **本地方法栈** | Native 方法 | |
+| **PC 寄存器** | 线程执行位置 | |
+
+### 4.2 一个数组的内存图
+
+```java
+public static void main(String[] args) {
+    int[] arr = new int[]{1, 2, 3};
+    int[] arr2 = arr;     // 传引用
+    arr2[0] = 100;
+    System.out.println(arr[0]);  // 100（共享同一对象）
+}
+```
+
+内存示意：
+```
+栈                          堆
+┌─────────┐               ┌──────────────┐
+│ arr  ────────────────→ │ 0x1000: [100,2,3] │
+│ arr2 ──────┐            └──────────────┘
+└─────────┘  │            ↑
+         └────┴────────────┘
+         (两个引用指向同一对象)
+```
+
+---
+
+## ���、面试常问
+
+&gt; &#128161; **Java 是值传递还是引用传递？**
+&gt; Java **只有值传递**。引用类型传递的是地址的副本，方法内改对象内容会影响实参，但形参指向新对象不影响实参。
+
+&gt; &#128161; **数组是基本类型还是引用类型？**
+&gt; 引用类型。变量存的是堆中数组对象的地址。
+
+&gt; &#128161; **方法重载和方法重写的区别？**
+&gt; - **重载**：同类中，方法名相同，参数列表不同（**编译时**）
+&gt; - **重写**：子类继承父类，方法签名相同，重新实现（**运行时**）
+
+---
+
+## 六、本章小结
+
+✅ 已掌握：
+- [ ] 方法定义、调用、重载
+- [ ] 可变参数（int...）
+- [ ] 递归三要素
+- [ ] 数组三种初始化方式
+- [ ] **数组内存分析**（栈 vs 堆）
+- [ ] **值传递 vs 引用传递**
+- [ ] Arrays 工具类常用方法
+- [ ] 二维数组、稀疏数组
+
+✅ 易错点：
+- [ ] 数组一旦创建长度不可变
+- [ ] 数组引用赋值后修改会互相影响
+- [ ] 可变参数只能放最后一个参数位置
+- [ ] 递归必须有出口，否则栈溢出
+
+下一章：[05-面向对象基础.md](./05-面向对象基础.md) — 整个 Java 的核心！</pre>

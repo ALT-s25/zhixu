@@ -1,0 +1,370 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>03-流程控制与函数</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 03 &#183; 流程控制与函数 ⭐
+
+&gt; **难度**：低 | **学习建议**：1 天
+&gt; 二刷重点：**函数重载、参数传递（值/指针/引用）、内联函数、默认参数**
+
+---
+
+## 一、知识框架
+
+```
+流程控制与函数
+├── 3.1 流程控制
+│   ├── 顺序、选择（if/switch）
+│   └── 循环（while/for/range-for）⭐
+├── 3.2 函数基础
+│   ├── 函数声明与定义
+│   ├── 函数调用
+│   └── 函数原型
+├── 3.3 参数传递 ⭐⭐⭐
+│   ├── 值传递
+│   ├── 指针传递
+│   └── 引用传递（重点）
+├── 3.4 函数进阶 ⭐⭐
+│   ├── 默认参数
+│   ├── 函数重载
+│   ├── 内联函数
+│   ├── constexpr 函数
+│   └── Lambda 表达式
+└── 3.5 递归
+```
+
+---
+
+## 二、流程控制
+
+### 2.1 if 语句
+
+```cpp
+if (condition) {
+    // ...
+} else if (condition2) {
+    // ...
+} else {
+    // ...
+}
+```
+
+### 2.2 switch 语句
+
+```cpp
+switch (expr) {
+    case 1:
+        // ...
+        break;
+    case 2:
+    case 3:          // 穿透
+        // ...
+        break;
+    default:
+        // ...
+}
+```
+
+&gt; ⚠ switch 表达式类型只能是**整型、字符、枚举**（不能是 string）。
+
+### 2.3 三种循环
+
+```cpp
+// while
+while (condition) { }
+
+// do-while（至少执行一次）
+do { } while (condition);
+
+// for
+for (int i = 0; i &lt; n; i++) { }
+```
+
+### 2.4 范围 for（C++11）⭐
+
+```cpp
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};
+
+for (int x : v) {
+    std::cout &lt;&lt; x;   // 读
+}
+
+for (int&amp; x : v) {
+    x *= 2;           // 写
+}
+
+for (const auto&amp; x : v) {
+    std::cout &lt;&lt; x;   // 读，性能高
+}
+```
+
+### 2.5 跳转
+
+```cpp
+break;       // 跳出循环
+continue;    // 跳过本次
+return;      // 结束函数
+goto label;  // 慎用
+```
+
+---
+
+## 三、函数基础
+
+### 3.1 函数声明与定义
+
+```cpp
+// 声明（原型）
+int add(int a, int b);
+
+// 定义
+int add(int a, int b) {
+    return a + b;
+}
+```
+
+### 3.2 函数调用
+
+```cpp
+int result = add(3, 5);
+```
+
+### 3.3 函数返回
+
+```cpp
+int func() { return 0; }              // 返回值
+void func2() { return; }              // 无返回值
+
+// C++17：多个返回值（结构化绑定）
+auto [a, b] = std::minmax(3, 5);
+```
+
+---
+
+## 四、参数传递 ⭐⭐⭐（重要）
+
+### 4.1 值传递（不修改原值）
+
+```cpp
+void swap(int a, int b) {  // a, b 是形参副本
+    int t = a; a = b; b = t;
+}
+
+int x = 1, y = 2;
+swap(x, y);  // x, y 不变
+```
+
+### 4.2 指针传递（修改原值）
+
+```cpp
+void swap(int* a, int* b) {
+    int t = *a; *a = *b; *b = t;
+}
+
+int x = 1, y = 2;
+swap(&amp;x, &amp;y);  // x, y 交换（需传地址）
+```
+
+### 4.3 引用传递（修改原值，推荐）⭐⭐
+
+```cpp
+void swap(int&amp; a, int&amp; b) {
+    int t = a; a = b; b = t;
+}
+
+int x = 1, y = 2;
+swap(x, y);  // x, y 交换（语法像值传递，实质传引用）
+```
+
+### 4.4 三种传递方式对比 ⭐⭐⭐
+
+| 维度 | 值传递 | 指针传递 | 引用传递 |
+|------|--------|---------|---------|
+| 是否修改原值 | ❌ | ✅ | ✅ |
+| 传参语法 | `f(x)` | `f(&amp;x)` | `f(x)` |
+| 能否为 null | - | ⚠ 可为 null | ❌ 必须绑定对象 |
+| 性能 | 复制开销 | 只传地址 | 只传引用 |
+| 推荐 | 基本类型 | C 风格遗留 | **C++ 推荐** |
+
+### 4.5 引用本质 ⭐
+
+```cpp
+int a = 10;
+int&amp; ref = a;    // ref 是 a 的别名
+
+ref = 20;         // 等价于 a = 20
+cout &lt;&lt; a;        // 20
+```
+
+**特性**：
+- 引用必须在**声明时初始化**
+- 引用一旦绑定，**不能改为其他对象的别名**
+- 引用不是对象（无地址）
+- 常引用：`const int&amp; ref = 10;` ✅（右值也能绑）
+
+```cpp
+int&amp; ref = 10;       // ❌ 错误（不能绑右值）
+const int&amp; ref = 10; // ✅ 正确
+```
+
+---
+
+## 五、函数进阶 ⭐⭐
+
+### 5.1 默认参数
+
+```cpp
+int add(int a, int b = 0, int c = 0) {
+    return a + b + c;
+}
+
+add(1);      // 1
+add(1, 2);   // 3
+add(1, 2, 3);// 6
+```
+
+&gt; ⚠ **默认参数必须从右往左**：
+&gt; ```cpp
+&gt; void f(int a, int b = 0);  // ✅
+&gt; void f(int a = 0, int b);  // ❌
+&gt; ```
+
+### 5.2 函数重载 ⭐⭐
+
+**同名函数，参数列表不同**（参数类型、个数、顺序），与返回类型无关。
+
+```cpp
+int add(int a, int b) { return a + b; }
+double add(double a, double b) { return a + b; }
+int add(int a, int b, int c) { return a + b + c; }
+
+add(1, 2);        // int 版本
+add(1.0, 2.0);    // double 版本
+add(1, 2, 3);     // 三参数版本
+```
+
+&gt; ⚠ **不能仅按返回类型重载**（编译错误）。
+
+### 5.3 内联函数（inline）⭐
+
+**编译器建议**将该函数在调用处展开，省去函数调用开销。
+
+```cpp
+inline int add(int a, int b) {
+    return a + b;
+}
+```
+
+&gt; &#128161; 适用：函数体小、频繁调用。**现代 C++ 中 inline 与模板组合使用**。
+
+### 5.4 constexpr 函数（C++11）⭐
+
+**编译期能算出值**的函数：
+
+```cpp
+constexpr int square(int x) { return x * x; }
+
+int a[square(5)];  // 编译期确定数组大小：int a[25]
+```
+
+### 5.5 Lambda 表达式（C++11）⭐⭐
+
+**匿名函数对象**，可捕获上下文变量。
+
+```cpp
+// 基本语法
+[capture](params) -&gt; return_type { body }
+
+// 示例
+auto add = [](int a, int b) { return a + b; };
+cout &lt;&lt; add(3, 5);  // 8
+
+// 捕获
+int x = 10, y = 20;
+auto f1 = [x, y]() { return x + y; };        // 值捕获
+auto f2 = [&amp;x, &amp;y]() { x++; y++; };           // 引用捕获
+auto f3 = [=]() { return x + y; };            // 全部值捕获
+auto f4 = [&amp;]() { x++; };                     // 全部引用捕获
+auto f5 = [this]() { /* 捕获 this */ };        // 捕获 this 指针
+
+// 用于 STL
+std::vector&lt;int&gt; v = {3, 1, 4, 1, 5};
+std::sort(v.begin(), v.end(), [](int a, int b) { return a &gt; b; });
+```
+
+&gt; &#128161; **捕获规则**：
+&gt; - `[]` 不捕获
+&gt; - `[=]` 值捕获全部
+&gt; - `[&amp;]` 引用捕获全部
+&gt; - `[=, &amp;x]` 除 x 外全部值捕获
+&gt; - `[&amp;, x]` 除 x 外全部引用捕获
+
+---
+
+## 六、递归 ⭐
+
+```cpp
+// 阶乘
+int factorial(int n) {
+    if (n &lt;= 1) return 1;       // 递归出口
+    return n * factorial(n - 1);  // 递归式
+}
+
+// 斐波那契
+int fib(int n) {
+    if (n &lt; 2) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+```
+
+&gt; ⚠ **递归太深会栈溢出**，必要时改为循环或尾递归。
+
+---
+
+## 七、面试常问 ⭐⭐
+
+&gt; &#128161; **值传递、指针传递、引用传递的区别？**
+&gt; - 值传递：传副本，不修改原值
+&gt; - 指针传递：传地址，可修改原值，可为 null
+&gt; - 引用传递：传别名，必须绑定对象，**C++ 推荐**
+
+&gt; &#128161; **引用和指针的区别？**
+&gt; | 维度 | 引用 | 指针 |
+&gt; |------|------|------|
+&gt; | 是否必须初始化 | ✅ | ❌ |
+&gt; | 能否改变指向 | ❌ | ✅ |
+&gt; | 能否为 null | ❌ | ✅ |
+&gt; | 实质 | 对象的别名 | 存地址的变量 |
+&gt; | sizeof | 等同被引用对象 | 固定 4/8 字节 |
+
+&gt; &#128161; **函数重载的规则？**
+&gt; - 同名，参数列表不同
+&gt; - 不能仅按返回类型不同
+&gt; - 默认参数可能导致二义性
+
+&gt; &#128161; **Lambda 表达式的捕获方式？**
+&gt; `[]` 不捕获，`[=]` 值捕获，`[&amp;]` 引用捕获，混合捕获如 `[=, &amp;x]`
+
+&gt; &#128161; **`inline` 函数的限制？**
+&gt; - 不允许循环 / 递归（C++17 之前）
+&gt; - 只是建议，编译器决定
+&gt; - 通常与模板搭配
+
+---
+
+## 八、本章小结
+
+✅ 已掌握：
+- [ ] if / switch / 循环 / 范围 for
+- [ ] 函数声明、定义、调用
+- [ ] **值/指针/引用 3 种参数传递**（重点）
+- [ ] **引用 vs 指针的区别**
+- [ ] 默认参数（从右往左）
+- [ ] 函数重载
+- [ ] inline 内联函数
+- [ ] constexpr 函数
+- [ ] Lambda 表达式
+
+✅ 易错点：
+- [ ] 默认参数必须从右往左
+- [ ] 引用必须初始化
+- [ ] 重载不能仅按返回类型
+- [ ] Lambda 捕获方式：值捕获不影响原值
+
+下一章：[04-数组与字符串.md](./04-数组与字符串.md)</pre>

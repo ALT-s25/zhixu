@@ -1,0 +1,458 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>05-面向对象基础</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 05 &#183; 面向对象基础 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; **本章是 Java 的灵魂**，学到这里才算真正入门 Java。二刷时一定要亲手画类图、敲代码。
+
+---
+
+## 一、知识框架
+
+```
+面向对象基础
+├── 5.1 面向对象 vs 面向过程
+├── 5.2 类与对象 ⭐⭐⭐
+│   ├── 类的定义
+│   ├── 对象的创建与使用
+│   └── 内存分析（对象内存图）⭐⭐
+├── 5.3 成员变量与局部变量
+├── 5.4 方法详解
+├── 5.5 构造器（构造方法）⭐⭐
+│   ├── 默认构造器
+│   ├── 有参构造器
+│   └── 构造器重载
+├── 5.6 this 关键字 ⭐
+├── 5.7 static 关键字 ⭐
+└── 5.8 封装 ⭐⭐
+```
+
+---
+
+## 二、面向对象 vs 面向过程
+
+| 维度 | 面向过程 (POP) | 面向对象 (OOP) |
+|------|---------------|---------------|
+| 思想 | 按步骤执行 | 按对象交互 |
+| 数据与函数 | 分离 | 封装在类中 |
+| 适合 | 小程序、脚本 | 大型项目 |
+| ���子 | C 语言 | Java、C++、Python |
+
+&gt; &#128161; Java 是**纯面向对象**语言（除基本类型外都是对象）。
+
+---
+
+## 三、类与对象 ⭐⭐⭐
+
+### 3.1 概念
+
+- **类 (Class)**：对象的模板/蓝图，定义了对象的属性和行为
+- **对象 (Object)**：类的实例，具体存在
+
+### 3.2 类与对象的关系
+
+```
+类（抽象）              对象（具体）
+┌─────────┐           ┌─────────┐ ┌─────────┐ ┌─────────┐
+│ Student │  ─实例化→ │ 张三    │ │ 李四    │ │ 王五    │
+└─────────┘           └─────────┘ └─────────┘ └─────────┘
+                      内存中实际的三个对象
+```
+
+### 3.3 类的定义
+
+```java
+public class Student {
+    // 属性（成员变量）
+    String name;
+    int age;
+    String gender;
+
+    // 方法（成员函数）
+    public void study() {
+        System.out.println(name + &quot; 在学习&quot;);
+    }
+
+    public void introduce() {
+        System.out.println(&quot;我叫 &quot; + name + &quot;，今年 &quot; + age + &quot; 岁&quot;);
+    }
+}
+```
+
+### 3.4 创建对象与使用
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        // 1. 实例化对象（new）
+        Student s1 = new Student();
+        Student s2 = new Student();
+
+        // 2. 给属性赋值
+        s1.name = &quot;张三&quot;;
+        s1.age = 18;
+        s1.gender = &quot;男&quot;;
+
+        s2.name = &quot;李四&quot;;
+        s2.age = 20;
+        s2.gender = &quot;女&quot;;
+
+        // 3. 调用方法
+        s1.introduce();
+        s2.study();
+    }
+}
+```
+
+### 3.5 对象内存图 ⭐⭐
+
+```
+栈（Stack）             堆（Heap）               方法区
+┌──────────┐          ┌──────────────┐         ┌──────────────┐
+│ s1 ─────────────→ │ 0x1000         │         │ Student 类模板 │
+│ s2 ──────┐        │ name: &quot;张三&quot;  │         │ name, age    │
+└──────────┘        │ age:  18      │         │ study()      │
+         │          │ gender: &quot;男&quot;  │         └──────────────┘
+         │          └──────────────┘
+         └─→       ┌──────────────┐
+                   │ 0x2000         │
+                   │ name: &quot;李四&quot;   │
+                   │ age:  20       │
+                   │ gender: &quot;女&quot;   │
+                   └──────────────┘
+```
+
+&gt; &#128161; 同一个类可以创建**无数对象**，每个对象有独立的内存空间。
+
+---
+
+## 四、成员变量 vs 局部变量 ⭐⭐
+
+| 维度 | 成员变量 | 局部变量 |
+|------|---------|---------|
+| 定义位置 | 类中、方法外 | 方法内或代码块 |
+| 作用域 | 整个类 | 方法内或代码块 |
+| 默认值 | 有（int→0, boolean→false, 引用→null） | **必须手动初始化** |
+| 内存位置 | 堆（对象中） | 栈 |
+| 生命周期 | 随对象创建/销毁 | 随方法调用开始/结束 |
+
+```java
+public class Test {
+    int a = 10;        // 成员变量：有默认值
+
+    public void method() {
+        int b = 20;    // 局部变量：必须初始化
+        System.out.println(a + b);
+    }
+}
+```
+
+&gt; ⚠ **常见坑**：局部变量不初始化直接使用会**编译错误**（区别于成员变量）。
+
+---
+
+## 五、方法详解
+
+### 5.1 方法的分类
+
+| 类型 | 修饰符 | 调用方式 | 典型例子 |
+|------|--------|---------|---------|
+| 成员方法 | 无 static | 对象.方法名() | `s1.study()` |
+| 静态方法 | `static` | 类名.方法名() | `Math.max()` |
+
+### 5.2 形参与实参
+
+```java
+public int add(int a, int b) {  // a, b 是形参
+    return a + b;
+}
+
+int result = add(3, 5);          // 3, 5 是实参
+```
+
+---
+
+## 六、构造器（构造方法）⭐⭐⭐
+
+### 6.1 什么是构造器
+
+- 构造器是**特殊的方法**，用于**创建并初始化对象**
+- 名称必须与**类名完全相同**
+- **没有返回值类型**（连 void 都没有）
+- 创建对象时自动调用，**每 new 一次就调一次**
+
+### 6.2 默认构造器
+
+如果类中没有写任何构造器，编译器会**自动生成**一个无参构造器：
+
+```java
+public class Student {
+    String name;
+    int age;
+    // 隐式存在：public Student() {}
+}
+
+Student s = new Student();  // 调用默认构造器
+```
+
+### 6.3 有参构造器
+
+```java
+public class Student {
+    String name;
+    int age;
+
+    // 有参构造器
+    public Student(String name, int age) {
+        this.name = name;   // this 指当前对象
+        this.age = age;
+    }
+}
+
+Student s = new Student(&quot;张三&quot;, 18);  // 一行初始化
+```
+
+### 6.4 构造器重载
+
+```java
+public Student() {                        // 无参
+    this.name = &quot;未知&quot;;
+    this.age = 0;
+}
+
+public Student(String name) {             // 1 个参数
+    this.name = name;
+}
+
+public Student(String name, int age) {    // 2 个参数
+    this.name = name;
+    this.age = age;
+}
+```
+
+&gt; ⚠ **常见坑**：
+&gt; 1. **一旦定义了有参构造器，编译器就不再提供默认构造器**
+&gt; 2. 建议**显式写出无参构造器**（防止子类继承时报错）
+&gt; 3. 构造器不能用 static、final 修饰
+
+```java
+public class Test {
+    public Test(String s) { }   // 显式定义有参构造器
+
+    public static void main(String[] args) {
+        Test t = new Test();    // ❌ 编译错误！没有无参构造器了
+        Test t = new Test(&quot;hi&quot;); // ✅
+    }
+}
+```
+
+---
+
+## 七、this 关键字 ⭐⭐
+
+**含义**：`this` 代表**当前对象的引用**。
+
+### 7.1 三大用途
+
+```java
+public class Student {
+    String name;
+
+    // 1. 区分成员变量和局部变量
+    public Student(String name) {
+        this.name = name;   // this.name 是成员变量，name 是参数
+    }
+
+    // 2. 在构造器中调用其他构造器
+    public Student() {
+        this(&quot;默认名&quot;, 0);      // 必须放在第一行！
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // 3. 返回当前对象（链式调用）
+    public Student setName(String name) {
+        this.name = name;
+        return this;        // 返回当前对象
+    }
+}
+
+// 链式调用
+new Student().setName(&quot;张三&quot;).setAge(18);
+```
+
+&gt; ⚠ **this() 必须放在构造器第一行**！
+
+---
+
+## 八、static 关键字 ⭐⭐
+
+### 8.1 static 修饰成员变量
+
+**类变量**：被所有对象共享。
+
+```java
+public class Student {
+    static String school = &quot;北京大学&quot;;  // 类变量，所有学生共享
+
+    String name;                       // 实例变量，每个学生独立
+}
+
+Student s1 = new Student();
+Student s2 = new Student();
+System.out.println(s1.school);  // 北京大学
+s1.school = &quot;清华大学&quot;;
+System.out.println(s2.school);  // 清华大学（共享）
+```
+
+### 8.2 static 修饰方法
+
+**静态方法**：属于类，不属于对象。
+
+```java
+public class MathUtil {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+
+int sum = MathUtil.add(3, 5);   // 类名直接调用，无需创建对象
+```
+
+&gt; ⚠ **常见坑**：
+&gt; 1. **静态方法中不能直接访问非静态成员**（生命周期不匹配）
+&gt; 2. **静态方法中不能使用 this**（没有&quot;当前对象&quot;）
+&gt; 3. 推荐用类名调用静态方法（`Math.max()` 比 `m.max()` 更清晰）
+
+```java
+public class Test {
+    int a = 10;            // 实例变量
+    static int b = 20;     // 静态变量
+
+    public static void method() {
+        System.out.println(b);     // ✅
+        System.out.println(a);     // ❌ 编译错误
+    }
+}
+```
+
+### 8.3 static 修饰代码块（静态代码块）
+
+```java
+public class Student {
+    static String school;
+
+    // 静态代码块：类加载时执行，仅一次
+    static {
+        school = &quot;北京大学&quot;;
+        System.out.println(&quot;类被加载了&quot;);
+    }
+}
+```
+
+&gt; &#128161; 与构造代码块（每次 new 都执行）对比。
+
+---
+
+## 九、封装 ⭐⭐
+
+### 9.1 什么是封装
+
+将**属性私有化（private）**，对外提供**公开的 getter/setter** 方法访问。
+
+### 9.2 封装示例
+
+```java
+public class Student {
+    private String name;     // 私有
+    private int age;         // 私有
+
+    // getter / setter
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getAge() { return age; }
+    public void setAge(int age) {
+        if (age &lt; 0 || age &gt; 150) {           // 数据验证
+            System.out.println(&quot;年龄非法！&quot;);
+            return;
+        }
+        this.age = age;
+    }
+}
+```
+
+### 9.3 封装的好处
+
+1. **隐藏实现细节**，使用者只需关注功能
+2. **���护数据**，可通过 setter 做合法性校验
+3. **降低耦合**，修改类内部不影响外部
+
+### 9.4 IDEA 快捷生成 getter/setter
+
+`Alt + Insert` → 选 Getter and Setter → 一键生成
+
+---
+
+## 十一、JavaBean 规范 ⭐
+
+JavaBean 是符合特定规范的普通 Java 类：
+
+1. 类是**公共的**，有公共无参构造器
+2. 属性**私有化**
+3. 提供**公共的 getter/setter**
+
+```java
+public class User implements java.io.Serializable {
+    private String name;
+    private int age;
+
+    public User() {}    // 无参构造
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    // ... 其他 getter/setter
+}
+```
+
+---
+
+## 十二、面试常问
+
+&gt; &#128161; **面向对象的三大特性？**
+&gt; 封装、继承、多态
+
+&gt; &#128161; **构造器的作用？能否被重写？能否被继承？**
+&gt; - 作用：创建对象并初始化
+&gt; - 不能被重写（override），但可以被重载
+&gt; - 子类构造器默认调用父类无参构造器
+
+&gt; &#128161; **this 和 super 的区别？**
+&gt; - `this` 代表当前对象，访问当前类的成员
+&gt; - `super` 代表父类对���，访问父类的成员
+
+&gt; &#128161; **static 能修饰什么？**
+&gt; 变量、方法、代码块、内部类、导入（import static）
+
+---
+
+## 十三、本章小结
+
+✅ 已掌握：
+- [ ] 类与对象的概念、关系
+- [ ] 类的定义语法（属性、方法、构造器）
+- [ ] 对象创建与内存分析
+- [ ] **构造器的作用与重载**
+- [ ] **this 关键字的三大用途**
+- [ ] **static 修饰变量/方法/代码块**
+- [ ] 封装（private + getter/setter）
+- [ ] JavaBean 规范
+
+✅ 易错点：
+- [ ] 定义有参构造器后，默认无参构造器消失
+- [ ] this() 必须放在构造器第一行
+- [ ] 静态方法中不能访问非静态成员
+- [ ] 局部变量不初始化会编译错误
+
+下一章：[06-封装继承多态.md](./06-封装继承多态.md) — OOP 三大特性！</pre>

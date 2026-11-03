@@ -1,0 +1,487 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>15-异常与多线程</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 15 &#183; 异常与多线程 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; 二刷重点：**异常处理、thread、mutex、async/future、智能锁**
+
+---
+
+## 一、知识框架
+
+```
+异常与多线程
+├── 15.1 异常处理 ⭐⭐
+│   ├── try / catch / throw
+│   ├── 标准异常类
+│   ├── 自定义异常
+│   └── noexcept
+├── 15.2 多线程基础（C++11）⭐⭐⭐
+│   ├── std::thread
+│   ├── std::async / std::future
+│   └── std::this_thread
+├── 15.3 互斥锁 ⭐⭐⭐
+│   ├── std::mutex
+│   ├── std::lock_guard
+│   ├── std::unique_lock
+│   └── std::scoped_lock
+└── 15.4 条件变量与原子操作
+```
+
+---
+
+## 二、异常处理 ⭐⭐
+
+### 2.1 基本语法
+
+```cpp
+try {
+    // 可能抛异常的代码
+    throw std::runtime_error(&quot;出错了&quot;);
+} catch (const std::runtime_error&amp; e) {
+    std::cerr &lt;&lt; &quot;运行时错误：&quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
+} catch (const std::exception&amp; e) {
+    std::cerr &lt;&lt; &quot;其他异常：&quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
+} catch (...) {
+    std::cerr &lt;&lt; &quot;未知异常\n&quot;;
+}
+```
+
+### 2.2 throw
+
+```cpp
+// 抛出异常
+throw std::runtime_error(&quot;something went wrong&quot;);
+throw 42;                           // 抛 int
+throw &quot;error&quot;;                      // 抛 const char*
+```
+
+### 2.3 标准异常类 ⭐
+
+```
+exception
+├── logic_error
+│   ├── invalid_argument
+│   ├── out_of_range
+│   └── domain_error
+└── runtime_error
+    ├── overflow_error
+    └── range_error
+```
+
+### 2.4 自定义异常
+
+```cpp
+class MyException : public std::exception {
+    std::string msg_;
+public:
+    MyException(const std::string&amp; msg) : msg_(msg) {}
+    const char* what() const noexcept override {
+        return msg_.c_str();
+    }
+};
+
+throw MyException(&quot;自定义错误&quot;);
+```
+
+### 2.5 noexcept ⭐
+
+**承诺函数不会抛出异常**，编译器可以优化。
+
+```cpp
+void func() noexcept {
+    // 不抛异常
+}
+
+void risky() noexcept(false) {     // 显式声明可能抛
+    throw std::runtime_error(&quot;&quot;);
+}
+
+// 条件 noexcept
+template &lt;typename T&gt;
+void swap(T&amp; a, T&amp; b) noexcept(std::is_nothrow_move_constructible_v&lt;T&gt;);
+```
+
+&gt; ⚠ **noexcept 函数抛异常 → std::terminate**
+
+### 2.6 异常最佳实践 ⭐
+
+```cpp
+// 1. 析构函数绝对不能抛异常
+~MyClass() noexcept { }
+
+// 2. RAII 配合异常处理
+{
+    std::unique_ptr&lt;int&gt; p(new int(10));    // 异常时也自动释放
+}
+
+// 3. 构造函数抛异常 → 对象未构造完成
+```
+
+---
+
+## 三、多线程基础（C++11）⭐⭐⭐
+
+### 3.1 std::thread
+
+```cpp
+#include &lt;thread&gt;
+
+void task(int n) {
+    std::cout &lt;&lt; &quot;Task &quot; &lt;&lt; n &lt;&lt; &quot; running\n&quot;;
+}
+
+int main() {
+    // 1. 创建并启动线程
+    std::thread t1(task, 1);
+    std::thread t2(task, 2);
+
+    // 2. 等待线程结束
+    t1.join();           // 主线程阻塞等 t1
+    t2.join();
+
+    // 3. detach（分离，让线程后台运行）
+    // std::thread t3(task, 3);
+    // t3.detach();
+}
+```
+
+&gt; ⚠ **join 或 detach 必须调用一次**，否则析构会 std::terminate。
+
+### 3.2 Lambda 创建线程
+
+```cpp
+std::thread t([]() {
+    std::cout &lt;&lt; &quot;Hello from thread\n&quot;;
+});
+t.join();
+```
+
+### 3.3 std::async（C++11）⭐⭐⭐
+
+**异步任务**，获取执行结果。
+
+```cpp
+#include &lt;future&gt;
+
+std::future&lt;int&gt; fut = std::async([]() {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 42;
+});
+
+std::cout &lt;&lt; &quot;等待结果...\n&quot;;
+int result = fut.get();     // 阻塞等待
+std::cout &lt;&lt; &quot;结果：&quot; &lt;&lt; result;
+```
+
+**启动策略**：
+```cpp
+std::launch::async    // 立即在新线程中执行
+std::launch::deferred // 延迟到 get() 时才执行（同一线程）
+std::launch::async | std::launch::deferred   // 默认（让系统选）
+```
+
+### 3.4 std::this_thread
+
+```cpp
+std::this_thread::get_id();                       // 当前线程 id
+std::this_thread::sleep_for(std::chrono::ms(100));// 休眠
+std::this_thread::sleep_until(time_point);        // 休眠到指定时间
+std::this_thread::yield();                        // 让出 CPU
+```
+
+### 3.5 std::future / std::promise
+
+```cpp
+std::promise&lt;int&gt; prom;
+std::future&lt;int&gt; fut = prom.get_future();
+
+std::thread t([&amp;prom]() {
+    prom.set_value(42);   // 设置值
+});
+
+std::cout &lt;&lt; fut.get();   // 阻塞获取
+t.join();
+```
+
+---
+
+## 四、互斥锁 ⭐⭐⭐
+
+### 4.1 std::mutex
+
+```cpp
+#include &lt;mutex&gt;
+
+std::mutex mtx;
+int counter = 0;
+
+void increment() {
+    mtx.lock();
+    counter++;
+    mtx.unlock();
+}
+
+// 推荐：使用 RAII 包装
+{
+    std::lock_guard&lt;std::mutex&gt; lock(mtx);
+    counter++;
+}   // 自动 unlock
+```
+
+### 4.2 std::lock_guard（RAII）⭐⭐
+
+```cpp
+{
+    std::lock_guard&lt;std::mutex&gt; lock(mtx);    // 加锁
+    counter++;
+}   // 析构自动解锁
+```
+
+&gt; &#128161; **永远不要忘记解锁**，用 `lock_guard` 避免忘记。
+
+### 4.3 std::unique_lock ⭐⭐
+
+比 lock_guard 更灵活，可延迟加锁、提前解锁。
+
+```cpp
+std::unique_lock&lt;std::mutex&gt; lock(mtx);   // 加锁
+// ... 中间可 lock.unlock() / lock.lock()
+```
+
+### 4.4 std::scoped_lock（C++17）⭐⭐
+
+**同时锁多个互斥量**，避免死锁。
+
+```cpp
+std::mutex mtx1, mtx2;
+
+{
+    std::scoped_lock lock(mtx1, mtx2);    // 同时锁多个
+    // ...
+}   // 自动按相反顺序解锁
+```
+
+### 4.5 try_lock / try_lock_for
+
+```cpp
+std::timed_mutex tmtx;
+
+if (tmtx.try_lock_for(std::chrono::ms(100))) {
+    // 拿到锁了
+    tmtx.unlock();
+} else {
+    // 超时了
+}
+```
+
+---
+
+## 五、条件变量 ⭐⭐
+
+```cpp
+#include &lt;condition_variable&gt;
+
+std::mutex mtx;
+std::condition_variable cv;
+bool ready = false;
+
+void wait_for_ready() {
+    std::unique_lock&lt;std::mutex&gt; lock(mtx);
+    cv.wait(lock, []() { return ready; });   // 等待 ready 变 true
+    std::cout &lt;&lt; &quot;已就绪\n&quot;;
+}
+
+void set_ready() {
+    {
+        std::lock_guard&lt;std::mutex&gt; lock(mtx);
+        ready = true;
+    }
+    cv.notify_one();   // 通��一个等待者
+}
+
+std::thread t1(wait_for_ready);
+std::this_thread::sleep_for(std::chrono::seconds(1));
+std::thread t2(set_ready);
+```
+
+&gt; ⚠ `cv.wait` 会**自动释放锁并阻塞**，被唤醒后**重新加锁**。
+
+---
+
+## 六、原子操作 ⭐
+
+```cpp
+#include &lt;atomic&gt;
+
+std::atomic&lt;int&gt; counter(0);
+
+void increment() {
+    counter.fetch_add(1);    // 原子加
+}
+
+// 整型、指针等都可 atomic
+std::atomic&lt;bool&gt; flag(false);
+flag.store(true);
+bool b = flag.load();
+```
+
+&gt; &#128161; **原子操作比互斥锁快**，但只适合简单的读写。
+
+---
+
+## 七、call_once 与单例
+
+```cpp
+#include &lt;mutex&gt;
+
+std::once_flag flag;
+std::unique_ptr&lt;Config&gt; config;
+
+void init() {
+    config = std::make_unique&lt;Config&gt;();
+}
+
+// 多线程中只执行一次
+std::call_once(flag, init);
+```
+
+---
+
+## 八、线程池（C++ 本身没有，但可自己实现）
+
+```cpp
+class ThreadPool {
+    std::vector&lt;std::thread&gt; workers_;
+    std::queue&lt;std::function&lt;void()&gt;&gt; tasks_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    bool stop_ = false;
+
+public:
+    ThreadPool(size_t n) {
+        for (size_t i = 0; i &lt; n; i++) {
+            workers_.emplace_back([this] {
+                while (true) {
+                    std::function&lt;void()&gt; task;
+                    {
+                        std::unique_lock&lt;std::mutex&gt; lock(mtx_);
+                        cv_.wait(lock, [this] {
+                            return stop_ || !tasks_.empty();
+                        });
+                        if (stop_ &amp;&amp; tasks_.empty()) return;
+                        task = std::move(tasks_.front());
+                        tasks_.pop();
+                    }
+                    task();
+                }
+            });
+        }
+    }
+
+    template &lt;typename F, typename... Args&gt;
+    auto enqueue(F&amp;&amp; f, Args&amp;&amp;... args) {
+        using R = std::invoke_result_t&lt;F, Args...&gt;;
+        auto task = std::make_shared&lt;std::packaged_task&lt;R()&gt;&gt;(
+            std::bind(std::forward&lt;F&gt;(f), std::forward&lt;Args&gt;(args)...)
+        );
+        std::future&lt;R&gt; res = task-&gt;get_future();
+        {
+            std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+            tasks_.emplace([task]() { (*task)(); });
+        }
+        cv_.notify_one();
+        return res;
+    }
+
+    ~ThreadPool() {
+        {
+            std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+            stop_ = true;
+        }
+        cv_.notify_all();
+        for (auto&amp; w : workers_) w.join();
+    }
+};
+```
+
+&gt; &#128161; 现代项目推荐使用 **Asio、QtThreadPool、Boost.Asio** 等现成库。
+
+---
+
+## 九、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **std::async vs std::thread？**
+&gt; | std::async | std::thread |
+&gt; |------------|-------------|
+&gt; | 自动管理线程 | 手动 join/detach |
+&gt; | 返回 future | 无返回值（用 promise） |
+&gt; | 可指定启动策略 | - |
+&gt; | **推荐** | - |
+
+&gt; &#128161; **std::lock_guard vs std::unique_lock？**
+&gt; | lock_guard | unique_lock |
+&gt; |------------|-------------|
+&gt; | 简单 | 灵活 |
+&gt; | 构造加锁、析构解锁 | 可延迟加锁、提前解锁 |
+&gt; | **首选** | 需要条件变量等场景 |
+
+&gt; &#128161; **如何避免死锁？**
+&gt; - 固定加锁顺序
+&gt; - 用 `std::lock()` 或 `std::scoped_lock`
+&gt; - 减少嵌套锁
+&gt; - 用 try_lock
+
+&gt; &#128161; **为什么析构函数要 noexcept？**
+&gt; 栈展开时若析构函数抛异常，会导致 std::terminate 程序崩溃。
+
+&gt; &#128161; **原子操作 vs 互斥锁？**
+&gt; - 原子操作：仅适合单变量读写（无锁，CAS）
+&gt; - 互斥锁：保护临界区（有锁，开销大）
+
+&gt; &#128161; **`std::future::get` 只能调一次？**
+&gt; 是的，`get()` 调用后 future 状态变为 ready。多次调用未定义。
+
+---
+
+## 十、本章小结
+
+✅ 已掌握：
+- [ ] try / catch / throw
+- [ ] 标准异常类与自定义异常
+- [ ] **noexcept** 的作用
+- [ ] **std::thread** 创建与 join
+- [ ] **std::async** 与 future
+- [ ] **std::mutex + lock_guard**（互斥锁）
+- [ ] unique_lock / scoped_lock
+- [ ] 条件变量 cv
+- [ ] 原子操作 atomic
+- [ ] 线程池原理
+
+✅ 易错点：
+- [ ] thread 必须 join 或 detach
+- [ ] 析构函数不能抛异常（应 noexcept）
+- [ ] future.get() 只能调一次
+- [ ] cv.wait 会释放锁，被唤醒后重新加锁
+- [ ] 多线程注意数据竞争
+
+---
+
+## 全部 C++ 章节完结 &#127881;
+
+到此 C++ 15 章全部学完，建议：
+
+1. **回到 README.md**，按复习路线查漏补缺
+2. **重点回顾**：
+   - 指针与引用（05）
+   - 面向对象（06、07）
+   - 智能指针（12）
+   - 现代 C++ 新特性（14）
+3. **动手项目**：
+   - 实现自己的智能指针（unique_ptr 简化版）
+   - 实现简易 STL 容器（vector、string）
+   - 多线程下载器（IO + 多线程 + 智能指针）
+4. **推荐阅读**：
+   - 《Effective Modern C++》（14、15 章）
+   - 《STL 源码剖析》（深入 STL）
+5. **下一步**：Qt 图形界面 / Unreal 游戏引擎 / 嵌入式开发
+
+C++ 学习曲线陡峭但一旦掌握就拥有巨大能力！&#128640;</pre>

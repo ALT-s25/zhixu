@@ -1,0 +1,389 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>08-运算符重载与友元</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 08 &#183; 运算符重载与友元 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**运算符重载的语法、哪些能重载哪些不能、友元的使用**
+
+---
+
+## 一、知识框架
+
+```
+运算符重载与友元
+├── 8.1 运算符重载基础 ⭐⭐
+├── 8.2 可重载与不可重载的运算符
+├── 8.3 常用运算符重载 ⭐⭐
+│   ├── 算术运算符 +、-
+│   ├── 关系运算符 ==、&lt;
+│   ├── 流运算符 &lt;&lt;、&gt;&gt;
+│   ├── 下标运算符 []
+│   └── 自增自减 ++、--
+├── 8.4 单目与赋值运算符
+├── 8.5 友元函数与友元类 ⭐
+└── 8.6 运算符重载最佳实践
+```
+
+---
+
+## 二、运算符重载基础 ⭐⭐
+
+### 2.1 什么是运算符重载
+
+让自定义类型也能用 `+`、`-`、`==` 等运算符。
+
+```cpp
+class Complex {
+    double real_, imag_;
+
+public:
+    Complex(double r = 0, double i = 0) : real_(r), imag_(i) {}
+
+    // 成员函数形式
+    Complex operator+(const Complex&amp; other) const {
+        return Complex(real_ + other.real_, imag_ + other.imag_);
+    }
+};
+
+Complex a(1, 2), b(3, 4);
+Complex c = a + b;       // 等价于 a.operator+(b)
+```
+
+### 2.2 两种重载形式
+
+```cpp
+// 1. 成员函数（左侧是 this）
+class MyClass {
+    int x;
+public:
+    MyClass operator+(const MyClass&amp; other) const {
+        return MyClass(x + other.x);
+    }
+};
+
+// 2. 友元/普通函数（左侧是参数）
+class MyClass {
+    int x;
+    friend MyClass operator+(const MyClass&amp; a, const MyClass&amp; b);
+};
+
+MyClass operator+(const MyClass&amp; a, const MyClass&amp; b) {
+    return MyClass(a.x + b.x);
+}
+```
+
+---
+
+## 三、可重载与不可重载的运算符 ⭐
+
+### 3.1 可重载（40+ 个）
+
+```
+算术：+  -  *  /  %  ++  --
+关系：==  !=  &lt;  &gt;  &lt;=  &gt;=
+逻辑：&amp;&amp;  ||  !
+位运算：&amp;  |  ^  ~  &lt;&lt;  &gt;&gt;
+赋值：=  +=  -=  *=  /=  %=  &amp;=  |=  ^=  &lt;&lt;=  &gt;&gt;=
+其他：[]  ()  -&gt;  -&gt;*  ,  new  delete
+流：&lt;&lt;  &gt;&gt;（仅友元函数）
+```
+
+### 3.2 不可重载
+
+```
+::       // 作用域
+.        // 成员访问
+.*       // 成员指针访问
+?:       // 三元
+sizeof   // 大小
+typeid   // 类型
+```
+
+&gt; ⚠ **优先级、结合性、操作数个数都不可变**！
+
+---
+
+## 四、常用运算符重载 ⭐⭐
+
+### 4.1 算术运算符
+
+```cpp
+class Complex {
+    double real_, imag_;
+
+public:
+    Complex(double r = 0, double i = 0) : real_(r), imag_(i) {}
+
+    // 二元运算符
+    Complex operator+(const Complex&amp; o) const {
+        return Complex(real_ + o.real_, imag_ + o.imag_);
+    }
+    Complex operator-(const Complex&amp; o) const { /* ... */ }
+    Complex operator*(const Complex&amp; o) const { /* ... */ }
+
+    // 一元运算符
+    Complex operator-() const {                    // 取负
+        return Complex(-real_, -imag_);
+    }
+
+    // 前置++
+    Complex&amp; operator++() {
+        real_++;
+        return *this;
+    }
+    // 后置++（int 参数仅用于区分）
+    Complex operator++(int) {
+        Complex tmp(*this);
+        real_++;
+        return tmp;
+    }
+};
+```
+
+### 4.2 关系运算符 ⭐
+
+```cpp
+bool operator==(const MyClass&amp; o) const {
+    return x == o.x &amp;&amp; y == o.y;
+}
+bool operator!=(const MyClass&amp; o) const { return !(*this == o); }
+bool operator&lt;(const MyClass&amp; o) const {
+    return x &lt; o.x || (x == o.x &amp;&amp; y &lt; o.y);
+}
+```
+
+&gt; &#128161; **C++20 `&lt;=&gt;` 三路比较运算符**（spaceship operator），自动生成 6 个比较运算符。
+
+### 4.3 流运算符 &lt;&lt; &gt;&gt; ⭐⭐
+
+**只能重载为友元函数**。
+
+```cpp
+class Student {
+    std::string name_;
+    int age_;
+
+public:
+    Student(const std::string&amp; n, int a) : name_(n), age_(a) {}
+
+    friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Student&amp; s) {
+        return os &lt;&lt; &quot;Student{name=&quot; &lt;&lt; s.name_ &lt;&lt; &quot;, age=&quot; &lt;&lt; s.age_ &lt;&lt; &quot;}&quot;;
+    }
+
+    friend std::istream&amp; operator&gt;&gt;(std::istream&amp; is, Student&amp; s) {
+        return is &gt;&gt; s.name_ &gt;&gt; s.age_;
+    }
+};
+
+Student s(&quot;张三&quot;, 18);
+std::cout &lt;&lt; s;     // Student{name=张三, age=18}
+std::cin &gt;&gt; s;
+```
+
+### 4.4 下标运算符 [] ⭐⭐
+
+```cpp
+class MyArray {
+    int data_[10];
+
+public:
+    // 非 const 版本
+    int&amp; operator[](int i) {
+        return data_[i];
+    }
+
+    // const 版本（用于 const 对象）
+    const int&amp; operator[](int i) const {
+        return data_[i];
+    }
+};
+
+MyArray a;
+a[0] = 100;        // 调用非 const 版本，返回引用可写
+
+const MyArray&amp; ca = a;
+ca[0];              // 调用 const 版本
+```
+
+### 4.5 函数调用运算符 () ⭐⭐
+
+让对象像函数一样调用。
+
+```cpp
+class Add {
+public:
+    int operator()(int a, int b) const {
+        return a + b;
+    }
+};
+
+Add add;
+std::cout &lt;&lt; add(3, 5);    // 8
+```
+
+&gt; &#128161; 这是 **函数对象（Function Object / Functor）**，STL 算法常用。
+
+### 4.6 解引用运算符 *
+
+```cpp
+class SmartPtr {
+    int* p_;
+public:
+    SmartPtr(int* p) : p_(p) {}
+    ~SmartPtr() { delete p_; }
+
+    int&amp; operator*() { return *p_; }
+    int* operator-&gt;() { return p_; }
+};
+
+SmartPtr p(new int(10));
+std::cout &lt;&lt; *p;       // 10
+```
+
+---
+
+## 五、赋值运算符 =
+
+&gt; 详见 [06-面向对象基础.md](./06-面向对象基础.md) 的拷贝构造部分
+
+```cpp
+// 拷贝赋值
+MyClass&amp; operator=(const MyClass&amp; o) {
+    if (this != &amp;o) {              // 自赋值检查
+        // 释放旧资源
+        // 拷贝新资源
+    }
+    return *this;                  // 返回 *this 以支持链式
+}
+
+// 移动赋值（C++11）
+MyClass&amp; operator=(MyClass&amp;&amp; o) noexcept {
+    if (this != &amp;o) {
+        // 转移资源
+        o.资源 = nullptr;          // 置空
+    }
+    return *this;
+}
+```
+
+&gt; ⚠ **赋值运算符必须处理自赋值**（`a = a`）！
+
+---
+
+## 六、友元 ⭐
+
+详见 [06-面向对象基础.md](./06-面向对象基础.md)
+
+### 6.1 友元函数
+
+```cpp
+class Student {
+    std::string name_;
+    int age_;
+
+    friend void print(const Student&amp; s);     // 友元函数声明
+};
+
+void print(const Student&amp; s) {
+    std::cout &lt;&lt; s.name_ &lt;&lt; &quot; &quot; &lt;&lt; s.age_;   // 可访问私有
+}
+```
+
+### 6.2 友元类
+
+```cpp
+class Teacher {
+public:
+    void view(const Student&amp; s) {
+        std::cout &lt;&lt; s.name_;    // 可访问 Student 私有
+    }
+};
+
+class Student {
+    friend class Teacher;         // 友元类
+private:
+    std::string name_;
+};
+```
+
+### 6.3 友元运算符重载
+
+```cpp
+class Vec2 {
+    double x_, y_;
+
+public:
+    Vec2(double x, double y) : x_(x), y_(y) {}
+
+    // 二元运算符（左侧不是 this，必须友元）
+    friend Vec2 operator+(const Vec2&amp; a, const Vec2&amp; b) {
+        return Vec2(a.x_ + b.x_, a.y_ + b.y_);
+    }
+};
+```
+
+---
+
+## 七、运算符重载最佳实践
+
+### 7.1 Rule of Five
+
+如果定义了析构、拷贝构造、拷贝赋值、移动构造、移动赋值中的任何一个，**通常都要定义其他四个**。
+
+### 7.2 优先级建议
+
+1. **优先使用 STL 算法 + lambda**
+2. **优先使用成员函数重载**（如 `+`）
+3. **流运算符、复合赋值必须友元**
+
+### 7.3 重载的语义要自然
+
+```cpp
+// ✅ 自然的
+a + b       // 表示 &quot;相加&quot;
+a == b      // 表示 &quot;相等&quot;
+
+// ❌ 不自然的
+a + b       // 表示 &quot;比较&quot;（不应该）
+```
+
+---
+
+## 八、面试常问 ⭐⭐
+
+&gt; &#128161; **哪些运算符不能重载？**
+&gt; `::`、`.`、`.*`、`?:`、`sizeof`、`typeid`
+
+&gt; &#128161; **成员函数 vs 友元���数重载？**
+&gt; - **成员函数**：左侧是 `this`，如 `a + b` 等价 `a.operator+(b)`
+&gt; - **友元函数**：左侧也是参数，如 `&lt;&lt;`、`&gt;&gt;`、`a + b`（交换律）
+
+&gt; &#128161; **`operator++` 前置和后置的区别？**
+&gt; - 前置：`++a` → 先加后用，返回引用
+&gt; - 后置：`a++` → 先用后加，返回旧值（拷贝）
+&gt; - 后置用 `int` 占位参数区分
+
+&gt; &#128161; **`&lt;&lt;` 运算符为什么要重载为友元？**
+&gt; 因为 `cout &lt;&lt; obj` 中，**左侧是 ostream，不是 this**，必须用友元函数。
+
+&gt; &#128161; **为什么运算符重载不能改变优先级？**
+&gt; 保证语言的一致性，避免歧义。
+
+---
+
+## 九、本章小结
+
+✅ 已掌握：
+- [ ] 运算符重载的两种形式（成员/友元）
+- [ ] 可重载与不可重载的运算符
+- [ ] **算术、关系、流、下标、自增/自减** 重载
+- [ ] 前置与后置 `++` 的区别
+- [ ] 拷贝赋值与移动赋值
+- [ ] 友元函数与友元类
+- [ ] Rule of Five
+
+✅ 易错点：
+- [ ] 流运算符必须用友元函数
+- [ ] 自赋值检查不能少
+- [ ] 后置 `++` 必须有 `int` 占位
+- [ ] 不要滥用运算符重载，保持语义自然
+
+下一章：[09-模板.md](./09-模板.md)</pre>

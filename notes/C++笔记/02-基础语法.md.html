@@ -1,0 +1,434 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>02-基础语法</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 02 &#183; 基础语法 ⭐
+
+&gt; **难度**：低 | **学习建议**：1 天
+&gt; 二刷重点：**类型系统、const 修饰、auto/decltype、类型转换**
+
+---
+
+## 一、知识框架
+
+```
+基础语法
+├── 2.1 数据类型 ⭐
+├── 2.2 变量与常量
+├── 2.3 运算符
+├── 2.4 类型转换 ⭐⭐
+├── 2.5 auto 与 decltype ⭐⭐
+├── 2.6 输入输出
+└── 2.7 命名空间与作用域
+```
+
+---
+
+## 二、数据类型 ⭐
+
+### 2.1 基本数据类型
+
+| 类型 | 关键字 | 大小（32/64位） | 取值范围 |
+|------|--------|----------------|----------|
+| 布尔 | `bool` | 1 字节 | true / false |
+| 字符 | `char` | 1 字节 | -128 ~ 127 |
+| 短整型 | `short` | 2 字节 | -32768 ~ 32767 |
+| 整型 | **`int`** | 4 字节 | -2&#179;&#185; ~ 2&#179;&#185;-1 |
+| 长整型 | `long` | 4 / 8 字节 | |
+| 长长整型 | `long long` | 8 字节 | -2⁶&#179; ~ 2⁶&#179;-1 |
+| 单精度浮点 | `float` | 4 字节 | 约 &#177;3.4e38（精度 7 位） |
+| 双精度浮点 | **`double`** | 8 字节 | 约 &#177;1.8e308（精度 15 位） |
+| 无字符 | `unsigned char` | 1 字节 | 0 ~ 255 |
+| 无符号 | `unsigned int` | 4 字节 | 0 ~ 2&#179;&#178;-1 |
+
+&gt; &#128161; **用 `sizeof` 查大小**：
+&gt; ```cpp
+&gt; cout &lt;&lt; sizeof(int);    // 4
+&gt; cout &lt;&lt; sizeof(long);   // Linux 8, Windows 4
+&gt; ```
+
+### 2.2 字面值常量 ⭐
+
+```cpp
+// 整型
+int a = 100;          // 十进制
+int b = 0144;         // 八进制（0 开头）
+int c = 0xFF;         // 十六进制（0x 开头）
+int d = 0b1010;       // 二进制（C++14）
+int e = 1&#39;000&#39;000;    // 分隔符（C++14，可读性）
+
+// 浮点
+double pi = 3.14;
+double g = 3.14f;     // float 字面值（f/F 后缀）
+double h = 3.14L;     // long double（l/L 后缀）
+
+// 字符
+char c1 = &#39;A&#39;;
+char c2 = &#39;\n&#39;;       // 转义
+char c3 = u8&#39;a&#39;;      // UTF-8 字符
+
+// 布尔
+bool flag = true;     // 1
+bool stop = false;    // 0
+
+// C++14：二进制字面值
+int bin = 0b1010;     // 10
+```
+
+### 2.3 字符串字面值
+
+```cpp
+const char* s1 = &quot;hello&quot;;                    // C 风格字符串
+std::string s2 = &quot;hello&quot;;                    // C++ 字符串（推荐）
+auto s3 = u8&quot;hello&quot;;                          // UTF-8（C++11）
+auto s4 = u&quot;hello&quot;;                           // char16_t
+auto s5 = U&quot;hello&quot;;                           // char32_t
+auto s6 = L&quot;hello&quot;;                           // wchar_t
+auto s7 = R&quot;(hello\nworld)&quot;;                  // 原始字符串（C++11）
+```
+
+&gt; ⚠ **C 风格字符串以 `\0` 结尾**，不能直接比较 / 拼接。
+
+---
+
+## 三、变量与常量
+
+### 3.1 变量定义
+
+```cpp
+int age = 18;
+double pi = 3.14;
+char ch = &#39;A&#39;;
+std::string name = &quot;张三&quot;;
+
+// 列表初始化（C++11）
+int a{10};
+int b = {20};
+```
+
+### 3.2 常量
+
+```cpp
+// 1. C 风格宏（不推荐）
+#define PI 3.14159
+
+// 2. const 常量（推荐）
+const double PI = 3.14159;
+const int MAX = 100;
+
+// 3. constexpr 常量（C++11）—— 编译期常量
+constexpr double PI = 3.14159;
+constexpr int SIZE = 100;
+```
+
+&gt; &#128161; **constexpr vs const**：
+&gt; - `const`：运行时不能修改（不一定编译期常量）
+&gt; - `constexpr`：编译期就能算出值（C++11）
+&gt; - `consteval`：强制编译期（C++20）
+
+### 3.3 变量作用域
+
+```cpp
+int x = 10;          // 全局变量
+
+void func() {
+    int y = 20;      // 局部变量
+    {
+        int z = 30;  // 块作用域
+    }
+    // z 不可访问
+}
+```
+
+---
+
+## 四、运算符 ⭐
+
+### 4.1 算术运算符
+
+```cpp
++  -  *  /  %  ++  --
+```
+
+### 4.2 关系与逻辑运算符
+
+```cpp
+==  !=  &gt;  &lt;  &gt;=  &lt;=
+&amp;&amp;  ||  !
+```
+
+### 4.3 位运算符 ⭐
+
+```cpp
+&amp;   // 按位与
+|   // 按位或
+^   // 按位异或
+~   // 按位取反
+&lt;&lt;  // 左移
+&gt;&gt;  // 右移
+```
+
+&gt; ⚠ **位运算符 vs 逻辑运算符**：`&amp;` 和 `&amp;&amp;` 是不同的！
+
+### 4.4 赋值运算符
+
+```cpp
+=  +=  -=  *=  /=  %=  &amp;=  |=  ^=  &lt;&lt;=  &gt;&gt;=
+```
+
+### 4.5 三元运算符
+
+```cpp
+int max = (a &gt; b) ? a : b;
+```
+
+### 4.6 其他运算符
+
+```cpp
+sizeof(x)     // 求大小
+typeid(x)     // 求类型
+? :           // 三元
+,             // 逗号
+-&gt;            // 指针访问
+::            // 作用域
+```
+
+### 4.7 运算符优先级（从高到低）
+
+```
+()  []  -&gt;  .              // 最高
+!  ~  ++  --  +  -  *  &amp;   // 单目
+*  /  %
++  -
+&lt;&lt;  &gt;&gt;
+&lt;  &lt;=  &gt;  &gt;=
+==  !=
+&amp;
+^
+|
+&amp;&amp;
+||
+?:                          // 三元
+=  +=  -= ...               // 赋值
+,                           // 最低
+```
+
+---
+
+## 五、类型转换 ⭐⭐
+
+### 5.1 隐式转换
+
+```cpp
+int i = 3.14;           // double → int（截断）
+double d = 5;            // int → double
+char c = 65;             // int → char（&#39;A&#39;）
+```
+
+### 5.2 显式转换（C 风格）
+
+```cpp
+int i = (int)3.14;
+double d = (double)5 / 2;    // 2.5
+```
+
+### 5.3 C++ 强制类型转换（推荐���⭐���
+
+```cpp
+// 1. static_cast：常规转换
+int i = static_cast&lt;int&gt;(3.14);
+double d = static_cast&lt;double&gt;(5) / 2;    // 2.5
+
+// 2. const_cast：去 const
+const int* p = &amp;x;
+int* q = const_cast&lt;int*&gt;(p);
+
+// 3. dynamic_cast：父子类安全转换（多态中）
+Derived* d = dynamic_cast&lt;Derived*&gt;(basePtr);
+
+// 4. reinterpret_cast：底层重新解释（慎用）
+int* p = reinterpret_cast&lt;int*&gt;(0x1234);
+```
+
+&gt; ⚠ **C++ 强制转换更安全、语义更清晰**，推荐使用 C++ 风格而非 C 风格。
+
+---
+
+## 六、auto 与 decltype ⭐⭐
+
+### 6.1 auto（C++11）
+
+**让编译器自动推导类型**。
+
+```cpp
+auto i = 42;           // int
+auto d = 3.14;         // double
+auto s = &quot;hello&quot;;      // const char*
+auto str = std::string(&quot;hi&quot;);  // std::string
+
+// 配合迭代器
+std::vector&lt;int&gt; v;
+for (auto it = v.begin(); it != v.end(); ++it) { }
+
+// 配合范围 for（C++11）
+for (auto&amp; num : v) {
+    std::cout &lt;&lt; num;
+}
+```
+
+### 6.2 auto 的推导规则 ⭐
+
+| 声明 | 推导规则 |
+|------|---------|
+| `auto x = expr;` | 忽略 const/volatile/引用 |
+| `auto&amp; x = expr;` | 保留 const/volatile |
+| `auto* x = expr;` | 指针 |
+
+```cpp
+const int a = 10;
+auto b = a;           // int（去掉 const）
+auto&amp; c = a;          // const int&amp;
+
+int x = 5;
+int&amp; ref = x;
+auto y = ref;          // int（去掉引用）
+auto&amp; z = ref;         // int&amp;（保留引用）
+```
+
+### 6.3 decltype（C++11）
+
+**推导表达式的类型，但不使用该表达式**。
+
+```cpp
+int a = 10;
+decltype(a) b = 20;      // int
+
+decltype((a)) c = a;     // int&amp;（双括号 = 引用）
+
+// 用于模板
+template &lt;typename T, typename U&gt;
+auto add(T x, U y) -&gt; decltype(x + y) {
+    return x + y;
+}
+```
+
+### 6.4 auto vs decltype ⭐
+
+| 维度 | auto | decltype |
+|------|------|----------|
+| 用法 | 声明变量 | 推导类型 |
+| 是否赋值 | 必须赋值 | 可不赋值 |
+| 顶层 const | 去除 | 保留 |
+
+---
+
+## 七、命名空间与作用域 ⭐
+
+### 7.1 命名空间
+
+```cpp
+namespace my {
+    int x = 10;
+    void func() { }
+}
+
+my::x = 20;
+my::func();
+```
+
+### 7.2 using
+
+```cpp
+// 单个引入
+using std::cout;
+cout &lt;&lt; &quot;hi&quot;;
+
+// 全部引入（慎用）
+using namespace std;
+cout &lt;&lt; &quot;hi&quot;;
+```
+
+### 7.3 作用域
+
+```cpp
+int x = 10;   // 全局
+
+void f() {
+    int x = 20;       // 局部（隐藏全局）
+    ::x = 30;          // 显式访问全局（::作用域运算符）
+}
+```
+
+---
+
+## 八、输入输出 ⭐
+
+```cpp
+#include &lt;iostream&gt;
+
+int main() {
+    int age;
+    std::string name;
+    double score;
+
+    std::cout &lt;&lt; &quot;请输入姓名 年龄 分数：&quot;;
+    std::cin &gt;&gt; name &gt;&gt; age &gt;&gt; score;
+
+    std::cout &lt;&lt; name &lt;&lt; &quot; &quot; &lt;&lt; age &lt;&lt; &quot; &quot; &lt;&lt; score &lt;&lt; std::endl;
+    return 0;
+}
+```
+
+**cin/cout 加速**（大数据量时）：
+```cpp
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+```
+
+---
+
+## 九、面试常问 ⭐
+
+&gt; &#128161; **`const` 和 `#define` 的区别？**
+&gt; | const | #define |
+&gt; |-------|---------|
+&gt; | 有类型检查 | 纯文本替换 |
+&gt; | 有作用域 | 全局 |
+&gt; | 可调试 | 难调试 |
+&gt; | 现代 C++ 推荐 | 不推荐 |
+
+&gt; &#128161; **`auto` 的限制？**
+&gt; - 不能作为函数形参（C++20 之前）
+&gt; - 不能用于非静态成员变量
+&gt; - 必须初始化
+
+&gt; &#128161; **`auto` 和 `decltype` 的区别？**
+&gt; - auto 声明变量并初始化，会去掉引用和 const
+&gt; - decltype 仅推导类型，可保留 const 和引用
+
+&gt; &#128161; **C++ 四种强制类型转换？**
+&gt; - `static_cast`：常规转换
+&gt; - `const_cast`：去 const
+&gt; - `dynamic_cast`：父子类安全转换（多态）
+&gt; - `reinterpret_cast`：底层重新解释
+
+&gt; &#128161; **`sizeof` 是函数还是运算符？**
+&gt; 运算符（编译期计算），不是函数调用。
+
+---
+
+## 十、本章小结
+
+✅ 已掌握：
+- [ ] 基本数据类型及大小（sizeof）
+- [ ] 字面值常量的各种写法
+- [ ] **constexpr**（编译期常量）
+- [ ] 运算符优先级
+- [ ] **C++ 4 种强制类型转换**
+- [ ] **auto 与 decltype**（C++11）
+- [ ] cin/cout 输入输出
+- [ ] 命名空间与 using
+
+✅ 易错点：
+- [ ] `&amp;`（按位与）和 `&amp;&amp;`（逻辑与）不同
+- [ ] `auto` 会去掉 const 和引用
+- [ ] 头文件不要 `using namespace std;`
+- [ ] `float` 字面值要加 `f` 后缀
+
+下一章：[03-流程控制与函数.md](./03-流程控制与函数.md)</pre>

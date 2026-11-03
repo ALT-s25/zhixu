@@ -1,0 +1,444 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>14-现代C++新特性</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 14 &#183; 现代 C++ 新特性 ⭐⭐⭐⭐
+
+&gt; **难度**：高 | **学习建议**：2 天
+&gt; **C++11/14/17/20 核心特性**。面试高频，工作日常用。
+
+---
+
+## 一、知识框架
+
+```
+现代 C++ 新特性
+├── 14.1 C++ 标准演变
+├── 14.2 左值 vs 右值 ⭐⭐⭐
+├── 14.3 右值引用 ⭐⭐⭐
+├── 14.4 移动语义 ⭐⭐⭐⭐
+├── 14.5 std::move ⭐⭐⭐
+├── 14.6 完美转发 ⭐⭐
+├── 14.7 nullptr
+├── 14.8 constexpr 进阶
+├── 14.9 auto / decltype（已述）
+├── 14.10 范围 for
+├── 14.11 结构化绑定（C++17）
+├── 14.12 if/switch 初始化（C++17）
+├── 14.13 其他特性
+```
+
+---
+
+## 二、C++ 标准演变
+
+| 标准 | 年份 | 主要特性 |
+|------|------|---------|
+| C++98 | 1998 | 第一个标准 |
+| C++03 | 2003 | 小修订 |
+| C++11 | 2011 | **大更新**：auto、lambda、右值引用、智能指针、范围 for |
+| C++14 | 2014 | 泛型 lambda、make_unique |
+| C++17 | 2017 | 结构化绑定、filesystem、optional、string_view |
+| C++20 | 2020 | concepts、coroutines、ranges、modules |
+
+---
+
+## 三、左值 vs 右值 ⭐⭐⭐
+
+### 3.1 概念
+
+- **左值（lvalue）**：有名字、可取地址、生命周期长
+- **右值（rvalue）**：临时值、不可取地址、生命周期短
+
+```cpp
+int a = 10;          // a 是左值
+int b = a + 5;       // a+5 是右值（临时）
+std::string s1 = &quot;hello&quot;;
+std::string s2 = s1 + &quot; world&quot;;   // s1+&quot; world&quot; 是右值
+```
+
+**详细分类**：
+
+```
+表达式
+├── 左值
+│   ├── 变量
+│   ├── 函数返回值（返回引用）
+│   └── 前置++ / --
+└── 右值
+    ├── 字面值（42, &quot;hello&quot;）
+    ├── 函数返回值（返回临时对象）
+    ├── 后置++ / --
+    └── 临时对象
+```
+
+### 3.2 引用折叠规则 ⭐
+
+```cpp
+int a = 10;
+int&amp; lref = a;        // 左值引用
+int&amp;&amp; rref = 10;       // 右值引用
+
+// 引用折叠
+int&amp; &amp;   → int&amp;
+int&amp; &amp;&amp;  → int&amp;
+int&amp;&amp; &amp;  → int&amp;
+int&amp;&amp; &amp;&amp; → int&amp;&amp;
+```
+
+&gt; &#128161; 这是 **std::forward** 的基础。
+
+---
+
+## 四、右值引用 ⭐⭐⭐
+
+### 4.1 语法
+
+```cpp
+int a = 10;
+int&amp; lref = a;        // 左值引用
+int&amp;&amp; rref = 10;       // 右值引用（绑定到字面值）
+
+// std::move 把左值转为右值引用
+int&amp;&amp; rref2 = std::move(a);
+```
+
+### 4.2 右值引用延长生命周期
+
+```cpp
+std::string&amp;&amp; r = std::string(&quot;hello&quot;);   // 临时对象的生命周期延长
+// r 离开作用域才释放
+```
+
+---
+
+## 五、移动语义 ⭐⭐⭐⭐
+
+### 5.1 为什么需要移动语义
+
+**避免不必要的拷贝**。
+
+```cpp
+// C++03：拷贝构造（深拷贝）
+std::string a = &quot;hello&quot;;
+std::string b = a;              // 拷贝 a 的内容给 b（开销大）
+
+// C++11：移动构造（移动资源）
+std::string c = std::move(a);   // 移动 a 的指针给自己（快）
+// a 现在是空字符串
+```
+
+### 5.2 移动构造函数
+
+```cpp
+class MyString {
+    char* data_;
+    size_t size_;
+
+public:
+    // 移动构造：从右值&quot;窃取&quot;资源
+    MyString(MyString&amp;&amp; other) noexcept
+        : data_(other.data_), size_(other.size_) {
+        other.data_ = nullptr;       // 防止 double-free
+        other.size_ = 0;
+    }
+};
+
+MyString a(&quot;hello&quot;);
+MyString b = std::move(a);    // 调移动构造
+```
+
+### 5.3 移动赋值
+
+```cpp
+MyString&amp; operator=(MyString&amp;&amp; other) noexcept {
+    if (this != &amp;other) {
+        delete[] data_;
+        data_ = other.data_;
+        size_ = other.size_;
+        other.data_ = nullptr;
+        other.size_ = 0;
+    }
+    return *this;
+}
+```
+
+### 5.4 移动语义的性能优势
+
+```cpp
+std::vector&lt;std::string&gt; v;
+v.push_back(std::string(&quot;hello&quot;));   // 移动构造（快）
+v.push_back(&quot;hello&quot;);                // 隐式构造 + 移动
+v.push_back(std::move(someString));  // 移动构造（避免拷贝）
+```
+
+### 5.5 Rule of Five
+
+&gt; **如果定义了析构、拷贝构造、拷贝赋值、移动构造、移动赋值 之一，**通常需要考虑其他几个。
+
+```cpp
+class MyClass {
+public:
+    ~MyClass();                                // 析构
+    MyClass(const MyClass&amp;);                   // 拷贝构造
+    MyClass&amp; operator=(const MyClass&amp;);        // 拷贝赋值
+    MyClass(MyClass&amp;&amp;) noexcept;               // 移动构造
+    MyClass&amp; operator=(MyClass&amp;&amp;) noexcept;    // 移动赋值
+};
+```
+
+### 5.6 何时会调用移动语义
+
+```cpp
+// 1. 函数返回局部对象（隐式移动）
+std::vector&lt;int&gt; make_vec() {
+    std::vector&lt;int&gt; v;
+    return v;            // NRVO / 移动
+}
+
+// 2. std::move
+std::string a = &quot;hi&quot;;
+std::string b = std::move(a);
+
+// 3. push_back / emplace_back 等
+v.push_back(std::move(s));
+```
+
+---
+
+## 六、std::move ⭐⭐⭐
+
+**将左值强制转换为右值引用**，触发移动语义。
+
+```cpp
+template &lt;typename T&gt;
+constexpr std::remove_reference_t&lt;T&gt;&amp;&amp; move(T&amp;&amp; t) {
+    return static_cast&lt;std::remove_reference_t&lt;T&gt;&amp;&amp;&gt;(t);
+}
+
+std::string a = &quot;hi&quot;;
+std::string b = std::move(a);    // a 变为&quot;移后源&quot;，b 接管资源
+```
+
+&gt; ⚠ **std::move 不移动任何东西**，只是类型转换，**真正的移动在移动构造/赋值中完成**。
+
+---
+
+## 七、完美转发 ⭐⭐
+
+**保持参数的值类别**（左值仍是左值，右值仍是右值）。
+
+```cpp
+template &lt;typename T&gt;
+void wrapper(T&amp;&amp; arg) {
+    // std::forward 保持原类型
+    func(std::forward&lt;T&gt;(arg));
+}
+
+wrapper(42);        // T = int，arg 是右值，转发给 func 的右值参数
+wrapper(x);          // T = int&amp;，arg 是左值，转发给 func 的左值参数
+```
+
+&gt; &#128161; **完美转发**用于**模板包装函数**，常见于工厂模式、emplace。
+
+---
+
+## 八、nullptr（C++11）⭐
+
+```cpp
+int* p1 = NULL;          // C 风格（实际是 0）
+int* p2 = nullptr;       // C++11 风格（类型安全的空指针）
+
+template &lt;typename T&gt;
+void func(T* p);
+
+func(NULL);              // ❌ 推导为 int
+func(nullptr);           // ✅ 推导为 nullptr_t
+```
+
+&gt; &#128161; **现代 C++ 一律用 nullptr**。
+
+---
+
+## 九、constexpr 进阶 ⭐⭐
+
+```cpp
+constexpr int square(int x) { return x * x; }
+
+constexpr int arr[square(3)];          // int arr[9]
+constexpr auto pi = 3.14;              // double
+
+// constexpr 函数中允许局部变量、循环（C++14）
+constexpr int factorial(int n) {
+    int result = 1;
+    for (int i = 1; i &lt;= n; i++) result *= i;
+    return result;
+}
+
+// constexpr 构造（C++11）
+struct Point {
+    int x, y;
+    constexpr Point(int a, int b) : x(a), y(b) {}
+};
+constexpr Point p(1, 2);    // 编译期构造
+```
+
+---
+
+## 十、范围 for（C++11）⭐
+
+```cpp
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};
+
+for (int x : v) { }             // 读
+for (auto&amp; x : v) { x *= 2; }   // 写
+for (const auto&amp; x : v) { }     // 读（避免拷贝）
+```
+
+---
+
+## 十一、结构化绑定（C++17）⭐⭐
+
+```cpp
+// 1. pair / tuple
+std::pair&lt;int, double&gt; p{1, 3.14};
+auto [a, b] = p;        // a = 1, b = 3.14
+
+// 2. 数组
+int arr[] = {1, 2, 3};
+auto [x, y, z] = arr;
+
+// 3. 结构体
+struct Point { int x, y; };
+Point pt{1, 2};
+auto [px, py] = pt;
+
+// 4. map 遍历
+std::map&lt;std::string, int&gt; m;
+for (const auto&amp; [k, v] : m) { /* k 是 key, v 是 value */ }
+```
+
+---
+
+## 十二、if / switch 初始化（C++17）
+
+```cpp
+// if 初始化
+if (auto it = m.find(key); it != m.end()) {
+    std::cout &lt;&lt; it-&gt;second;
+}
+
+// switch 初始化
+switch (auto x = compute(); x) {
+    case 1: /* ... */ break;
+    default: /* ... */;
+}
+```
+
+&gt; &#128161; **作用域限制在 if/switch 内**，避免污染外部。
+
+---
+
+## 十三、其他特性
+
+### 13.1 std::optional（C++17）
+
+```cpp
+std::optional&lt;int&gt; opt = 42;
+if (opt) std::cout &lt;&lt; *opt;
+
+opt = std::nullopt;
+opt = 100;
+```
+
+### 13.2 std::variant（C++17）
+
+```cpp
+std::variant&lt;int, std::string&gt; v = 42;
+v = &quot;hello&quot;;
+
+std::visit([](auto&amp;&amp; arg) { std::cout &lt;&lt; arg; }, v);
+```
+
+### 13.3 std::string_view（C++17）
+
+不拷贝的字符串视图，**用于只读参数**。
+
+```cpp
+void print(std::string_view s) {     // 不分配内存
+    std::cout &lt;&lt; s;
+}
+
+print(&quot;hello&quot;);        // 字面值 → 不会构造 std::string
+```
+
+### 13.4 std::filesystem（C++17）
+
+```cpp
+#include &lt;filesystem&gt;
+
+for (auto&amp; entry : std::filesystem::directory_iterator(&quot;.&quot;)) {
+    std::cout &lt;&lt; entry.path() &lt;&lt; &quot;\n&quot;;
+}
+```
+
+### 13.5 tuple 解包
+
+```cpp
+auto t = std::make_tuple(1, &quot;hi&quot;, 3.14);
+std::cout &lt;&lt; std::get&lt;0&gt;(t);    // 1
+std::cout &lt;&lt; std::get&lt;1&gt;(t);    // hi
+```
+
+---
+
+## 十四、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **左值和右值的区别？**
+&gt; - 左值：有名字、可取地址
+&gt; - 右值：临时值、不可取地址
+
+&gt; &#128161; **std::move 是什么？**
+&gt; 本质是**类型转换**（T → T&amp;&amp;），不移动任何东西。**真正的移动在移动构造中**。
+
+&gt; &#128161; **移动语义解决了什么问题？**
+&gt; - 避免不必要的深拷贝
+&gt; - 对临时对象&quot;窃取&quot;资源
+
+&gt; &#128161; **什么是完美转发？**
+&gt; 模板函数转发参数时**保持原值类别**（左值/右值）。用 `std::forward&lt;T&gt;(arg)`。
+
+&gt; &#128161; **`emplace_back` vs `push_back`？**
+&gt; - push_back：先构造临时对象，再移动到容器
+&gt; - emplace_back：**直接在容器内存中构造**（少一次移动）
+
+&gt; &#128161; **Rule of Five 是什么？**
+&gt; 析构、拷贝构造、拷贝赋值、移动构造、移动赋值是配套的。
+
+&gt; &#128161; **`nullptr` vs `NULL`？**
+&gt; - NULL 是宏（实际是 0 或 (void*)0）
+&gt; - nullptr 是类型安全的空指针（C++11）
+
+&gt; &#128161; **结构化绑定能用在哪些场景？**
+&gt; - pair / tuple
+&gt; - 数组
+&gt; - 结构体（所有非静态成员）
+&gt; - map 遍历
+
+---
+
+## 十五、本章小结
+
+✅ 已掌握：
+- [ ] **左值 vs 右值**
+- [ ] **右值引用** &amp;&amp; 与引用折叠
+- [ ] **移动语义**（移动构造、移动赋值）
+- [ ] **std::move** 与 std::forward
+- [ ] nullptr、constexpr 进阶
+- [ ] **结构化绑定**（C++17）
+- [ ] if/switch 初始化
+- [ ] std::optional / variant / string_view
+
+✅ 易错点：
+- [ ] std::move 只是类型转换，不移动
+- [ ] 移动后的对象状态**未定义**，不能访问
+- [ ] 移动构造应加 noexcept
+- [ ] 完美转发要配合 `T&amp;&amp;` + std::forward
+
+下一章：[15-异常与多线程.md](./15-异常与多线程.md)</pre>

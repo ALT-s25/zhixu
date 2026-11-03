@@ -1,0 +1,384 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>07-查找</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 第 7 章 &#183; 查找 ⭐⭐⭐⭐⭐
+
+&gt; **考频**：选+码+用 | **难度**：高 | **分值占比**：~16%
+&gt; 本章分值高、难度大。**折半查找 + B 树 + 哈希**每年必考，AVL 调整是重难点。
+
+---
+
+## 一、知识框架
+
+```
+查找
+├── 7.1 基本概念
+│   ├── ASL（平均查找长度）
+│   └── 静态 vs 动态查找
+├── 7.2 顺序查找
+├── 7.3 折半查找 ★★★★
+├── 7.4 分块查找
+├── 7.5 二叉排序树 BST ★★★★
+├── 7.6 平衡二叉树 AVL ★★★★★
+│   ├── 平衡因子
+│   └── 4 种调整：LL/RR/LR/RL
+├── 7.7 B 树 ★★★★
+│   ├── m 阶 B 树的定义
+│   └── 插入、删除
+├── 7.8 B+ 树 ★★★
+└── 7.9 散列表（哈希表）★★★★★
+    ├── 散列函数构造
+    ├── 冲突处理（线性/平方/双散列/链地址）
+    └── 装填因子 + ASL 公式
+```
+
+---
+
+## 二、核心概念
+
+### 2.1 基本概念
+
+- **查找长度 ASL**：查找过程中比较关键字次数的平均值
+- **静态查找**：不插入/删除（顺序、折半、分块）
+- **动态查找**：支持插入/删除（BST、AVL、B 树、哈希）
+
+### 2.2 顺序查找
+
+- ASL = (n+1)/2（成功），n+1（失败，带哨兵）
+- 适用**顺序存储或链式存储**，对数据无要求
+- 优化：&quot;哨兵&quot;放在 a[0]，少一次边界判断
+
+### 2.3 折半查找 ★★★★
+
+**仅适用有序顺序表**，ASL = `⌊log₂(n+1)⌋`。
+
+**过程**：low、high、mid = `⌊(low+high)/2⌋`。比较 key 与 a[mid]，缩小区间。
+**判定树**：折半查找的判定树是**平衡二叉树**（但不一定完全）。
+
+### 2.4 分块查找
+
+- 分块有序（块内无序，块间有序）
+- 先索引表折半/顺序 → 再块内顺序
+- ASL ≈ 折半块间 + 顺序块内
+
+### 2.5 二叉排序树 BST ★★★★
+
+**定义**：**左子树 &lt; 根 &lt; 右子树**。中序遍历得到有序序列。
+
+**操作**：
+- **查找**：类似折半，沿子树方向递归
+- **插入**：从根开始，遇到更大就往左、否则往右，直到空位
+- **删除**：三种情况
+  1. 叶子 → 直接删
+  2. 仅一棵子树 → 子树顶替
+  3. 两棵子树都有 → 用**直接后继（或前驱）**填补，再删后继/前驱
+
+&gt; ⚠ ASL 取决于树高：平均 O(log n)，最坏 O(n)（退化为链表）。
+
+### 2.6 平衡二叉树 AVL ★★★★★
+
+**定义**：BST + **任一结点左右子树高度差 ≤ 1**（平衡因子 = 左高 - 右高，取值 -1/0/1）。
+
+#### 插入失衡 → 4 种调整 ★★★★★
+
+| 失衡类型 | 症状 | 调整方法 | 口诀 |
+|---------|------|---------|------|
+| LL（左左） | 失衡结点左孩子的左子树插入 | 右单旋 | 失衡点右旋 |
+| RR（右右） | 失衡结点右孩子的右子树插入 | 左单旋 | 失衡点左旋 |
+| LR（左右） | 失衡结点左孩子的右子树插入 | 先左后右双旋 | 先对失衡点的左孩子左旋，再对失衡点右旋 |
+| RL（右左） | 失衡结点右孩子的左子树插入 | 先右后左双旋 | 先对失衡点的右孩子右旋，再对失衡点左旋 |
+
+**最少结点数**：高度 h 的 AVL 树最少 F(h) 个结点，F(0)=1, F(1)=2, F(h)=F(h-1)+F(h-2)+1。
+
+**最大树高**：含 n 结点的 AVL 树，最大深度 `h &lt; 1.44 log₂(n+2)`，ASL 接近 O(log n)。
+
+&gt; &#128161; **调整画图套路**：画树 → 找到失衡点（离插入点最近、bf ∈ {-2, 2} 的祖先）→ 看失衡点 + 孩子 + 孙子的方位 → 套 4 种调整。
+
+### 2.7 B 树 ★★★★
+
+#### 为何需要 B 树
+降低磁盘 I/O（每个结点可放多个关键字）。
+
+#### m 阶 B 树的定义
+1. 每个结点最多 m 棵子树，**最多 m-1 个关键字**
+2. 除根外，每个分支结点至少 `⌈m/2⌉` 棵子树，至少 `⌈m/2⌉-1` 个关键字
+3. 所有叶子结点都在同一层（带空指针/失败指针）
+4. 结点内关键字有序，kᵢ 左侧子树关键字都 &lt; kᵢ，右侧都 &gt; kᵢ
+
+#### 关键公式
+
+| 结点 | 子树数 | 关键字数 |
+|------|--------|----------|
+| 根 | [2, m] | [1, m-1] |
+| 其他分支结点 | [⌈m/2⌉, m] | [⌈m/2⌉-1, m-1] |
+| 叶子 | 0 | [⌈m/2⌉-1, m-1] |
+
+#### 插入 ★★★★★
+**查找 → 定位 → 插入**。插入后若该结点关键字数 = m，则**分裂**：中间关键字上提到父结点，左右各分一半。
+若父结点也溢出，递归上提直到根（根溢出则树增高一层）。
+
+#### 删除
+复杂情况：删除后关键字数低于下限 → **借兄弟**（父结点补下来，兄弟上来）或 **合并**。考试一般不要求实现，但要会分析。
+
+### 2.8 B+ 树 ★★★
+
+#### B 树 vs B+ 树
+
+| 维度 | B 树 | B+ 树 |
+|------|------|-------|
+| 关键字数 vs 子树数 | n 个关键字 → n+1 个子树 | n 个关键字 → n 个子树 |
+| 数据存储 | 每个结点都存数据 | **只有叶子结点存数据**，分支结点仅索引 |
+| 叶子结点 | 独立 | 用**链表**串起来 → 范围查找快 |
+| 查找方式 | 可能在分支结点结束 | 必须走到叶子 |
+
+### 2.9 散列表（哈希表）★★★★★
+
+#### 基本思想
+关键字 → 散列函数 → 存储位置。最理想 O(1) 查找。
+
+#### 冲突
+**不同关键字映射到同一地址**，不可避免。
+
+#### 散列函数构造 ★★
+- **直接定址法**：`H(key) = a&#183;key + b`，简单不冲突
+- **除留余数法**：`H(key) = key % p`，**p 取不大于表长的最大素数**
+- **数字分析法、平方取中法、折叠法**
+
+---
+
+## 三、关键代码
+
+### 3.1 顺序查找（带哨兵）
+
+```c
+typedef struct {
+    int *data;
+    int length;
+} SSTable;
+
+int SeqSearch(SSTable ST, int key) {
+    ST.data[0] = key;                  // 哨兵
+    int i;
+    for (i = ST.length; ST.data[i] != key; i--);
+    return i;                           // 0 表示失败
+}
+```
+
+### 3.2 折半查找 ⭐⭐⭐⭐
+
+```c
+int BinSearch(SqList L, int key) {
+    int low = 0, high = L.length - 1;
+    while (low &lt;= high) {
+        int mid = (low + high) / 2;
+        if (L.data[mid] == key) return mid;
+        else if (L.data[mid] &lt; key) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+}
+```
+
+### 3.3 BST 插入 ⭐⭐⭐⭐
+
+```c
+bool BSTInsert(BiTree &amp;T, int key) {
+    if (T == NULL) {
+        T = (BiTree)malloc(sizeof(BiNode));
+        T-&gt;data = key;
+        T-&gt;lchild = T-&gt;rchild = NULL;
+        return true;
+    }
+    if (key == T-&gt;data) return false;     // 不插重复
+    else if (key &lt; T-&gt;data) return BSTInsert(T-&gt;lchild, key);
+    else return BSTInsert(T-&gt;rchild, key);
+}
+```
+
+### 3.4 BST 删除（递归）
+
+```c
+bool BSTDelete(BiTree &amp;T, int key) {
+    if (T == NULL) return false;
+    if (key == T-&gt;data) return DeleteNode(T);
+    else if (key &lt; T-&gt;data) return BSTDelete(T-&gt;lchild, key);
+    else return BSTDelete(T-&gt;rchild, key);
+}
+
+bool DeleteNode(BiTree &amp;T) {
+    if (T-&gt;lchild == NULL) {        // 只有右子树或叶子
+        BiTree tmp = T;
+        T = T-&gt;rchild;
+        free(tmp);
+    } else if (T-&gt;rchild == NULL) { // 只有左子树
+        BiTree tmp = T;
+        T = T-&gt;lchild;
+        free(tmp);
+    } else {                        // 两子树都有：找直接后继
+        BiTree s = T-&gt;rchild;
+        while (s-&gt;lchild) s = s-&gt;lchild;     // 一直向左
+        T-&gt;data = s-&gt;data;                    // 后继值补上
+        BSTDelete(T-&gt;rchild, s-&gt;data);       // 删除后继
+    }
+    return true;
+}
+```
+
+### 3.5 哈希表（线性探测法）
+
+```c
+#define HASHSIZE 12
+#define NULLKEY -1
+
+int HashTable[HASHSIZE];
+
+void InitHash() { for (int i = 0; i &lt; HASHSIZE; i++) HashTable[i] = NULLKEY; }
+
+int H(int key) { return key % HASHSIZE; }   // 除留余数法
+
+// 插入（探测序列）
+bool InsertHash(int key) {
+    int addr = H(key);
+    while (HashTable[addr] != NULLKEY)       // 冲突，线性探测
+        addr = (addr + 1) % HASHSIZE;
+    HashTable[addr] = key;
+    return true;
+}
+
+// 查找
+int SearchHash(int key) {
+    int addr = H(key);
+    while (HashTable[addr] != key) {
+        if (HashTable[addr] == NULLKEY) return -1;   // 失败
+        addr = (addr + 1) % HASHSIZE;
+    }
+    return addr;
+}
+```
+
+### 3.6 哈希表（链地址法）
+
+```c
+typedef struct LNode {
+    int key;
+    struct LNode *next;
+} LNode, *LinkList;
+
+LinkList HashTable[HASHSIZE];
+
+int H(int key) { return key % HASHSIZE; }
+
+void InsertHash(int key) {
+    int addr = H(key);
+    LinkList s = (LinkList)malloc(sizeof(LNode));
+    s-&gt;key = key;
+    s-&gt;next = HashTable[addr];     // 头插
+    HashTable[addr] = s;
+}
+
+LinkList SearchHash(int key) {
+    int addr = H(key);
+    LinkList p = HashTable[addr];
+    while (p &amp;&amp; p-&gt;key != key) p = p-&gt;next;
+    return p;       // NULL 表示失败
+}
+```
+
+---
+
+## 四、冲突处理 ★★★★
+
+### 4.1 开放定址法（闭散列��
+
+`Hᵢ(key) = (H(key) + dᵢ) % m`
+
+- **线性探测**：`dᵢ = 0, 1, 2, ..., m-1`。易**堆积**
+- **平方探测**：`dᵢ = 0&#178;, 1&#178;, -1&#178;, 2&#178;, -2&#178;, ...`。可缓解堆积，但**不能探测到所有单元**
+- **双散列**：`dᵢ = i &#215; H₂(key)`，探测序列分布更均匀
+- **伪随机探测**：`dᵢ = 伪随机序列`
+
+### 4.2 链地址法（开散列）★★★
+
+同地址的冲突元素拉成**链表**挂在该槽位。**考研最常考**。
+
+- 装填因子 `α = n/m`（n 关键字数，m 槽数）
+- ASL 成功 ≈ 1 + α/2，ASL 失败 ≈ α + e^(-α)（王道默认）
+
+### 4.3 再散列法
+
+构造多个散列函数，第一个冲突用第二个，以此类推。
+
+### 4.4 装填因子 α ★★★
+
+`α = 表中记录数 / 散列表长度`。**α 越大，冲突越多**。
+
+### 4.5 各种探测法 ASL 公式
+
+| 方法 | 成功 ASL | 失败 ASL |
+|------|---------|---------|
+| 线性探测 | `(1+1/(1-α))/2` | `(1+α&#178;)/(1+α)/2 + 1/2` |
+| 平方探测 | `-(1/α)&#183;ln(1-α)` | `1/(1-α) - α + ln(1-α)` |
+| 链地址法 | `1 + α/2` | `α + e^(-α)` |
+
+&gt; ⚠ **ASL 计算常错**：成功是&quot;找到关键字的查找次数期望&quot;，失败是&quot;判定不存在的查找次数期望&quot;。
+
+---
+
+## 五、真题套路
+
+### 套路 A：折半查找判定树
+- 给有序表，画判定树
+- 求 ASL
+
+### 套路 B：BST 构造 + 删除
+- 给一组关键字，画 BST
+- 删除结点：分类讨论三种情况
+
+### 套路 C：AVL 调整
+- 插入后画图找失衡点
+- 套 4 种调整
+
+### 套路 D：B 树插入分裂
+- 关键字逐个插入
+- 结点满时分裂
+
+### 套路 E：哈希表构造 + ASL
+- 给定哈希函数和冲突处理方法
+- 构造哈希表（手写）
+- 计算 ASL
+
+---
+
+## 六、概念清单（必背）
+
+- [ ] ASL 定义 + 静态/动态查找
+- [ ] 折半查找：判定树 = 平衡二叉树
+- [ ] BST：插入/删除（特别是删除两子树都有时）
+- [ ] AVL 4 种调整：LL/RR/LR/RL 的判定和调整
+- [ ] m 阶 B 树：关键字范围 + 插入分裂
+- [ ] B+ 树 vs B 树：叶子链表 + 范围查找
+- [ ] 哈希表冲突处理 4 种 + 装填因子 + ASL 公式
+
+---
+
+## 七、自测题
+
+1. **折半查找**：有序表 (1, 3, 5, 7, 9, 11, 13, 15)，查找 11 的比较次数？
+   - mid=7 (1次)，右侧 mid=11 (2次)，命中
+   - **答案**：2
+
+2. **AVL**：依次插入 50, 30, 70, 20, 40，画出每次调整结果
+   - 50 插入 → 50
+   - 30 插入 → 30 左
+   - 70 插入 → 70 右
+   - 20 插入 → 30 左左
+   - 40 插入 → 30 的右孩子 → LR 调整
+
+3. **哈希**：表长 11，散列函��� H(key) = key % 11，依次插入 26, 41, 25, 60, 39, 31, 线性探测
+   - 26 → 4
+   - 41 → 8
+   - 25 → 3
+   - 60 → 5（原本 5，空）
+   - 39 → 6
+   - 31 → 9
+
+4. **链地址法 ASL**：表长 7，存 8 个关键字
+   - α = 8/7 ≈ 1.14
+   - ASL 成功 ≈ 1 + α/2 ≈ 1.57</pre>

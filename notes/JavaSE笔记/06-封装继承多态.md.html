@@ -1,0 +1,382 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>06-封装继承多态</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 06 &#183; 封装继承多态 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; OOP **三大特性**，面试必问。本章是整个 JavaSE 的灵魂。
+
+---
+
+## 一、知识框架
+
+```
+封装继承多态
+├── 6.1 封装 ⭐⭐
+├── 6.2 继承 ⭐⭐⭐
+│   ├── extends 用法
+│   ├── super 关键字
+│   ├── 方法重写（override）
+│   ├── 继承中的构造器
+│   └── Object 类
+└── 6.3 多态 ⭐⭐⭐
+    ├── 向上转型
+    ├── instanceof
+    ├── 动态绑定
+    └── 经典应用
+```
+
+---
+
+## 二、封装 ⭐⭐
+
+### 2.1 封装的好处（再总结）
+
+- **隐藏细节**：对外只暴露必要的方法
+- **数据校验**：可以在 setter 中检查数据合法性
+- **降低耦合**：内部修改不影响外部调用
+
+### 2.2 封装的 4 种访问修饰符
+
+| 修饰符 | 同一类 | 同一包 | 子类 | 其他包 |
+|--------|--------|--------|------|--------|
+| `private` | ✅ | ❌ | ❌ | ❌ |
+| (默认) | ✅ | ✅ | ❌ | ❌ |
+| `protected` | ✅ | ✅ | ✅ | ❌ |
+| `public` | ✅ | ✅ | ✅ | ✅ |
+
+&gt; &#128161; **记忆**：private 最小，public 最大。
+
+---
+
+## 三、继承 ⭐⭐⭐
+
+### 3.1 什么是继承
+
+子类**复用父类**的属性和方法，是 is-a 的关系。
+
+```java
+public class Animal {        // 父类（基类、超类）
+    String name;
+    int age;
+
+    public void eat() {
+        System.out.println(name + &quot; 在吃东西&quot;);
+    }
+}
+
+public class Dog extends Animal {   // 子类（派生类）
+    public void bark() {
+        System.out.println(name + &quot; 汪汪叫&quot;);
+    }
+}
+
+public class Cat extends Animal {
+    public void catchMouse() {
+        System.out.println(name + &quot; 抓老鼠&quot;);
+    }
+}
+```
+
+### 3.2 继承的特点
+
+- Java 是**单继承**（一个类只能 extends 一个父类）
+- 但可以**多层继承**（祖父 → 父 → 子）
+- 所有类都直接或间接继承 `Object`
+
+### 3.3 super 关键字 ⭐⭐
+
+**含义**：代表**父类对象的引用**。
+
+```java
+public class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public void eat() {
+        System.out.println(name + &quot; 在吃东西&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    public Dog(String name) {
+        super(name);          // 调用父类构造器（必须第一行！）
+    }
+
+    public void eat() {       // 重写
+        super.eat();          // 调用父类被重写的方法
+        System.out.println(&quot;狗在啃骨头&quot;);
+    }
+
+    public void showTag() {
+        System.out.println(super.toString());   // 调用父类方法
+    }
+}
+```
+
+### 3.4 方法重写（Override）⭐⭐⭐
+
+**定义**：子类重新实现父类的某个方法。
+
+**规则**：
+1. 方法名、参数列表**完全相同**
+2. 返回类型**相同**或是其子类（Java 5+ 协变返回）
+3. 访问修饰符**不能比父类更严格**
+4. **不能重写** `static` 方法、构造器、`private` 方法、`final` 方法
+
+```java
+public class Animal {
+    public void eat() {
+        System.out.println(&quot;吃东西&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    @Override    // 注解，编译器帮检查
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+}
+```
+
+### 3.5 重载 vs 重写 ⭐⭐
+
+| 维度 | 重载 (Overload) | 重写 (Override) |
+|------|----------------|----------------|
+| 位置 | 同一个类中 | 子类与父类间 |
+| 参数列表 | **必须不同** | 必须相同 |
+| 返回类型 | 任意 | 相同或子类 |
+| 修��符 | 任意 | 不能更严格 |
+| 发生 | **编译时** | **运行时** |
+
+### 3.6 继承中的构造器 ⭐⭐
+
+```java
+public class Animal {
+    String name;
+
+    public Animal() {
+        System.out.println(&quot;Animal 无参构造&quot;);
+    }
+
+    public Animal(String name) {
+        this.name = name;
+        System.out.println(&quot;Animal 有参构造&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    public Dog() {
+        super();            // 默认调用父类无参构造
+        System.out.println(&quot;Dog 无参构造&quot;);
+    }
+
+    public Dog(String name) {
+        super(name);        // 调用父类有参构造
+        System.out.println(&quot;Dog 有参构造&quot;);
+    }
+}
+
+new Dog(&quot;旺财&quot;);
+// 输出：
+// Animal 有参构造
+// Dog 有参构造
+```
+
+&gt; ⚠ **常见坑**：
+&gt; 1. 子类构造器**默认调用**父类无参构造（隐式 super()）
+&gt; 2. 父类**如果没有无参构造器**，子类必须**显式调用** super(args)
+&gt; 3. super() 必须放在子类构造器**第一行**
+&gt; 4. 因此建议父类**始终保留无参构造器**
+
+### 3.7 Object 类
+
+所有类都直接或间接继承 `Object`，常见方法：
+
+| 方法 | 作用 |
+|------|------|
+| `toString()` | 返回对象的字符串表示，建议所有类重�� |
+| `equals(Object)` | 比较两个对象是否相等，建议重写 |
+| `hashCode()` | 返回对象的哈希码，重写 equals 必重写 hashCode |
+| `getClass()` | 获取对象的运行时类 |
+| `clone()` | 克隆对象（需实现 Cloneable 接口） |
+| `finalize()` | GC 回收前调用（已废弃） |
+
+```java
+// 重写 toString
+@Override
+public String toString() {
+    return &quot;Student{name=&quot; + name + &quot;, age=&quot; + age + &quot;}&quot;;
+}
+
+// 重写 equals
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Student s = (Student) o;
+    return age == s.age &amp;&amp; Objects.equals(name, s.name);
+}
+```
+
+---
+
+## 四、多态 ⭐⭐⭐
+
+### 4.1 什么是多态
+
+**同一个引用类型，调用同一个方法，实际表现不一样**（因为绑定的对象不同）。
+
+```java
+Animal a = new Dog();   // 父类引用指向子类对象（向上转型）
+a.eat();                  // 调的是 Dog 的 eat（动态绑定）
+```
+
+### 4.2 多态三要素
+
+1. **继承**（或实现接口）
+2. **方法重写**
+3. **父类引用指向子类对象**（向上转型）
+
+### 4.3 向上转型 ⭐⭐
+
+```java
+Animal a = new Dog();   // 自动转型
+
+// 能调用什么？看 Animal 的��法
+// 实际执行什么？看 Dog 的实现
+```
+
+&gt; ⚠ 向上转型后**不能调用子类特有的方法**：
+```java
+class Dog extends Animal {
+    public void bark() { }   // 子类特有
+}
+Animal a = new Dog();
+a.bark();   // ❌ 编译错误
+```
+
+### 4.4 向下转型 + instanceof ⭐⭐
+
+```java
+// 向下转型：将父类引用强制转为子类引用
+Animal a = new Dog();
+Dog d = (Dog) a;          // 强转
+d.bark();                 // ✅ 可以调用
+
+// 但强转不安全：ClassCastException
+Animal a2 = new Cat();
+Dog d2 = (Dog) a2;        // ❌ 运行时异常
+
+// instanceof 判断
+if (a instanceof Dog) {
+    Dog d = (Dog) a;
+    d.bark();
+}
+```
+
+&gt; &#128161; **Java 16+ 模式匹配**：
+```java
+if (a instanceof Dog d) {   // 自动转型为 d
+    d.bark();
+}
+```
+
+### 4.5 动态绑定（多态的本质）
+
+```java
+public class Demo {
+    public static void main(String[] args) {
+        Animal a = new Dog();
+        a.eat();   // 输出：&quot;狗啃骨头&quot;
+        // 虽然 a 声明为 Animal 类型
+        // 但 JVM 运行时发现 a 实际指向 Dog
+        // 所以调用 Dog 的 eat（而不是 Animal 的）
+    }
+}
+```
+
+&gt; &#128161; 这就是 **&quot;编译看左边，运行看右边&quot;**。
+
+### 4.6 多态经典应用 ⭐⭐
+
+```java
+// 1. 参数多态：方法参数是父类，传入子类
+public void feed(Animal a) {
+    a.eat();
+}
+feed(new Dog());    // 狗吃骨头
+feed(new Cat());    // 猫吃鱼
+
+// 2. 数组多态
+Animal[] animals = {new Dog(), new Cat(), new Dog()};
+for (Animal a : animals) {
+    a.eat();   // 多态调用
+}
+```
+
+### 4.7 多态的局限
+
+1. **不能调用子类特有方法**（需要向下转型）
+2. **字段没有多态性**（字段看左边，方法看右边）
+
+```java
+class A { int x = 1; }
+class B extends A { int x = 2; }
+
+A a = new B();
+System.out.println(a.x);   // 1（字段看左边，没有多态）
+a.method();                 // 多态，看右边
+```
+
+---
+
+## 五、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **重载和重写的区别？**
+&gt; | 维度 | 重载 | 重写 |
+&gt; |------|------|------|
+&gt; | 范围 | 同类 | 子父类 |
+&gt; | 参数 | 必须不同 | 必须相同 |
+&gt; | 返回 | 任意 | 相同/子类 |
+&gt; | 修饰符 | 任意 | 不能更严格 |
+&gt; | 时期 | 编译时 | 运行时 |
+
+&gt; &#128161; **多态的三个必要条件？**
+&gt; 1. 继承或实现接口
+&gt; 2. 子类重写父类方法
+&gt; 3. 父类引用指向子类对象（向上转型）
+
+&gt; &#128161; **为什么字段没有多态？**
+&gt; 字段在编译时就被确定，运行时不会动态绑定。
+
+&gt; &#128161; **super 和 this 的区别？**
+&gt; - this：当前对象，访问本类成员
+&gt; - super：父类对象引用，访问父类成员
+
+&gt; &#128161; **构造器能被继承吗？能被重写吗？**
+&gt; 都不能。子类构造器必须调用父类构造器（super）。
+
+---
+
+## 六、本章小结
+
+✅ 已掌握：
+- [ ] 4 种访问修饰符的作用范围
+- [ ] **继承的语法、特点、单继承/多层继承**
+- [ ] **super 关键字的三大用法**
+- [ ] **方法重写（override）的规则**
+- [ ] **重载 vs 重写 的区别**
+- [ ] 继承中的构造器调用顺序
+- [ ] Object 类常用方法的重写
+- [ ] **多态三要素 + 向上/向下转型**
+- [ ] **instanceof** 的使用
+- [ ] 动态绑定（编译看左，运行看右）
+
+✅ 易错点：
+- [ ] 子类构造器默认调用父类无参构造
+- [ ] 父类没有无参构造器时子类必须显式 super(args)
+- [ ] 多态字段不参与（字段看左边）
+- [ ] 向下转型前必须 instanceof 检查
+
+下一章：[07-抽象类接口内部类.md](./07-抽象类接口内部类.md)</pre>

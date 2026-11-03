@@ -1,0 +1,396 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>05-指针与引用</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 05 &#183; 指针与引用 ⭐⭐⭐
+
+&gt; **难度**：高 | **学习建议**：2 天
+&gt; **C++ 区别于其他语言的核心特性**。指针搞不懂 → 后面所有 C++ 都学不会。
+
+---
+
+## 一、知识框架
+
+```
+指针与引用
+├── 5.1 指针基础 ⭐⭐
+│   ├── 声明与初始化
+│   ├── 取地址 &amp;
+│   ├── 解引用 *
+│   ├── 指针运算
+│   └── 空指针
+├── 5.2 指针与数组 ⭐
+├── 5.3 指针与 const ⭐⭐
+├── 5.4 指针数组 vs 数组指针
+├── 5.5 函数指针 ⭐
+├── 5.6 引用（refresher）⭐
+└── 5.7 智能指针入门
+```
+
+---
+
+## 二、指针基础 ⭐⭐
+
+### 2.1 什么是指针
+
+**指针是存储内存地址的变量**。
+
+```
+内存示意：
+┌──────────┐
+│  变量 x   │   值 10    地址 0x1000
+└──────────┘
+   ↑
+   │
+┌──────────┐
+│ 指针 p   │   值 0x1000
+└──────────┘
+   指向 x
+```
+
+### 2.2 指针的声明与���始化
+
+```cpp
+int x = 10;
+int* p = &amp;x;        // p 指向 x（&amp; 取地址）
+
+cout &lt;&lt; x;          // 10
+cout &lt;&lt; &amp;x;         // 0x1000（x 的地址）
+cout &lt;&lt; p;          // 0x1000（p 存的就是地址）
+cout &lt;&lt; *p;         // 10（解引用：通过地址取值）
+```
+
+&gt; &#128161; `&amp;x` 是取地址运算符；`*p` 是解引用运算符。
+
+### 2.3 指针四要素
+
+| 运算符 | 作用 | 示例 |
+|--------|------|------|
+| `&amp;` | 取地址 | `int* p = &amp;x;` |
+| `*` | 解引用 | `int y = *p;` |
+| `-&gt;` | 指针访问成员 | `p-&gt;func();` |
+| `[]` | 指针偏移 | `p[0] == *p;` |
+
+### 2.4 空指针 ⭐
+
+```cpp
+// 三种写法（C++11 前）
+int* p1 = NULL;
+int* p2 = 0;
+int* p3 = (int*)0;
+
+// C++11 后推荐
+int* p4 = nullptr;   // 推荐
+```
+
+&gt; ⚠ 解引用空指针会**段错误（Segmentation Fault）**：
+&gt; ```cpp
+&gt; int* p = nullptr;
+&gt; cout &lt;&lt; *p;  // ❌ 程序崩溃
+&gt; ```
+
+### 2.5 void 指针
+
+```cpp
+void* p = &amp;x;       // 可以指向任何类型
+// *p;              // ❌ 错误！不能直接解引用
+int y = *(int*)p;   // 必须显式转换
+```
+
+### 2.6 指针运算 ⭐
+
+```cpp
+int arr[] = {1, 2, 3, 4, 5};
+int* p = arr;        // 指向首元素
+
+p++;                 // p += sizeof(int)，指向下一个元素
+p--;                 // 指向上一个元素
+p + 2;               // 指向下 2 个元素
+p - p2;              // 两指针间元素个数（同数组）
+p1 &lt; p2;             // 指针比较（同数组）
+```
+
+### 2.7 sizeof 指针
+
+```cpp
+cout &lt;&lt; sizeof(int*);    // 8（64位）/ 4（32位）
+cout &lt;&lt; sizeof(void*);   // 同上
+```
+
+---
+
+## 三、指针与数组 ⭐
+
+### 3.1 数组名的本质
+
+数组名 = 首元素地址（**常量指针**）。
+
+```cpp
+int arr[5] = {1, 2, 3, 4, 5};
+int* p = arr;        // 等价于 int* p = &amp;arr[0];
+
+arr++;               // ❌ 错误！arr 是常量，不能修改
+p++;                  // ✅ 正确
+```
+
+### 3.2 指针与数组下标等价
+
+```cpp
+arr[i] == *(arr + i) == p[i] == *(p + i)
+```
+
+### 3.3 数组作为函数参数 ⭐⭐
+
+```cpp
+// 三种写法等价
+void func1(int arr[]) { }
+void func2(int arr[10]) { }     // 大小被忽略
+void func3(int* arr) { }        // 退化为指针
+
+void print(int* arr, int n) {
+    for (int i = 0; i &lt; n; i++) cout &lt;&lt; arr[i];
+}
+
+int data[] = {1, 2, 3, 4, 5};
+print(data, 5);    // 传数组名（地址）和大小
+```
+
+&gt; ⚠ **数组传参会退化为指针**，所以函数内 `sizeof(arr)` 是指针大小，不是数组大小。
+
+---
+
+## 四、指针与 const ⭐⭐
+
+### 4.1 指向常量的指针
+
+```cpp
+const int* p1;          // *p 是 const，不能通过 p 改所指对象
+int const* p2;          // 同上
+
+const int x = 10;
+const int* p3 = &amp;x;     // ✅
+*p3 = 20;               // ❌ 错误
+p3 = &amp;y;                 // ✅ p 本身可变
+```
+
+### 4.2 常量指针
+
+```cpp
+int* const p4;          // p 本身是 const，不能改指向
+
+int x = 10, y = 20;
+int* const p4 = &amp;x;     // p 必须初始化
+*p4 = 30;                // ✅ 通过 p 改 x
+p4 = &amp;y;                  // ❌ 错误，p 不能改指向
+```
+
+### 4.3 指向常量的常量指针
+
+```cpp
+const int* const p5 = &amp;x;   // 既不能改指向，也不能改所指
+```
+
+### 4.4 记忆口诀 ⭐
+
+| 写法 | 解读 |
+|------|------|
+| `const int* p` | const 在 `*` 左边：所指对象是 const |
+| `int* const p` | const 在 `*` 右边：指针本身是 const |
+| `const int* const p` | 两边都是 const |
+
+---
+
+## 五、指针数组 vs 数组指针 ⭐
+
+### 5.1 指针数组（数组，每个元素是指针）
+
+```cpp
+int* arr1[5];           // 5 个 int* 的数组
+int* arr2[] = {new int(1), new int(2), new int(3)};
+
+// 二级指针
+int** pp = arr2;
+```
+
+### 5.2 数组指针（指针，指向数组）
+
+```cpp
+int (*p)[5];            // 指针，指向 5 个 int 的数组
+
+int arr[3][4];
+int (*p)[4] = arr;      // p 指向 arr[0]（包含 4 个 int 的一维数组）
+```
+
+### 5.3 区分技巧
+
+```
+int* p[5];     // 指针数组（先看 []，再 *)
+int (*p)[5];   // 数组指针（先括号，p 是指针）
+```
+
+---
+
+## 六、函数指针 ⭐
+
+### 6.1 函数指针定义
+
+```cpp
+int add(int a, int b) { return a + b; }
+
+int (*fp)(int, int) = &amp;add;   // 函数指针
+int (*fp)(int, int) = add;    // &amp; 可省略
+
+cout &lt;&lt; fp(3, 5);            // 8
+```
+
+### 6.2 函数指针作为参数（回调函数）
+
+```cpp
+// qsort 的回调（C）
+int compare(const void* a, const void* b) {
+    return *(int*)a - *(int*)b;
+}
+qsort(arr, n, sizeof(int), compare);
+
+// C++ 用 lambda 更优雅
+std::sort(arr, arr + n, [](int a, int b) { return a &lt; b; });
+```
+
+### 6.3 std::function（C++11）⭐
+
+```cpp
+#include &lt;functional&gt;
+
+std::function&lt;int(int, int)&gt; f = add;
+f(3, 5);            // 8
+
+// 也可指向 lambda
+std::function&lt;int(int, int)&gt; g = [](int a, int b) { return a + b; };
+```
+
+---
+
+## 七、引用（refresher）⭐
+
+### 7.1 引用基础
+
+```cpp
+int x = 10;
+int&amp; ref = x;       // ref 是 x 的别名
+
+ref = 20;           // x = 20
+cout &lt;&lt; x;          // 20
+```
+
+### 7.2 引用规则
+
+- 必须在**声明时初始化**（除了引用参数、返回值等）
+- 一旦绑定，**不能改为其他对象的别名**
+- 引用不是对象（不能有引用的引用）
+
+### 7.3 const 引用 ⭐⭐
+
+```cpp
+const int&amp; ref = 10;     // ✅ 可以绑右值
+int&amp; ref2 = 10;          // ❌ 错误
+
+// 用于函数参数（避免拷贝 + 防止修改��
+void print(const std::vector&lt;int&gt;&amp; v) {
+    for (int x : v) cout &lt;&lt; x;
+}
+```
+
+### 7.4 引用 vs 指针 ⭐⭐⭐
+
+| 维度 | 引用 | 指针 |
+|------|------|------|
+| 是否必须初始化 | ✅ | ❌ |
+| 能否改变指向 | ❌ | ✅ |
+| 能否为 null | ❌ | ✅ |
+| 实质 | 对象的别名 | 存地址的变量 |
+| sizeof | 被引用对象大小 | 固定 4/8 字节 |
+| 语法 | `ref` | `*p`、`p-&gt;` |
+| 推荐场景 | 函数参数、返回值 | 数据结构、动态分配 |
+
+---
+
+## 八、智能指针入门 ⭐
+
+&gt; 详细见 [12-智能指针与内存管理.md](./12-智能指针与内存管理.md)
+
+```cpp
+#include &lt;memory&gt;
+
+std::unique_ptr&lt;int&gt; p1 = std::make_unique&lt;int&gt;(10);
+std::shared_ptr&lt;int&gt; p2 = std::make_shared&lt;int&gt;(20);
+```
+
+&gt; &#128161; 智能指针**自动释放内存**，避免内存泄漏。
+
+---
+
+## 九、多级指针 ⭐
+
+```cpp
+int x = 10;
+int* p = &amp;x;        // 一级
+int** pp = &amp;p;      // 二级
+int*** ppp = &amp;pp;   // ��级
+
+cout &lt;&lt; *p;         // 10
+cout &lt;&lt; **pp;       // 10
+cout &lt;&lt; ***ppp;     // 10
+```
+
+&gt; ⚠ 多级指针难调试、易出错，**尽量使用一级指针 + 引用**。
+
+---
+
+## 十、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **指针和引用的区别？**
+&gt; | 维度 | 引用 | 指针 |
+&gt; |------|------|------|
+&gt; | 必须初始化 | ✅ | ❌ |
+&gt; | 改变指向 | ❌ | ✅ |
+&gt; | null | ❌ | ✅ |
+&gt; | sizeof | 对象大小 | 指针大小 |
+
+&gt; &#128161; **`nullptr` 与 `NULL` 的区别？**
+&gt; - `NULL`：宏定义，可能是 0 或 `(void*)0`，**C 风格**
+&gt; - `nullptr`：C++11 引入，类型安全的空指针，**C++ 风格**
+
+&gt; &#128161; **`const int* p` 和 `int* const p` 的区别？**
+&gt; - `const int* p`：p 可改指向，但不能通过 p 改所指
+&gt; - `int* const p`：p 不可改指向，但可通过 p 改所指
+
+&gt; &#128161; **`void*` 指针的作用？**
+&gt; 可以指向任何类型，但**不能直接解引用**，必须显式转换。常用于内存操作（malloc）。
+
+&gt; &#128161; **指针数组和数组指针的区别？**
+&gt; - `int* p[5]`：5 个 int 指针组成的数组
+&gt; - `int (*p)[5]`：指针，指向 5 个 int 的数组
+
+&gt; &#128161; **野指针和悬空指针的区别？**
+&gt; - **野指针**：未初始化的指针（指向随机地址）
+&gt; - **悬空指针**：指向已释放内存的指针（指���失效地址）
+
+---
+
+## 十一、本章小结
+
+✅ 已掌握：
+- [ ] 指针声明、取地址、解引用
+- [ ] **指针四要素**：&amp;、*、-&gt;、[]
+- [ ] 指针运算（++、--、+、-）
+- [ ] **空指针 nullptr**
+- [ ] **数组与指针的关系**
+- [ ] **指针与 const 的 3 种组合**
+- [ ] 指针数组 vs 数组指针
+- [ ] 函数指针与 std::function
+- [ ] **引用 vs 指针的区别**
+- [ ] 智能指针入门
+
+✅ 易错点：
+- [ ] 数组传参退化为指针
+- [ ] 悬空指针（指向已释放内存）
+- [ ] const 修饰位置决定修饰对象
+- [ ] void* 指针不能直接解引用
+
+下一章：[06-面向对象基础.md](./06-面向对象基础.md) — C++ OOP 起点！</pre>

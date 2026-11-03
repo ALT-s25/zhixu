@@ -1,0 +1,459 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>06-面向对象基础</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 06 &#183; 面向对象基础 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; C++ OOP 的起点。**构造/析构函数、this 指针、访问控制**是核心。
+
+---
+
+## 一、知识框架
+
+```
+面向对象基础
+├── 6.1 类与对象 ⭐⭐
+├── 6.2 访问控制（public/private/protected）
+├── 6.3 构造函数 ⭐⭐⭐
+│   ├── 默认构造函数
+│   ├── 参数化构造函数
+│   ├── 拷贝构造函数
+│   └── 移动构造函数（C++11）
+├── 6.4 析构函数 ⭐⭐⭐
+├── 6.5 this 指针
+├── 6.6 static 成员
+├── 6.7 const 成员
+└── 6.8 友元（friend）
+```
+
+---
+
+## 二、类与对象 ⭐⭐
+
+### 2.1 类的定义
+
+```cpp
+class Student {
+private:                    // 私有（默认）
+    std::string name;
+    int age;
+
+public:                     // 公开
+    // 成员函数
+    void setName(const std::string&amp; n) { name = n; }
+    std::string getName() const { return name; }
+
+    void setAge(int a) {
+        if (a &gt;= 0) age = a;
+    }
+    int getAge() const { return age; }
+
+    void introduce() const {
+        std::cout &lt;&lt; &quot;I&#39;m &quot; &lt;&lt; name &lt;&lt; &quot;, &quot; &lt;&lt; age &lt;&lt; &quot; years old.\n&quot;;
+    }
+};
+```
+
+### 2.2 对象的创建与使用
+
+```cpp
+int main() {
+    // 1. 栈上创建（推荐）
+    Student s1;
+    s1.setName(&quot;张三&quot;);
+    s1.setAge(18);
+    s1.introduce();
+
+    // 2. 堆上创建（指针）
+    Student* p = new Student();
+    p-&gt;setName(&quot;李四&quot;);
+    p-&gt;introduce();
+    delete p;       // 必须手动释放！
+
+    // 3. 栈对象自动销毁，堆对象必须 delete
+}
+```
+
+### 2.3 类 vs struct
+
+```cpp
+// struct：默认 public（C 风格）
+struct Point {
+    int x;
+    int y;
+};
+
+// class：默认 private（C++ 推荐）
+class Point {
+    int x;          // 默认 private
+    int y;
+};
+```
+
+&gt; &#128161; **风格选择**：
+&gt; - **struct**：纯数据、没有行为（类似 C 的 struct）
+&gt; - **class**：有行为、有封装（有 OOP 设计）
+
+---
+
+## 三、访问控制 ⭐⭐
+
+### 3.1 三种修饰符
+
+| 修饰符 | 类内 | 子类 | 类外 |
+|--------|------|------|------|
+| `public` | ✅ | ✅ | ✅ |
+| `protected` | ✅ | ✅ | ❌ |
+| `private` | ✅ | ❌ | ❌ |
+
+### 3.2 推荐写法
+
+```cpp
+class MyClass {
+public:
+    MyClass();                              // 构造
+    ~MyClass();                             // 析构
+
+    void publicMethod();                    // 公开接口
+
+protected:
+    void protectedMethod();                 // 给子类用
+
+private:
+    int data_;                              // 数据私有
+    void privateMethod();                   // 内部实现
+};
+```
+
+&gt; &#128161; **数据成员通常私有**（封装原则）。
+
+---
+
+## 四、构造函数 ⭐⭐⭐（重要）
+
+构造函数是对象创建时**自动调用**的成员函数，**无返回值**。
+
+### 4.1 默认构造函数
+
+```cpp
+class Student {
+private:
+    std::string name;
+    int age;
+
+public:
+    Student() : name(&quot;未知&quot;), age(0) {       // 默认构造
+        std::cout &lt;&lt; &quot;默认构造\n&quot;;
+    }
+};
+
+Student s;    // 自动调用默认构造
+```
+
+### 4.2 参数化构造函数
+
+```cpp
+class Student {
+    std::string name;
+    int age;
+
+public:
+    Student(const std::string&amp; n, int a) : name(n), age(a) {
+        // 初始化列表（推荐）
+    }
+};
+
+Student s(&quot;张三&quot;, 18);
+```
+
+### 4.3 初始化列表 ⭐⭐
+
+```cpp
+// 推荐写法
+Student(const std::string&amp; n, int a) : name(n), age(a) { }
+
+// 不推荐（先默认构造再赋值）
+Student(const std::string&amp; n, int a) {
+    name = n;
+    age = a;
+}
+```
+
+&gt; ⚠ **必须用初始化列表的情况**：
+&gt; - `const` 成员
+&gt; - 引用成员
+&gt; - 没有默认构造的类成员
+
+### 4.4 拷贝构造函数 ⭐⭐
+
+```cpp
+class Student {
+    std::string name;
+    int age;
+
+public:
+    // 默认拷贝构造：浅拷贝
+    Student(const Student&amp; other) : name(other.name), age(other.age) {
+        std::cout &lt;&lt; &quot;拷贝构造\n&quot;;
+    }
+};
+
+Student s1(&quot;张三&quot;, 18);
+Student s2(s1);            // 调用拷贝构造
+Student s3 = s1;           // 同上
+```
+
+### 4.5 移动构造函数（C++11）⭐⭐
+
+```cpp
+class Student {
+    std::string name;
+    int* data;
+
+public:
+    // 移动构造：从临时对象&quot;窃取&quot;资源
+    Student(Student&amp;&amp; other) noexcept : name(std::move(other.name)), data(other.data) {
+        other.data = nullptr;    // 防止 double-free
+    }
+};
+```
+
+&gt; &#128161; **左值 vs 右值**：
+&gt; - 左值：有名字、可取地址（如变量）
+&gt; - 右值：临时值、字面值（如 `42`、`x+y`）
+
+### 4.6 = default / = delete ⭐⭐
+
+```cpp
+class MyClass {
+public:
+    MyClass() = default;                          // 强制编译器生成默认版本
+    MyClass(const MyClass&amp;) = delete;             // 禁止拷贝
+};
+```
+
+### 4.7 委托构造函数（C++11）
+
+```cpp
+class Student {
+    std::string name;
+    int age;
+
+public:
+    Student() : Student(&quot;未知&quot;, 0) { }     // 委托给下面那个
+
+    Student(const std::string&amp; n, int a) : name(n), age(a) { }
+};
+```
+
+---
+
+## 五、析构函数 ⭐⭐⭐
+
+对象销毁时**自动调用**，用于清理资源（内存、文件、锁等）。
+
+```cpp
+class MyArray {
+    int* data;
+    int size;
+
+public:
+    MyArray(int n) : size(n) {
+        data = new int[n];          // 分配资源
+        std::cout &lt;&lt; &quot;构造\n&quot;;
+    }
+
+    ~MyArray() {                    // 析构函数（无参数、无返回值）
+        delete[] data;              // 释放资源
+        std::cout &lt;&lt; &quot;析构\n&quot;;
+    }
+};
+```
+
+&gt; ⚠ **没有析构 → 内存泄漏**！
+&gt; **有动态内存必须实现拷贝构造、operator=、析构**（Rule of Three）。
+
+---
+
+## 六、this 指针
+
+每个非静态成员函数都有一个 `this` 指针，**指向当前对象**。
+
+```cpp
+class Student {
+    std::string name;
+
+public:
+    Student&amp; setName(const std::string&amp; name) {
+        this-&gt;name = name;      // 区分成员变量与参数
+        return *this;            // 返回当前对象（链式调用）
+    }
+};
+
+Student s;
+s.setName(&quot;张三&quot;).setName(&quot;李四&quot;);   // 链式调用
+```
+
+---
+
+## 七、static 成员 ⭐
+
+### 7.1 静态成员变量
+
+所有对象**共享**。
+
+```cpp
+class Student {
+    static int count;            // 静态成员（类内声明）
+
+public:
+    Student() { count++; }
+    ~Student() { count--; }
+    static int getCount() { return count; }  // 静态成员函数
+};
+
+int Student::count = 0;          // 类外定义（必须）
+```
+
+### 7.2 静态成员函数
+
+- 没有 `this` 指针
+- 只能访问静态成员
+
+```cpp
+class Math {
+public:
+    static int add(int a, int b) { return a + b; }
+};
+
+Math::add(3, 5);   // 无需创建对象
+```
+
+---
+
+## 八、const 成员 ⭐⭐
+
+### 8.1 const 成员变量
+
+```cpp
+class MyClass {
+    const int x = 10;           // 必须初始化
+    const int y;                 // 必须在初始化列表初始化
+public:
+    MyClass(int v) : y(v) { }
+};
+```
+
+### 8.2 const 成员函数
+
+```cpp
+class Student {
+    std::string name;
+
+public:
+    std::string getName() const {     // 不修改成员
+        return name;
+    }
+
+    // void setName(string n) const { name = n; }  // ❌ 错误
+};
+```
+
+&gt; &#128161; **const 对象只能调用 const 成员函数**。
+
+### 8.3 mutable 关键字
+
+在 const 函数中可以修改 `mutable` 成员：
+
+```cpp
+class Cache {
+    mutable int count_ = 0;
+
+public:
+    void touch() const {       // const 函数
+        count_++;               // ✅ 可以改
+    }
+};
+```
+
+---
+
+## 九、友元（friend）⭐
+
+允许**非成员函数/类**访问私有成员（破坏封装，慎用）。
+
+```cpp
+class Student {
+    friend void print(const Student&amp; s);     // 友元函数
+    friend class Teacher;                     // 友元类
+
+private:
+    std::string name_;
+    int age_;
+};
+
+void print(const Student&amp; s) {
+    std::cout &lt;&lt; s.name_;       // ✅ 可访问私有
+}
+```
+
+&gt; ⚠ 友元**破坏封装**，尽量少用。
+
+---
+
+## 十、对象内存布局 ⭐
+
+```cpp
+class Empty {};                    // sizeof(Empty) == 1（占位）
+class A { int x; };                // sizeof(A) == 4
+class B { int x; char c; };        // sizeof(B) == 8（对齐）
+class C { int x; char c; char d; }; // sizeof(C) == 8（c, d 合并）
+```
+
+---
+
+## 十一、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **构造函数有哪几种？**
+&gt; - 默认构造（无参）
+&gt; - 参数化构造
+&gt; - 拷贝构造（const T&amp;）
+&gt; - 移动构造（T&amp;&amp;，C++11）
+
+&gt; &#128161; **拷贝构造和移动构造的区别？**
+&gt; - 拷贝：复制所有资源（**深拷贝**，慢）
+&gt; - 移动：转移资源所有权（**窃取**，快）
+
+&gt; &#128161; **Rule of Three / Five / Zero**
+&gt; - **Rule of Three**：定义了析构、拷贝构造、拷贝赋值之一，通常要定义其他两个
+&gt; - **Rule of Five**：再加移动构造、移动赋值
+&gt; - **Rule of Zero**：用智能指针 + 标准容器，无需自己写
+
+&gt; &#128161; **`this` 指针的本质？**
+&gt; 隐含的成员函数参数，指向当前对象。`this` 是 const 指针（不可修改指向）。
+
+&gt; &#128161; **`const` 成员函数的作用？**
+&gt; 承诺不修改对象状态。`const` 对象只能调用 `const` 成员函数。
+
+&gt; &#128161; **`mutable` 关键字？**
+&gt; 允许在 const 成员函数中修改该成员（如缓存计数）。
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] 类与对象的基本定义
+- [ ] **访问控制 public/private/protected**
+- [ ] **构造函数 4 种**（默认、参数化、拷贝、移动）
+- [ ] **初始化列表** 的使用
+- [ ] **析构函数** 与资源管理
+- [ ] this 指针与链式调用
+- [ ] static 成员
+- [ ] const 成员与 mutable
+- [ ] friend 友元
+
+✅ 易错点：
+- [ ] 没有默认构造时不能 `Student s;`
+- [ ] const 成员必须在初始化列表初始化
+- [ ] 拷贝构造和析构要配套出现
+- [ ] 静态成员类外必须定义
+
+下一章：[07-继承多态.md](./07-继承多态.md) — OOP 三大特性！</pre>
