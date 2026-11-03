@@ -1,0 +1,455 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>07-常用API</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 07 &#183; 常用 API ⭐⭐
+
+&gt; **难度**：入门 | **学习建议**：2 天
+&gt; 对应黑马视频：第 66 ~ 95 集
+&gt; 项目导向：**字符串处理是最频繁的操作**（用户输入、日志、JSON 处理）
+
+---
+
+## 一、知识框架
+
+```
+常用 API
+├── 7.1 API 文档使用
+├── 7.2 String 类 ⭐⭐⭐
+├── 7.3 StringBuilder / StringBuffer ⭐⭐
+├── 7.4 ArrayList 集合 ⭐⭐⭐
+├── 7.5 Math 类
+├── 7.6 System 类
+└── 7.7 Object 类 ⭐
+```
+
+---
+
+## 二、API 文档使用
+
+**API（Application Programming Interface）**：程序员的&quot;字典&quot;。
+
+- 类名、构造方法、普通方法
+- 看包路径（`java.lang` 不需要导包）
+
+---
+
+## 三、String 类 ⭐⭐⭐（黑马重点）
+
+### 3.1 String 本质
+
+```java
+public final class String
+    implements java.io.Serializable, Comparable&lt;String&gt;, CharSequence {
+    private final char value[];   // 内部是 final char[]
+}
+```
+
+&gt; ⚠ **String 不可变**！
+
+### 3.2 字符串常量池 ⭐⭐
+
+```java
+String s1 = &quot;hello&quot;;     // 走常量池
+String s2 = &quot;hello&quot;;     // 复用
+String s3 = new String(&quot;hello&quot;);   // new 强制新建
+
+System.out.println(s1 == s2);     // true
+System.out.println(s1 == s3);     // false
+System.out.println(s1.equals(s3)); // true
+```
+
+&gt; &#128161; **黑马常考**：String 直接赋值（走常量池）和 new 的区别。
+
+### 3.3 String 常用方法 ⭐⭐⭐
+
+```java
+String s = &quot;HelloWorld&quot;;
+
+// 长度
+s.length();                          // 10
+
+// 字符访问
+s.charAt(0);                          // &#39;H&#39;
+
+// 拼接
+s.concat(&quot;!&quot;);                        // &quot;HelloWorld!&quot;
+s + &quot;!&quot;;                              // 同上（编译器优化）
+
+// 子串
+s.substring(5);                       // &quot;World&quot;
+s.substring(0, 5);                    // &quot;Hello&quot;
+
+// 判断
+s.contains(&quot;World&quot;);                  // true
+s.startsWith(&quot;Hello&quot;);                // true
+s.endsWith(&quot;World&quot;);                  // true
+s.isEmpty();                          // false
+
+// 查找
+s.indexOf(&quot;o&quot;);                       // 4
+s.lastIndexOf(&quot;o&quot;);                   // 6
+
+// 替换
+s.replace(&quot;World&quot;, &quot;Java&quot;);           // &quot;HelloJava&quot;
+
+// 切割
+String[] arr = &quot;a,b,c&quot;.split(&quot;,&quot;);    // [a, b, c]
+
+// 大小写
+&quot;HELLO&quot;.toLowerCase();                // &quot;hello&quot;
+&quot;hello&quot;.toUpperCase();                // &quot;HELLO&quot;
+
+// 去除空格
+&quot;  hi  &quot;.trim();                      // &quot;hi&quot;
+```
+
+### 3.4 黑马经典案例 ⭐⭐
+
+**案例 1：用户名校验**
+```java
+public static boolean checkUsername(String username) {
+    if (username.length() &lt; 6 || username.length() &gt; 12) return false;
+    if (!Character.isLetter(username.charAt(0))) return false;
+    for (int i = 0; i &lt; username.length(); i++) {
+        char c = username.charAt(i);
+        if (!Character.isLetterOrDigit(c) &amp;&amp; c != &#39;_&#39;) return false;
+    }
+    return true;
+}
+```
+
+**案例 2：字符串反转**
+```java
+public static String reverse(String s) {
+    return new StringBuilder(s).reverse().toString();
+}
+```
+
+**案例 3：统计字符出现次数**
+```java
+public static int countChar(String s, char target) {
+    int count = 0;
+    for (int i = 0; i &lt; s.length(); i++) {
+        if (s.charAt(i) == target) count++;
+    }
+    return count;
+}
+```
+
+---
+
+## 四、StringBuilder / StringBuffer ⭐⭐
+
+### 4.1 String 拼接的问题
+
+```java
+String s = &quot;&quot;;
+for (int i = 0; i &lt; 1000; i++) {
+    s += i;     // 每次循环创建新 String（性能差）
+}
+```
+
+### 4.2 StringBuilder 用法
+
+```java
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i &lt; 1000; i++) {
+    sb.append(i);   // 直接拼接，性能好
+}
+String s = sb.toString();
+```
+
+### 4.3 常用方法
+
+```java
+sb.append(&quot;hello&quot;);
+sb.insert(0, &quot;Hi&quot;);           // 指定位置插入
+sb.delete(0, 2);               // 删除区间
+sb.reverse();                  // 反转
+sb.replace(0, 5, &quot;Hi&quot;);        // 替换
+sb.toString();                 // 转 String
+sb.length();
+```
+
+### 4.4 对比
+
+| 维度 | String | StringBuilder | StringBuffer |
+|------|--------|---------------|--------------|
+| 可变 | ❌ | ✅ | ✅ |
+| 线程安全 | ✅ | ❌ | ✅ |
+| 性能 | 差 | 高 | 中 |
+| 场景 | 字符串常量 | 单线程拼接 | 多线程拼接 |
+
+---
+
+## 五、ArrayList 集合 ⭐⭐⭐
+
+黑马视频**单独**：数组、ArrayList 是 Java 中最常用的容器。
+
+### 5.1 为什么用 ArrayList
+
+数组长度固定，ArrayList 可变。
+
+### 5.2 基本使用
+
+```java
+import java.util.ArrayList;
+
+ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+
+// 添加
+list.add(&quot;张三&quot;);
+list.add(&quot;李四&quot;);
+list.add(0, &quot;王五&quot;);   // 指定位置插入
+
+// 获取
+list.get(0);              // &quot;王五&quot;
+list.size();
+
+// 删除
+list.remove(0);            // 按下标
+list.remove(&quot;张三&quot;);       // 按值（首次出现的）
+
+// 修改
+list.set(0, &quot;赵六&quot;);
+
+// 判断
+list.contains(&quot;张三&quot;);
+list.isEmpty();
+
+// 遍历
+for (int i = 0; i &lt; list.size(); i++) {
+    System.out.println(list.get(i));
+}
+
+for (String s : list) {
+    System.out.println(s);
+}
+```
+
+### 5.3 黑马经典案例 ⭐⭐
+
+**学生成绩管理系统（升级版）**：
+```java
+ArrayList&lt;Student&gt; students = new ArrayList&lt;&gt;();
+students.add(new Student(&quot;张三&quot;, 95));
+students.add(new Student(&quot;李四&quot;, 82));
+
+// 查找最高分
+Student maxStu = students.get(0);
+for (Student s : students) {
+    if (s.getScore() &gt; maxStu.getScore()) maxStu = s;
+}
+System.out.println(&quot;最高分：&quot; + maxStu.getName());
+```
+
+### 5.4 ArrayList 底层 ⭐
+
+- 基于**动态数组**实现
+- 初始容量 10
+- 扩容机制：约 1.5 倍（具体看 JDK 版本）
+
+---
+
+## 六、Math 类
+
+```java
+Math.abs(-10);          // 10
+Math.max(3, 5);          // 5
+Math.min(3, 5);          // 3
+Math.pow(2, 3);          // 8
+Math.sqrt(9);            // 3.0
+Math.random();            // [0, 1) 随机小数
+Math.round(3.5);          // 4
+Math.PI;                  // 3.14159...
+```
+
+### 黑马案例：随机数
+
+```java
+// 1~100 随机整数
+int n = (int)(Math.random() * 100) + 1;
+```
+
+---
+
+## 七、System 类
+
+```java
+System.out.println(&quot;hi&quot;);       // 标准输出
+System.err.println(&quot;err&quot;);       // 错误输出
+System.in;                       // 标准输入
+
+System.currentTimeMillis();      // 当前毫秒
+System.arraycopy(src, srcPos, dest, destPos, length);   // 数组拷贝
+System.exit(0);                  // 退出程序
+```
+
+---
+
+## 八、Object 类 ⭐
+
+**所有类的父类**。
+
+### 8.1 常用方法
+
+```java
+// 1. toString：返回对象的字符串表示
+// 默认：类名@哈希码
+// 重写后：属性信息
+
+@Override
+public String toString() {
+    return &quot;Student{name=&quot; + name + &quot;, score=&quot; + score + &quot;}&quot;;
+}
+
+// 2. equals：比较两个对象是否相等
+// 默认 ==，重写后比较内容
+
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Student s = (Student) o;
+    return score == s.score &amp;&amp; Objects.equals(name, s.name);
+}
+
+// 3. hashCode：返回哈希码
+// 重写 equals 必重写 hashCode
+
+@Override
+public int hashCode() {
+    return Objects.hash(name, score);
+}
+```
+
+### 8.2 黑马案例：���户比较
+
+```java
+User u1 = new User(&quot;admin&quot;, &quot;123&quot;);
+User u2 = new User(&quot;admin&quot;, &quot;123&quot;);
+
+// 不重写 equals 时
+System.out.println(u1.equals(u2));   // false（默认 ==）
+
+// 重写后
+System.out.println(u1.equals(u2));   // true（比较内容）
+```
+
+---
+
+## 九、项目场景（实战导向）⭐
+
+### &#127919; 场景 1：日志系统
+
+```java
+StringBuilder log = new StringBuilder();
+log.append(&quot;[&quot;).append(new java.util.Date()).append(&quot;] &quot;);
+log.append(&quot;用户登录：&quot;).append(&quot;admin&quot;);
+System.out.println(log.toString());
+```
+
+### &#127919; 场景 2：订单列表
+
+```java
+ArrayList&lt;Order&gt; orders = new ArrayList&lt;&gt;();
+orders.add(new Order(&quot;A001&quot;, 100.0));
+orders.add(new Order(&quot;A002&quot;, 200.0));
+
+// 计算总金额
+double total = 0;
+for (Order o : orders) {
+    total += o.getAmount();
+}
+```
+
+### &#127919; 场景 3：字符串模板（简单实现）
+
+```java
+public static String format(String template, Object... args) {
+    StringBuilder sb = new StringBuilder(template);
+    for (Object arg : args) {
+        int idx = sb.indexOf(&quot;{}&quot;);
+        if (idx &gt;= 0) {
+            sb.replace(idx, idx + 2, arg.toString());
+        }
+    }
+    return sb.toString();
+}
+
+format(&quot;你好，{}，今年 {} 岁&quot;, &quot;张三&quot;, 18);
+// &quot;你好，张三，今年 18 岁&quot;
+```
+
+---
+
+## 十、力扣实战 ⭐⭐
+
+### LeetCode 344. 反转字符串
+
+```java
+class Solution {
+    public void reverseString(char[] s) {
+        int left = 0, right = s.length - 1;
+        while (left &lt; right) {
+            char temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+            left++; right--;
+        }
+    }
+}
+```
+
+### LeetCode 387. 字符串中的第一个唯一字符
+
+```java
+class Solution {
+    public int firstUniqChar(String s) {
+        int[] count = new int[26];
+        for (char c : s.toCharArray()) count[c - &#39;a&#39;]++;
+        for (int i = 0; i &lt; s.length(); i++) {
+            if (count[s.charAt(i) - &#39;a&#39;] == 1) return i;
+        }
+        return -1;
+    }
+}
+```
+
+---
+
+## 十一、面试常问 ⭐
+
+&gt; &#128161; **String 不可变的原因？**
+&gt; 1. `final class` 不能继承
+&gt; 2. `final char[]` 内部数组不能修改
+&gt; 3. 没有暴露修改方法
+
+&gt; &#128161; **`==` 和 `equals` 的区别？**
+&gt; - `==` 基本类型比值，引用类型比地址
+&gt; - `equals` 默认 ==，但 String 等类重写后比内容
+
+&gt; &#128161; **String / StringBuilder / StringBuffer？**
+&gt; - String 不可变（拼接差）
+&gt; - StringBuilder 可变（最快）
+&gt; - StringBuffer 可变（线程安全）
+
+&gt; &#128161; **`new String(&quot;abc&quot;)` 创建几个对象？**
+&gt; 1 或 2 个。字面量在常量池 + 堆对象（如果常量池不存在）。
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] **String 不可变性**
+- [ ] 字符串常量池
+- [ ] **String 常用方法**
+- [ ] StringBuilder 拼接
+- [ ] **ArrayList 集合**（黑马重点）
+- [ ] Math / System / Object 类
+
+✅ 易错点：
+- [ ] String 拼接性能差（循环中用 StringBuilder）
+- [ ] equals 默认是 ==（要重写）
+- [ ] ArrayList 中 add/remove 等返回 boolean 还是 void
+- [ ] 重写 equals 必重写 hashCode
+
+下一章：[08-面向对象进阶.md](./08-面向对象进阶.md)</pre>

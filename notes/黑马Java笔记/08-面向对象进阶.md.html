@@ -1,0 +1,484 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>08-面向对象进阶</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 08 &#183; 面向对象进阶 ⭐⭐⭐
+
+&gt; **难度**：核心 | **学习建议**：3 天
+&gt; 对应黑马视频：第 96 ~ 135 集
+&gt; 项目导向：**继承/多态是设计模式的基石**，面试必问
+
+---
+
+## 一、知识框架
+
+```
+面向对象进阶
+├── 8.1 继承 ⭐⭐⭐
+├── 8.2 super 关键字 ⭐⭐
+├── 8.3 方法重写（Override）⭐⭐
+├── 8.4 多态 ⭐⭐⭐⭐
+├── 8.5 抽象类 ⭐⭐
+├── 8.6 接口 ⭐⭐⭐
+└── 8.7 综合案例：员工类设计
+```
+
+---
+
+## 二、继承 ⭐⭐⭐
+
+### 2.1 什么是继承
+
+子类**复用**父类的属性和方法，is-a 关系。
+
+```java
+public class Animal {
+    String name;
+    int age;
+
+    public void eat() {
+        System.out.println(name + &quot; 在吃东西&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    public void bark() {
+        System.out.println(name + &quot; 汪汪叫&quot;);
+    }
+}
+
+Dog dog = new Dog();
+dog.name = &quot;旺财&quot;;
+dog.eat();     // 继承自父类
+dog.bark();    // 子类特有
+```
+
+### 2.2 继承特点
+
+- Java 是**单继承**（一个类只能 extends 一个父类）
+- 可以**多层继承**（祖父 → 父 → 子）
+- 所有类直接或间接继承 `Object`
+
+### 2.3 super 关键字 ⭐⭐
+
+```java
+public class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+}
+
+public class Dog extends Animal {
+    public Dog(String name) {
+        super(name);          // 调用父类构造（必须第一行）
+    }
+
+    public void eat() {
+        super.eat();          // 调用父类被重写的方法
+    }
+}
+```
+
+### 2.4 继承中的构造器
+
+```java
+class Animal {
+    public Animal() {
+        System.out.println(&quot;Animal 无参构造&quot;);
+    }
+    public Animal(String name) {
+        System.out.println(&quot;Animal 有参构造：&quot; + name);
+    }
+}
+
+class Dog extends Animal {
+    public Dog() {
+        super();   // 默认调用父类无参构造
+        System.out.println(&quot;Dog 无参构造&quot;);
+    }
+}
+
+new Dog();
+// 输出：
+// Animal 无参构造
+// Dog 无参构造
+```
+
+&gt; ⚠ **黑马经典坑**：
+&gt; - 子类构造器**默认**调用父类无参构造
+&gt; - 父类没有无参构造 → 子类必须显式 `super(args)`
+
+### 2.5 方法重写（Override）⭐⭐
+
+子类重��实现父类的方法。
+
+**规则**：
+1. 方法名、参数列表**完全相同**
+2. 返回类型相同或是其子类
+3. 访问修饰符不能比父类更严格
+4. 不能重写 `static`、`final`、`private` 方法
+
+```java
+public class Animal {
+    public void eat() {
+        System.out.println(&quot;吃东西&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    @Override       // 注解，编译器帮检查
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+}
+```
+
+### 2.6 重载 vs 重写 ⭐
+
+| 维度 | 重载 | 重写 |
+|------|------|------|
+| 位置 | 同一个类中 | 子父类间 |
+| 参数列表 | 必须不同 | 必须相同 |
+| 返回类型 | 任意 | 相同或子类 |
+| 修饰符 | 任意 | 不能更严格 |
+| 发生 | 编译时 | 运行时 |
+
+---
+
+## 三、多态 ⭐⭐⭐⭐
+
+### 3.1 什么是多态
+
+**同一个引用类型，调用同一个方法，实际表现不一样**。
+
+### 3.2 多态三要素
+
+1. 继承（或实现接口）
+2. 方法重写
+3. 父类引用指向子类对象（向上转型）
+
+### 3.3 向上转型
+
+```java
+Animal a = new Dog();   // 父类引用指向子类对象
+a.eat();                  // 调 Dog 的 eat（动态绑定）
+// a.bark();              // ❌ 编译错误，不能调用子类特有方法
+```
+
+### 3.4 向下转型 + instanceof ⭐⭐
+
+```java
+Animal a = new Dog();
+
+if (a instanceof Dog) {       // 类型判断
+    Dog d = (Dog) a;          // 向下转型
+    d.bark();
+}
+```
+
+### 3.5 黑马经典案例：动物类 ⭐⭐
+
+```java
+public class Animal {
+    public void eat() {
+        System.out.println(&quot;吃东西&quot;);
+    }
+    public void sleep() {
+        System.out.println(&quot;睡觉&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    @Override
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+    public void lookHome() {
+        System.out.println(&quot;看家&quot;);
+    }
+}
+
+public class Cat extends Animal {
+    @Override
+    public void eat() {
+        System.out.println(&quot;猫吃鱼&quot;);
+    }
+    public void catchMouse() {
+        System.out.println(&quot;抓老鼠&quot;);
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Animal a1 = new Dog();
+        Animal a2 = new Cat();
+
+        a1.eat();    // 狗啃骨头
+        a2.eat();    // 猫吃鱼
+
+        // 多态的好处：参数多态
+        showAnimal(a1);    // 多态调用
+    }
+
+    public static void showAnimal(Animal a) {
+        a.eat();
+        a.sleep();
+    }
+}
+```
+
+### 3.6 多态的好处
+
+- **可扩展性**：新增子类不影响原有代码
+- **可维护性**：调用方不关心具体类型
+
+---
+
+## 四、抽象类 ⭐⭐
+
+### 4.1 抽象方法
+
+只有声明没有实现：
+
+```java
+public abstract class Animal {
+    public abstract void eat();   // 抽象方法
+}
+```
+
+### 4.2 抽象类要点
+
+1. 有抽象方法的类必须是抽象类
+2. 抽象类**不能实例化**
+3. 子类必须实现所有抽象方法，否则也是抽象类
+4. 抽象类可以有普通方法、构造器
+
+```java
+public abstract class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public abstract void eat();
+
+    public void sleep() {                  // 普通方法
+        System.out.println(name + &quot; 睡觉&quot;);
+    }
+}
+
+public class Dog extends Animal {
+    public Dog(String name) {
+        super(name);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+}
+```
+
+---
+
+## 五、接口 ⭐⭐⭐
+
+### 5.1 接口定义
+
+```java
+public interface AnimalAction {
+    int MAX_AGE = 200;            // 默认 public static final
+
+    void eat();                    // 默认 public abstract
+    void sleep();
+
+    default void breathe() {       // Java 8+
+        System.out.println(&quot;呼吸&quot;);
+    }
+}
+```
+
+### 5.2 接口实现
+
+```java
+public class Dog implements AnimalAction {
+    @Override
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+
+    @Override
+    public void sleep() {
+        System.out.println(&quot;狗睡觉&quot;);
+    }
+}
+```
+
+### 5.3 接口的多实现 ⭐
+
+```java
+public class Dog implements AnimalAction, Swimmable, Runnable {
+    // 必须实现所有接口
+}
+
+interface Swimmable { void swim(); }
+interface Runnable { void run(); }
+```
+
+### 5.4 抽象类 vs 接口 ⭐
+
+| 维度 | 抽象类 | 接口 |
+|------|--------|------|
+| 关系 | is-a（同类共性） | has-a（扩展能力） |
+| 多继承 | 单继承 | 多实现 |
+| 构造器 | 有 | 无 |
+| 方法 | 抽象 + 普通 | 主要抽象（Java 8+ 可有 default） |
+
+### 5.5 黑马经典案例：USB 接口 ⭐⭐
+
+```java
+public interface USB {
+    void open();
+    void close();
+}
+
+public class Mouse implements USB {
+    @Override
+    public void open() {
+        System.out.println(&quot;鼠标开启&quot;);
+    }
+
+    @Override
+    public void close() {
+        System.out.println(&quot;鼠标关闭&quot;);
+    }
+}
+
+public class Keyboard implements USB {
+    @Override
+    public void open() {
+        System.out.println(&quot;键盘开启&quot;);
+    }
+
+    @Override
+    public void close() {
+        System.out.println(&quot;键盘关闭&quot;);
+    }
+}
+
+public class Computer {
+    public void useUSB(USB usb) {
+        usb.open();
+        // ...使用 USB 设备
+        usb.close();
+    }
+}
+
+// 使用
+Computer c = new Computer();
+c.useUSB(new Mouse());
+c.useUSB(new Keyboard());
+```
+
+---
+
+## 六、综合案例：员工类设计 ⭐⭐
+
+```java
+// 抽象员工类
+public abstract class Employee {
+    private String name;
+    private double salary;
+
+    public Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public abstract void work();
+
+    public String getName() { return name; }
+    public double getSalary() { return salary; }
+}
+
+// 普通员工
+public class Worker extends Employee {
+    public Worker(String name, double salary) {
+        super(name, salary);
+    }
+
+    @Override
+    public void work() {
+        System.out.println(getName() + &quot; 在上班打卡&quot;);
+    }
+}
+
+// 经理
+public class Manager extends Employee {
+    public Manager(String name, double salary) {
+        super(name, salary);
+    }
+
+    @Override
+    public void work() {
+        System.out.println(getName() + &quot; 在管理团队&quot;);
+    }
+}
+
+// 测试
+Employee[] employees = {
+    new Worker(&quot;张三&quot;, 5000),
+    new Manager(&quot;李四&quot;, 10000)
+};
+
+for (Employee e : employees) {
+    e.work();   // 多态调用
+}
+```
+
+---
+
+## 七、面试常问 ⭐⭐
+
+&gt; &#128161; **重载和重写的区别？**
+&gt; | 重载 | 重写 |
+&gt; |------|------|
+&gt; | 同类 | 子父类 |
+&gt; | 参数列表不同 | 参数列表相同 |
+&gt; | 编译时 | 运行时 |
+
+&gt; &#128161; **多态的三个必要条件？**
+&gt; 1. 继承或实现接口
+&gt; 2. 子类重写父类方法
+&gt; 3. 父类引用指向子类对象（向上转型）
+
+&gt; &#128161; **抽象类和接口的区别？**
+&gt; | 抽象类 | 接口 |
+&gt; |--------|------|
+&gt; | is-a | has-a |
+&gt; | 单继承 | 多实现 |
+&gt; | 可有构造器 | 无构造器 |
+&gt; | 设计模板 | 设计规范 |
+
+&gt; &#128161; **为什么字段没有多态？**
+&gt; 字段编译期就确定，运行时不会动态绑定。
+
+---
+
+## 八、本章小结
+
+✅ 已掌握：
+- [ ] **继承**的语法与特点（单继承）
+- [ ] **super 关键字**（调用父类构造和方法）
+- [ ] **方法重写（Override）**
+- [ ] **多态三要素 + 向上/向下转型**
+- [ ] **instanceof** 类型判断
+- [ ] **抽象类**（abstract）
+- [ ] **��口**（interface + 多实现）
+
+✅ 易错点：
+- [ ] 子类构造器默认调用父类无参构造
+- [ ] 父类无无参构造时子类必须显式 super(args)
+- [ ] 多态字段不参与（字段看左边）
+- [ ] 向下转型必须先 instanceof 检查
+
+下一章：[09-内部类与常用类.md](./09-内部类与常用类.md)</pre>

@@ -1,0 +1,319 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>10-异常处理</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 10 &#183; 异常处理 ⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 对应黑马视频：下部第 1 ~ 12 集
+&gt; 项目导向：**每个项目都有异常处理**，学会让程序不崩溃
+
+---
+
+## 一、知识框架
+
+```
+异常处理
+├── 10.1 异常体系 ⭐⭐⭐
+├── 10.2 异常分类（编译期/运行期）
+├── 10.3 异常处理 ⭐⭐
+│   ├── try-catch
+│   ├── throws
+│   └── throw
+├── 10.4 自定义异常
+└── 10.5 异常实践
+```
+
+---
+
+## 二、异常体系 ⭐⭐⭐
+
+```
+Throwable
+├── Error（严重错误，程序无法处理）
+│   ├── OutOfMemoryError
+│   └── StackOverflowError
+└── Exception
+    ├── 编译期异常（必须处理）
+    │   ├── IOException
+    │   └── ParseException
+    └── RuntimeException（运行期异常）
+        ├── NullPointerException ⭐
+        ├── ArrayIndexOutOfBoundsException ⭐
+        ├── ArithmeticException
+        └── ClassCastException
+```
+
+---
+
+## 三、异常分类 ⭐⭐
+
+| 维度 | 编译期异常 | 运行期异常 |
+|------|-----------|----------|
+| 继承 | Exception 子类（除 RuntimeException） | RuntimeException 子类 |
+| 处理 | **必须**（throws/try-catch） | 不强制 |
+| 原因 | 外部因素 | 程序逻辑错误 |
+| 例子 | IOException、SQLException | 空指针、数组越界 |
+
+&gt; ⚠ **黑马经典**：编译期异常不处理**编译不通过**，运行期异常可处理也可不处理。
+
+---
+
+## 四、try-catch-finally ⭐⭐
+
+### 4.1 基本用法
+
+```java
+try {
+    // 可能出现异常的代码
+    int result = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println(&quot;除数不能为零&quot;);
+    e.printStackTrace();          // 打印栈轨迹
+} catch (Exception e) {            // 兜底
+    System.out.println(&quot;其他异常&quot;);
+} finally {
+    System.out.println(&quot;一定执行&quot;);
+}
+```
+
+### 4.2 多个 catch 规则
+
+- 子类异常**必须放在父类之前**
+- Java 7+ 支持 `|` 多异常
+
+```java
+try {
+    // ...
+} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+    System.out.println(&quot;空指针或数组越界&quot;);
+}
+```
+
+### 4.3 try-with-resources ⭐
+
+自动关闭资源（实现了 AutoCloseable 接口）：
+
+```java
+try (BufferedReader br = new BufferedReader(new FileReader(&quot;a.txt&quot;))) {
+    return br.readLine();
+}   // 自动 close
+```
+
+### 4.4 黑马经典案例 ⭐
+
+```java
+public static void main(String[] args) {
+    try {
+        int[] arr = {1, 2, 3};
+        System.out.println(arr[5]);    // ArrayIndexOutOfBoundsException
+    } catch (ArrayIndexOutOfBoundsException e) {
+        System.out.println(&quot;数组越界&quot;);
+    }
+
+    try {
+        String s = null;
+        System.out.println(s.length());   // NullPointerException
+    } catch (NullPointerException e) {
+        System.out.println(&quot;空指针&quot;);
+    }
+
+    try {
+        int a = 10, b = 0;
+        System.out.println(a / b);        // ArithmeticException
+    } catch (ArithmeticException e) {
+        System.out.println(&quot;算术异常&quot;);
+    }
+}
+```
+
+---
+
+## 五、throws（声明抛出）⭐⭐
+
+把异常**抛给调用者**处理：
+
+```java
+public static void readFile() throws IOException {
+    FileReader fr = new FileReader(&quot;a.txt&quot;);
+    // ...
+}
+
+public static void main(String[] args) throws IOException {
+    readFile();   // 也可继续抛
+}
+```
+
+---
+
+## 六、throw（手动抛出）⭐
+
+```java
+public static void setAge(int age) {
+    if (age &lt; 0 || age &gt; 150) {
+        throw new IllegalArgumentException(&quot;年龄非法：&quot; + age);
+    }
+}
+```
+
+---
+
+## 七、自定义异常 ⭐
+
+### 7.1 定义
+
+```java
+// 受检异常（必须处理）
+public class LoginException extends Exception {
+    public LoginException() {}
+    public LoginException(String message) {
+        super(message);
+    }
+}
+
+// 非受检（可选处理）
+public class LoginRuntimeException extends RuntimeException {
+    public LoginRuntimeException(String message) {
+        super(message);
+    }
+}
+```
+
+### 7.2 黑马经典案例：用户登录 ⭐⭐
+
+```java
+public class UserService {
+    public void login(String username, String password) throws LoginException {
+        if (!&quot;admin&quot;.equals(username)) {
+            throw new LoginException(&quot;用户名不存在&quot;);
+        }
+        if (!&quot;123&quot;.equals(password)) {
+            throw new LoginException(&quot;密码错误&quot;);
+        }
+        System.out.println(&quot;登录成功&quot;);
+    }
+}
+
+public static void main(String[] args) {
+    UserService service = new UserService();
+    try {
+        service.login(&quot;admin&quot;, &quot;123&quot;);
+    } catch (LoginException e) {
+        System.out.println(&quot;登录失败：&quot; + e.getMessage());
+    }
+}
+```
+
+---
+
+## 八、异常实践 ⭐⭐
+
+### 8.1 应该捕获的场景
+
+✅ 网络请求
+✅ 文件读写
+✅ 数据库操作
+✅ 用户输入校验
+
+### 8.2 不应该捕获的场景
+
+❌ **空 catch 块**（隐藏问题）
+❌ 异常用于控制流程（性能差）
+❌ **捕获 Exception 兜底**（应该捕获具体异常）
+
+### 8.3 良好的写法
+
+```java
+// ✅ 好的写法
+try {
+    // 业务代码
+} catch (FileNotFoundException e) {
+    logger.error(&quot;文件未找到：{}&quot;, filePath, e);
+    throw new BusinessException(&quot;文件不存在&quot;);
+}
+
+// ❌ 不好的写法
+try {
+    // 业务代码
+} catch (Exception e) {
+    // 什么都不做
+}
+```
+
+---
+
+## 九、项目场景（实战导向）⭐
+
+### &#127919; 场景 1：用户输入校验
+
+```java
+public static int inputAge(Scanner sc) {
+    while (true) {
+        try {
+            System.out.print(&quot;请输入年龄：&quot;);
+            int age = Integer.parseInt(sc.nextLine());
+            if (age &lt; 0 || age &gt; 150) {
+                System.out.println(&quot;年龄非法&quot;);
+                continue;
+            }
+            return age;
+        } catch (NumberFormatException e) {
+            System.out.println(&quot;输入不是整数，请重试&quot;);
+        }
+    }
+}
+```
+
+### &#127919; 场景 2：文件操作
+
+```java
+public static String readFile(String path) {
+    try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        return br.readLine();
+    } catch (FileNotFoundException e) {
+        System.out.println(&quot;文件不存在&quot;);
+        return null;
+    } catch (IOException e) {
+        System.out.println(&quot;读取失败&quot;);
+        return null;
+    }
+}
+```
+
+---
+
+## 十、面试常问 ⭐⭐
+
+&gt; &#128161; **Error vs Exception？**
+&gt; - Error：JVM 内部严重错误（OOM、栈溢出）
+&gt; - Exception：程序可处理的异常
+
+&gt; &#128161; **受检 vs 非受检？**
+&gt; | 维度 | 受检 | 非受检 |
+&gt; |------|------|--------|
+&gt; | 编译 | 必须处理 | 不强制 |
+&gt; | 原因 | 外部 | 逻辑错误 |
+
+&gt; &#128161; **final、finally、finalize？**
+&gt; - `final`：修饰类/方法/变量
+&gt; - `finally`：try-catch 始终执行
+&gt; - `finalize`：Object 方法（已废弃）
+
+&gt; &#128161; **try 中 return 后 finally 还执行吗？**
+&gt; 执行。finally 在 return 前执行（除非 `System.exit()`）。
+
+---
+
+## 十一、本章小结
+
+✅ 已掌握：
+- [ ] **异常体系**（Throwable → Error/Exception → RuntimeException）
+- [ ] **受检 vs 运行期**
+- [ ] **try-catch-finally**
+- [ ] **throws / throw**
+- [ ] 自定义异常
+- [ ] **try-with-resources** 自动关闭
+
+✅ 易错点：
+- [ ] catch 必须从小到大（子类 → 父类）
+- [ ] 受检异常必须处理
+- [ ] finally 在 return 前执行
+- [ ] 空 catch 块是坏习惯
+
+下一章：[11-集合框架.md](./11-集合框架.md) — Java 核心！</pre>

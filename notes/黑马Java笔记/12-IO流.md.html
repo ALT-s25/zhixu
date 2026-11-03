@@ -1,0 +1,404 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>12-IO流</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 12 &#183; IO 流 ⭐⭐⭐
+
+&gt; **难度**：中高 | **学习建议**：3 天
+&gt; 对应黑马视频：下部第 61 ~ 95 集
+&gt; 项目导向：**文件上传/下载、日志读写、配置文件**
+
+---
+
+## 一、知识框架
+
+```
+IO 流
+├── 12.1 File 类 ⭐⭐
+├── 12.2 IO 流分类 ⭐⭐⭐
+├── 12.3 字节流 ⭐⭐
+│   ├── InputStream / OutputStream
+│   ├── FileInputStream / FileOutputStream
+│   └── BufferedInputStream
+├── 12.4 字符流 ⭐⭐
+│   ├── Reader / Writer
+│   ├── FileReader / FileWriter
+│   └── BufferedReader ⭐⭐
+├── 12.5 转换流 ⭐
+├── 12.6 对象流 ⭐⭐
+├── 12.7 打印流与 Properties
+└── 12.8 黑马实战：文件复制
+```
+
+---
+
+## 二、File 类 ⭐⭐
+
+### 2.1 File 表示
+
+```java
+import java.io.File;
+
+File f = new File(&quot;D:\\test.txt&quot;);
+File dir = new File(&quot;D:\\myDir&quot;);
+```
+
+### 2.2 常用方法
+
+```java
+// 判断
+f.exists();        // 文件/目录是否存在
+f.isFile();         // 是否是文件
+f.isDirectory();    // 是否是目录
+
+// 获取信息
+f.getName();         // 文件名
+f.getPath();         // 路径
+f.getAbsolutePath(); // 绝对路径
+f.length();          // 文件大小（字节）
+
+// 创建/删除
+f.createNewFile();   // 创建文件
+dir.mkdir();          // 创建单层目录
+dir.mkdirs();        // 创建多层目录
+f.delete();          // 删除
+
+// 列出内容
+String[] list = dir.list();
+File[] files = dir.listFiles();
+```
+
+### 2.3 黑马经典案例：递归遍历 ⭐⭐
+
+```java
+public static void listFiles(File dir) {
+    if (!dir.isDirectory()) return;
+    File[] files = dir.listFiles();
+    if (files == null) return;
+    for (File f : files) {
+        if (f.isFile()) {
+            System.out.println(&quot;文件：&quot; + f.getName());
+        } else {
+            System.out.println(&quot;目录：&quot; + f.getName());
+            listFiles(f);    // 递归
+        }
+    }
+}
+```
+
+---
+
+## 三、IO 流分类 ⭐⭐⭐
+
+### 3.1 按流向
+
+| 输入流 | 输出流 |
+|--------|--------|
+| InputStream / Reader | OutputStream / Writer |
+
+### 3.2 按数据���位
+
+| 字节流 | 字符流 |
+|--------|--------|
+| InputStream / OutputStream | Reader / Writer |
+| 图片、视频、二进制 | 文本文件 |
+
+### 3.3 按功能
+
+| 节点流 | 处理流（包装流） |
+|--------|----------------|
+| 直接操作数据源 | 提供额外功能（缓冲、转换） |
+
+---
+
+## 四、字节流 ⭐⭐
+
+### 4.1 FileInputStream（读）
+
+```java
+public void readFile(String path) throws IOException {
+    try (FileInputStream fis = new FileInputStream(path)) {
+        int b;
+        while ((b = fis.read()) != -1) {
+            System.out.print((char) b);
+        }
+    }
+}
+```
+
+### 4.2 FileOutputStream（写）
+
+```java
+public void writeFile(String path, String content) throws IOException {
+    try (FileOutputStream fos = new FileOutputStream(path, true)) {
+        fos.write(content.getBytes(StandardCharsets.UTF_8));
+    }
+}
+```
+
+### 4.3 黑马经典案例：文件复制 ⭐⭐⭐
+
+```java
+public void copyFile(String src, String dst) throws IOException {
+    try (FileInputStream fis = new FileInputStream(src);
+         FileOutputStream fos = new FileOutputStream(dst)) {
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = fis.read(buf)) != -1) {
+            fos.write(buf, 0, len);
+        }
+}
+```
+
+### 4.4 缓冲字节流（性能更高）
+
+```java
+public void bufferedCopy(String src, String dst) throws IOException {
+    try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(src));
+         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dst))) {
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = bis.read(buf)) != -1) {
+            bos.write(buf, 0, len);
+        }
+    }
+}
+```
+
+---
+
+## 五、字符流 ⭐⭐
+
+### 5.1 FileReader / FileWriter
+
+```java
+try (FileReader fr = new FileReader(path)) {
+    int c;
+    while ((c = fr.read()) != -1) System.out.print((char) c);
+}
+
+try (FileWriter fw = new FileWriter(path)) {
+    fw.write(&quot;Hello, World!&quot;);
+}
+```
+
+### 5.2 BufferedReader / BufferedWriter ⭐⭐
+
+```java
+try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+    String line;
+    while ((line = br.readLine()) != null) {
+        System.out.println(line);
+    }
+}
+
+try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
+    bw.write(&quot;Hello&quot;);
+    bw.newLine();   // 换行
+}
+```
+
+---
+
+## 六、转换流 ⭐
+
+字节流 ↔ 字符流（指定编码）：
+
+```java
+try (BufferedReader br = new BufferedReader(
+        new InputStreamReader(new FileInputStream(path), &quot;UTF-8&quot;))) {
+    String line;
+    while ((line = br.readLine()) != null) System.out.println(line);
+}
+```
+
+&gt; ⚠ **黑马经典坑**：中文乱码 = 没指定编码。
+
+---
+
+## 七、对象流 ⭐⭐（序列化）
+
+### 7.1 序列化与反序列化
+
+- **序列化**：对象 → 字节流
+- **反序列化**：字节流 → 对象
+
+### 7.2 序列化示例
+
+```java
+public class Student implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String name;
+    private int age;
+    private transient String password;  // 不参与序列化
+}
+
+// 序列化
+try (ObjectOutputStream oos = new ObjectOutputStream(
+        new FileOutputStream(&quot;student.bin&quot;))) {
+    Student s = new Student();
+    s.setName(&quot;张三&quot;);
+    oos.writeObject(s);
+}
+
+// 反序列化
+try (ObjectInputStream ois = new ObjectInputStream(
+        new FileInputStream(&quot;student.bin&quot;))) {
+    Student s = (Student) ois.readObject();
+    System.out.println(s.getName());
+}
+```
+
+&gt; ⚠ **黑马经典**：
+&gt; - 必须实现 `Serializable`
+&gt; - 加 `serialVersionUID`
+&gt; - `transient` 字段不序列化
+
+---
+
+## 八、打印流与 Properties ⭐
+
+### 8.1 打印流
+
+```java
+PrintStream ps = System.out;
+ps.println(&quot;Hello&quot;);
+
+PrintWriter pw = new PrintWriter(new FileWriter(&quot;log.txt&quot;), true);
+pw.println(&quot;日志内容&quot;);
+```
+
+### 8.2 Properties 配置文件
+
+```java
+Properties props = new Properties();
+try (InputStream is = new FileInputStream(&quot;config.properties&quot;)) {
+    props.load(is);
+    System.out.println(props.getProperty(&quot;name&quot;));
+}
+```
+
+---
+
+## 九、黑马实战综合项目 ⭐⭐⭐
+
+### 9.1 大文件复制（性能优化）
+
+```java
+public static void bigFileCopy(String src, String dst) throws IOException {
+    long start = System.currentTimeMillis();
+
+    try (BufferedInputStream bis = new BufferedInputStream(
+            new FileInputStream(src));
+         BufferedOutputStream bos = new BufferedOutputStream(
+            new FileOutputStream(dst))) {
+        byte[] buf = new byte[8192];   // 8KB 缓冲区
+        int len;
+        while ((len = bis.read(buf)) != -1) {
+            bos.write(buf, 0, len);
+        }
+    }
+
+    long end = System.currentTimeMillis();
+    System.out.println(&quot;复制完成，耗时：&quot; + (end - start) + &quot;ms&quot;);
+}
+```
+
+### 9.2 文件夹复制
+
+```java
+public static void copyDir(File src, File dst) throws IOException {
+    if (!dst.exists()) dst.mkdirs();
+    for (File f : src.listFiles()) {
+        File dest = new File(dst, f.getName());
+        if (f.isFile()) {
+            // 复制文件
+            Files.copy(f.toPath(), dest.toPath());
+        } else {
+            copyDir(f, dest);
+        }
+    }
+}
+```
+
+### 9.3 日志记录器
+
+```java
+public class Logger {
+    private static final String LOG_FILE = &quot;app.log&quot;;
+
+    public static void info(String msg) {
+        String timestamp = LocalDateTime.now()
+            .format(DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;));
+        String log = &quot;[&quot; + timestamp + &quot;] INFO: &quot; + msg + &quot;\n&quot;;
+        try (BufferedWriter bw = new BufferedWriter(
+                new FileWriter(LOG_FILE, true))) {
+            bw.write(log);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+---
+
+## 十、项目场景（实战导向）⭐
+
+### &#127919; 场景 1：导出 CSV
+
+```java
+public static void exportCSV(List&lt;Student&gt; students, String path) throws IOException {
+    try (BufferedWriter bw = new BufferedWriter(
+            new OutputStreamWriter(new FileOutputStream(path), &quot;UTF-8&quot;))) {
+        bw.write(&quot;姓名,年龄,分数\n&quot;);
+        for (Student s : students) {
+            bw.write(s.getName() + &quot;,&quot; + s.getAge() + &quot;,&quot; + s.getScore() + &quot;\n&quot;);
+        }
+}
+```
+
+### &#127919; 场景 2：读取配置文件
+
+```java
+Properties props = new Properties();
+try (InputStream is = App.class.getClassLoader()
+        .getResourceAsStream(&quot;config.properties&quot;)) {
+    props.load(is);
+    String dbUrl = props.getProperty(&quot;db.url&quot;);
+}
+```
+
+---
+
+## 十一、面试常问 ⭐⭐
+
+&gt; &#128161; **字节流 vs 字符流？**
+&gt; - 字节流：图片、视频、二进制
+&gt; - 字符流：文本文件
+
+&gt; &#128161; **什么是序列化？为什么需要？**
+&gt; 把对象转为字节序列，便于存储或网络传输。
+
+&gt; &#128161; **transient 关键字？**
+&gt; 不参与序列化。
+
+&gt; &#128161; **try-with-resources 的好处？**
+&gt; 自动关闭资源，避免忘记 close。
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] File 类常用方法
+- [ ] **IO 流分类**（输入/输出、字节/字符、节点/处理）
+- [ ] **文件复制**（字节流 + 缓冲流）
+- [ ] **BufferedReader 按行读取**
+- [ ] 转换流（指定编码）
+- [ ] **对象序列化**
+- [ ] Properties 配置文件
+
+✅ 易错点：
+- [ ] 中文乱码要指定 UTF-8
+- [ ] read 数组方法要传 0, len
+- [ ] 序列化要加 serialVersionUID
+- [ ] 所有 IO 流要 close
+
+下一章：[13-多线程.md](./13-多线程.md)</pre>

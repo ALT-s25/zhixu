@@ -1,0 +1,386 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>09-内部类与常用类</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 09 &#183; 内部类与常用类 ⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; 对应黑马视频：第 136 ~ 158 集
+&gt; 项目导向：**内部类是事件处理的灵魂**，包装类/日期是基础工具
+
+---
+
+## 一、知识框架
+
+```
+内部类与常用类
+├── 9.1 内部类 ⭐⭐
+│   ├── 成员内部类
+│   ├── 静态内部类
+│   ├── 局部内部类
+│   └── 匿名内部类 ⭐⭐⭐
+├── 9.2 Object 类（已述）
+├── 9.3 包装类 ⭐⭐
+├── 9.4 日期类 ⭐⭐
+│   ├── Date
+│   ├── SimpleDateFormat
+│   ├── Calendar
+│   └── JDK 8 新 API
+└── 9.5 Math / System / Runtime（已述）
+```
+
+---
+
+## 二、内部类 ⭐⭐
+
+### 2.1 什么是内部类
+
+定义在**类里面**的类。
+
+### 2.2 成员内部类
+
+```java
+public class Outer {
+    private int x = 10;
+
+    public class Inner {
+        public void print() {
+            System.out.println(x);   // 直接访问外部类私有成员
+        }
+    }
+
+    public void test() {
+        new Inner().print();
+    }
+}
+
+// 使用
+Outer outer = new Outer();
+Outer.Inner inner = outer.new Inner();
+inner.print();
+```
+
+### 2.3 静态内部类
+
+```java
+public class Outer {
+    private static int x = 10;
+
+    public static class Inner {
+        public void print() {
+            System.out.println(x);
+        }
+    }
+}
+
+// 使用
+Outer.Inner inner = new Outer.Inner();
+inner.print();
+```
+
+### 2.4 局部内部类
+
+```java
+public class Outer {
+    public void method() {
+        final int x = 10;     // Java 8+ 隐式 final
+
+        class LocalInner {
+            public void print() {
+                System.out.println(x);
+            }
+        }
+
+        new LocalInner().print();
+    }
+}
+```
+
+### 2.5 匿名内部类 ⭐⭐⭐
+
+**没有名字的类**，一次性使用。常配合接口使用。
+
+```java
+interface Greeting {
+    void sayHello();
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // 匿名内部类
+        Greeting g = new Greeting() {
+            @Override
+            public void sayHello() {
+                System.out.println(&quot;Hello!&quot;);
+            }
+        };
+        g.sayHello();
+
+        // Lambda 简化（Java 8+）
+        Greeting g2 = () -&gt; System.out.println(&quot;Hello from Lambda!&quot;);
+        g2.sayHello();
+    }
+}
+```
+
+### 2.6 黑马经典案例：按钮事件 ⭐⭐
+
+```java
+button.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println(&quot;按钮被点击&quot;);
+    }
+});
+```
+
+&gt; ⚠ Lambda 优先。
+
+---
+
+## 三、包装类 ⭐⭐
+
+### 3.1 8 种包装类
+
+| 基本类型 | 包装类 |
+|---------|--------|
+| byte | Byte |
+| short | Short |
+| int | **Integer** |
+| long | Long |
+| float | Float |
+| double | Double |
+| char | Character |
+| boolean | Boolean |
+
+### 3.2 装箱与拆箱
+
+```java
+// 装箱：基本 → 包装
+Integer i = 10;            // 自动装箱
+Integer j = Integer.valueOf(10);
+
+// 拆箱：包装 → 基本
+int n = i;                  // 自动拆箱
+int m = i.intValue();
+```
+
+### 3.3 自动装箱的坑 ⭐⭐
+
+```java
+Integer a = 127;
+Integer b = 127;
+System.out.println(a == b);   // true（缓存池）
+
+Integer c = 128;
+Integer d = 128;
+System.out.println(c == d);   // false（超出缓存池）
+```
+
+&gt; &#128161; **缓存池范围** -128~127，超出后 == 失效，**必须用 equals**。
+
+### 3.4 包装类常用方法
+
+```java
+int n = Integer.parseInt(&quot;123&quot;);       // 字符串 → int
+String s = Integer.toString(123);       // int → 字符串
+String s2 = String.valueOf(123);
+int max = Integer.MAX_VALUE;
+int min = Integer.MIN_VALUE;
+```
+
+### 3.5 黑马案例：字符串数字相加
+
+```java
+String s = &quot;100&quot;;
+int n = Integer.parseInt(s);
+int result = n + 1;     // 101
+```
+
+---
+
+## 四、日期类 ⭐⭐
+
+### 4.1 Date 类（老）
+
+```java
+import java.util.Date;
+
+Date d = new Date();
+System.out.println(d);     // 当前时间
+System.out.println(d.getTime());    // 时间戳（毫秒）
+```
+
+### 4.2 SimpleDateFormat
+
+```java
+import java.text.SimpleDateFormat;
+
+SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
+
+// Date → String
+Date d = new Date();
+String s = sdf.format(d);
+
+// String → Date
+Date d2 = sdf.parse(&quot;2025-01-01 12:00:00&quot;);
+```
+
+**格式化符号**：
+- `yyyy`：年
+- `MM`：月
+- `dd`：日
+- `HH`：时（24 小时）
+- `mm`：分
+- `ss`：秒
+
+### 4.3 Calendar 类
+
+```java
+import java.util.Calendar;
+
+Calendar c = Calendar.getInstance();
+c.set(2025, Calendar.JANUARY, 1);    // 设置日期
+c.add(Calendar.DAY_OF_MONTH, 7);      // 加 7 天
+Date d = c.getTime();
+```
+
+### 4.4 JDK 8 新时间 API ⭐⭐（推荐）
+
+```java
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+LocalDate today = LocalDate.now();
+LocalDate tomorrow = today.plusDays(1);
+
+LocalDateTime now = LocalDateTime.now();
+
+DateTimeFormatter fmt = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);
+String s = now.format(fmt);
+```
+
+### 4.5 黑马经典案例 ⭐⭐
+
+**计算两个日期相差多少天**：
+```java
+public static long daysBetween(Date d1, Date d2) {
+    long diff = d2.getTime() - d1.getTime();
+    return diff / (1000 * 60 * 60 * 24);
+}
+```
+
+---
+
+## 五、综合案例：黑马学生管理系统（升级版）⭐⭐⭐
+
+```java
+// Student.java
+public class Student {
+    private String id;
+    private String name;
+    private int age;
+    private String gender;
+
+    public Student() {}
+    public Student(String id, String name, int age, String gender) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    // getter/setter 略
+
+    @Override
+    public String toString() {
+        return &quot;Student{id=&quot; + id + &quot;, name=&quot; + name + &quot;, age=&quot; + age + &quot;, gender=&quot; + gender + &quot;}&quot;;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student s = (Student) o;
+        return Objects.equals(id, s.id);
+    }
+}
+
+// StudentManager.java
+public class StudentManager {
+    private ArrayList&lt;Student&gt; students = new ArrayList&lt;&gt;();
+
+    public void addStudent(Student s) {
+        students.add(s);
+    }
+
+    public void removeStudent(String id) {
+        students.removeIf(s -&gt; s.getId().equals(id));
+    }
+
+    public Student findById(String id) {
+        for (Student s : students) {
+            if (s.getId().equals(id)) return s;
+        }
+        return null;
+    }
+
+    public void printAll() {
+        for (Student s : students) {
+            System.out.println(s);
+        }
+    }
+}
+```
+
+---
+
+## 六、面试常问 ⭐
+
+&gt; &#128161; **`int` 和 `Integer` 区别？**
+&gt; - int：基本类型，默认 0
+&gt; - Integer：包装类，默认 null
+
+&gt; &#128161; **自动装箱的缓存池？**
+&gt; -128~127
+
+&gt; &#128161; **Date、Calendar、LocalDate 区别？**
+&gt; | Date | Calendar | LocalDate |
+&gt; |------|----------|-----------|
+&gt; | 老（可变线程不安全） | 老（线程安全但麻烦） | 新（线程安全，清晰） |
+
+&gt; &#128161; **内部类的作用？**
+&gt; - 访问外部类私有成员
+&gt; - 隐藏类的实现
+&gt; - 便于组织代码
+
+---
+
+## 七、本章小结
+
+✅ 已掌握：
+- [ ] **4 种内部类**（成员、静态、局部、匿名）
+- [ ] **匿名内部类** + Lambda 简化
+- [ ] **8 种包装类 + 自动装箱拆箱**
+- [ ] **Integer 缓存池陷阱**
+- [ ] Date、SimpleDateFormat、Calendar
+- [ ] **JDK 8 新时间 API**（LocalDate 等）
+
+✅ 易错点：
+- [ ] Integer 缓存池 -128~127
+- [ ] 包装类比较必须用 equals
+- [ ] SimpleDateFormat 不是线程安全的
+- [ ] 老日期 API 可变线程不安全
+
+---
+
+## 上部完结 &#127881;
+
+到此黑马 Java **上部（9 章）全部完成**！
+
+✅ 上部已掌握：
+- Java 入门与环境
+- 基础语法、流程控制
+- 数组、方法
+- 面向对象（基础 + 进阶）
+- 常用 API、内部类、包装类、日期
+
+可以继续学习：[10-异常处理.md](./10-异常处理.md)（下部开始）</pre>

@@ -1,0 +1,353 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>16-Lambda与Stream</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 16 &#183; Lambda 与 Stream ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; 对应黑马视频：下部第 176 ~ 195 集
+&gt; 项目导向：**现代 Java 代码风格**，工作中天天用
+
+---
+
+## 一、知识框架
+
+```
+Lambda 与 Stream
+├── 16.1 函数式编程思想
+├── 16.2 函数式接口 ⭐⭐
+├── 16.3 Lambda 表达式 ⭐⭐⭐
+├── 16.4 方法引用 ⭐⭐
+├── 16.5 Stream 流 ⭐⭐⭐⭐
+└── 16.6 Optional 类
+```
+
+---
+
+## 二、函数式编程思想 ⭐
+
+**面向对象**：做一件事，找一个能解决它的对象，调用方法。
+**函数式编程**：只要结果，不关心过程。
+
+&gt; Java 8 引入 Lambda，把函数作为参数传递。
+
+---
+
+## 三、函数式接口 ⭐⭐
+
+**只有一个抽象方法**的接口（可以用 `@FunctionalInterface` 标注）。
+
+```java
+@FunctionalInterface
+public interface MyFunction {
+    void run();
+}
+
+@FunctionalInterface
+public interface Calculator {
+    int calc(int a, int b);
+}
+```
+
+### 常见函数式接口（java.util.function）
+
+| 接口 | 抽象方法 | 用途 |
+|------|---------|------|
+| `Runnable` | `run()` | 无参无返回值 |
+| `Supplier&lt;T&gt;` | `T get()` | 生产数据 |
+| `Consumer&lt;T&gt;` | `void accept(T)` | 消费数据 |
+| `Function&lt;T,R&gt;` | `R apply(T)` | 类型转换 |
+| `Predicate&lt;T&gt;` | `boolean test(T)` | 条件判断 |
+
+```java
+// Supplier：提供数据
+Supplier&lt;Integer&gt; s = () -&gt; (int)(Math.random() * 100);
+
+// Consumer：消费数据
+Consumer&lt;String&gt; c = System.out::println;
+
+// Function：转换
+Function&lt;String, Integer&gt; f = Integer::parseInt;
+
+// Predicate：判断
+Predicate&lt;Integer&gt; p = x -&gt; x &gt; 0;
+```
+
+---
+
+## 四、Lambda 表达式 ⭐⭐⭐
+
+### 4.1 基本语法
+
+```java
+(参数列表) -&gt; { 方法体 }
+```
+
+### 4.2 三种形式
+
+```java
+// 1. 无参无返回值
+Runnable r = () -&gt; System.out.println(&quot;hi&quot;);
+
+// 2. 有参有返回值
+Calculator c = (a, b) -&gt; a + b;
+
+// 3. 单行可省略大括号
+Comparator&lt;Integer&gt; cmp = (a, b) -&gt; Integer.compare(a, b);
+```
+
+### 4.3 黑马经典案例
+
+```java
+// 1. 线程
+new Thread(() -&gt; System.out.println(&quot;hello&quot;)).start();
+
+// 2. 比较器
+Collections.sort(list, (a, b) -&gt; b - a);
+
+// 3. 事件监听
+button.addActionListener(e -&gt; System.out.println(&quot;clicked&quot;));
+```
+
+### 4.4 省略规则
+
+- 参数类型可省略
+- 单参数可省略括号
+- 单语句可省略大括号和 return
+
+```java
+x -&gt; x * 2       // 等价于 (x) -&gt; { return x * 2; }
+```
+
+---
+
+## 五、方法引用 ⭐⭐
+
+**Lambda 的简化版**，用 `::` 引用已有方法。
+
+### 5.1 静态方法引用
+
+```java
+Function&lt;String, Integer&gt; f1 = Integer::parseInt;
+// 等价 (s) -&gt; Integer.parseInt(s)
+```
+
+### 5.2 实例方法引用
+
+```java
+Consumer&lt;String&gt; c1 = System.out::println;
+// 等价 (s) -&gt; System.out.println(s)
+```
+
+### 5.3 任意对象方法引用
+
+```java
+Comparator&lt;String&gt; cmp = String::compareToIgnoreCase;
+```
+
+### 5.4 构造方法引用
+
+```java
+Supplier&lt;ArrayList&gt; s1 = ArrayList::new;
+```
+
+---
+
+## 六、Stream 流 ⭐⭐⭐⭐
+
+### 6.1 什么是 Stream
+
+**集合的流式处理**，流水线式操作数据。
+
+### 6.2 三步操作
+
+1. **获取流**：`list.stream()`
+2. **中间操作**（filter、map、sorted）
+3. **终结操作**（collect、forEach、count）
+
+### 6.3 获取流
+
+```java
+List&lt;String&gt; list = Arrays.asList(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;);
+Stream&lt;String&gt; stream = list.stream();
+
+int[] arr = {1, 2, 3};
+IntStream intStream = Arrays.stream(arr);
+```
+
+### 6.4 中间操作 ⭐⭐
+
+| 操作 | 作用 |
+|------|------|
+| `filter` | 过滤 |
+| `map` | 转换 |
+| `sorted` | 排序 |
+| `distinct` | 去重 |
+| `limit` | 限制个数 |
+| `skip` | 跳过 |
+| `flatMap` | 扁平化 |
+
+```java
+List&lt;String&gt; result = list.stream()
+    .filter(s -&gt; s.length() &gt; 2)        // 过滤
+    .map(String::toUpperCase)           // 转大写
+    .distinct()                         // 去重
+    .sorted()                           // 排序
+    .collect(Collectors.toList());
+```
+
+### 6.5 终结操作 ⭐⭐
+
+| 操作 | 作用 |
+|------|------|
+| `forEach` | 遍历 |
+| `count` | 计数 |
+| `collect` | 收集 |
+| `reduce` | 归约 |
+| `anyMatch/allMatch` | 匹配 |
+
+```java
+long count = list.stream().filter(s -&gt; s.length() &gt; 2).count();
+
+boolean anyMatch = list.stream().anyMatch(s -&gt; s.startsWith(&quot;a&quot;));
+```
+
+### 6.6 collect 收集到集合 ⭐⭐
+
+```java
+List&lt;String&gt; list = stream.collect(Collectors.toList());
+Set&lt;String&gt; set = stream.collect(Collectors.toSet());
+Map&lt;String, Integer&gt; map = stream.collect(
+    Collectors.toMap(s -&gt; s, String::length));
+
+// 分组
+Map&lt;Integer, List&lt;String&gt;&gt; grouped = stream.collect(
+    Collectors.groupingBy(String::length));
+
+// 分区
+Map&lt;Boolean, List&lt;String&gt;&gt; partitioned = stream.collect(
+    Collectors.partitioningBy(s -&gt; s.length() &gt; 3));
+```
+
+### 6.7 黑马经典案例 ⭐⭐⭐
+
+```java
+List&lt;Student&gt; students = Arrays.asList(
+    new Student(&quot;张三&quot;, 95),
+    new Student(&quot;李四&quot;, 82),
+    new Student(&quot;王五&quot;, 76),
+    new Student(&quot;赵六&quot;, 58)
+);
+
+// 1. 找出及格的学生
+List&lt;String&gt; passNames = students.stream()
+    .filter(s -&gt; s.getScore() &gt;= 60)
+    .map(Student::getName)
+    .collect(Collectors.toList());
+
+// 2. 按成绩排序
+List&lt;Student&gt; sorted = students.stream()
+    .sorted(Comparator.comparingInt(Student::getScore).reversed())
+    .collect(Collectors.toList());
+
+// 3. 统计各分数段人数
+Map&lt;String, Long&gt; stats = students.stream()
+    .collect(Collectors.groupingBy(
+        s -&gt; {
+            if (s.getScore() &gt;= 90) return &quot;A&quot;;
+            else if (s.getScore() &gt;= 80) return &quot;B&quot;;
+            else if (s.getScore() &gt;= 70) return &quot;C&quot;;
+            else return &quot;D&quot;;
+        },
+        Collectors.counting()
+    ));
+
+// 4. 最高分 / 平均分
+Optional&lt;Student&gt; top = students.stream()
+    .max(Comparator.comparingInt(Student::getScore));
+
+double avg = students.stream()
+    .mapToInt(Student::getScore)
+    .average()
+    .orElse(0);
+```
+
+---
+
+## 七、Optional ⭐
+
+**避免 NullPointerException**。
+
+```java
+Optional&lt;String&gt; opt = Optional.ofNullable(&quot;hello&quot;);
+
+if (opt.isPresent()) System.out.println(opt.get());
+
+// 默认值
+String s = opt.orElse(&quot;default&quot;);
+
+// 抛出异常
+String s = opt.orElseThrow(() -&gt; new RuntimeException(&quot;空&quot;));
+```
+
+---
+
+## 八、力扣实战 ⭐⭐
+
+### LeetCode 136. 只出现一次的数字（Stream）
+
+```java
+class Solution {
+    public int singleNumber(int[] nums) {
+        return Arrays.stream(nums).reduce(0, (a, b) -&gt; a ^ b);
+    }
+}
+```
+
+### LeetCode 169. 多数元素
+
+```java
+class Solution {
+    public int majorityElement(int[] nums) {
+        Map&lt;Integer, Long&gt; map = Arrays.stream(nums)
+            .boxed()
+            .collect(Collectors.groupingBy(
+                Function.identity(),
+                Collectors.counting()));
+        return map.entrySet().stream()
+            .max(Map.Entry.comparingByValue())
+            .get()
+            .getKey();
+    }
+}
+```
+
+---
+
+## 九、面试常问 ⭐⭐
+
+&gt; &#128161; **Lambda 表达式的本质？**
+&gt; 匿名函数对象，编译为 invokeDynamic 指令。
+
+&gt; &#128161; **Stream 的中间操作和终结操作区别？**
+&gt; - 中间操作：返回新 Stream，可链式
+&gt; - 终结操作：返回具体结果，触发处理
+
+&gt; &#128161; **`map` vs `flatMap`？**
+&gt; - map：一对一转���
+&gt; - flatMap：一对多 + 扁平化
+
+---
+
+## 十、本章小结
+
+✅ 已掌握：
+- [ ] **函数式接口**
+- [ ] **Lambda 表达式**
+- [ ] **方法引用**
+- [ ] **Stream 流三步操作**
+- [ ] **collect / groupingBy / partitioningBy**
+- [ ] Optional
+
+✅ 易错点：
+- [ ] Stream 只能用一次
+- [ ] 终结操作必须调用
+- [ ] filter 等中间操作是惰性求值
+
+下一章：[17-枚举与设计模式.md](./17-枚举与设计模式.md)</pre>

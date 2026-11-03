@@ -1,0 +1,282 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>14-网络编程</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 14 &#183; 网络编程 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; 对应黑马视频：下部第 136 ~ 155 集
+&gt; 项目导向：**Socket 是 RPC 框架的基础**，理解后才能看懂 Dubbo/Netty
+
+---
+
+## 一、知识框架
+
+```
+网络编程
+├── 14.1 网络基础
+│   ├── IP 地址
+│   └── 端口
+├── 14.2 InetAddress
+├── 14.3 TCP 通信 ⭐⭐⭐
+│   ├── Socket / ServerSocket
+│   ├── TCP 三次握手
+│   └── 文件上传
+├── 14.4 UDP 通信 ⭐⭐
+│   ├── DatagramSocket
+│   └── DatagramPacket
+└── 14.5 黑马实战：模拟 B/S
+```
+
+---
+
+## 二、网络基础
+
+### 2.1 IP 地址
+
+- IPv4：32 位，如 `192.168.1.1`
+- IPv6：128 位
+
+### 2.2 端口 ⭐
+
+- 范围 `0 ~ 65535`
+- `0-1023`：系统保留
+- 推荐 `8000+`
+
+### 2.3 InetAddress
+
+```java
+InetAddress local = InetAddress.getLocalHost();
+InetAddress baidu = InetAddress.getByName(&quot;www.baidu.com&quot;);
+
+System.out.println(baidu.getHostAddress());   // IP
+System.out.println(baidu.getHostName());       // 域名
+```
+
+---
+
+## 三、TCP 通信 ⭐⭐⭐
+
+### 3.1 TCP vs UDP
+
+| 维度 | TCP | UDP |
+|------|-----|-----|
+| 连接 | 面向连接 | 无连接 |
+| 可靠性 | ✅ | ❌ |
+| 速度 | 较慢 | 快 |
+| 应用 | 文件、邮件 | 视频、DNS |
+
+### 3.2 TCP 三次握手
+
+```
+客户端                 服务器
+   |  SYN              |
+   |-------------------&gt;|
+   |                    |
+   |  SYN+ACK           |
+   |&lt;-------------------|
+   |                    |
+   |  ACK               |
+   |-------------------&gt;|
+   |                    |
+  连接建立
+```
+
+### 3.3 TCP 客户端
+
+```java
+public class TcpClient {
+    public static void main(String[] args) throws IOException {
+        Socket socket = new Socket(&quot;127.0.0.1&quot;, 9999);
+        OutputStream os = socket.getOutputStream();
+        os.write(&quot;Hello, Server!&quot;.getBytes(StandardCharsets.UTF_8));
+        socket.close();
+    }
+}
+```
+
+### 3.4 TCP 服务器
+
+```java
+public class TcpServer {
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(9999);
+        Socket socket = server.accept();
+        InputStream is = socket.getInputStream();
+        byte[] buf = new byte[1024];
+        int len = is.read(buf);
+        System.out.println(&quot;收到：&quot; + new String(buf, 0, len));
+        socket.close();
+        server.close();
+    }
+}
+```
+
+### 3.5 黑马经典案例：文件上传 ⭐⭐⭐
+
+```java
+// 客户端
+public class UploadClient {
+    public static void main(String[] args) throws IOException {
+        Socket socket = new Socket(&quot;127.0.0.1&quot;, 8888);
+
+        FileInputStream fis = new FileInputStream(&quot;test.jpg&quot;);
+        OutputStream os = socket.getOutputStream();
+
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = fis.read(buf)) != -1) {
+            os.write(buf, 0, len);
+        }
+        socket.shutdownOutput();    // 通知服务器写完
+
+        // 接收服务器确认
+        InputStream is = socket.getInputStream();
+        byte[] resp = new byte[1024];
+        int respLen = is.read(resp);
+        System.out.println(&quot;服务器：&quot; + new String(resp, 0, respLen));
+
+        fis.close();
+        socket.close();
+    }
+}
+
+// 服务器
+public class UploadServer {
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8888);
+        while (true) {
+            Socket socket = server.accept();
+            new Thread(() -&gt; {
+                try {
+                    InputStream is = socket.getInputStream();
+                    FileOutputStream fos = new FileOutputStream(
+                        &quot;upload/&quot; + System.currentTimeMillis() + &quot;.jpg&quot;);
+
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) != -1) {
+                        fos.write(buf, 0, len);
+                    }
+
+                    socket.getOutputStream().write(&quot;OK&quot;.getBytes());
+                    fos.close();
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+}
+```
+
+---
+
+## 四、UDP 通信 ⭐⭐
+
+### 4.1 UDP 发送
+
+```java
+public class UdpSender {
+    public static void main(String[] args) throws IOException {
+        DatagramSocket ds = new DatagramSocket();
+
+        byte[] data = &quot;Hello, UDP!&quot;.getBytes();
+        DatagramPacket dp = new DatagramPacket(
+            data, data.length,
+            InetAddress.getByName(&quot;127.0.0.1&quot;), 9999);
+
+        ds.send(dp);
+        ds.close();
+    }
+}
+```
+
+### 4.2 UDP 接收
+
+```java
+public class UdpReceiver {
+    public static void main(String[] args) throws IOException {
+        DatagramSocket ds = new DatagramSocket(9999);
+
+        byte[] buf = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(buf, buf.length);
+
+        ds.receive(dp);
+
+        System.out.println(&quot;收到：&quot; + new String(dp.getData(), 0, dp.getLength()));
+        ds.close();
+    }
+}
+```
+
+---
+
+## 五、黑马实战：模拟 B/S 服务器 ⭐⭐
+
+```java
+public class BSServer {
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8080);
+        System.out.println(&quot;服务器启动，访问 http://localhost:8080&quot;);
+
+        while (true) {
+            Socket socket = server.accept();
+            new Thread(() -&gt; {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream()));
+                     PrintWriter pw = new PrintWriter(
+                        socket.getOutputStream(), true)) {
+
+                    br.readLine();   // 忽略请求行
+
+                    pw.println(&quot;HTTP/1.1 200 OK&quot;);
+                    pw.println(&quot;Content-Type: text/html;charset=utf-8&quot;);
+                    pw.println();
+                    pw.println(&quot;&lt;h1&gt;Hello, Browser!&lt;/h1&gt;&quot;);
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+}
+```
+
+&gt; &#128161; **真实 B/S 服务器用 Tomcat/SpringBoot**，但理解原理很重要。
+
+---
+
+## 六、面试常问 ⭐⭐
+
+&gt; &#128161; **TCP vs UDP？**
+&gt; - TCP 可靠（三次握手、四次挥手），UDP 不可靠
+&gt; - TCP 字节流，UDP 数据包
+&gt; - TCP 慢，UDP 快
+
+&gt; &#128161; **TCP 三次握手？**
+&gt; SYN → SYN+ACK → ACK。确保双方收发能力正常。
+
+&gt; &#128161; **TCP 四次挥手？**
+&gt; FIN → ACK → FIN → ACK，TIME_WAIT 等待 2MSL 防止丢包。
+
+&gt; &#128161; **Socket 工作流程？**
+&gt; 服务端：bind → listen → accept → read/write → close
+&gt; 客户端：connect → write/read → close
+
+---
+
+## 七、本章小结
+
+✅ 已掌握：
+- [ ] IP 地址与端口
+- [ ] InetAddress 类
+- [ ] **TCP Socket 客户端/服务器**
+- [ ] **文件上传**（黑马重点）
+- [ ] UDP 收发数据
+- [ ] 模拟 B/S 服务器
+
+✅ 易错点：
+- [ ] Socket 用完必须 close
+- [ ] TCP 是字节流，shutdownOutput 通知结束
+- [ ] UDP 数据包有大小限制
+
+下一章：[15-反射与注解.md](./15-反射与注解.md) — 框架基础！</pre>

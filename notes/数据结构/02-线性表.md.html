@@ -1,0 +1,308 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>02-线性表</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 第 2 章 &#183; 线性表 ⭐⭐⭐
+
+&gt; **考频**：选+码 | **难度**：中 | **分值占比**：~12%
+&gt; **大题必考**：链表大题（合并/逆置/判环）和顺序表扩容是经典题型。
+
+---
+
+## 一、知识框架
+
+```
+线性表
+├── 2.1 线性表定义
+├── 2.2 顺序表 ★★
+│   ├── 存储：数组
+│   ├── 插入/删除/查找 O(n)
+│   └── 动态扩容
+├── 2.3 链表 ★★★★
+│   ├── 单链表（带头/不带头）
+│   ├── 双链表
+│   ├── 循环链表
+│   └── 静态链表
+├── 2.4 顺序表 vs 链表对比
+└── 2.5 典型真题套路
+    ├── 套路 A：两个有序链表合并
+    ├── 套路 B：链表逆置
+    ├── 套路 C：链表判环 &amp; 找入口
+    └── 套路 D：删除所有值为 x 的结点
+```
+
+---
+
+## 二、核心概念
+
+### 2.1 线性表定义
+
+由 n (n≥0) 个**相同类型**数据元素组成的**有限**序列。
+- 除首尾元素外，每个元素有唯一前驱和后继
+- **逻辑特性**：一对一关系
+
+### 2.2 顺序表 ★★
+
+**存储结构**：
+- 用一段连续的内存依次存放元素
+- 支持**随机访问**（按下标 O(1) 访问）
+- 存储密度高（=1），但插入/删除需移动大量元素
+
+**基本操作时间复杂度**：
+
+| 操作 | 时间复杂度 | 说明 |
+|------|-----------|------|
+| 按下标访问 | O(1) | 随机存取 |
+| 按值查找 | O(n) | 顺序扫描 |
+| 插入/删除 | O(n) | 平均移动 n/2 个元素 |
+
+**动态顺序表扩容**：
+- 申请更大数组（一般 2 倍），复制旧元素，释放旧数组
+- 均摊时间复杂度：插入为 O(1)（均摊）
+
+&gt; ⚠ **易错**：&quot;第 i 个位置插入&quot;含义区分
+&gt; - 王道：位序 i，合法范围 `1 ≤ i ≤ n+1`
+&gt; - 实际代码：下标 `i-1`，合法范围 `0 ≤ i-1 ≤ n`
+
+### 2.3 链表 ★★★★
+
+#### 单链表
+
+- 每个结点：`data | next`
+- **带头结点**（推荐）：方便统一操作第一个结点，统一判空条件 `L-&gt;next == NULL`
+- **不带头结点**：第一个结点的处理需特殊代码
+
+#### 双链表
+
+- 结点：`prior | data | next`
+- 可双向遍历，删除/查找前驱 O(1)
+
+#### 循环链表
+
+- **循环单链表**：尾结点 next 指向头结点
+- **循环双链表**：头结点 prior 指向尾结点，尾结点 next 指向头结点
+
+#### 静态链表
+
+- 用数组模拟链表，游标 next 存下一结点下标
+- 考研较少考，了解即可
+
+#### 基本操作时间复杂度
+
+| 操作 | 单链表 | 双链表 |
+|------|--------|--------|
+| 头插/头删 | O(1) | O(1) |
+| 尾插/尾删（带尾指针） | O(1) | O(1) |
+| 按位序查找 | O(n) | O(n) |
+| 按值查找 | O(n) | O(n) |
+| 已知结点位置插入/删除 | O(n) 找前驱 | O(1) |
+
+### 2.4 顺序表 vs 链表 ★★★
+
+| 维度 | 顺序表 | 链表 |
+|------|--------|------|
+| 存储空间 | 连续 | 可离散 |
+| 随机访问 | ✓ O(1) | ✗ O(n) |
+| 插入删除 | O(n) 移动元素 | O(1) 改指针（已知位置） |
+| 存储密度 | =1 | &lt;1（有指针开销） |
+| 空间分配 | 预先分配，扩缩容 | 动态分配，按需 |
+| 适用场景 | 频繁查找、少增删 | 频繁增删、规模不可预知 |
+
+---
+
+## 三、关键代码 ★★★★★
+
+### 3.1 带头单链表结构定义
+
+```c
+typedef struct LNode {
+    int data;
+    struct LNode *next;
+} LNode, *LinkList;
+
+// 初始化（带头结点）
+bool InitList(LinkList &amp;L) {
+    L = (LNode*)malloc(sizeof(LNode));
+    if (L == NULL) return false;
+    L-&gt;next = NULL;
+    return true;
+}
+
+// 判空
+bool Empty(LinkList L) {
+    return L-&gt;next == NULL;
+}
+```
+
+### 3.2 单链表按位序插入
+
+```c
+// 在第 i 个位置插入元素 e（位序从 1 开始）
+bool ListInsert(LinkList &amp;L, int i, int e) {
+    if (i &lt; 1) return false;
+    LNode *p = L;             // p 指向头结点（从 0 开始走 i-1 步）
+    int j = 0;
+    while (p != NULL &amp;&amp; j &lt; i - 1) {
+        p = p-&gt;next;
+        j++;
+    }
+    if (p == NULL) return false;
+    LNode *s = (LNode*)malloc(sizeof(LNode));
+    s-&gt;data = e;
+    s-&gt;next = p-&gt;next;
+    p-&gt;next = s;
+    return true;
+}
+```
+
+### 3.3 双链表结构 + 插入
+
+```c
+typedef struct DNode {
+    int data;
+    struct DNode *prior, *next;
+} DNode, *DLinkList;
+
+// 在 p 结点后插入 s 结点
+bool InsertNextDNode(DNode *p, DNode *s) {
+    if (p == NULL || s == NULL) return false;
+    s-&gt;next = p-&gt;next;
+    if (p-&gt;next != NULL) p-&gt;next-&gt;prior = s;
+    s-&gt;prior = p;
+    p-&gt;next = s;
+    return true;
+}
+```
+
+### 3.4 两个有序链表合并 ⭐⭐⭐⭐⭐
+
+```c
+// 将两个升序链表 A、B 合并为一个升序链表 C
+LinkList Merge(LinkList A, LinkList B) {
+    LNode *pa = A-&gt;next, *pb = B-&gt;next;
+    LinkList C = (LinkList)malloc(sizeof(LNode));
+    LNode *pc = C;
+    while (pa &amp;&amp; pb) {
+        if (pa-&gt;data &lt;= pb-&gt;data) {
+            pc-&gt;next = pa; pc = pa; pa = pa-&gt;next;
+        } else {
+            pc-&gt;next = pb; pc = pb; pb = pb-&gt;next;
+        }
+    }
+    pc-&gt;next = pa ? pa : pb;     // 接剩余尾
+    free(B);                      // B 头结点释放（可选）
+    return C;
+}
+```
+
+### 3.5 链表逆置（头插法）⭐⭐⭐⭐
+
+```c
+// 头插法：将原链表结点逐个按头插法插入新链表
+void Reverse(LinkList &amp;L) {
+    LNode *p = L-&gt;next, *r;
+    L-&gt;next = NULL;          // 新链表置空
+    while (p != NULL) {
+        r = p-&gt;next;          // 暂存后继
+        p-&gt;next = L-&gt;next;    // 头插
+        L-&gt;next = p;
+        p = r;                // p 前进
+    }
+}
+```
+
+### 3.6 链表判环 &amp; 找入口 ⭐⭐⭐⭐
+
+```c
+// Floyd 判环：快慢指针
+bool HasCycle(LinkList L) {
+    LNode *slow = L, *fast = L;
+    while (fast != NULL &amp;&amp; fast-&gt;next != NULL) {
+        slow = slow-&gt;next;
+        fast = fast-&gt;next-&gt;next;
+        if (slow == fast) return true;   // 相遇则有环
+    }
+    return false;
+}
+
+// 找环入口：相遇后，一个从 head、一个从相遇点，同步走，再次相遇即为入口
+LNode* CycleEntry(LinkList L) {
+    LNode *slow = L, *fast = L;
+    while (fast &amp;&amp; fast-&gt;next) {
+        slow = slow-&gt;next;
+        fast = fast-&gt;next-&gt;next;
+        if (slow == fast) {
+            LNode *p = L;
+            while (p != slow) { p = p-&gt;next; slow = slow-&gt;next; }
+            return p;
+        }
+    }
+    return NULL;
+}
+```
+
+### 3.7 删除所有值为 x 的结点
+
+```c
+// 头结点技巧：避免删头结点的特殊情况
+void DeleteX(LinkList &amp;L, int x) {
+    LNode *p = L-&gt;next, *pre = L;     // pre 指向 p 的前驱
+    while (p != NULL) {
+        if (p-&gt;data == x) {
+            pre-&gt;next = p-&gt;next;
+            free(p);
+            p = pre-&gt;next;
+        } else {
+            pre = p;
+            p = p-&gt;next;
+        }
+    }
+}
+```
+
+---
+
+## 四、真题套路
+
+### 套路 A：两链表合并
+- 必背模板：3.4
+- 变形：合并到 A 中（节省空间）、合并为降序
+
+### 套路 B：链表逆置
+- 头插法（O(n) 时间，O(1) 空间）
+- 三指针原地翻转（类似）
+- 局部逆置：m 到 n 区间逆置
+
+### 套路 C：判环 + 找入口
+- 快慢指针 Floyd
+- 求环长度：相遇后继续走一圈
+
+### 套路 D：删除特定值结点
+- 头结点技巧处理边界
+- 双指针法：pre 跟踪前驱
+
+&gt; &#128161; **链表题统一心法**：**先画图 → 找临界点（头/尾/中点）→ 写代码 → 验证边界**
+&gt; 王道的链表真题 90% 都是这 4 个套路的变形。
+
+---
+
+## 五、概念清单（必背）
+
+- [ ] 线性表的定义、前驱后继
+- [ ] 顺序表特点：随机存取、存储密度
+- [ ] 单/双/循环/静态链表 4 种结构
+- [ ] 头结点的作用（统一操作、判空）
+- [ ] 顺序表 vs 链表 6 维对比
+- [ ] 链表 4 大套路：合并 / 逆置 / 判环 / 删除
+
+---
+
+## 六、自测题
+
+1. **选择**：n 个结点的单链表，访问第 i 个结点的时间复杂度是？
+   - A. O(1)  B. O(log n)  C. O(n)  D. O(n&#178;)
+   - **答案**：C
+
+2. **应用题**：已知 L 是带头结点的单链表，写算法删除所有值为偶数的结点。
+   - 提示：复用 3.7 模板，x 改为 `x % 2 == 0`
+
+3. **算法题**：判断两个无环单链表是否相交（设两链表均无环）。
+   - 思路：遍历两个链表到尾结点，看尾指针是否相同
+   - 或：长链表先走 |len1-len2| 步，再同步走，看是否相遇
+</pre>

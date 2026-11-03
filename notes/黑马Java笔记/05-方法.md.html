@@ -1,0 +1,359 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>05-方法</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 05 &#183; 方法 ⭐⭐
+
+&gt; **难度**：入门 | **学习建议**：2 天
+&gt; 对应黑马视频：第 31 ~ 40 集
+&gt; 项目导向：**每个项目都是方法的组合**，学会封装代码才能做项目
+
+---
+
+## 一、知识框架
+
+```
+方法
+├── 5.1 方法的定义与调用 ⭐
+├── 5.2 方法参数 ⭐⭐
+│   ├── 形参与实参
+│   └── 值传递（重要）
+├── 5.3 方法返回值
+├── 5.4 方法重载 ⭐⭐
+├── 5.5 方法递归 ⭐⭐
+└── 5.6 方法练习
+```
+
+---
+
+## 二、方法定义与调用 ⭐
+
+### 2.1 方法定义
+
+```java
+修饰符 返回值类型 方法名(参数列表) {
+    // 方法体
+    return 返回值;
+}
+
+public static int add(int a, int b) {
+    return a + b;
+}
+```
+
+### 2.2 方法调用
+
+```java
+int result = add(3, 5);
+System.out.println(result);   // 8
+```
+
+### 2.3 黑马经典案例
+
+```java
+// 案例 1：方法封装
+public static void printStar(int n) {
+    for (int i = 1; i &lt;= n; i++) {
+        for (int j = 1; j &lt;= i; j++) {
+            System.out.print(&quot;*&quot;);
+        }
+        System.out.println();
+    }
+}
+
+printStar(5);
+// 输出：
+// *
+// **
+// ***
+// ****
+// *****
+```
+
+---
+
+## 三、方法参数 ⭐⭐
+
+### 3.1 形参与实参
+
+```java
+public static int add(int a, int b) {  // a, b 是形参
+    return a + b;
+}
+
+int r = add(3, 5);   // 3, 5 是实参
+```
+
+### 3.2 值传递 ⭐⭐⭐（黑马重点）
+
+**Java 只有值传递**。
+
+**基本类型**：传递的是值的副本
+```java
+public static void change(int a) {
+    a = 100;
+}
+int x = 10;
+change(x);
+System.out.println(x);   // 10（未改变）
+```
+
+**引用类型**：传递的是地址的副本
+```java
+public static void change(int[] arr) {
+    arr[0] = 100;
+}
+int[] arr = {1, 2, 3};
+change(arr);
+System.out.println(arr[0]);   // 100（被改变）
+```
+
+### 3.3 黑马经典面试题 ⭐
+
+```java
+// 案例：引用传递的理解
+public static void swap(int[] arr) {
+    int temp = arr[0];
+    arr[0] = arr[1];
+    arr[1] = temp;
+}
+
+int[] arr = {1, 2};
+swap(arr);
+System.out.println(arr[0] + &quot;,&quot; + arr[1]);   // 2,1（交换成功）
+```
+
+&gt; ⚠ **误区**——以为引用传递就完全共享：
+```java
+public static void change(int[] arr) {
+    arr = new int[]{10, 20};   // 改变形参的指向
+}
+int[] arr = {1, 2};
+change(arr);
+System.out.println(arr[0]);   // 1（形参指向新对象不影响实参）
+```
+
+---
+
+## 四、方法返回值
+
+```java
+public static int sum(int a, int b) {
+    return a + b;       // 返回 int
+}
+
+public static void print(String msg) {
+    System.out.println(msg);
+    return;             // 可省略
+}
+```
+
+&gt; ⚠ **黑马常考**：
+&gt; - 一个方法**最多一个返回值**（想要多个用数组或对象）
+&gt; - return 后不能再写代码（不可达）
+
+---
+
+## 五、方法重载 ⭐⭐
+
+**同一个类中**，方法名相同，**参数列表不同**（类型、个数、顺序），与返回值无关。
+
+```java
+public static int add(int a, int b) {
+    return a + b;
+}
+
+public static double add(double a, double b) {
+    return a + b;
+}
+
+public static int add(int a, int b, int c) {
+    return a + b + c;
+}
+
+add(1, 2);          // 调用第一个
+add(1.5, 2.5);      // 调用第二个
+add(1, 2, 3);       // 调用第三个
+```
+
+&gt; ⚠ **黑马常见坑**：
+&gt; - 仅返回值不同**不构成重载**
+&gt; - 仅参数名不同**不构成重载**
+
+---
+
+## 六、方法递归 ⭐⭐
+
+**自己调用自己**。
+
+**三要素**：
+1. **递归出口**：何时停止
+2. **递归公式**：如何分解
+3. **递归方向**：向出口推进
+
+### 6.1 案例：阶乘
+
+```java
+public static int factorial(int n) {
+    if (n == 1) return 1;            // 递归出口
+    return n * factorial(n - 1);     // 递归公式
+}
+
+System.out.println(factorial(5));   // 120
+```
+
+### 6.2 案例：斐波那契
+
+```java
+public static int fib(int n) {
+    if (n &lt; 2) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+```
+
+### 6.3 黑马经典题：递归求和
+
+```java
+// 1+2+3+...+100
+public static int sum(int n) {
+    if (n == 1) return 1;
+    return n + sum(n - 1);
+}
+```
+
+### 6.4 递归内存图 ⭐
+
+```
+递归调用 factorial(3) 的内存：
+
+栈
+┌────────────────┐
+│ factorial(1)   │  返回 1
+├────────────────┤
+│ factorial(2)   │  等 2 * factorial(1)
+├────────────────┤
+│ factorial(3)   │  等 3 * factorial(2)
+├────────────────┤
+│ main           │
+└────────────────┘
+```
+
+&gt; ⚠ **递归太深 → 栈溢出**（StackOverflowError）。
+
+---
+
+## 七、项目场景（实战导向）⭐
+
+### &#127919; 场景 1：用户菜单
+
+```java
+public static void showMenu() {
+    System.out.println(&quot;=== 系统菜单 ===&quot;);
+    System.out.println(&quot;1. 添加用户&quot;);
+    System.out.println(&quot;2. 查询用户&quot;);
+    System.out.println(&quot;3. 删除用户&quot;);
+    System.out.println(&quot;0. 退出&quot;);
+}
+
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    while (true) {
+        showMenu();
+        System.out.print(&quot;请选择：&quot;);
+        int choice = sc.nextInt();
+        switch (choice) {
+            case 1: addUser(); break;
+            case 2: queryUser(); break;
+            case 3: deleteUser(); break;
+            case 0: return;
+            default: System.out.println(&quot;非法输入&quot;);
+        }
+    }
+}
+```
+
+### &#127919; 场景 2：用户登录
+
+```java
+public static boolean login(String username, String password) {
+    return username.equals(&quot;admin&quot;) &amp;&amp; password.equals(&quot;123&quot;);
+}
+
+// 主程序
+int count = 0;
+while (count &lt; 3) {
+    System.out.print(&quot;用户名：&quot;); String u = sc.nextLine();
+    System.out.print(&quot;密码：&quot;); String p = sc.nextLine();
+    if (login(u, p)) {
+        System.out.println(&quot;登录成功&quot;);
+        break;
+    }
+    count++;
+}
+```
+
+---
+
+## 八、力扣实战 ⭐⭐
+
+### LeetCode 509. 斐波那契数（递归）
+
+```java
+class Solution {
+    public int fib(int n) {
+        if (n &lt; 2) return n;
+        return fib(n - 1) + fib(n - 2);
+    }
+}
+```
+
+### LeetCode 70. 爬楼梯
+
+```java
+class Solution {
+    public int climbStairs(int n) {
+        if (n &lt;= 2) return n;
+        int prev = 1, curr = 2;
+        for (int i = 3; i &lt;= n; i++) {
+            int next = prev + curr;
+            prev = curr;
+            curr = next;
+        }
+        return curr;
+    }
+}
+```
+
+---
+
+## 九、面试常问 ⭐
+
+&gt; &#128161; **Java 是值传递还是引用传递？**
+&gt; **值传递**。引用类型传递的是地址的副本。
+
+&gt; &#128161; **方法重载和方法重写的区别？**
+&gt; | 重载 | 重写 |
+&gt; |------|------|
+&gt; | 同类 | 子父类 |
+&gt; | 参数列表不同 | 参数列表相同 |
+&gt; | 编译时 | 运行时 |
+
+&gt; &#128161; **递归的优缺点？**
+&gt; - 优：代码简洁
+&gt; - 缺：效率低、栈溢出风险
+
+---
+
+## 十、本章小结
+
+✅ 已掌握：
+- [ ] 方法定义与调用
+- [ ] **形参 vs 实参**
+- [ ] **值传递**（黑马重点）
+- [ ] 方法返回值
+- [ ] **方法重载**
+- [ ] **方法递归**
+
+✅ 易错点：
+- [ ] 基本类型 vs 引用类型的值传递区别
+- [ ] 仅返回值不同不构成重载
+- [ ] 递归必须有出口
+- [ ] 递归深度太大会栈溢出
+
+下一��：[06-面向对象基础.md](./06-面向对象基础.md) — Java 核心！</pre>

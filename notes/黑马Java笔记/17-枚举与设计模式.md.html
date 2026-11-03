@@ -1,0 +1,477 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>17-枚举与设计模式</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 17 &#183; 枚举与设计模式 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; 对应黑马视频：下部第 196 ~ 215 集
+&gt; 项目导向：**单例、工厂、代理是面试必问**，写代码天天用
+
+---
+
+## 一、知识框架
+
+```
+枚举与设计模式
+├── 17.1 枚举（enum）⭐⭐
+├── 17.2 设计模式概述
+├── 17.3 单例模式 ⭐⭐⭐⭐
+├── 17.4 工厂模式 ⭐⭐⭐
+├── 17.5 装饰者模式 ⭐⭐
+├── 17.6 代理模式 ⭐⭐⭐
+└── 17.7 模板模式 ⭐
+```
+
+---
+
+## 二、枚举（enum）⭐⭐
+
+### 2.1 基本定义
+
+```java
+public enum Color {
+    RED, GREEN, BLUE;
+}
+
+Color c = Color.RED;
+```
+
+### 2.2 带属性和方法的枚举
+
+```java
+public enum Status {
+    OK(200, &quot;成功&quot;),
+    ERROR(500, &quot;服务器错误&quot;),
+    NOT_FOUND(404, &quot;未找到&quot;);
+
+    private int code;
+    private String msg;
+
+    Status(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
+    public int getCode() { return code; }
+    public String getMsg() { return msg; }
+}
+```
+
+### 2.3 常用方法
+
+```java
+Color[] colors = Color.values();
+Color c = Color.valueOf(&quot;RED&quot;);
+
+// switch 中使用
+switch (status) {
+    case OK: /* ... */ break;
+    case ERROR: /* ... */ break;
+}
+```
+
+---
+
+## 三、设计模式概述
+
+设计模式是**代码设计的经验总结**（GoF 23 种）。
+
+- **创建型**：单例、工厂、抽象工厂、建造者、原型
+- **结构型**：装饰者、适配器、代理、桥接、组合、外观、享元
+- **行为型**：模板、策略、观察者、迭代器、责任链、命令、备忘录
+
+---
+
+## 四、单例模式 ⭐⭐⭐⭐
+
+**一个类只有一个实例**。
+
+### 4.1 饿汉式（线程安全）
+
+```java
+public class Singleton {
+    private static final Singleton INSTANCE = new Singleton();
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        return INSTANCE;
+    }
+}
+```
+
+### 4.2 懒汉式（线程不安全）
+
+```java
+public class Singleton {
+    private static Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+```
+
+### 4.3 双重检查（推荐）⭐⭐⭐⭐
+
+```java
+public class Singleton {
+    private static volatile Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+&gt; ⚠ **volatile 必须加**（防止指令重排）。
+
+### 4.4 静态内部类（最佳）
+
+```java
+public class Singleton {
+    private Singleton() {}
+
+    private static class Holder {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+```
+
+### 4.5 枚举实现（最简洁）
+
+```java
+public enum Singleton {
+    INSTANCE;
+
+    public void doSomething() {
+        // ...
+    }
+}
+```
+
+---
+
+## 五、工厂模式 ⭐⭐⭐
+
+**将对象的创建交给工厂类**。
+
+### 5.1 简单工厂
+
+```java
+public interface Shape {
+    void draw();
+}
+
+public class Circle implements Shape {
+    public void draw() { System.out.println(&quot;画圆形&quot;); }
+}
+
+public class Rectangle implements Shape {
+    public void draw() { System.out.println(&quot;画矩形&quot;); }
+}
+
+// 工厂
+public class ShapeFactory {
+    public static Shape create(String type) {
+        if (&quot;circle&quot;.equals(type)) return new Circle();
+        if (&quot;rectangle&quot;.equals(type)) return new Rectangle();
+        return null;
+    }
+}
+
+// 使用
+Shape s = ShapeFactory.create(&quot;circle&quot;);
+s.draw();
+```
+
+### 5.2 黑马经典：日志工厂 ⭐
+
+```java
+public interface Logger {
+    void log(String msg);
+}
+
+public class ConsoleLogger implements Logger {
+    public void log(String msg) { System.out.println(msg); }
+}
+
+public class FileLogger implements Logger {
+    public void log(String msg) {
+        // 写文件
+    }
+}
+
+public class LoggerFactory {
+    public static Logger create(String type) {
+        if (&quot;console&quot;.equals(type)) return new ConsoleLogger();
+        if (&quot;file&quot;.equals(type)) return new FileLogger();
+        return new ConsoleLogger();   // 默认
+    }
+}
+```
+
+---
+
+## 六、装饰者模式 ⭐⭐
+
+**动态地给对象添加职责**，比继承更灵活。
+
+### 黑马案例：IO 流包装
+
+```java
+InputStream is = new FileInputStream(&quot;test.txt&quot;);
+InputStream bis = new BufferedInputStream(is);   // 装饰
+InputStream gis = new GZIPInputStream(bis);      // 再装饰
+```
+
+### 自定义装饰者
+
+```java
+interface Beverage {
+    String getDescription();
+    double cost();
+}
+
+class Coffee implements Beverage {
+    public String getDescription() { return &quot;咖啡&quot;; }
+    public double cost() { return 20; }
+}
+
+// 装饰者
+class MilkDecorator implements Beverage {
+    private Beverage beverage;
+
+    public MilkDecorator(Beverage b) { this.beverage = b; }
+
+    public String getDescription() {
+        return beverage.getDescription() + &quot; + 牛奶&quot;;
+    }
+    public double cost() {
+        return beverage.cost() + 5;
+    }
+}
+
+// 使用
+Beverage b = new MilkDecorator(new Coffee());
+System.out.println(b.getDescription() + &quot; &quot; + b.cost());
+// &quot;咖啡 + 牛奶&quot; 25
+```
+
+---
+
+## 七、代理模式 ⭐⭐⭐
+
+**为其他对象提供一种代理以控制对这个对象的访问**。
+
+### 7.1 静态代理
+
+```java
+interface Service {
+    void doService();
+}
+
+class RealService implements Service {
+    public void doService() { System.out.println(&quot;真实服务&quot;); }
+}
+
+class ProxyService implements Service {
+    private RealService real;
+
+    public ProxyService(RealService real) { this.real = real; }
+
+    public void doService() {
+        System.out.println(&quot;前���增强&quot;);
+        real.doService();
+        System.out.println(&quot;后置增强&quot;);
+    }
+}
+```
+
+### 7.2 动态代理 ⭐⭐⭐
+
+```java
+InvocationHandler handler = new InvocationHandler() {
+    private final Object target;
+
+    public InvocationHandler(Object target) { this.target = target; }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println(&quot;前置增强&quot;);
+        Object result = method.invoke(target, args);
+        System.out.println(&quot;后置增强&quot;);
+        return result;
+    }
+};
+
+Service proxy = (Service) Proxy.newProxyInstance(
+    real.getClass().getClassLoader(),
+    real.getClass().getInterfaces(),
+    handler
+);
+proxy.doService();
+```
+
+&gt; &#128161; **Spring AOP 就是动态代理**。
+
+---
+
+## 八、模板模式 ⭐
+
+**定义算法骨架，将具体步骤延迟到子类**。
+
+```java
+abstract class BeverageTemplate {
+    public final void make() {       // 模板方法（final）
+        boilWater();
+        brew();
+        pourInCup();
+        addCondiments();             // 抽象方法
+    }
+
+    void boilWater() { System.out.println(&quot;烧水&quot;); }
+    void pourInCup() { System.out.println(&quot;倒入杯中&quot;); }
+    abstract void brew();
+    abstract void addCondiments();
+}
+
+class Tea extends BeverageTemplate {
+    void brew() { System.out.println(&quot;泡茶&quot;); }
+    void addCondiments() { System.out.println(&quot;加柠檬&quot;); }
+}
+
+class Coffee extends BeverageTemplate {
+    void brew() { System.out.println(&quot;冲咖啡&quot;); }
+    void addCondiments() { System.out.println(&quot;加糖&quot;); }
+}
+```
+
+---
+
+## 九、其他设计模式（了解）
+
+### 9.1 策略模式
+
+```java
+interface Strategy {
+    int execute(int a, int b);
+}
+
+class AddStrategy implements Strategy {
+    public int execute(int a, int b) { return a + b; }
+}
+
+class Context {
+    private Strategy strategy;
+    public void setStrategy(Strategy s) { this.strategy = s; }
+    public int execute(int a, int b) { return strategy.execute(a, b); }
+}
+```
+
+### 9.2 观察者模式
+
+```java
+// 简易版：监听器机制
+class EventBus {
+    private List&lt;Runnable&gt; listeners = new ArrayList&lt;&gt;();
+    public void register(Runnable listener) { listeners.add(listener); }
+    public void fire() {
+        for (Runnable l : listeners) l.run();
+    }
+}
+```
+
+---
+
+## 十、黑马实战：JDBC 模板模式 ⭐⭐
+
+```java
+abstract class JdbcTemplate {
+    public final Object execute(String sql) {
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            Object result = mapRow(rs);
+            rs.close();
+            ps.close();
+            conn.close();
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected abstract Object mapRow(ResultSet rs) throws SQLException;
+}
+
+// 使用
+public class UserQuery extends JdbcTemplate {
+    protected Object mapRow(ResultSet rs) throws SQLException {
+        User u = new User();
+        u.setName(rs.getString(&quot;name&quot;));
+        return u;
+    }
+}
+```
+
+&gt; &#128161; **Spring JdbcTemplate 就是这种思路**。
+
+---
+
+## 十一、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **单例模式有哪几种实现？各自的优缺点？**
+&gt; | 方式 | 线程 | 性能 |
+&gt; |------|------|------|
+&gt; | 饿汉 | ✅ | 高 |
+&gt; | 懒汉 | ❌ | 中 |
+&gt; | 双重检查 | ✅ | 中 |
+&gt; | 静态内部类 | ✅ | 高 |
+&gt; | 枚举 | ✅ | 高 |
+
+&gt; &#128161; **工厂模式和策略模式的区别？**
+&gt; - 工厂模式：创建对象
+&gt; - 策略模式：选择行为
+
+&gt; &#128161; **动态代理 vs 静态代理？**
+&gt; - 静态：手动写代理类
+&gt; - 动态：运行时生成（如 JDK Proxy、CGLIB）
+
+&gt; &#128161; **装饰者 vs 代理的��别？**
+&gt; - 装饰者：增强对象职责
+&gt; - 代理：控制对象访问
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] **枚举定义与使用**
+- [ ] **单例模式**（双重检查、静态内部类）
+- [ ] **工厂模式**
+- [ ] 装饰者模式
+- [ ] **动态代理**（JDK Proxy）
+- [ ] 模板模式
+
+✅ 易错点：
+- [ ] 双重检查必须加 volatile
+- [ ] 静态内部类是单例最佳实践
+- [ ] 代理对象与目标对象实现同一接口
+
+下一章：[18-实战项目.md](./18-实战项目.md) — 项目驱动实战！</pre>

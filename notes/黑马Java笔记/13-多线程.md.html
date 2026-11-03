@@ -1,0 +1,399 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>13-多线程</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 13 &#183; 多线程 ⭐⭐⭐⭐
+
+&gt; **难度**：高 | **学习建议**：4 天
+&gt; 对应黑马视频：下部第 96 ~ 135 集
+&gt; 项目导向：**高并发是面试必问**，理解线程才能做服务端
+
+---
+
+## 一、知识框架
+
+```
+多线程
+├── 13.1 进程 vs 线程 ⭐
+├── 13.2 线程创建（3 种方式）⭐⭐
+├── 13.3 线程状态 ⭐⭐⭐
+├── 13.4 线程方法 ⭐
+├── 13.5 线程同步 ⭐⭐⭐⭐
+│   ├── synchronized
+│   ├── Lock
+│   └── volatile
+├── 13.6 线程通信 ⭐⭐
+│   ├── wait / notify
+│   └── 生产者-消费者
+└── 13.7 线程池 ⭐⭐⭐
+```
+
+---
+
+## 二、进程 vs 线程 ⭐
+
+| 维度 | 进程 | 线程 |
+|------|------|------|
+| 概念 | 运行的程序 | 进程内的执行流 |
+| 资源 | 独立内存 | 共享进程内存 |
+| 开销 | 大 | 小 |
+
+&gt; &#128161; **比喻**：进程 = 工厂，线程 = 工人。
+
+---
+
+## 三、线程创建（3 种方式）⭐⭐
+
+### 3.1 继承 Thread
+
+```java
+public class MyThread extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i &lt; 100; i++) {
+            System.out.println(getName() + &quot;: &quot; + i);
+        }
+    }
+}
+
+MyThread t = new MyThread();
+t.start();    // 启动新线程
+```
+
+### 3.2 实现 Runnable ⭐（推荐）
+
+```java
+public class MyRunnable implements Runnable {
+    @Override
+    public void run() {
+        for (int i = 0; i &lt; 100; i++) {
+            System.out.println(Thread.currentThread().getName() + &quot;: &quot; + i);
+        }
+    }
+}
+
+new Thread(new MyRunnable()).start();
+
+// Lambda
+new Thread(() -&gt; System.out.println(&quot;Hello from &quot; + Thread.currentThread().getName())).start();
+```
+
+### 3.3 实现 Callable（有返回值）
+
+```java
+public class MyCallable implements Callable&lt;Integer&gt; {
+    @Override
+    public Integer call() {
+        return 42;
+    }
+}
+
+ExecutorService es = Executors.newSingleThreadExecutor();
+Future&lt;Integer&gt; future = es.submit(new MyCallable());
+int result = future.get();    // 阻塞获取
+```
+
+---
+
+## 四、线程状态 ⭐⭐⭐
+
+### 4.1 六种状态
+
+```
+新建 → 就绪 → 运行 → 阻塞 → 死亡
+         ↑      ↓
+         └──────┘
+```
+
+| 状态 | 说明 |
+|------|------|
+| NEW | 新建，未启动 |
+| RUNNABLE | 就绪 + 运行中 |
+| BLOCKED | 等待锁 |
+| WAITING | 等待（wait/join） |
+| TIMED_WAITING | 限时等待 |
+| TERMINATED | 死亡 |
+
+---
+
+## 五、线程方法 ⭐
+
+```java
+Thread.sleep(1000);                  // 休眠
+Thread.yield();                      // 让出 CPU
+t.join();                            // 等待 t 结束
+t.setPriority(Thread.MAX_PRIORITY);  // 优先级
+t.setDaemon(true);                   // 守护线程
+t.interrupt();                       // 中断
+```
+
+---
+
+## 六、线程同步 ⭐⭐⭐⭐
+
+### 6.1 为什么需要同步
+
+**多线程同时操作共享数据**，可能产生数据不一致。
+
+### 6.2 synchronized ⭐⭐⭐
+
+#### 同步方法
+
+```java
+public synchronized void increment() {  // 锁 this
+    count++;
+}
+```
+
+#### 同步代码块
+
+```java
+public void increment() {
+    synchronized (this) {
+        count++;
+    }
+}
+```
+
+#### 静态同步方法
+
+```java
+public static synchronized void increment() {  // 锁 类.class
+    count++;
+}
+```
+
+&gt; ⚠ **黑马经典**：锁的是对象不是方法。
+
+### 6.3 黑马经典案例：卖票 ⭐⭐⭐
+
+```java
+public class Ticket implements Runnable {
+    private int count = 100;
+
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (this) {
+                if (count &lt;= 0) break;
+                System.out.println(Thread.currentThread().getName() + &quot; 卖票：&quot; + count);
+                count--;
+            }
+            // 模拟出票时间
+            try { Thread.sleep(10); } catch (InterruptedException e) {}
+        }
+    }
+}
+
+// 测试
+Ticket t = new Ticket();
+new Thread(t, &quot;窗口1&quot;).start();
+new Thread(t, &quot;窗口2&quot;).start();
+new Thread(t, &quot;窗口3&quot;).start();
+```
+
+### 6.4 Lock 接口（JDK 5+）
+
+```java
+Lock lock = new ReentrantLock();
+
+public void increment() {
+    lock.lock();
+    try {
+        count++;
+    } finally {
+        lock.unlock();
+    }
+}
+```
+
+### 6.5 volatile
+
+```java
+private volatile boolean flag = false;
+```
+
+&gt; ⚠ volatile 只保证**可见性**，不保证原子性。
+
+---
+
+## 七、死锁 ⭐
+
+```java
+Object lockA = new Object();
+Object lockB = new Object();
+
+new Thread(() -&gt; {
+    synchronized (lockA) {
+        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        synchronized (lockB) { }
+    }
+}).start();
+
+new Thread(() -&gt; {
+    synchronized (lockB) {
+        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        synchronized (lockA) { }
+    }
+}).start();
+```
+
+**避免���法**：固定加锁顺序。
+
+---
+
+## 八、线程通信 ⭐⭐
+
+### 8.1 wait / notify
+
+```java
+// 必须在 synchronized 中
+synchronized (lock) {
+    lock.wait();        // 等待
+    lock.notify();       // 唤醒一个
+    lock.notifyAll();    // 唤醒所有
+}
+```
+
+&gt; ⚠ wait 释放锁，sleep 不释放锁。
+
+### 8.2 生产者-消费者 ⭐⭐⭐
+
+```java
+public class ProducerConsumer {
+    private static final int CAPACITY = 10;
+    private Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
+    private Object lock = new Object();
+
+    public void produce() throws InterruptedException {
+        while (true) {
+            synchronized (lock) {
+                while (queue.size() == CAPACITY) {   // 必须用 while
+                    lock.wait();
+                }
+                queue.offer((int)(Math.random() * 100));
+                lock.notify();
+            }
+            Thread.sleep(500);
+        }
+    }
+
+    public void consume() throws InterruptedException {
+        while (true) {
+            synchronized (lock) {
+                while (queue.isEmpty()) {
+                    lock.wait();
+                }
+                queue.poll();
+                lock.notify();
+            }
+            Thread.sleep(500);
+        }
+    }
+}
+```
+
+&gt; ⚠ **必须用 while** 而非 if（防虚假唤醒）。
+
+---
+
+## 九、线程池 ⭐⭐⭐
+
+### 9.1 为什么用线程池
+
+- 减少线程创建/销毁开销
+- 限制线程数
+
+### 9.2 创建线程池
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);    // 固定 5 线程
+ExecutorService pool2 = Executors.newCachedThreadPool();   // 弹性
+ExecutorService pool3 = Executors.newSingleThreadExecutor(); // 单线程
+
+pool.execute(() -&gt; System.out.println(&quot;Task&quot;));
+pool.shutdown();
+```
+
+### 9.3 自定义线程池（推荐）⭐⭐
+
+```java
+ThreadPoolExecutor pool = new ThreadPoolExecutor(
+    5, 10, 60, TimeUnit.SECONDS,
+    new LinkedBlockingQueue&lt;&gt;(100),
+    Executors.defaultThreadFactory(),
+    new ThreadPoolExecutor.CallerRunsPolicy()
+);
+```
+
+---
+
+## 十、黑马小项目：模拟银行叫号 ⭐⭐
+
+```java
+public class BankQueue {
+    public static void main(String[] args) {
+        ExecutorService pool = Executors.newFixedThreadPool(3);
+
+        for (int i = 1; i &lt;= 10; i++) {
+            final int num = i;
+            pool.execute(() -&gt; {
+                System.out.println(&quot;客户 &quot; + num + &quot; 办理业务&quot;);
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                System.out.println(&quot;客户 &quot; + num + &quot; 办完离开&quot;);
+            });
+        }
+
+        pool.shutdown();
+    }
+}
+```
+
+---
+
+## 十一、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **创建线程的 3 种方式？**
+&gt; 1. 继承 Thread
+&gt; 2. 实现 Runnable（推荐）
+&gt; 3. 实现 Callable（有返回值）
+
+&gt; &#128161; **run() vs start()？**
+&gt; - run()：普通方法调用
+&gt; - start()：启动新线程
+
+&gt; &#128161; **synchronized vs volatile？**
+&gt; | synchronized | volatile |
+&gt; |-------------|----------|
+&gt; | 原子性 ✅ | 原子性 ❌ |
+&gt; | 可见性 ✅ | 可见性 ✅ |
+&gt; | 阻塞 | 不阻塞 |
+
+&gt; &#128161; **sleep vs wait？**
+&gt; | sleep | wait |
+&gt; |-------|------|
+&gt; | 不释放锁 | 释放锁 |
+&gt; | Thread | Object |
+
+&gt; &#128161; **线程池参数？**
+&gt; corePoolSize、maximumPoolSize、keepAliveTime、unit、workQueue、threadFactory、handler
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] 进程 vs 线程
+- [ ] **3 种线程创建方式**
+- [ ] **6 种线程状态**
+- [ ] **synchronized** 同步
+- [ ] **Lock** 接口
+- [ ] volatile 可见性
+- [ ] 死锁产生与避免
+- [ ] **wait / notify** 通信
+- [ ] **生产者-消费者模型**
+- [ ] **线程池创建与使用**
+
+✅ 易错点：
+- [ ] start() 不是 run()
+- [ ] wait/notify 必须在 synchronized 中
+- [ ] 生��者-消费者必须用 while
+- [ ] Lock 必须手动 unlock
+
+下一章：[14-网络编程.md](./14-网络编程.md)</pre>

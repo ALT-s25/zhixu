@@ -1,0 +1,381 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>02-基础语法</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 02 &#183; 基础语法 ⭐
+
+&gt; **难度**：入门 | **学习建议**：2 天
+&gt; 对应黑马视频：第 4 ~ 10 集
+&gt; 项目导向：**做项目必备的基本功**，每个变量、运算符都要用对
+
+---
+
+## 一、知识框架
+
+```
+基础语法
+├── 2.1 注释（已述）
+├── 2.2 字面量与常量
+├── 2.3 变量
+├── 2.4 数据类型 ⭐
+├── 2.5 数据类型转换 ⭐⭐
+├── 2.6 运算符
+├── 2.7 键盘录入（Scanner）⭐
+└── 2.8 原码反码补码（了解）
+```
+
+---
+
+## 二、字面量与常量
+
+### 2.1 字面量分类
+
+```java
+// 整数字面量
+System.out.println(100);           // 整数
+System.out.println(3.14);          // 小数
+System.out.println(&#39;A&#39;);            // 字符（单引号）
+System.out.println(&quot;Hello&quot;);        // 字符串（双引号）
+System.out.println(true);           // 布尔
+System.out.println(null);           // 空值（不能直接打印）
+```
+
+### 2.2 常量
+
+```java
+final double PI = 3.14159;       // final 修饰
+final int MAX = 100;
+final String COMPANY = &quot;黑马&quot;;
+```
+
+---
+
+## 三、变量
+
+### 3.1 变量定义
+
+```java
+int age = 18;
+String name = &quot;张三&quot;;
+double score = 99.5;
+boolean flag = true;
+char gender = &#39;男&#39;;
+```
+
+### 3.2 变量使用注意事项
+
+```java
+// ❌ 错误：未初始化不能使用
+int a;
+System.out.println(a);   // 编译错误
+
+// ✅ 必须先赋值
+int a = 10;
+System.out.println(a);
+```
+
+&gt; &#128161; **项目中的实际应用**：
+&gt; ```java
+&gt; // 用户登录后存储用户信息
+&gt; User user = new User();
+&gt; user.setName(&quot;张三&quot;);
+&gt; user.setAge(18);
+&gt; String username = user.getName();   // 用变量接收对象属性
+&gt; ```
+
+---
+
+## 四、数据类型 ⭐
+
+### 4.1 8 种基本数据类型
+
+| 类别 | 类型 | 字节 | 取值范围 |
+|------|------|------|----------|
+| 整数 | `byte` | 1 | -128 ~ 127 |
+| 整数 | `short` | 2 | -32768 ~ 32767 |
+| 整数 | **`int`** | 4 | -2&#179;&#185; ~ 2&#179;&#185;-1（约 &#177;21 亿） |
+| 整数 | `long` | 8 | -2⁶&#179; ~ 2⁶&#179;-1 |
+| 浮点 | `float` | 4 | &#177;3.4e38（7 位精度） |
+| 浮点 | **`double`** | 8 | &#177;1.8e308（15 位精度） |
+| 字符 | `char` | 2 | 0 ~ 65535 |
+| 布尔 | `boolean` | 1 | true / false |
+
+**记忆口诀**：`byte short int long → 1 2 4 8 字节；float double → 4 8 字节`
+
+### 4.2 ���面值后缀
+
+```java
+long num = 100L;           // long 字面值
+float f = 3.14F;            // float 字面值（默认 double）
+double d = 3.14D;           // double 字面值（D 可省略）
+```
+
+### 4.3 引用数据类型
+
+除 8 种基本类型外都是**引用类型**：
+
+```java
+String s = &quot;Hello&quot;;       // 字符串
+int[] arr = {1, 2, 3};     // 数组
+Student stu = new Student();  // 对象
+```
+
+&gt; ⚠ **黑马常见坑**：
+&gt; - 整数字面量默认是 `int` 类型
+&gt; - 小数字面量默认是 `double` 类型
+&gt; - 整数超过 int 范围需要加 `L`
+
+---
+
+## 五、数据类型转换 ⭐⭐
+
+### 5.1 自动类型转换（小→大）
+
+```java
+int i = 100;
+long l = i;            // int → long 自动转
+double d = l;          // long → double 自动转
+```
+
+**自动转换规则**：byte → short → int → long → float → double
+（byte/short/char 在运算时自动转 int）
+
+### 5.2 强制类型转换（大→小）
+
+```java
+double d = 3.14;
+int i = (int) d;       // i = 3（截断小数，不四舍五入）
+
+int a = 200;
+byte b = (byte) a;     // 溢出！b = -56
+```
+
+&gt; ⚠ **黑马常考**：
+&gt; - 截断 vs 四舍五入
+&gt; - 精度丢失
+&gt; - 整数溢出
+
+### 5.3 实战练习 ⭐
+
+```java
+// 练习 1
+byte b1 = 10, b2 = 20;
+byte b3 = b1 + b2;      // ❌ 编译错误（byte + byte 自动转 int）
+int b3 = b1 + b2;       // ✅
+
+// 练习 2
+char c = &#39;A&#39;;
+int n = c + 1;          // n = 66（char 转 int）
+
+// 练习 3
+double d = 12.5;
+float f = (float) d;    // 必须强转
+```
+
+&gt; &#128161; **项目应用**：Web 接口返回金额时，要考虑 `double` 转 `BigDecimal`，避免精度问题。
+
+---
+
+## 六、运算符
+
+### 6.1 算术运算符
+
+| 运算符 | 含义 | 示例 |
+|--------|------|------|
+| `+` | 加 / 字符串拼接 | `1+2=3`, `&quot;a&quot;+&quot;b&quot;=&quot;ab&quot;` |
+| `-` | 减 | `5-3=2` |
+| `*` | 乘 | `2*3=6` |
+| `/` | 除 | `5/2=2`（整数除法截断） |
+| `%` | 取模 | `5%2=1` |
+| `++` | 自增 | `a++` / `++a` |
+| `--` | 自减 | `a--` / `--a` |
+
+### 6.2 自增运算（黑马必讲）
+
+```java
+int a = 5;
+int b = a++;      // b=5, a=6（先用后加）
+int c = ++a;      // c=7, a=7（先加后用）
+```
+
+**实战题**：
+```java
+int x = 4;
+int y = (x++) + (++x) + (x * 10);
+//   = 4   +   6   +    60
+//   = 70
+```
+
+### 6.3 关系运算符
+
+`==`, `!=`, `&gt;`, `&lt;`, `&gt;=`, `&lt;=` → 返回 boolean
+
+### 6.4 逻辑运算符 ⭐
+
+| 运算符 | 含义 | 短路 |
+|--------|------|------|
+| `&amp;&amp;` | 与 | ✅ 左 false 不算右 |
+| `\|\|` | 或 | ✅ 左 true 不算右 |
+| `!` | 非 | - |
+
+```java
+int a = 5;
+boolean b = (a &gt; 3) || (a++ &gt; 0);
+// a 还是 5（短路）
+```
+
+### 6.5 赋值运算符
+
+`=`, `+=`, `-=`, `*=`, `/=`, `%=`
+
+```java
+int a = 10;
+a += 5;     // 等价 a = a + 5 = 15
+```
+
+### 6.6 三元运算符
+
+```java
+int max = (a &gt; b) ? a : b;
+String result = (score &gt;= 60) ? &quot;及格&quot; : &quot;不及格&quot;;
+```
+
+### 6.7 运算符优先级
+
+```
+() &gt; ++ -- &gt; * / % &gt; + - &gt; &lt; &gt; &lt;= &gt;=
+&gt; == != &gt; &amp;&amp; &gt; || &gt; ?: &gt; 赋值
+```
+
+&gt; &#128161; **黑马建议**：不确定优先级就**加括号**，不要死记硬背。
+
+---
+
+## 七、键盘录入（Scanner）⭐
+
+### 7.1 基本使用
+
+```java
+import java.util.Scanner;
+
+public class ScannerDemo {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print(&quot;请输入姓名：&quot;);
+        String name = sc.nextLine();
+
+        System.out.print(&quot;请输入年龄：&quot;);
+        int age = sc.nextInt();
+
+        System.out.println(&quot;你好，&quot; + name + &quot;，&quot; + age + &quot; 岁&quot;);
+
+        sc.close();
+    }
+}
+```
+
+### 7.2 next() vs nextLine()
+
+| 方法 | 行为 |
+|------|------|
+| `next()` | 读到空格或换行停止 |
+| `nextLine()` | 读到换行停止，读整行 |
+
+&gt; �� **黑马经典坑**：`nextInt()` 后用 `nextLine()` 会读到空字符串。
+
+### 7.3 实战练习
+
+**案例：用户登录**
+```java
+import java.util.Scanner;
+
+public class Login {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print(&quot;用户名：&quot;);
+        String username = sc.nextLine();
+
+        System.out.print(&quot;密码：&quot;);
+        String password = sc.nextLine();
+
+        if (username.equals(&quot;admin&quot;) &amp;&amp; password.equals(&quot;123&quot;)) {
+            System.out.println(&quot;登录成功&quot;);
+        } else {
+            System.out.println(&quot;登录失败&quot;);
+        }
+
+        sc.close();
+    }
+}
+```
+
+---
+
+## 八、原码、反码、补码（了解）
+
+**计算机底层以补码存储**：
+- 正数：原码 = 反码 = 补码
+- 负数：反码 = 除符号位取反；补码 = 反码 + 1
+
+&gt; &#128161; 这个知识点黑马视频简单提及，**面试问到的概率低**，了解即可。
+
+---
+
+## 九、面试常问 ⭐
+
+&gt; &#128161; **`int` 和 `Integer` 区别？**
+&gt; - `int`：基本类型，默认值 0
+&gt; - `Integer`：包装类，默认值 null，对象
+
+&gt; &#128161; **`==` 和 `equals` 的区别？**
+&gt; - `==` 对基本类型比值，对引用类型比地址
+&gt; - `equals` 默��� `==`，但 String、Integer 等重写后比内容
+
+&gt; &#128161; **`a++` 和 `++a` 区别？**
+&gt; - 前缀先加减后用
+&gt; - 后缀先用后加减
+
+---
+
+## 十、力扣实战 ⭐⭐
+
+### LeetCode 1. 两数之和
+
+**题目**：给定数组和目标值，找出两个数的下标使其和等于目标值。
+
+**思路**：用 HashMap 存 (值, 下标)，遍历时检查 target-num 是否在 map 中。
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[]{map.get(complement), i};
+            }
+            map.put(nums[i], i);
+        }
+        return new int[0];
+    }
+}
+```
+
+&gt; 本题涉及 HashMap 和循环基础，**综合运用**。学完集合再回顾更清晰。
+
+---
+
+## 十一、本章小结
+
+✅ 已掌握：
+- [ ] 8 种基本数据类型及范围
+- [ ] **自动转换与强制转换的规则**
+- [ ] 算术、关系、逻辑、赋值、三元运算符
+- [ ] **Scanner 输入**
+- [ ] 自增自减的前后缀
+
+✅ 易错点：
+- [ ] 整数除法会截断（5/2=2，不是 2.5）
+- [ ] 浮点强转整数会截断（不四舍五入���
+- [ ] 自增运算的先后顺序
+- [ ] nextInt + nextLine 的残留换行
+
+下一章：[03-流程控制.md](./03-流程控制.md)</pre>

@@ -1,0 +1,504 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>11-集合框架</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 11 &#183; 集合框架 ⭐⭐⭐⭐
+
+&gt; **难度**：核心 | **学习建议**：5 天
+&gt; 对应黑马视频：下部第 13 ~ 60 集
+&gt; 项目导向：**80% 的工作都在用 ArrayList 和 HashMap**，集合学不好等于不会写 Java
+
+---
+
+## 一、知识框架
+
+```
+集合框架
+├── 11.1 集合体系总览 ⭐⭐⭐
+├── 11.2 Collection 接口
+├── 11.3 List 接口（ArrayList、LinkedList）⭐⭐⭐
+├── 11.4 Set 接口（HashSet、TreeSet、LinkedHashSet）⭐⭐
+├── 11.5 泛型 ⭐⭐
+├── 11.6 Map 接口（HashMap、TreeMap、LinkedHashMap）⭐⭐⭐⭐
+├── 11.7 Collections 工具类
+└── 11.8 综合实战：黑马学生系统
+```
+
+---
+
+## 二、集合体系总览 ⭐⭐⭐
+
+```
+Collection (单列)
+├── List (接口)：有序、可重复
+│   ├── ArrayList：数组实现，查询快
+│   ├── LinkedList：双向链表，增删快
+│   └── Vector：古老线程安全版
+└── Set (接口)：无序、不重复
+    ├── HashSet：哈希表
+    ├── LinkedHashSet：保留插入顺序
+    └── TreeSet：红黑树，自动排序
+
+Map (双列，键值对)
+├── HashMap：哈希表，最常用 ⭐⭐⭐
+├── LinkedHashMap：保留插入顺序
+├── Hashtable：古老线程安全
+└── TreeMap：红黑树，键可排序
+```
+
+---
+
+## 三、Collection 接口 ⭐
+
+公共方法：
+
+```java
+Collection&lt;String&gt; c = new ArrayList&lt;&gt;();
+
+c.add(&quot;A&quot;);
+c.remove(&quot;A&quot;);
+c.contains(&quot;A&quot;);
+c.size();
+c.isEmpty();
+c.clear();
+c.toArray();
+```
+
+---
+
+## 四、List 接口 ⭐⭐⭐
+
+### 4.1 特点
+
+- **有序**：按插入顺序
+- **可重复**：相同元素可多次出现
+- 可按下标访问
+
+### 4.2 ArrayList ⭐⭐⭐（黑马重点）
+
+**底层**：动态数组，初始 10，扩容 1.5 倍。
+
+```java
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+
+// 增删改查
+list.add(&quot;A&quot;);
+list.add(1, &quot;B&quot;);           // 指定位置插入
+list.remove(&quot;A&quot;);            // 按值删除
+list.remove(0);              // 按下标
+list.set(0, &quot;C&quot;);
+list.get(0);
+list.contains(&quot;A&quot;);
+list.indexOf(&quot;A&quot;);
+list.size();
+list.isEmpty();
+list.clear();
+
+// 遍历
+for (int i = 0; i &lt; list.size(); i++) System.out.println(list.get(i));
+for (String s : list) System.out.println(s);
+```
+
+### 4.3 LinkedList
+
+**底层**：双向链表。
+
+```java
+LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
+
+list.addFirst(&quot;A&quot;);
+list.addLast(&quot;B&quot;);
+list.removeFirst();
+list.removeLast();
+list.getFirst();
+list.getLast();
+```
+
+### 4.4 ArrayList vs LinkedList ⭐⭐
+
+| 维度 | ArrayList | LinkedList |
+|------|-----------|------------|
+| 底层 | 数组 | 双向链表 |
+| 随机访问 | O(1) | O(n) |
+| 头尾增删 | O(n) | O(1) |
+| 内存 | 少 | 多 |
+| 场景 | 读多写少 | 增删频繁 |
+
+---
+
+## 五、Set 接口 ⭐⭐
+
+### 5.1 特点
+
+- **无序**（不保证插入顺序）
+- **不可重复**（通过 hashCode + equals 判定）
+
+### 5.2 HashSet ⭐⭐⭐（黑马重点）
+
+```java
+Set&lt;String&gt; set = new HashSet&lt;&gt;();
+
+set.add(&quot;A&quot;);
+set.add(&quot;B&quot;);
+set.add(&quot;A&quot;);     // 不会重复添加
+set.size();          // 2
+
+for (String s : set) System.out.println(s);
+```
+
+### 5.3 HashSet 去重原理 ⭐⭐⭐
+
+```java
+class Student {
+    String name;
+    int age;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student s = (Student) o;
+        return age == s.age &amp;&amp; Objects.equals(name, s.name);
+    }
+}
+```
+
+&gt; ⚠ **黑马经典**：放进 HashSet 必须重写 `equals` 和 `hashCode`。
+
+### 5.4 LinkedHashSet
+
+保留**插入顺序**。
+
+### 5.5 TreeSet ⭐
+
+**自动排序**（红黑树）：
+
+```java
+Set&lt;Integer&gt; set = new TreeSet&lt;&gt;();
+set.add(5); set.add(2); set.add(8);
+System.out.println(set);   // [2, 5, 8]
+```
+
+---
+
+## 六、泛型 ⭐⭐
+
+### 6.1 为什么用泛型
+
+```java
+// 没有泛型
+List list = new ArrayList();
+list.add(&quot;hello&quot;);
+list.add(123);          // 可以放任何类型
+String s = (String) list.get(0);   // 必须强转
+
+// 有泛型
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+list.add(&quot;hello&quot;);
+list.add(123);          // ❌ 编译错误
+String s = list.get(0);   // 不需要强转
+```
+
+### 6.2 自定义泛型类
+
+```java
+public class Box&lt;T&gt; {
+    private T value;
+
+    public T getValue() { return value; }
+    public void setValue(T value) { this.value = value; }
+}
+
+Box&lt;String&gt; box = new Box&lt;&gt;();
+box.setValue(&quot;hello&quot;);
+String s = box.getValue();
+```
+
+### 6.3 泛型方法
+
+```java
+public &lt;T&gt; T getFirst(List&lt;T&gt; list) {
+    return list.isEmpty() ? null : list.get(0);
+}
+```
+
+### 6.4 通配符
+
+```java
+// ? extends：上限通配
+public void process(List&lt;? extends Number&gt; list) { }
+// ? super：下限通配
+public void add(List&lt;? super Integer&gt; list) { }
+```
+
+&gt; ⚠ **黑马经典**：PECS 原则（Producer Extends, Consumer Super）。
+
+---
+
+## 七、Map 接口 ⭐⭐⭐⭐
+
+### 7.1 特点
+
+- **键值对**（key-value）
+- **键不可重复**，值可以
+
+### 7.2 HashMap ⭐⭐⭐⭐（黑马重点，面试必问）
+
+```java
+Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+
+map.put(&quot;apple&quot;, 5);
+map.put(&quot;banana&quot;, 3);
+map.put(&quot;apple&quot;, 8);        // 覆盖
+
+map.get(&quot;apple&quot;);            // 8
+map.getOrDefault(&quot;pear&quot;, 0); // 不存在返回默认值
+map.containsKey(&quot;apple&quot;);
+map.containsValue(5);
+map.remove(&quot;banana&quot;);
+map.size();
+map.clear();
+
+// 遍历（三种方式）
+// 1. 遍历 key
+for (String key : map.keySet()) {
+    System.out.println(key + &quot;=&quot; + map.get(key));
+}
+
+// 2. 遍历 entry（推荐）
+for (Map.Entry&lt;String, Integer&gt; e : map.entrySet()) {
+    System.out.println(e.getKey() + &quot;=&quot; + e.getValue());
+}
+
+// 3. 遍历 value
+for (Integer v : map.values()) {
+    System.out.println(v);
+}
+```
+
+### 7.3 HashMap 原理（黑马讲+面试必问）⭐⭐⭐⭐
+
+**JDK 8+ 结构**：数组 + 链表 + 红黑树
+
+```
+table（默认 16）
+   ↓
+[i] → 链表（&lt; 8）→ 红黑树（≥ 8）
+```
+
+**put 流程**：
+1. 算 key 的 hash
+2. 定位桶
+3. 桶空：直接插入
+4. 桶不空：遍历链表，key 相同覆盖；否则插入尾部
+5. 链表 &gt; 8 且数组 ≥ 64：转红黑树
+6. size &gt; threshold（容量 &#215; 0.75）：扩容 2 倍
+
+### 7.4 LinkedHashMap
+
+保留**插入顺序**。
+
+### 7.5 TreeMap ⭐
+
+**键自动排序**（红黑树）。
+
+### 7.6 HashMap vs Hashtable ⭐
+
+| 维度 | HashMap | Hashtable |
+|------|---------|-----------|
+| 线程 | 不安全 | 安全 |
+| null | 允许 key/value | 不允许 |
+| 性能 | 高 | 低 |
+| 推荐 | 单线程 | ❌（基本被淘汰） |
+
+---
+
+## 八、Collections 工具类 ⭐⭐
+
+```java
+List&lt;Integer&gt; list = new ArrayList&lt;&gt;(Arrays.asList(3, 1, 4, 1, 5));
+
+Collections.sort(list);                      // 升序
+Collections.sort(list, Comparator.reverseOrder());  // 降序
+Collections.reverse(list);                  // 反转
+Collections.shuffle(list);                  // 随机打乱
+Collections.max(list);
+Collections.min(list);
+Collections.frequency(list, 1);             // 1 出现的次数
+Collections.binarySearch(list, 3);          // 二分查找
+
+// 线程安全包装
+List&lt;Integer&gt; syncList = Collections.synchronizedList(list);
+```
+
+---
+
+## 九、黑马小项目：学生成绩管理系统（集合版）⭐⭐⭐
+
+```java
+public class StudentManager {
+    private Map&lt;String, Student&gt; students = new HashMap&lt;&gt;();
+
+    public void addStudent(Student s) {
+        students.put(s.getId(), s);
+    }
+
+    public Student findById(String id) {
+        return students.get(id);
+    }
+
+    public void removeById(String id) {
+        students.remove(id);
+    }
+
+    public List&lt;Student&gt; findAll() {
+        return new ArrayList&lt;&gt;(students.values());
+    }
+
+    public List&lt;Student&gt; findByScoreRange(int min, int max) {
+        return students.values().stream()
+            .filter(s -&gt; s.getScore() &gt;= min &amp;&amp; s.getScore() &lt;= max)
+            .collect(Collectors.toList());
+    }
+
+    public void printAll() {
+        for (Student s : students.values()) {
+            System.out.println(s);
+        }
+    }
+
+    // 按成绩排序
+    public List&lt;Student&gt; sortByScore() {
+        List&lt;Student&gt; list = new ArrayList&lt;&gt;(students.values());
+        Collections.sort(list, (a, b) -&gt; b.getScore() - a.getScore());
+        return list;
+    }
+}
+```
+
+---
+
+## 十、项目场景（实战导向）⭐
+
+### &#127919; 场景 1：缓存（HashMap）
+
+```java
+public class Cache&lt;K, V&gt; {
+    private Map&lt;K, V&gt; map = new HashMap&lt;&gt;();
+
+    public V get(K key, Function&lt;K, V&gt; loader) {
+        return map.computeIfAbsent(key, loader);
+    }
+}
+
+Cache&lt;String, User&gt; userCache = new Cache&lt;&gt;();
+User u = userCache.get(&quot;admin&quot;, id -&gt; userDao.findById(id));
+```
+
+### &#127919; 场景 2：统计字符出现次数
+
+```java
+public static Map&lt;Character, Integer&gt; countChars(String s) {
+    Map&lt;Character, Integer&gt; map = new HashMap&lt;&gt;();
+    for (char c : s.toCharArray()) {
+        map.merge(c, 1, Integer::sum);   // 累加
+    }
+    return map;
+}
+```
+
+### &#127919; 场景 3：List 去重（Stream）
+
+```java
+List&lt;String&gt; list = Arrays.asList(&quot;A&quot;, &quot;B&quot;, &quot;A&quot;, &quot;C&quot;, &quot;B&quot;);
+List&lt;String&gt; distinct = list.stream().distinct().collect(Collectors.toList());
+// [A, B, C]
+```
+
+---
+
+## 十一、力扣实战 ⭐⭐
+
+### LeetCode 1. 两数之和
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[]{map.get(complement), i};
+            }
+            map.put(nums[i], i);
+        }
+        return new int[0];
+    }
+}
+```
+
+### LeetCode 49. 字母异位词分组
+
+```java
+class Solution {
+    public List&lt;List&lt;String&gt;&gt; groupAnagrams(String[] strs) {
+        Map&lt;String, List&lt;String&gt;&gt; map = new HashMap&lt;&gt;();
+        for (String s : strs) {
+            char[] arr = s.toCharArray();
+            Arrays.sort(arr);
+            String key = new String(arr);
+            map.computeIfAbsent(key, k -&gt; new ArrayList&lt;&gt;()).add(s);
+        }
+        return new ArrayList&lt;&gt;(map.values());
+    }
+}
+```
+
+---
+
+## 十二、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **ArrayList vs LinkedList？**
+&gt; - ArrayList：数组，随机访问 O(1)，增删 O(n)
+&gt; - LinkedList：链表，随机访问 O(n)，增删 O(1)
+
+&gt; &#128161; **HashMap put 流程？**
+&gt; 1. 算 hash → 定位桶
+&gt; 2. 桶空：直接插入
+&gt; 3. 桶不空：遍历链表，key 相同覆盖；否则插入尾部
+&gt; 4. 链表 &gt; 8 转红黑树
+&gt; 5. size &gt; threshold 扩容 2 倍
+
+&gt; &#128161; **HashMap 为什么用红黑树而不是 AVL？**
+&gt; 红黑树近似平衡，插入删除更快。
+
+&gt; &#128161; **HashSet 去重原理？**
+&gt; hashCode + equals。
+&gt; 1. 先算 hash 找桶
+&gt; 2. 桶中无元素直接放
+&gt; 3. 有元素调 equals，相同则放弃
+
+&gt; &#128161; **ConcurrentHashMap 1.7 vs 1.8？**
+&gt; 1.7 分段锁，1.8 CAS + synchronized。
+
+---
+
+## 十三、本章小结
+
+✅ 已掌握：
+- [ ] **集合框架整体结构**
+- [ ] **ArrayList / LinkedList** 的使用和区别
+- [ ] **HashSet 去重原理**
+- [ ] **泛型**（类、方法、通配符）
+- [ ] **HashMap 原理**（重点）
+- [ ] HashMap vs Hashtable
+- [ ] Collections 工具类
+
+✅ 易错点：
+- [ ] HashSet 自定义类必须重写 equals + hashCode
+- [ ] HashMap 允许 null 键值
+- [ ] HashMap 键必须不可变
+- [ ] 遍历时不能 add/remove（要用迭代器）
+
+下一章：[12-IO流.md](./12-IO流.md)</pre>

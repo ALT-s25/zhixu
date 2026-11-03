@@ -1,0 +1,634 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>18-实战项目</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 18 &#183; 实战项目 ⭐⭐⭐⭐
+
+&gt; **难度**：综合 | **学习建议**：实战为主，多敲代码
+&gt; 对应黑马视频：下部第 216 ~ 集（含实战项目）
+&gt; 项目导向：**学完黑马，能力体现在实战**，这是检验学习成果的关键
+
+---
+
+## 一、知识框架
+
+```
+实战项目
+├── 18.1 力扣精选题解 ⭐⭐⭐
+├── 18.2 黑马小项目 1：学生管理系统（集合版）
+├── 18.3 黑马小项目 2：ATM 模拟
+├── 18.4 黑马小项目 3：斗地主
+├── 18.5 综合实战：模拟 Spring IoC
+└── 18.6 黑马面试题精选
+```
+
+---
+
+## 二、力扣精选题解 ⭐⭐⭐
+
+### 2.1 LeetCode 1. 两数之和 ⭐⭐
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[]{map.get(complement), i};
+            }
+            map.put(nums[i], i);
+        }
+        return new int[0];
+    }
+}
+```
+
+### 2.2 LeetCode 704. 二分查找
+
+```java
+class Solution {
+    public int search(int[] nums, int target) {
+        int left = 0, right = nums.length - 1;
+        while (left &lt;= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            else if (nums[mid] &lt; target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return -1;
+    }
+}
+```
+
+### 2.3 LeetCode 20. 有效的括号 ⭐⭐
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        Map&lt;Character, Character&gt; map = new HashMap&lt;&gt;();
+        map.put(&#39;)&#39;, &#39;(&#39;);
+        map.put(&#39;]&#39;, &#39;[&#39;);
+        map.put(&#39;}&#39;, &#39;{&#39;);
+
+        Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
+        for (char c : s.toCharArray()) {
+            if (c == &#39;(&#39; || c == &#39;[&#39; || c == &#39;{&#39;) {
+                stack.push(c);
+            } else if (stack.isEmpty() || stack.pop() != map.get(c)) {
+                return false;
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+### 2.4 LeetCode 21. 合并两个有序链表
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode curr = dummy;
+        while (l1 != null &amp;&amp; l2 != null) {
+            if (l1.val &lt;= l2.val) {
+                curr.next = l1; l1 = l1.next;
+            } else {
+                curr.next = l2; l2 = l2.next;
+            }
+            curr = curr.next;
+        }
+        curr.next = (l1 != null) ? l1 : l2;
+        return dummy.next;
+    }
+}
+```
+
+### 2.5 LeetCode 136. 只出现一次的数字
+
+```java
+class Solution {
+    public int singleNumber(int[] nums) {
+        int result = 0;
+        for (int num : nums) result ^= num;
+        return result;
+    }
+}
+```
+
+### 2.6 LeetCode 53. 最大子数组和 ⭐⭐⭐
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int maxSum = nums[0], curSum = nums[0];
+        for (int i = 1; i &lt; nums.length; i++) {
+            curSum = Math.max(nums[i], curSum + nums[i]);
+            maxSum = Math.max(maxSum, curSum);
+        }
+        return maxSum;
+    }
+}
+```
+
+### 2.7 LeetCode 70. 爬楼梯
+
+```java
+class Solution {
+    public int climbStairs(int n) {
+        if (n &lt;= 2) return n;
+        int a = 1, b = 2;
+        for (int i = 3; i &lt;= n; i++) {
+            int c = a + b;
+            a = b; b = c;
+        }
+        return b;
+    }
+}
+```
+
+### 2.8 LeetCode 198. 打家劫舍 ⭐⭐
+
+```java
+class Solution {
+    public int rob(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+
+        int prev2 = 0, prev1 = 0;
+        for (int num : nums) {
+            int curr = Math.max(prev1, prev2 + num);
+            prev2 = prev1;
+            prev1 = curr;
+        }
+        return prev1;
+    }
+}
+```
+
+---
+
+## 三、黑马小项目 1：学生管理系统（集合 + 文件）⭐⭐⭐
+
+```java
+// Student.java
+public class Student implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String id;
+    private String name;
+    private int age;
+    private String gender;
+    private double score;
+
+    public Student() {}
+    public Student(String id, String name, int age, String gender, double score) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.score = score;
+    }
+
+    // getter/setter 略
+
+    @Override
+    public String toString() {
+        return String.format(&quot;%-6s %-10s %-4d %-4s %.1f&quot;, id, name, age, gender, score);
+    }
+}
+```
+
+```java
+// StudentManager.java
+import java.io.*;
+;
+import java.util.*;
+
+public class StudentManager {
+    private final Map&lt;String, Student&gt; students = new LinkedHashMap&lt;&gt;();
+    private static final String FILE = &quot;students.dat&quot;;
+
+    public void add(Student s) {
+        students.put(s.getId(), s);
+    }
+
+    public void remove(String id) {
+        students.remove(id);
+    }
+
+    public Student find(String id) {
+        return students.get(id);
+    }
+
+    public List&lt;Student&gt; findAll() {
+        return new ArrayList&lt;&gt;(students.values());
+    }
+
+    public List&lt;Student&gt; sortByScore() {
+        return students.values().stream()
+            .sorted(Comparator.comparingDouble(Student::getScore).reversed())
+            .collect(Collectors.toList());
+    }
+
+    public void save() throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(FILE))) {
+            oos.writeObject(students);
+        }
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public void load() throws IOException, ClassNotFoundException {
+        File f = new File(FILE);
+        if (!f.exists()) return;
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(FILE))) {
+            Map&lt;String, Student&gt; map = (Map&lt;String, Student&gt;) ois.readObject();
+            students.putAll(map);
+        }
+    }
+}
+```
+
+```java
+// Main.java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        StudentManager mgr = new StudentManager();
+        mgr.load();
+
+        mgr.add(new Student(&quot;S001&quot;, &quot;��三&quot;, 18, &quot;男&quot;, 95.5));
+        mgr.add(new Student(&quot;S002&quot;, &quot;李四&quot;, 19, &quot;女&quot;, 82.0));
+        mgr.add(new Student(&quot;S003&quot;, &quot;王五&quot;, 20, &quot;男&quot;, 76.5));
+
+        System.out.println(&quot;=== 学生列表 ===&quot;);
+        mgr.findAll().forEach(System.out::println);
+
+        System.out.println(&quot;\n=== 成绩排序 ===&quot;);
+        mgr.sortByScore().forEach(System.out::println);
+
+        mgr.save();
+    }
+}
+```
+
+---
+
+## 四、黑马小项目 2：ATM 模拟 ⭐⭐
+
+```java
+public class Account {
+    private String cardNo;
+    private String name;
+    private String password;
+    private double balance;
+
+    public Account(String cardNo, String name, String password, double balance) {
+        this.cardNo = cardNo;
+        this.name = name;
+        this.password = password;
+        this.balance = balance;
+    }
+
+    // getter/setter
+    public String getCardNo() { return cardNo; }
+    public String getName() { return name; }
+    public boolean checkPassword(String pwd) { return password.equals(pwd); }
+    public double getBalance() { return balance; }
+    public void setBalance(double balance) { this.balance = balance; }
+}
+```
+
+```java
+public class ATMSystem {
+    private Map&lt;String, Account&gt; accounts = new HashMap&lt;&gt;();
+    private Scanner sc = new Scanner(System.in);
+    private Account currentUser;
+
+    public ATMSystem() {
+        // 初始化测试账号
+        accounts.put(&quot;6222021234&quot;, new Account(&quot;6222021234&quot;, &quot;张三&quot;, &quot;123&quot;, 10000));
+    }
+
+    public void run() {
+        while (true) {
+            System.out.println(&quot;=== ATM 模拟系统 ===&quot;);
+            System.out.println(&quot;1. 登录&quot;);
+            System.out.println(&quot;2. 注册&quot;);
+            System.out.println(&quot;0. 退出&quot;);
+            System.out.print(&quot;选择：&quot;);
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1: login(); break;
+                case 2: register(); break;
+                case 0: System.exit(0);
+            }
+        }
+    }
+
+    private void login() {
+        System.out.print(&quot;卡号：&quot;);
+        String cardNo = sc.next();
+        System.out.print(&quot;密码：&quot;);
+        String pwd = sc.next();
+
+        Account acc = accounts.get(cardNo);
+        if (acc != null &amp;&amp; acc.checkPassword(pwd)) {
+            currentUser = acc;
+            System.out.println(&quot;登录成功，欢迎 &quot; + acc.getName());
+            userMenu();
+        } else {
+            System.out.println(&quot;卡号或密码错误&quot;);
+        }
+    }
+
+    private void userMenu() {
+        while (true) {
+            System.out.println(&quot;\n=== 用户菜单 ===&quot;);
+            System.out.println(&quot;1. 查询余额&quot;);
+            System.out.println(&quot;2. 存款&quot;);
+            System.out.println(&quot;3. 取款&quot;);
+            System.out.println(&quot;4. 转账&quot;);
+            System.out.println(&quot;5. 修改密码&quot;);
+            System.out.println(&quot;0. 注销&quot;);
+            System.out.print(&quot;选择：&quot;);
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1: System.out.println(&quot;余额：&quot; + currentUser.getBalance()); break;
+                case 2: deposit(); break;
+                case 3: withdraw(); break;
+                case 4: transfer(); break;
+                case 5: changePassword(); break;
+                case 0: currentUser = null; return;
+            }
+        }
+    }
+
+    private void deposit() {
+        System.out.print(&quot;存款金额：&quot;);
+        double amount = sc.nextDouble();
+        currentUser.setBalance(currentUser.getBalance() + amount);
+        System.out.println(&quot;存款成功&quot;);
+    }
+
+    private void withdraw() {
+        System.out.print(&quot;取款金额：&quot;);
+        double amount = sc.nextDouble();
+        if (amount &gt; currentUser.getBalance()) {
+            System.out.println(&quot;余额不足&quot;);
+            return;
+        }
+        currentUser.setBalance(currentUser.getBalance() - amount);
+        System.out.println(&quot;取款成功&quot;);
+    }
+
+    private void transfer() {
+        System.out.print(&quot;对方卡号：&quot;);
+        String toCard = sc.next();
+        Account to = accounts.get(toCard);
+        if (to == null) {
+            System.out.println(&quot;卡号不存在&quot;);
+            return;
+        }
+        System.out.print(&quot;转账金额：&quot;);
+        double amount = sc.nextDouble();
+        if (amount &gt; currentUser.getBalance()) {
+            System.out.println(&quot;余额不足&quot;);
+            return;
+        }
+        currentUser.setBalance(currentUser.getBalance() - amount);
+        to.setBalance(to.getBalance() + amount);
+        System.out.println(&quot;转账成功&quot;);
+    }
+
+    private void changePassword() {
+        System.out.print(&quot;新密码：&quot;);
+        String newPwd = sc.next();
+        // 反射或直接 setter
+        try {
+            java.lang.reflect.Field f = Account.class.getDeclaredField(&quot;password&quot;);
+            f.setAccessible(true);
+            f.set(currentUser, newPwd);
+            System.out.println(&quot;修改成功&quot;);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void register() {
+        System.out.print(&quot;卡号：&quot;);
+        String cardNo = sc.next();
+        if (accounts.containsKey(cardNo)) {
+            System.out.println(&quot;卡号已存在&quot;);
+            return;
+        }
+        System.out.print(&quot;姓名：&quot;);
+        String name = sc.next();
+        System.out.print(&quot;密码：&quot;);
+        String pwd = sc.next();
+        accounts.put(cardNo, new Account(cardNo, name, pwd, 0));
+        System.out.println(&quot;注册成功&quot;);
+    }
+
+    public static void main(String[] args) {
+        new ATMSystem().run();
+    }
+}
+```
+
+---
+
+## 五、黑马小项目 3：斗地主 ⭐⭐⭐
+
+```java
+import java.util.*;
+
+public class DouDiZhu {
+    static final String[] SUITS = {&quot;♠&quot;, &quot;♥&quot;, &quot;♦&quot;, &quot;♣&quot;};
+    static final String[] RANKS = {&quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;J&quot;, &quot;Q&quot;, &quot;K&quot;, &quot;A&quot;, &quot;2&quot;};
+
+    public static void main(String[] args) {
+        // 1. 准备一副牌
+        List&lt;String&gt; poker = new ArrayList&lt;&gt;();
+        for (String suit : SUITS) {
+            for (String rank : RANKS) poker.add(suit + rank);
+        }
+        poker.add(&quot;小王&quot;);
+        poker.add(&quot;大王&quot;);
+
+        // 2. 洗牌
+        Collections.shuffle(poker);
+
+        // 3. 发牌（3 个玩家）
+        List&lt;String&gt; player1 = new ArrayList&lt;&gt;();
+        List&lt;String&gt; player2 = new ArrayList&lt;&gt;();
+        List&lt;String&gt; player3 = new ArrayList&lt;&gt;();
+        List&lt;String&gt; bottom = new ArrayList&lt;&gt;();
+
+        for (int i = 0; i &lt; poker.size(); i++) {
+            if (i &lt; 3) {
+                bottom.add(poker.get(i));
+            } else if (i % 3 == 0) player1.add(poker.get(i));
+            else if (i % 3 == 1) player2.add(poker.get(i));
+            else player3.add(poker.get(i));
+        }
+
+        // 4. 看牌
+        System.out.println(&quot;玩家 1：&quot; + player1);
+        System.out.println(&quot;玩家 2：&quot; + player2);
+        System.out.println(&quot;玩家 3：&quot; + player3);
+        System.out.println(&quot;底牌：&quot; + bottom);
+    }
+}
+```
+
+---
+
+## 六、综合实战：模拟 Spring IoC ⭐⭐⭐
+
+```java
+// 1. 自定义注解
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Component {
+    String value() default &quot;&quot;;
+}
+
+// 2. Bean 容器
+public class SimpleApplicationContext {
+    private Map&lt;String, Object&gt; beans = new HashMap&lt;&gt;();
+
+    public void registerBean(String name, Object bean) {
+        beans.put(name, bean);
+    }
+
+    public Object getBean(String name) {
+        return beans.get(name);
+    }
+
+    public &lt;T&gt; T getBean(Class&lt;T&gt; clazz) {
+        for (Object bean : beans.values()) {
+            if (clazz.isInstance(bean)) return clazz.cast(bean);
+        }
+        return null;
+    }
+}
+
+// 3. 业务类
+@Component(&quot;userService&quot;)
+public class UserService {
+    public void save() {
+        System.out.println(&quot;保存用户&quot;);
+    }
+}
+
+// 4. 使用
+SimpleApplicationContext ctx = new SimpleApplicationContext();
+ctx.registerBean(&quot;userService&quot;, new UserService());
+UserService us = ctx.getBean(UserService.class);
+us.save();
+```
+
+---
+
+## 七、黑马面试题精选 ⭐⭐⭐
+
+### 7.1 == 和 equals 的区别？
+== 对基本类型比值，对引用类型比地址；equals 默认是 ==，但 String、Integer 等类重写后比较内容。
+
+### 7.2 HashMap put 流程？
+1. 算 hash → 定位桶
+2. 桶空直接插入
+3. 桶不空遍历链表，key 相同覆盖
+4. 链表 &gt; 8 转红黑树
+5. size &gt; threshold ���容
+
+### 7.3 String 不可变的原因？
+1. `final class` 不能继承
+2. `final char[]` 不能修改
+3. 安全性（HashMap key）、常量池、线程安全
+
+### 7.4 ArrayList vs LinkedList？
+- ArrayList 数组：随机访问 O(1)，增删 O(n)
+- LinkedList 链表：随机访问 O(n)，增删 O(1)
+
+### 7.5 synchronized vs volatile？
+- synchronized 保证原子性和可见性
+- volatile 只保证可见性
+
+### 7.6 sleep vs wait？
+- sleep 不释放锁，wait 释放锁
+- sleep 是 Thread 方法，wait 是 Object 方法
+
+### 7.7 单例模式的几种实现？
+- 饿汉、懒汉、双重检查（volatile 必备）、静态内部类、枚举
+
+### 7.8 进程 vs 线程？
+- 进程独立内存，线程共享内存
+- 进程开销大，线程开销小
+
+### 7.9 TCP 三次握手？
+SYN → SYN+ACK → ACK，确保双方收发能力正常。
+
+### 7.10 反射的应用？
+Spring IoC、MyBatis ORM、Jackson 序列化、JUnit 测试。
+
+---
+
+## 八、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **ArrayList 的扩容机制？**
+&gt; 初始 10，扩容 1.5 倍。扩容时重新分配 + 拷贝。
+
+&gt; &#128161; **HashSet 怎么去重？**
+&gt; hashCode + equals。
+&gt; 1. 算 hash 找桶
+&gt; 2. 桶空直接放
+&gt; 3. 桶不空调 equals，相同则放弃
+
+&gt; &#128161; **生产者-消费者模式怎么用？**
+&gt; wait/notify + 共享队列 + 锁。
+
+&gt; &#128161; **代理模式的实际应用？**
+&gt; Spring AOP（动态代理）、RPC 框架、MyBatis Mapper 接口。
+
+---
+
+## 九、本章小结
+
+✅ 已掌握：
+- [ ] **8 道力扣精选题解**
+- [ ] **黑马学生管理系统**（集合 + IO + 序列化）
+- [ ] **黑马 ATM 模拟**（流程 + 反射）
+- [ ] **黑马斗地主**（集合 + 算法）
+- [ ] 模拟 Spring IoC
+- [ ] 黑马面试题精选
+
+✅ 项目实战建议：
+- [ ] 每个项目**自己敲一遍**
+- [ ] **尝试扩展**：学生系统加查询条件、ATM 加日志、斗地主加抢地主
+- [ ] **多做力扣**：简单/中等各 30 题
+
+---
+
+## &#127881; 全部黑马 Java 笔记完结！
+
+到此 **18 章全部完成**，你已学完黑马 Java 零基础上下部全部内容。
+
+### ✅ 上下部完整覆盖
+- **上部（9 章）**：入门 → 基础语法 → 数组方法 → 面向对象 → 常用 API → 进阶 → 内部类
+- **下部（9 章）**：异常 → 集合 → IO → 多线程 → 网络 → 反射 → Lambda → 枚举设计模式 → 实战
+
+### &#127919; 后续学习路线
+1. **数据库**（MySQL）
+2. **JDBC**
+3. **JavaWeb**（Servlet/JSP/Tomcat）
+4. **Maven / Git**
+5. **Spring / SpringBoot**
+6. **MyBatis / Redis**
+
+### &#128221; 学习建议
+- 每章笔记看完后**先敲���码**
+- 黑马课后题**必做**
+- 斯坦福 + 力扣题库**每天 1-2 题**
+- 实战项目（学生系统、ATM、斗地主）**独立完成**
+
+加油，黑马课程扎实、案例丰富，认真学完就���上手做 Java 项目！&#128640;</pre>

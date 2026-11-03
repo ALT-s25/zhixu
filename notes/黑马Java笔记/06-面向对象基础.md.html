@@ -1,0 +1,483 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>06-面向对象基础</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 06 &#183; 面向对象基础 ⭐⭐⭐
+
+&gt; **难度**：核心 | **学习建议**：3 天
+&gt; 对应黑马视频：第 41 ~ 65 集
+&gt; 项目导向：**整个 Java 项目的核心**，所有代码都是&quot;类 + 对象&quot;
+
+---
+
+## 一、知识框架
+
+```
+面向对象基础
+├── 6.1 面向对象 vs 面向过程 ⭐
+├── 6.2 类与对象 ⭐⭐
+├── 6.3 封装 ⭐⭐
+├── 6.4 构造方法 ⭐⭐
+├── 6.5 this 关键字 ⭐
+├── 6.6 static 关键字 ⭐⭐
+├── 6.7 代码块
+└── 6.8 黑马小项目：学生类
+```
+
+---
+
+## 二、面向对象 vs 面向过程 ⭐
+
+| 维度 | 面向过程 (POP) | 面向对象 (OOP) |
+|------|---------------|---------------|
+| 思想 | 按步骤执行 | 按对象交互 |
+| 数据与函数 | 分离 | 封装在类中 |
+| 适合 | 小程序 | 大型项目 |
+| 例子 | C 语言 | Java、C++ |
+
+&gt; &#128161; **做项目必须用 OOP**：把现实世界的&quot;东西&quot;抽象成类。
+
+---
+
+## 三、类与对象 ⭐⭐
+
+### 3.1 概念
+
+- **类**：对象的模板/蓝图（抽象���
+- **对象**：类的实例（具体）
+
+```
+类（抽象）              对象（具体）
+┌─────────┐           ┌─────────┐ ┌─────────┐
+│ Student │  ─实例化→ │ 张三    │ │ 李四    │
+└─────────┘           └─────────┘ └─────────┘
+```
+
+### 3.2 类定义
+
+```java
+public class Student {
+    // 属性（成员变量）
+    String name;
+    int age;
+    String gender;
+
+    // 方法
+    public void study() {
+        System.out.println(name + &quot; 在学习&quot;);
+    }
+
+    public void introduce() {
+        System.out.println(&quot;我叫 &quot; + name + &quot;，今年 &quot; + age + &quot; 岁&quot;);
+    }
+}
+```
+
+### 3.3 创建对象
+
+```java
+Student s = new Student();
+s.name = &quot;张三&quot;;
+s.age = 18;
+s.introduce();   // 我叫 张三，今年 18 岁
+```
+
+### 3.4 对象内存图 ⭐⭐
+
+```
+栈                     堆
+┌────────┐            ┌──────────────┐
+│ s ────────────→    │ name: &quot;张三&quot; │
+└────────┘            │ age:  18     │
+                      │ gender: null │
+                      └──��───────────┘
+```
+
+### 3.5 两个引用指向同一对象
+
+```java
+Student s1 = new Student();
+Student s2 = s1;          // 共享
+s2.name = &quot;李四&quot;;
+System.out.println(s1.name);   // 李四（被修改）
+```
+
+---
+
+## 四、封装 ⭐⭐
+
+**将属性私有化（private），对外提供 getter/setter**。
+
+### 4.1 封装示例
+
+```java
+public class Student {
+    private String name;       // 私有
+    private int age;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getAge() { return age; }
+    public void setAge(int age) {
+        if (age &lt; 0 || age &gt; 150) {
+            System.out.println(&quot;年龄非法&quot;);
+            return;
+        }
+        this.age = age;
+    }
+}
+```
+
+### 4.2 黑马经典案例：用户类
+
+```java
+public class User {
+    private String username;
+    private String password;
+    private String email;
+
+    // 构造、getter、setter 略
+}
+
+// 使用
+User user = new User();
+user.setUsername(&quot;张三&quot;);
+user.setEmail(&quot;zhangsan@example.com&quot;);
+```
+
+&gt; &#128161; **项目中的作用**：
+&gt; 1. 隐藏实现细节
+&gt; 2. 数据验证（setter 中校验）
+&gt; 3. 降低耦合
+
+---
+
+## 五、构造方法 ⭐⭐
+
+### 5.1 什么是构造方法
+
+- 名称与类名相同
+- **无返回值类型**（连 void 都没有）
+- 创建对象时**自动调用**
+- 每 new 一次调一次
+
+### 5.2 默认构造
+
+```java
+public class Student {
+    String name;
+    // 隐式存在：public Student() {}
+}
+
+Student s = new Student();   // 调用默认构造
+```
+
+### 5.3 有参构造
+
+```java
+public class Student {
+    String name;
+    int age;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+Student s = new Student(&quot;张三&quot;, 18);
+```
+
+### 5.4 黑马经典案例：三角形类 ⭐⭐
+
+```java
+public class Triangle {
+    private double a, b, c;   // 三边长
+
+    public Triangle() {}
+    public Triangle(double a, double b, double c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    public void setSides(double a, double b, double c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    public double perimeter() {
+        return a + b + c;
+    }
+
+    public double area() {
+        double p = perimeter() / 2;
+        return Math.sqrt(p * (p - a) * (p - b) * (p - c));
+    }
+}
+
+Triangle t = new Triangle(3, 4, 5);
+System.out.println(&quot;周长：&quot; + t.perimeter());
+System.out.println(&quot;面积：&quot; + t.area());
+```
+
+&gt; ⚠ **黑马经典坑**：
+&gt; - 显式定义有参构造后，**默认无参构造消失**
+&gt; - 建议**始终保留无参构造**
+
+---
+
+## 六、this 关键字 ⭐
+
+**当前对象的引用**。
+
+### 6.1 三大用途
+
+```java
+public class Student {
+    String name;
+
+    // 1. 区分成员变量和局部变量
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    // 2. 调用其他构造（必须第一行）
+    public Student() {
+        this(&quot;未知&quot;, 0);
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // 3. 返回当前对象
+    public Student setName2(String name) {
+        this.name = name;
+        return this;        // 链式调用
+    }
+}
+```
+
+---
+
+## 七、static 关键字 ⭐⭐
+
+### 7.1 static 修饰变量（类变量）
+
+```java
+public class Student {
+    static String school = &quot;黑马&quot;;   // 所有学生共享
+    String name;
+
+    public Student(String name) {
+        this.name = name;
+    }
+}
+
+Student s1 = new Student(&quot;张三&quot;);
+Student s2 = new Student(&quot;李四&quot;);
+System.out.println(s1.school);   // 黑马
+s1.school = &quot;清华&quot;;
+System.out.println(s2.school);   // 清华（共享）
+```
+
+### 7.2 static 修饰方法（类方法）
+
+```java
+public class MathUtil {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+
+int sum = MathUtil.add(3, 5);   // 类名直接调用
+```
+
+&gt; ⚠ **黑马常见坑**：
+&gt; - 静态方法中**不能访问非静态成员**（生命周期不匹配）
+&gt; - 静态方法中**不能使用 this**（无&quot;当前对象&quot;）
+
+### 7.3 黑马经典案例：账户编号
+
+```java
+public class Account {
+    private static int count = 1000;   // 起始编号
+
+    private String id;
+    private double balance;
+
+    public Account(double balance) {
+        this.id = &quot;ACC&quot; + (++count);
+        this.balance = balance;
+    }
+
+    public String getId() { return id; }
+}
+
+Account a1 = new Account(1000);   // ACC1001
+Account a2 = new Account(2000);   // ACC1002
+```
+
+---
+
+## 八、代码块
+
+### 8.1 构造代码块
+
+```java
+public class Student {
+    {
+        System.out.println(&quot;构造代码块（每次 new 都执行）&quot;);
+    }
+
+    public Student() {
+        System.out.println(&quot;构造方法&quot;);
+    }
+}
+```
+
+### 8.2 静态代码块
+
+```java
+public class Student {
+    static String school;
+
+    static {
+        school = &quot;黑马&quot;;
+        System.out.println(&quot;静态代码块（类加载时执行，只一次）&quot;);
+    }
+}
+```
+
+&gt; ⚠ **黑马常考**：静态代码块在**类加载时执行**，比 main 还早。
+
+---
+
+## 九、JavaBean 规范
+
+符合特定规范的普通 Java 类：
+
+1. 类是公共的，有公共无参构造
+2. 属性私有化
+3. 提供公共的 getter/setter
+4. 通常实现 Serializable
+
+```java
+public class User implements Serializable {
+    private String username;
+    private String password;
+
+    public User() {}
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    // ...
+}
+```
+
+&gt; &#128161; **项目应用**：所有实体类（Entity / POJO / DO）都遵循 JavaBean 规范。
+
+---
+
+## 十、黑马小项目：学生成绩管理系统（初级）⭐⭐
+
+```java
+public class Student {
+    private String name;
+    private int score;
+
+    public Student() {}
+    public Student(String name, int score) {
+        this.name = name;
+        this.score = score;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getScore() { return score; }
+    public void setScore(int score) { this.score = score; }
+
+    public String getGrade() {
+        if (score &gt;= 90) return &quot;A&quot;;
+        else if (score &gt;= 80) return &quot;B&quot;;
+        else if (score &gt;= 70) return &quot;C&quot;;
+        else if (score &gt;= 60) return &quot;D&quot;;
+        else return &quot;E&quot;;
+    }
+}
+```
+
+```java
+public class StudentManager {
+    public static void main(String[] args) {
+        Student[] students = {
+            new Student(&quot;张三&quot;, 95),
+            new Student(&quot;李四&quot;, 82),
+            new Student(&quot;王五&quot;, 76),
+            new Student(&quot;赵六&quot;, 58)
+        };
+
+        // 统计各等级人数
+        int a = 0, b = 0, c = 0, d = 0, e = 0;
+        for (Student s : students) {
+            switch (s.getGrade()) {
+                case &quot;A&quot;: a++; break;
+                case &quot;B&quot;: b++; break;
+                case &quot;C&quot;: c++; break;
+                case &quot;D&quot;: d++; break;
+                case &quot;E&quot;: e++; break;
+            }
+        }
+
+        System.out.println(&quot;A 等：&quot; + a);
+        System.out.println(&quot;B 等：&quot; + b);
+        System.out.println(&quot;C 等：&quot; + c);
+        System.out.println(&quot;D 等：&quot; + d);
+        System.out.println(&quot;E 等：&quot; + e);
+    }
+}
+```
+
+---
+
+## 十一、面试常问 ⭐
+
+&gt; &#128161; **面向对���的三大特性？**
+&gt; 封装、继承、多态
+
+&gt; &#128161; **构造方法的特点？**
+&gt; - 与类同名
+&gt; - 无返回值类型
+&gt; - 创建对象时自动调用
+&gt; - 可重载
+
+&gt; &#128161; **this 和 super 的区别？**
+&gt; - this：当前对象，访问本类成员
+&gt; - super：父类对象，访问父类成员
+
+&gt; &#128161; **static 能修饰什么？**
+&gt; 变量、方法、代码块、内部类、import static
+
+&gt; &#128161; **static 修饰后生命周期？**
+&gt; 整个程序运行期间。
+
+---
+
+## 十二、本章小结
+
+✅ 已掌握：
+- [ ] **类与对象的概念、关系**
+- [ ] 类的定义（属性、方法）
+- [ ] **封装**（private + getter/setter）
+- [ ] **构造方法**（默认/有参/重载）
+- [ ] **this 关键字**
+- [ ] **static 修饰变量/方法/代码块**
+- [ ] JavaBean 规范
+
+✅ 易错点：
+- [ ] 定义有参构造后默认无参构造消失
+- [ ] this() 必须放在构造器第一行
+- [ ] 静态方法不能访问非静态成员
+- [ ] 局部变量不初始化编译错误
+
+下一章：[07-常用API.md](./07-常用API.md)</pre>

@@ -1,0 +1,406 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>06-图</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 第 6 章 &#183; 图 ⭐⭐⭐⭐⭐
+
+&gt; **考频**：选+码+用 | **难度**：高 | **分值占比**：~16%
+&gt; **408 大题重灾区**：最短路径、最小生成树、拓扑排序、关键路径都可能考代码或推演。
+
+---
+
+## 一、知识框架
+
+```
+图
+├── 6.1 图的基本概念 ★★★
+│   ├── 分类（有向/无向/完全图/稀疏稠密/网）
+│   ├── 度数
+│   ├── 路径与连通
+│   ├── 生成树
+│   └── 有向树
+├── 6.2 图的存储 ★★★★★
+│   ├── 邻接矩阵
+│   ├── 邻接表
+│   ├── 十字链表
+│   └── 邻接多重表
+├── 6.3 图的遍历 ★★★
+│   ├── DFS（深度优先）
+│   └── BFS（广度优先）
+├── 6.4 最小生成树 ★★★★
+│   ├── Prim（点视角，稠密图）
+│   └── Kruskal（边视角，稀疏图）
+├── 6.5 最短路径 ★★★★
+│   ├── Dijkstra（单源，无负权）
+│   └── Floyd（任意两点）
+├── 6.6 拓扑排序 ★★★
+└── 6.7 关键路径（AOE���★★
+```
+
+---
+
+## 二、核心概念
+
+### 6.1 图的基本概念
+
+**定义**：图 G = (V, E)，V 顶点集，E 边集。
+
+#### 分类
+
+| 分类 | 细分 | 特征 |
+|------|------|------|
+| 有向图 vs 无向图 | 边是否有方向 | 用 `&lt;v,w&gt;` vs `(v,w)` 表示 |
+| 简单图 vs 多重图 | 是否存在重复边 | 考研考简单图 |
+| 完全图 | 任意两顶点都有边 | 无向完全图 n(n-1)/2，有向 n(n-1) |
+| 稀疏图 vs 稠密图 | `|E| &lt; |V|log|V|` 一般为稀疏 | 反过来是稠密 |
+| 网（带权图） | 边上带权 | 最短路径问题载体 |
+
+#### 度数
+
+- **无向图**：TD(v) = 度，`∑ TD(v) = 2|E|`
+- **有向图**：出度 OD(v) + 入度 ID(v) = 度，`∑ OD = ∑ ID = |E|`
+
+#### 路径与连通
+
+- **路径长度**：路径上边数 / 权值之和（带权图）
+- **回路**：起点=终点的路径
+- **简单路径**：顶点不重复出现的路径
+- **连通（无向）**：两顶点间有路径。极大连通子图 = **连通分量**
+- **强连通（有向）**：任意两顶点双向可达。极大强连通子图 = **强连通分量**
+
+#### 生成树
+
+连通图的**极小连通子图**，包含 n 顶点 + n-1 边。
+**生成森林**：非连通图的连通分量的生成树集合。
+
+#### 有向树
+
+一个有向图，**恰有一��顶点入度为 0，其余入度为 1**。
+
+---
+
+## 三、图的存储 ★★★★★
+
+### 3.1 邻接矩阵
+
+二维数组 `A[i][j]` 表示边 (i,j) 的信息（无权 1/0；有权即权值，∞ 表示无）。
+
+| 维度 | 说明 |
+|------|------|
+| 空间 | O(V&#178;)，适合稠密图 |
+| 判边 | O(1) |
+| 求度 | 无向图：行/列求和 O(V)；有向图：行=出度，列=入度 |
+| 对称性 | 无向图的矩阵是对称的 |
+
+### 3.2 邻接表
+
+顶点数组 + 每个顶点挂一条边链表。
+
+| 维度 | 说明 |
+|------|------|
+| 空间 | 无向图 O(V+2E)，有向图 O(V+E)，适合稀疏图 |
+| 判边 | O(度数) |
+| 求度 | 无向图不方便（要遍历所有链表）；有向图出度=链表长，入度需建逆邻接表 |
+
+### 3.3 十字链表（仅用于有向图）
+
+边结点同时挂在起点链表（出边）和终点链表（入边）上。求入度/出度都方便。
+
+### 3.4 邻接多重表（仅用于无向图）
+
+每条边只对应一个边结点，同时出现在两个顶点的链表中。删除边方便。
+
+&gt; &#128161; **选择建议**：稠密图 → 邻接矩阵；稀疏图 → 邻接表；考代码大题 → **邻接表**（最适）。
+
+---
+
+## 四、关键代码
+
+### 4.1 邻接表存储
+
+```c
+#define MaxVertexNum 100
+typedef struct ArcNode {        // 边表结点
+    int adjvex;                 // 该弧所指向的顶点位置
+    struct ArcNode *next;       // 指向下一条弧的指针
+    // int info;                // 网的权值（可选）
+} ArcNode;
+
+typedef struct VNode {          // 顶点表结点
+    int data;
+    ArcNode *first;             // 指向第一条依附该顶点的弧
+} VNode, AdjList[MaxVertexNum];
+
+typedef struct {
+    AdjList vertices;
+    int vexnum, arcnum;
+} ALGraph;
+```
+
+### 4.2 邻接矩阵 DFS（递归）
+
+```c
+bool visited[MaxVertexNum];
+
+void DFS(MGraph G, int v) {
+    visit(v);
+    visited[v] = true;
+    for (int w = 0; w &lt; G.vexnum; w++)
+        if (G.edge[v][w] != 0 &amp;&amp; !visited[w])
+            DFS(G, w);
+}
+
+// 主调：对所有未访问顶点调一次
+void DFSTraverse(MGraph G) {
+    for (int i = 0; i &lt; G.vexnum; i++) visited[i] = false;
+    for (int i = 0; i &lt; G.vexnum; i++)
+        if (!visited[i]) DFS(G, i);
+}
+```
+
+### 4.3 邻接矩阵 BFS（队列）
+
+```c
+void BFS(MGraph G, int v) {
+    visit(v); visited[v] = true;
+    EnQueue(Q, v);
+    while (!QueueEmpty(Q)) {
+        DeQueue(Q, v);
+        for (int w = 0; w &lt; G.vexnum; w++) {
+            if (!visited[w] &amp;&amp; G.edge[v][w] != 0) {
+                visit(w);
+                visited[w] = true;
+                EnQueue(Q, w);
+            }
+        }
+    }
+}
+```
+
+### 4.4 Prim 算法（O(V&#178;)）
+
+```c
+void Prim(MGraph G, int v0) {
+    // lowcost[i] = 当前最小边权；closest[i] = 该边对应的起点
+    int lowcost[MaxVertexNum], closest[MaxVertexNum];
+    for (int i = 0; i &lt; G.vexnum; i++) {
+        lowcost[i] = G.edge[v0][i];
+        closest[i] = v0;
+    }
+    lowcost[v0] = 0;          // v0 已加入 U
+
+    for (int i = 1; i &lt; G.vexnum; i++) {
+        int min = INF, k = -1;
+        for (int j = 0; j &lt; G.vexnum; j++)
+            if (lowcost[j] != 0 &amp;&amp; lowcost[j] &lt; min) {
+                min = lowcost[j]; k = j;
+            }
+        if (k == -1) break;
+        printf(&quot;(%d, %d)\n&quot;, closest[k], k);
+        lowcost[k] = 0;       // k 加入 U
+        for (int j = 0; j &lt; G.vexnum; j++)
+            if (lowcost[j] != 0 &amp;&amp; G.edge[k][j] &lt; lowcost[j]) {
+                lowcost[j] = G.edge[k][j];
+                closest[j] = k;
+            }
+    }
+}
+```
+
+### 4.5 Kruskal 算法 + 并查集
+
+```c
+// 并查集
+int parent[MaxVertexNum];
+
+int Find(int x) {
+    while (parent[x] != x) x = parent[x];
+    return x;
+}
+
+void Union(int x, int y) {
+    int rx = Find(x), ry = Find(y);
+    if (rx != ry) parent[rx] = ry;
+}
+
+// Kruskal
+typedef struct { int u, v, w; } Edge;
+
+void Kruskal(ALGraph G, Edge E[], int e) {
+    for (int i = 0; i &lt; G.vexnum; i++) parent[i] = i;
+    Sort(E, e);              // 边按权值升序
+    int cnt = 0;
+    for (int i = 0; i &lt; e; i++) {
+        int fu = Find(E[i].u), fv = Find(E[i].v);
+        if (fu != fv) {
+            Union(fu, fv);
+            printf(&quot;(%d, %d) %d\n&quot;, E[i].u, E[i].v, E[i].w);
+            if (++cnt == G.vexnum - 1) break;
+        }
+    }
+}
+```
+
+### 4.6 Dijkstra（单源最短路径）
+
+```c
+// dist[v] = 当前 v 到源点 v0 的最短距离；path[v] = 路径上前驱
+void Dijkstra(MGraph G, int v0) {
+    bool final[MaxVertexNum];          // final[v] = true 表示已确定
+    for (int v = 0; v &lt; G.vexnum; v++) {
+        dist[v] = G.edge[v0][v];
+        final[v] = false;
+        path[v] = (dist[v] &lt; INF) ? v0 : -1;
+    }
+    dist[v0] = 0; final[v0] = true;
+
+    for (int i = 1; i &lt; G.vexnum; i++) {
+        int min = INF, v = -1;
+        for (int w = 0; w &lt; G.vexnum; w++)
+            if (!final[w] &amp;&amp; dist[w] &lt; min) { v = w; min = dist[w]; }
+        if (v == -1) break;
+        final[v] = true;
+        for (int w = 0; w &lt; G.vexnum; w++)
+            if (!final[w] &amp;&amp; dist[v] + G.edge[v][w] &lt; dist[w]) {
+                dist[w] = dist[v] + G.edge[v][w];
+                path[w] = v;
+            }
+    }
+}
+```
+
+### 4.7 Floyd（任意两点）
+
+```c
+void Floyd(MGraph G) {
+    // A[][] 是初始邻接矩阵，path[][] 记录路径
+    for (int k = 0; k &lt; G.vexnum; k++)
+        for (int i = 0; i &lt; G.vexnum; i++)
+            for (int j = 0; j &lt; G.vexnum; j++)
+                if (A[i][k] + A[k][j] &lt; A[i][j]) {
+                    A[i][j] = A[i][k] + A[k][j];
+                    path[i][j] = k;
+                }
+}
+```
+
+### 4.8 拓扑排序
+
+```c
+void TopologicalSort(ALGraph G) {
+    InitStack(S);                // 栈存放入度为 0 的顶点
+    for (int i = 0; i &lt; G.vexnum; i++)
+        if (indegree[i] == 0) Push(S, i);
+    int cnt = 0;
+    while (!StackEmpty(S)) {
+        Pop(S, i);
+        print[i]; cnt++;
+        for (ArcNode *p = G.vertices[i].first; p; p = p-&gt;next) {
+            int v = p-&gt;adjvex;
+            if (--indegree[v] == 0) Push(S, v);
+        }
+    }
+    if (cnt &lt; G.vexnum) printf(&quot;有环！\n&quot;);
+}
+```
+
+---
+
+## 五、关键算法 ★★★★
+
+### 5.1 最小生成树
+
+**定义**：带权连通无向图中，**边权之和最小**的生成树（可能不唯一）。
+
+| 算法 | 思想 | 复杂度 | 适合 |
+|------|------|--------|------|
+| Prim | 点视角：选当前 U 到 V-U 最小边 | O(V&#178;) | 稠密图 |
+| Kruskal | 边视角：按权升序 + 并查集 | O(E log E) | 稀疏图 |
+
+&gt; **核心区别**：Prim 从点扩张（贪心当前点集中最小边），Kruskal 从边贪心（必须用到并查集）。
+
+### 5.2 最短路径
+
+#### Dijkstra（单源最短路径）★★★★★
+- **无负权图**上一个顶点到其他所有顶点的最短路径，O(V&#178;)
+- **思想**：集合 S（已确定最短路径）+ 集合 V-S。每次选 dist 最小的 u 加入 S，更新 u 的所有邻居
+
+**手算步骤**：
+1. 写出各顶点到源点的当前距离 dist[]
+2. 选未确定集合中 dist 最小的顶点加入确定集
+3. 以该顶点为中转，更新其邻居的 dist = min(dist, dist[该点] + 边权)
+4. 重复直到所有顶点确定
+
+&gt; ⚠ **易错**：Dijkstra **不适用负权图**，负权用 Bellman-Ford 或 SPFA。
+
+#### Floyd（任意两点间最短路径）
+- 动态规划，三重循环，O(V&#179;)
+- 可处理负权但不能有负权回路
+
+### 5.3 拓扑排序 ★★★
+
+**应用**：**AOV 网**（顶点表示活动、边表示先后关系）上，输出一个满足所有先后关系的线性序列。
+
+**算法**：
+1. 选一个**入度为 0**的顶点输出
+2. 删除该顶点及其所有出边（邻居入度 -1）
+3. 重复 1-2，直到图为空或不存在入度为 0 顶点（后者则有环）
+
+**复杂度**：O(V+E)。**拓扑序列可能不唯一**。
+
+&gt; &#128161; 拓扑排序的两个用途：① 判断有向图是否有环；② 求 AOV 网的合理序列。
+
+### 5.4 关键路径（AOE 网）★★
+
+- **AOE 网**：顶点表示**事件**、边表示**活动**、边上权表示活动持续时间
+- **关键活动**：最早开始时间 = 最迟开始时间的活动，组成**关键路径**
+- **关键路径长度 = 项目最短完成时间**
+
+| 量 | 公式 | 方向 |
+|----|------|------|
+| 事件最早发生时间 ve(k) | `ve(k) = max{ve(j) + 权&lt;j,k&gt;}` | 从前往后（拓扑序） |
+| 事件最迟发生时间 vl(k) | `vl(k) = min{vl(j) - 权&lt;k,j&gt;}` | 从后往前（逆拓扑序） |
+| 活动最早开始时间 e(i) | `e(i) = ve(j)` | 边 `&lt;j,k&gt;` 的最早开始 |
+| 活动最迟开始时间 l(i) | `l(i) = vl(k) - 权&lt;j,k&gt;` | 边 `&lt;j,k&gt;` 的最迟开始 |
+| 关键活动判定 | `e(i) == l(i)` | 两者相等即关键 |
+
+---
+
+## 六、真题套路
+
+### 套路 A：DFS/BFS 序列推演
+- 邻接表存储 → 手写访问序列
+- 注意：非连通图要循环启动
+
+### 套路 B：Prim/Kruskal 手算
+- Prim：每次找 U-VU 最小边
+- Kruskal：按边权升序 + 判环
+
+### 套路 C：Dijkstra 手算 dist[] 数组
+- 必考大题
+- 反复更新直到所有顶点确定
+
+### 套路 D：拓扑��序 + 关键���径
+- AOE 网求关键路径：ve、vl、e、l 全套计算
+
+---
+
+## 七、概念清单（必背）
+
+- [ ] 完全图、稀疏/稠密图、有向树
+- [ ] 度数的两种求和公式（无向 2|E|，有向 |E|）
+- [ ] 连通、强连通、连通分量、强连通分量
+- [ ] 生成树/生成森林定义
+- [ ] 4 种存储：邻接矩阵/邻接表/十字链表/邻接多重表
+- [ ] DFS + BFS：复杂度 + 应用
+- [ ] Prim（稠密）+ Kruskal（稀疏，必用并查集）
+- [ ] Dijkstra（无负权）+ Floyd（任意两点）
+- [ ] 拓扑排序：AOV + 判环
+- [ ] 关键路径：ve/vl/e/l + 关键活动判定
+
+---
+
+## 八、自测题
+
+1. **选择**：无向图 G 有 n 个顶点、e 条边，求某个顶点度的时间复杂度
+   - 邻接矩阵 O(V)
+   - 邻接表 O(度数)
+
+2. **应用题**：手算 Dijkstra 写出每个顶点的 dist 和 path 数组
+3. **关键路径**：给一个 AOE 网，画出 ve、vl 表格，找出关键路径</pre>

@@ -1,0 +1,247 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>01-Java入门</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 01 &#183; Java 入门 ⭐
+
+&gt; **难度**：入门 | **学习建议**：1 天
+&gt; 对应黑马视频：第 1 ~ 3 集
+&gt; 项目导向：**配置环境、写第一个 Java 程序**，这是做项目的起点
+
+---
+
+## 一、知识框架
+
+```
+Java 入门
+├── 1.1 Java 是什么
+├── 1.2 Java 三大家族（JavaSE/EE/ME）
+├── 1.3 JDK / JRE / JVM 关系
+├── 1.4 JDK 安装与环境配置
+├── 1.5 第一个程序 HelloWorld
+├── 1.6 编译与运行原理
+└── 1.7 常用 IDE（IntelliJ IDEA）
+```
+
+---
+
+## 二、核心概念
+
+### 2.1 Java 是什么 ⭐
+
+Java 是一门**面向对象**的、**跨平台**的编程语言。
+
+**特点**：
+- 简单、面向对象、健壮
+- 跨平台（**一次编写，到处运行**）
+- 多线程、安全
+- 生态丰富，企业级开发首选
+
+### 2.2 Java 三大家族
+
+| 版本 | 全称 | 用途 |
+|------|------|------|
+| **Java SE** | Standard Edition | 桌面应用、Java 标准库（**我们学的**） |
+| Java EE | Enterprise Edition | 企业级（Spring 全家桶） |
+| Java ME | Micro Edition | 嵌入式（已淘汰） |
+
+### 2.3 JDK / JRE / JVM 三者关系 ⭐
+
+```
+JDK（开发者使用）
+  ├── JRE（运行时环境）
+  │     └── JVM（虚拟机）
+  └── 开发工具（javac、java、jar）
+```
+
+**记忆**：
+- **JDK = JRE + 开发工具**
+- **JRE = JVM + 核心类库**
+- **JVM**：跨平台核心
+
+### 2.4 安装配置 ⭐
+
+**Windows 安装步骤**：
+1. 下载 JDK（推荐 LTS 版本：JDK 8 / 11 / 17）
+2. 安装到无空格无中文路径（如 `D:\Java\jdk1.8.0_xxx`）
+3. 配置环境变量：
+   - `JAVA_HOME = D:\Java\jdk1.8.0_xxx`
+   - `Path` 中添加 `%JAVA_HOME%\bin`
+4. 验证：cmd 中输入 `java -version`、`javac -version`
+
+---
+
+## 三、第一个程序 HelloWorld ⭐
+
+### 3.1 编写
+
+新建文件 `HelloWorld.java`：
+
+```java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println(&quot;Hello, World!&quot;);
+    }
+}
+```
+
+### 3.2 编译运行
+
+```bash
+# 编译（生成 HelloWorld.class）
+javac HelloWorld.java
+
+# 运行
+java HelloWorld
+```
+
+### 3.3 注意事项
+
+&gt; ⚠ **黑马常见坑**：
+&gt; 1. `public class` 的类名**必须**与文件名一致
+&gt; 2. `main` 方法签名固定：`public static void main(String[] args)`
+&gt; 3. 大小写敏感
+&gt; 4. 每一行以分号 `;` 结尾
+&gt; 5. 大括号成对出现
+
+---
+
+## 四、编译与运行原理 ⭐
+
+```
+HelloWorld.java（源代码）
+       ↓ javac 编译
+HelloWorld.class（字节码）
+       ↓ 类加载 + 字节码解释执行
+       ↓
+   操作系统调用硬件
+```
+
+**关键点**：
+- **编译**：`javac` 把 `.java` 编译成 `.class`（字节码，与平台无关）
+- **解释**：JVM 逐行翻译字节码为机器码
+- **JIT**：热点代码编译为本地机器码（提高性能）
+
+---
+
+## 五、注释
+
+```java
+// 单行注释
+
+/*
+ * 多行注释
+ */
+
+/**
+ * 文档注释（生成 JavaDoc）
+ * @author 黑马
+ */
+public class Demo { }
+```
+
+---
+
+## 六、关键字与标识符
+
+### 6.1 关键字
+
+Java 预定义的有特殊含义的单词，**全部小写**：
+
+```
+class, public, static, void, int, long, double,
+if, else, switch, while, for, return,
+new, this, super, abstract, final, ...
+```
+
+### 6.2 标识符规则
+
+- 字母、数字、下划线、美元符 `$`
+- **不能数字开头**
+- 不能是关键字
+- 大小写敏感
+
+### 6.3 命名规范
+
+| 类型 | 规范 | 例子 |
+|------|------|------|
+| 类名 | 大驼峰 | `HelloWorld`, `UserService` |
+| 方法名、变量名 | 小驼峰 | `getName`, `userAge` |
+| 常量 | 全大写 + 下划线 | `MAX_VALUE` |
+| 包名 | 全小写 | `com.itheima.utils` |
+
+&gt; &#128161; **项目中的实际应用**：
+&gt; - 类名首字母大写是公司规范
+&gt; - 包名常以公司域名倒写开头（如 `com.alibaba.fastjson`）
+
+---
+
+## 七、IDE 选择 ⭐
+
+黑马视频用 **IntelliJ IDEA**，强烈推荐。
+
+| 快捷键 | 功能 |
+|--------|------|
+| `psvm` + Tab | 生成 main 方法 |
+| `sout` + Tab | 生成 `System.out.println` |
+| `Ctrl + /` | 单行注释 |
+| `Alt + Insert` | 生成构造器、getter/setter |
+| `Ctrl + D` | 复制当前行 |
+| `Shift + F10` | 运行 |
+
+---
+
+## 九、项目场景（应用导向）
+
+### &#127919; 场景 1：写一个&quot;项目启动类&quot;
+
+每个项目都有一个 `main` 方法作为入口：
+
+```java
+public class Application {
+    public static void main(String[] args) {
+        System.out.println(&quot;项目启动成功！&quot;);
+        // 调用业务模块
+        UserService userService = new UserService();
+        userService.run();
+    }
+}
+```
+
+### &#127919; 场景 2：用 IDEA 创建第一个项目
+
+1. New Project → Java
+2. 项目结构：`src/` 存放源代码
+3. 右键 `src` → New → Java Class
+4. 写代码 → 运行
+
+---
+
+## 十、面试常问 ⭐
+
+&gt; &#128161; **JDK、JRE、JVM 的���别？**
+&gt; - JDK：开发工具包（含 JRE + 开发工具）
+&gt; - JRE：运行时环境（含 JVM + 类库）
+&gt; - JVM：虚拟机
+
+&gt; &#128161; **Java 为什么跨平台？**
+&gt; 编译成字节码，由 JVM 解释执行。不同平台有不同的 JVM 实现。
+
+&gt; &#128161; **`main` 方法为什么是 `static`？**
+&gt; JVM 调用 main 时**还没有任何对象**，所以必须是静态的，可以由类直接调用。
+
+---
+
+## 十一、本章小结
+
+✅ 已掌握：
+- [ ] Java 三大家族与特点
+- [ ] JDK / JRE / JVM 关系
+- [ ] JDK 安装配置
+- [ ] HelloWorld 编写与运行
+- [ ] 编译原理（.java → .class）
+- [ ] IDEA 基本使用
+
+✅ 易错点：
+- [ ] 类名与文件名不一致
+- [ ] main 方法签名写错
+- [ ] 环境变量没配好
+- [ ] 标点符号用成中文
+
+下一章：[02-基础语法.md](./02-基础语法.md)</pre>
