@@ -1,0 +1,287 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>08-异常处理</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 08 &#183; 异常处理 ⭐⭐
+
+&gt; **难度**：中 | **学习建议**：1 天
+&gt; 二刷重点：**异常体系、try-catch-finally、throws vs throw、自定义异常**
+
+---
+
+## 一、知识框架
+
+```
+异常处理
+├── 8.1 异常体系 ⭐⭐⭐
+├── 8.2 异常分类（编译期/运行时）
+├── 8.3 异常处理机制
+│   ├── try-catch-finally ⭐⭐
+│   ├── throws ⭐⭐
+│   └── throw ⭐
+├── 8.4 自定义异常
+└── 8.5 异常实践建议
+```
+
+---
+
+## 二、异常体系 ⭐⭐⭐
+
+### 2.1 顶级父类
+
+```
+Throwable (可抛出的)
+├── Error (错误)               —— 严重，无法处理
+│   ├── OutOfMemoryError
+│   └── StackOverflowError
+└── Exception (异常)          —— 可处理
+    ├── IOException (受检异常)
+    ├── SQLException (受检异常)
+    └── RuntimeException (运行时异常)
+        ├── NullPointerException
+        ├── ArrayIndexOutOfBoundsException
+        ├── ArithmeticException
+        ├── NumberFormatException
+        └── ClassCastException
+```
+
+### 2.2 受检异常 vs 非受检异常
+
+| 维度 | 受检异常 (Checked) | 非受检异常 (Unchecked) |
+|------|------------------|---------------------|
+| 继承 | `Exception` 及其子类（除 RuntimeException） | `RuntimeException` 及其子类 |
+| 编译 | **必须处理**（try-catch 或 throws） | 不强制处理 |
+| 原因 | 外部因素（IO、数据库） | 程序员逻辑错误 |
+| 例子 | IOException、SQLException | 空指针、数组越界 |
+
+```java
+// 受检异常示例
+public void readFile() throws IOException {     // 必须声明 throws
+    FileReader fr = new FileReader(&quot;a.txt&quot;);
+}
+
+// 非受检异常示例
+public int divide(int a, int b) {
+    return a / b;     // b=0 会抛 ArithmeticException，无需声明
+}
+```
+
+---
+
+## 三、异常处理机制 ⭐⭐⭐
+
+### 3.1 try-catch-finally
+
+```java
+try {
+    // 可能出现异常的代码
+    int result = 10 / 0;
+} catch (ArithmeticException e) {     // 捕获特定异常
+    System.out.println(&quot;除数不能为零&quot;);
+    e.printStackTrace();              // 打印栈轨迹
+} catch (Exception e) {                // 兜底异常
+    System.out.println(&quot;其他异常&quot;);
+} finally {
+    // 无论是否异常都执行（通常用于��放资源）
+    System.out.println(&quot;执行 finally&quot;);
+}
+```
+
+### 3.2 多个 catch 规则
+
+1. 子类异常**必须放在父类之前**
+2. 多个 catch 只匹配**第一个**满足的类型
+3. Java 7+ 可用 `|` 多异常捕获
+
+```java
+try {
+    // ...
+} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+    System.out.println(&quot;空指针或数组越界&quot;);
+}
+```
+
+### 3.3 try-with-resources（Java 7+）⭐
+
+自动关闭实现了 `AutoCloseable` 接口的资源：
+
+```java
+// 传统写法
+BufferedReader br = null;
+try {
+    br = new BufferedReader(new FileReader(&quot;a.txt&quot;));
+    return br.readLine();
+} finally {
+    if (br != null) br.close();
+}
+
+// try-with-resources（推荐）
+try (BufferedReader br = new BufferedReader(new FileReader(&quot;a.txt&quot;))) {
+    return br.readLine();
+}    // 自动调用 br.close()
+```
+
+### 3.4 throws（声明抛出）⭐⭐
+
+将异常**抛给调用者**处理：
+
+```java
+public void readFile() throws IOException {     // 声明可能抛出
+    FileReader fr = new FileReader(&quot;a.txt&quot;);    // 受检异常必须 throws
+}
+
+// 调用方必须处理
+public void caller() {
+    try {
+        readFile();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+// 也可以继续向上 throws
+public void caller() throws IOException {
+    readFile();
+}
+```
+
+### 3.5 throw（手动抛出）⭐
+
+```java
+public void setAge(int age) {
+    if (age &lt; 0) {
+        throw new IllegalArgumentException(&quot;年龄不能为负：&quot; + age);
+    }
+    this.age = age;
+}
+```
+
+### 3.6 throws vs throw
+
+| 维度 | throws | throw |
+|------|--------|-------|
+| 位置 | 方法声明 | 方法体内 |
+| 后面 | 异常类名（可多个） | 异常对象（只能一个） |
+| 作用 | 声明可能抛出 | 主动抛出 |
+| 个数 | 可声明多个异常 | 每次抛一个 |
+
+---
+
+## 四、异常常用方法
+
+```java
+catch (Exception e) {
+    e.printStackTrace();          // 打印栈轨迹（开发时最常用）
+    e.getMessage();                // 返回异常信息
+    e.toString();                  // 返回异常的字符串表示
+    System.out.println(e.fillInStackTrace());
+}
+```
+
+---
+
+## 五、自定义异常 ⭐
+
+### 5.1 为什么需要自定义异常
+
+- Java 内置异常不够用
+- 业务相关的异常描述
+
+### 5.2 自定义步骤
+
+```java
+// 1. 继承 Exception（受检）或 RuntimeException（非受检）
+public class LoginException extends RuntimeException {
+    public LoginException() {
+        super();
+    }
+
+    public LoginException(String message) {
+        super(message);     // 传给父类
+    }
+}
+
+// 2. 使用
+public void login(String username, String password) {
+    if (!&quot;admin&quot;.equals(username) || !&quot;123&quot;.equals(password)) {
+        throw new LoginException(&quot;用户名或密码错误！&quot;);
+    }
+}
+```
+
+---
+
+## 六、异常实践建议 ⭐⭐
+
+### 6.1 应该捕获异常的场景
+
+✅ 网络请求失败
+✅ 文件读写
+✅ 数据库操作
+✅ 用户输入校验
+
+### 6.2 不应该捕获异常的场景
+
+❌ **捕获但不处理**（catch 块为空）—— 隐藏了问题
+❌ **捕获 Exception 兜底** —— 应该捕获具体异常
+❌ **异常用于控制流程** —— 性能差，应使用 if-else
+
+### 6.3 良好的实践
+
+```java
+// ✅ 好的写法
+try {
+    // 业务代码
+} catch (FileNotFoundException e) {
+    logger.error(&quot;文件未找到：{}&quot;, filePath, e);
+    throw new BusinessException(&quot;文件不存在&quot;);
+}
+
+// ❌ 不好的写法
+try {
+    // 业务代码
+} catch (Exception e) {
+    // 什么都不做
+}
+```
+
+---
+
+## 七、面试常问 ⭐⭐
+
+&gt; &#128161; **Error 和 Exception 的区别？**
+&gt; - Error：严重错误（JVM 内部），程序无法处理
+&gt; - Exception：程序可以处理的异常
+
+&gt; &#128161; **受��异常和运行时异常的区别？**
+&gt; - 受检异常：编译时必须处理（throws 或 try-catch）
+&gt; - 运行时异常：编译时不强制，一般是程序 bug
+
+&gt; &#128161; **final、finally、finalize 的区别？**
+&gt; - `final`：修饰类（不可继承）、方法（不可重写）、变量（常量）
+&gt; - `finally`：try-catch 始终执行的代码块（除非 JVM 退出）
+&gt; - `finalize`：Object 的方法，GC 前调用，**已废弃**
+
+&gt; &#128161; **try-catch-finally 中哪个部分可以省略？**
+&gt; catch 和 finally 不能同时省略。但 try-finally 可以（无 catch 不处理）。
+
+&gt; &#128161; **try 中 return 后 finally 还执行吗？**
+&gt; 执行。finally 在 return 前执行（修改返回值不影响原 return）。
+&gt; 但 `System.exit()` 会阻止 finally。
+
+---
+
+## 八、本章小结
+
+✅ 已掌握：
+- [ ] **异常体系**：Throwable → Error / Exception → RuntimeException
+- [ ] 受检异常 vs 运行时异常
+- [ ] **try-catch-finally** 用法
+- [ ] **throws** 声明异常
+- [ ] **throw** 手动抛出
+- [ ] 自定义异常
+- [ ] try-with-resources 自动关闭资源
+
+✅ 易错点：
+- [ ] catch 必须从小到大（子类 → 父类）
+- [ ] 受检异常必须处理
+- [ ] finally 在 return 前执行
+- [ ] finally 不执行的特殊情况：System.exit()、JVM 崩溃
+
+下一章：[09-常用类与包装类.md](./09-常用类与包装类.md)</pre>

@@ -1,0 +1,165 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>README</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 狂神说 Java &#183; JavaSE 阶段总结笔记
+
+&gt; 二刷补漏版 &#183; 按模块切分 &#183; 知识点 + 代码示例 + 常见坑
+&gt; 对应视频：B 站【狂神说 Java】JavaSE 系列
+
+---
+
+## &#128193; 文件清单
+
+| 序号 | 文件 | 模块 | 难度 | 学习建议 |
+|------|------|------|------|----------|
+| 00 | [README.md](./README.md) | 复习地图（本文） | ⭐ | 先看 |
+| 01 | [01-Java入门与环境.md](./01-Java入门与环境.md) | JDK/JRE、HelloWorld、IDE | ⭐ | 半天 |
+| 02 | [02-基础语法.md](./02-基础语法.md) | 变量、数据类型、运算符、Scanner | ⭐ | 1 天 |
+| 03 | [03-流程控制.md](./03-流程控制.md) | if、switch、while、for | ⭐ | 1 天 |
+| 04 | [04-方法与数组.md](./04-方法与数组.md) | 方法、数组、内存分析 | ⭐⭐ | 1 天 |
+| 05 | [05-面向对象基础.md](./05-面向对象基础.md) | 类、对象、构造器、this | ⭐⭐⭐ | 2 天 |
+| 06 | [06-封装继承多态.md](./06-封装继承多态.md) | OOP 三特性 | ⭐⭐⭐ | 2 天 |
+| 07 | [07-抽象类接口内部类.md](./07-抽象类接口内部类.md) | abstract、interface、内部类 | ⭐⭐⭐ | 2 天 |
+| 08 | [08-异常处理.md](./08-异常处理.md) | 异常体系、try-catch、throws | ⭐⭐ | 1 天 |
+| 09 | [09-常用类与包装类.md](./09-常用类与包装类.md) | Object、String、StringBuilder、包装类 | ⭐⭐ | 1 天 |
+| 10 | [10-集合框架.md](./10-集合框架.md) | Collection、Map、泛型 | ⭐⭐⭐⭐ | 3 天 |
+| 11 | [11-IO流.md](./11-IO流.md) | File、字节字符流、缓冲流 | ⭐⭐⭐ | 2 天 |
+| 12 | [12-多线程.md](./12-多线程.md) | Thread、Runnable、同步、锁 | ⭐⭐⭐⭐ | 2 天 |
+| 13 | [13-网络编程.md](./13-网络编程.md) | Socket、TCP、UDP | ⭐⭐⭐ | 1 天 |
+| 14 | [14-注解与反射.md](./14-注解与反射.md) | Annotation、Reflection | ⭐⭐⭐ | 1 天 |
+
+---
+
+## &#127919; 二刷者重点（哪些是必看、哪些可以快过）
+
+### &#128308; 必看、必须深入理解
+
+| 模块 | 为什么重要 |
+|------|-----------|
+| 面向对象基础（5） | 整个 Java 的核心，类/对象没搞懂后面全崩 |
+| 封装继承多态（6） | OOP 三大特性，面试必问 |
+| 抽象类接口（7） | 实际项目天天用 |
+| 集合框架（10） | 工作 80% 时间在用 ArrayList、HashMap |
+| 多线程（12） | 面试高频 |
+
+### &#128993; 重要、但可快过
+
+| 模块 | 学习策略 |
+|------|----------|
+| 基础语法（2、3） | 快过，重点是数据类型转换、运算符优先级 |
+| 方法与数组（4） | 重点是数组内存分析、方法重载、值传递 vs 引用传递 |
+| 异常（8） | 重点是异常体系、try-catch-finally、自定义异常 |
+| 常用类（9） | 重点是 String 不可变性、StringBuilder/StringBuffer 区别 |
+| IO 流（11） | 重点是字节流 vs 字符流、缓冲流提升性能 |
+
+### &#128994; 了解、看过即可
+
+| 模块 | 学习策略 |
+|------|----------|
+| Java 入门（1） | 安装配置而已 |
+| 网络编程（13） | 简单了解 Socket 即可，工作用框架 |
+| 注解与反射（14） | 框架基础，但二刷可了解即可 |
+
+---
+
+## &#129504; JavaSE 知识体系全景图
+
+```
+JavaSE
+├── 基础语法层
+│   ├── 数据类型、变量、常量、Scanner
+│   ├── 运算符、表达式
+│   ├── 流程控制（if/switch/循环）
+│   └── 数组、方法
+├── 面向对象层 ⭐核心
+│   ├── 类与对象、构造器
+│   ├── 封装（private + getter/setter）
+│   ├── 继承（extends、super、方法重写）
+│   ├── 多态（向上转型、instanceof）
+│   ├── 抽象类（abstract）
+│   ├── 接口（interface）
+│   └── 内部类（成��/静态/局部/匿名）
+├── 进阶特性层
+│   ├── 异常体系（try-catch-throws-throw）
+│   ├── 常用类（Object、String、Math、Date）
+│   ├── 包装类（装箱、拆箱）
+│   └── 枚举（enum）
+├── 集合框架层 ⭐核心
+│   ├── Collection（List/Set）
+│   ├── Map
+│   ├── 泛型
+│   └── Collections 工具类
+├── IO 层
+│   ├── File 类
+│   ├── 字节流（InputStream/OutputStream）
+│   ├── 字符流（Reader/Writer）
+│   └── 缓冲流、对象流
+├── 并发层 ⭐核心
+│   ├── Thread、Runnable
+│   ├── 线程同步（synchronized）
+│   └── 锁、volatile
+└── 应用层
+    ├── 网络编程（Socket）
+    ├── 注解（Annotation）
+    └── 反射（Reflection）
+```
+
+---
+
+## &#128640; 二刷复习路线（4 周）
+
+### 第一周：基础 + OOP
+- Day 1-2：环境 + 基础语法 + 流程控制（快速过）
+- Day 3-4：方法 + 数组（重点看内存分析）
+- Day 5-7：面向对象（5、6、7 三章）— **重中之重**
+
+### 第二周：进阶 + 集合
+- Day 8-9：异常 + 常用类 + 包装类
+- Day 10-12：集合框架（核心章节，建议多敲代码）
+- Day 13-14：泛型深入���Collections 工具类
+
+### 第三周：IO + 多线程
+- Day 15-16：IO 流（文件复制练习）
+- Day 17-19：多线程（理解并发本质）
+- Day 20-21：网络编程 + 注解与反射（了解即可）
+
+### 第四周：综合实战
+- Day 22-23：选 2-3 个小项目练手
+  - 简易文件管理器（集合 + IO）
+  - 多线程下载器（IO + 多线程）
+- Day 24-25：回顾所有笔记中的&quot;常见坑&quot;和&quot;面试常问&quot;
+- Day 26-28：模拟面试、写总结
+
+---
+
+## &#128161; 二刷常见问题（提前避坑）
+
+1. **&quot;学了就忘&quot;** → 笔记结构化 + 关键代码敲 3 遍
+2. **&quot;面向对象学了但不会用&quot;** → 必须自己手写小项目练
+3. **&quot;集合/IO 类太多记不住&quot;** → 记住&quot;父接口 + 子类特点&quot;框架，具体类用时查
+4. **&quot;多线程难理解&quot;** → 先理解进程/线程概念，再画图理解执行流
+5. **&quot;注解反射有啥用&quot;** → 了解 Spring/ORM 框架底层用就行
+
+---
+
+## &#128218; 学习资源
+
+- **视频**：[B 站 狂神说 Java](https://www.bilibili.com/video/BV12J41137hu)（原视频）
+- **文档**：[Java 8 官方文档](https://docs.oracle.com/javase/8/docs/api/)
+- **书**：《Java 核心技术 卷 1》《Head First Java》《Effective Java》
+- **练手**：[LeetCode Java 题库](https://leetcode.cn/)、[牛客网](https://www.nowcoder.com/)
+
+---
+
+## &#127919; 学完 JavaSE 的检验标准
+
+- [ ] 能手写 ArrayList、LinkedList 的核心方法
+- [ ] 能解释 HashMap 的 put 流程（扩容、链表转红黑树）
+- [ ] 能手写生产者-消费者模型（wait/notify）
+- [ ] 能用反射获取类的所有信息
+- [ ] 看到 `equals`、`hashCode`、`toString` 能立刻说出何时重写
+- [ ] 能口述 String 为什么不可变、StringBuilder/StringBuffer 区别
+- [ ] 能解释 synchronized 锁的是什么（对象锁 vs 类锁）
+
+完成这些 → JavaSE 过关！
+
+---
+
+加油，二刷一定比一刷通透！&#128640;</pre>

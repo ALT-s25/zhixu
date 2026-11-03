@@ -1,0 +1,461 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>10-集合框架</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 10 &#183; 集合框架 ⭐⭐⭐⭐
+
+&gt; **难度**：中高 | **学习建议**：3 天
+&gt; **JavaSE 最重要的章节之一**。80% 的工作时间在用 ArrayList、HashMap。
+
+---
+
+## 一、知识框架
+
+```
+集合框架
+├── 10.1 集合体系总览
+├── 10.2 Collection 接口
+│   ├── List（有序可重复）
+│   │   ├── ArrayList ⭐⭐⭐
+│   │   ├── LinkedList ⭐⭐
+│   │   └── Vector / Stack
+│   └── Set（无序不重复）
+│       ├── HashSet ⭐⭐⭐
+│       ├── LinkedHashSet
+│       └── TreeSet ⭐
+├── 10.3 Map 接口 ⭐⭐⭐
+│   ├── HashMap ⭐⭐⭐⭐
+│   ├── LinkedHashMap
+│   ├── Hashtable
+│   └── TreeMap ⭐
+├── 10.4 Iterator 迭代器 ⭐
+└── 10.5 Collections 工具类
+```
+
+---
+
+## 二、集合体系总览 ⭐⭐⭐
+
+```
+Collection (单列集合)
+├── List (接口)：有序、可重复
+│   ├── ArrayList：数组实现，查询快，增删慢
+│   ├── LinkedList：双向链表，增删快，查询慢
+│   └── Vector：古老线程安全版 ArrayList
+└── Set (接口)：无序、不可重复
+    ├── HashSet：哈希表实现
+    ├── LinkedHashSet：插入顺序
+    └── TreeSet：红黑树，自动排序
+
+Map (双列集合) — 键值对
+├── HashMap：哈希表，最常用
+├── LinkedHashMap：保留插入顺序
+├── Hashtable：古老线程安全版 HashMap
+└── TreeMap：红黑树，键可排序
+```
+
+---
+
+## 三、List 接口 ⭐⭐⭐
+
+### 3.1 List 特点
+
+- **有序**：元素按插入顺序排列
+- **可重复**：相同元素可多次出现
+- **可按下标访问**
+
+### 3.2 ArrayList ⭐⭐⭐（重点）
+
+**底层**：动态数组，初始容量 10，扩容 1.5 倍。
+
+```java
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+
+// 增删改查
+list.add(&quot;A&quot;);              // 末尾添加
+list.add(1, &quot;B&quot;);           // 指定位置插入
+list.remove(&quot;A&quot;);           // 按值删除
+list.remove(0);             // 按下标删除
+list.set(0, &quot;C&quot;);           // 替换
+list.get(0);                // 按下标获取
+list.contains(&quot;A&quot;);         // 是否包含
+list.indexOf(&quot;A&quot;);          // 第一次出现的位置
+list.size();                // 大小
+list.isEmpty();             // 是否为空
+list.clear();               // 清空
+list.toArray();             // 转数组
+```
+
+**ArrayList 扩容机制**：
+```java
+// 简化伪代码
+int oldCapacity = elementData.length;
+int newCapacity = oldCapacity + (oldCapacity &gt;&gt; 1);   // 1.5 倍
+elementData = Arrays.copyOf(elementData, newCapacity);
+```
+
+### 3.3 LinkedList ⭐⭐
+
+**底层**：双���链表。
+
+```java
+LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
+
+list.addFirst(&quot;A&quot;);          // 头插
+list.addLast(&quot;B&quot;);           // 尾插
+list.getFirst();
+list.getLast();
+list.removeFirst();
+list.removeLast();
+
+// 实现栈
+list.push(&quot;A&quot;);             // 头插
+list.pop();                  // 头删
+
+// 实现队列
+list.offer(&quot;A&quot;);             // 尾插
+list.poll();                  // 头删
+```
+
+### 3.4 ArrayList vs LinkedList ⭐⭐⭐
+
+| 维度 | ArrayList | LinkedList |
+|------|-----------|------------|
+| 底层 | 数组 | 双向链表 |
+| 随机访问 | O(1) ✅ | O(n) ❌ |
+| 头部插入/删除 | O(n) ❌ | O(1) ✅ |
+| 内存占用 | 较少 | 较多（每个节点多 2 个引用） |
+| 适用场景 | 读多写少 | 增删频繁 |
+
+---
+
+## 四、Set 接口 ⭐⭐⭐
+
+### 4.1 Set 特点
+
+- **无序**（不保证插入顺序）
+- **不可重复**（通过 equals 和 hashCode 判定）
+
+### 4.2 HashSet ⭐⭐⭐（重点）
+
+**底层**：HashMap（值都是同一个占位对象）。
+
+```java
+Set&lt;String&gt; set = new HashSet&lt;&gt;();
+
+set.add(&quot;A&quot;);
+set.add(&quot;B&quot;);
+set.add(&quot;A&quot;);   // 不会重复添加
+set.size();      // 2
+
+// 遍历
+for (String s : set) {
+    System.out.println(s);
+}
+```
+
+**去重原理** ⭐⭐⭐：
+- 添加元素时，先算 hashCode 定位桶
+- 若桶中无元素，直接放
+- 若桶中有元素，调 equals 比较
+- 都相同则放弃添加
+
+```java
+// 自定义类放进 HashSet 必须重写 equals 和 hashCode
+public class Student {
+    String name;
+    int age;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student s = (Student) o;
+        return age == s.age &amp;&amp; Objects.equals(name, s.name);
+    }
+}
+```
+
+### 4.3 LinkedHashSet
+
+**底层**：哈希表 + 双向链表。**保证插入顺序**。
+
+### 4.4 TreeSet ⭐
+
+**底层**：红黑树。**自动排序**。
+
+```java
+Set&lt;Integer&gt; set = new TreeSet&lt;&gt;();
+set.add(5); set.add(2); set.add(8);
+System.out.println(set);   // [2, 5, 8]（自动升序）
+
+// 自定义排序：传 Comparator
+Set&lt;Student&gt; stuSet = new TreeSet&lt;&gt;((a, b) -&gt; a.age - b.age);
+```
+
+---
+
+## 五、Map 接口 ⭐⭐⭐
+
+### 5.1 Map 特点
+
+- **键值对**（key-value）存储
+- **键不可重复**，值可以重复
+- 一个键最多映射一个值
+
+### 5.2 HashMap ⭐⭐⭐⭐（面试必问）
+
+**底层**：JDK 8 之前是数组+链表，JDK 8+ 是**数组 + 链表 + 红黑树**。
+
+#### 5.2.1 基本使用
+
+```java
+Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+
+map.put(&quot;apple&quot;, 5);
+map.put(&quot;banana&quot;, 3);
+map.put(&quot;apple&quot;, 8);   // 覆盖，key 重复则 value 更新
+
+map.get(&quot;apple&quot;);       // 8
+map.getOrDefault(&quot;pear&quot;, 0);   // 不存在则默认值
+map.containsKey(&quot;apple&quot;);
+map.containsValue(5);
+map.remove(&quot;banana&quot;);
+
+map.size();
+map.isEmpty();
+map.clear();
+
+// 遍历
+// 1. 遍历 key
+for (String key : map.keySet()) {
+    System.out.println(key + &quot;=&quot; + map.get(key));
+}
+
+// 2. 遍历 entry（推荐）
+for (Map.Entry&lt;String, Integer&gt; e : map.entrySet()) {
+    System.out.println(e.getKey() + &quot;=&quot; + e.getValue());
+}
+
+// 3. 遍历 value
+for (Integer v : map.values()) {
+    System.out.println(v);
+}
+```
+
+#### 5.2.2 HashMap 原理（重要！）⭐⭐⭐
+
+**JDK 8 之前的结构**：数组 + 链表
+```
+Entry[] table
+   ↓
+[0] → null
+[1] → Entry(k1,v1) → Entry(k4,v4) → null
+[2] → null
+[3] → Entry(k2,v2) → null
+[4] → Entry(k3,v3) → null
+[15] → null
+```
+
+**JDK 8+ 的结构**：数组 + 链表 + 红黑树（链表长度 &gt; 8 转红黑树）
+```
+table 数组（默认 16）
+   ↓
+[0]
+[1] → 链表（&lt; 8 个） → 红黑树（≥ 8 个）
+[2]
+...
+```
+
+#### 5.2.3 put 流程（必背）⭐⭐⭐
+
+1. 计算 key 的 hash（`(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)`）
+2. 根据 hash 计算数组下标 `(n - 1) &amp; hash`
+3. 若桶为空，直接插入新节点
+4. 若桶不为空（链表）：
+   - 遍历链表，key 相同则覆盖 value
+   - 否则插入链表尾部
+   - 若链表长度 &gt; 8 且数组容量 ≥ 64，转红黑树
+5. 插入后 size &gt; threshold（容量 &#215; 加载因子，默认 0.75），扩容为 2 倍
+
+#### 5.2.4 get 流程
+
+1. 计算 key 的 hash
+2. 定位桶
+3. 桶中第一个节点：检查 hash 和 key
+4. 是红黑树：红黑树查找
+5. 是链表：链表遍历
+
+#### 5.2.5 关键参数
+
+| 参数 | 默认 | 说明 |
+|------|------|------|
+| 初始容量 | 16 | new HashMap() |
+| 加载因子 | 0.75 | 何时扩容 |
+| 树化阈值 | 8 | 链表长度 &gt; 8 转树 |
+| 退化阈值 | 6 | 树 &lt; 6 转回链表 |
+
+&gt; &#128161; **扩容是 rehash，性能开销大**，预估容量可优化：`new HashMap&lt;&gt;(64)`
+
+### 5.3 LinkedHashMap
+
+**特点**：保留插入顺序。底层是哈希表 + 双向链表。
+
+### 5.4 Hashtable
+
+**特点**：古老，**线程安全**（synchronized）。**不允许 null 键值**。基本被淘汰。
+
+| 维度 | HashMap | Hashtable | ConcurrentHashMap |
+|------|---------|-----------|-------------------|
+| 线程 | ❌ 不安全 | ✅ 全表锁 | ✅ 分段锁/CAS |
+| null | ✅ 允许 | ❌ 禁止 | ❌ 禁止 |
+| 性能 | 高 | 低 | 高 |
+| 推荐 | 单线程 | ❌ | �� 多线程 |
+
+### 5.5 TreeMap ⭐
+
+**底层**：红黑树，**键自动排序**。
+
+```java
+Map&lt;String, Integer&gt; map = new TreeMap&lt;&gt;((a, b) -&gt; b.compareTo(a));   // 降序
+```
+
+---
+
+## 六、Iterator 迭代器 ⭐
+
+### 6.1 为什么需要迭代器
+
+统一遍历集合的方式。
+
+```java
+List&lt;String&gt; list = Arrays.asList(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;);
+
+Iterator&lt;String&gt; it = list.iterator();
+while (it.hasNext()) {
+    String s = it.next();
+    System.out.println(s);
+    if (&quot;B&quot;.equals(s)) it.remove();   // 迭代器删除（安全）
+}
+
+// 增强 for 底层就是迭代器
+for (String s : list) {
+    System.out.println(s);
+}
+```
+
+### 6.2 ListIterator ⭐
+
+支持双向遍历 + 修改：
+
+```java
+ListIterator&lt;String&gt; it = list.listIterator();
+while (it.hasNext()) {          // 正向
+    String s = it.next();
+}
+while (it.hasPrevious()) {      // 反向
+    String s = it.previous();
+}
+it.set(&quot;D&quot;);    // 替换刚遍历的元素
+```
+
+---
+
+## 七、Collections 工具类 ⭐
+
+```java
+List&lt;Integer&gt; list = new ArrayList&lt;&gt;(Arrays.asList(3, 1, 4, 1, 5));
+
+// 排序
+Collections.sort(list);                              // 升序
+Collections.sort(list, Comparator.reverseOrder());   // 降序
+
+// 反转
+Collections.reverse(list);
+
+// 随机打乱
+Collections.shuffle(list);
+
+// 最值
+Collections.max(list);
+Collections.min(list);
+
+// 频率
+int freq = Collections.frequency(list, 1);
+
+// 线程安全包装
+List&lt;Integer&gt; syncList = Collections.synchronizedList(list);
+```
+
+---
+
+## 八、并发集合（了解）
+
+| 集合 | 替代 |
+|------|------|
+| ArrayList | CopyOnWriteArrayList |
+| HashSet | CopyOnWriteArraySet |
+| HashMap | ConcurrentHashMap |
+| TreeMap | ConcurrentSkipListMap |
+
+---
+
+## 九、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **ArrayList 和 LinkedList 区别？**
+&gt; - ArrayList：数组，随机访问 O(1)，增删 O(n)
+&gt; - LinkedList：链表，随机访问 O(n)，增删 O(1)
+
+&gt; &#128161; **HashMap 的 put 流程？**
+&gt; 1. 算 hash → 定位桶
+&gt; 2. 桶空：直接插入
+&gt; 3. 桶不空：遍历链表，key 相同覆盖，否则追加到尾部
+&gt; 4. 链表 &gt; 8 转红黑树
+&gt; 5. size &gt; threshold 扩容 2 倍
+
+&gt; &#128161; **HashMap 扩容机制？**
+&gt; 默认容量 16、加载因子 0.75。扩容时容量翻倍，重新 rehash。
+
+&gt; &#128161; **为什么链表长度 &gt; 8 转红黑树？**
+&gt; 链表查找 O(n)，红黑树 O(log n)。阈值 8 是时间和空间的平衡点。
+
+&gt; &#128161; **HashMap 为什么用红黑树而不是 AVL？**
+&gt; 红黑树近似平衡，**插入删除更快**，适合频繁修改的场景。
+
+&gt; &#128161; **HashMap 的 key 要满足什么条件？**
+&gt; - 不可变（否则 put 后修改 hashCode 会丢失）
+&gt; - 正确重写 equals 和 hashCode
+&gt; - String、Integer 是好 key
+
+&gt; &#128161; **HashMap 和 Hashtable 区别？**
+&gt; | HashMap | Hashtable |
+&gt; |---------|-----------|
+&gt; | 线程不安全 | 线程安全 |
+&gt; | null 允许 | null 禁止 |
+&gt; | 性能好 | 性能差 |
+
+&gt; &#128161; **ConcurrentHashMap 1.7 vs 1.8？**
+&gt; - 1.7：分段锁（Segment）
+&gt; - 1.8：CAS + synchronized（锁粒度更小）
+
+---
+
+## 十、本章小结
+
+✅ 已掌握：
+- [ ] 集合框架整体结构（Collection / Map）
+- [ ] **ArrayList / LinkedList** 的使用和区别
+- [ ] **HashSet 去重原理**（hashCode + equals）
+- [ ] **HashMap put/get 流程**（重点）
+- [ ] HashMap 扩容机制、加载因子、树化阈值
+- [ ] Iterator / ListIterator 迭代器
+- [ ] Collections 工具类
+
+✅ 易错点：
+- [ ] HashMap 允许 null 键值，Hashtable 不允许
+- [ ] HashMap 键必须不可变，否则 put 后修改会丢失
+- [ ] 集合遍历时不能调用集合的 add/remove（用迭代器）
+- [ ] 包装类作 HashMap 键要小心缓存池
+
+下一章：[11-IO流.md](./11-IO流.md)</pre>

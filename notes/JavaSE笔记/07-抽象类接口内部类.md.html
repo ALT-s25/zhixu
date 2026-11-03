@@ -1,0 +1,362 @@
+<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>07-抽象类接口内部类</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 07 &#183; 抽象类、接口、内部类 ⭐⭐⭐
+
+&gt; **难度**：中 | **学习建议**：2 天
+&gt; 本章是项目实战天天用的内容，**接口**尤为重要（Spring 全是接口）。
+
+---
+
+## 一、知识框架
+
+```
+抽象类接口内部类
+├── 7.1 抽象类（abstract）⭐⭐
+├── 7.2 接口（interface）⭐⭐⭐
+├── 7.3 抽象类 vs 接口
+└── 7.4 内部类 ⭐⭐
+    ├── 成员内部类
+    ├── 静态内部类
+    ├── 局部内部类
+    └── 匿名内部类 ⭐⭐
+```
+
+---
+
+## 二、抽象类 ⭐⭐
+
+### 2.1 什么是抽象类
+
+被 `abstract` 修饰的类，**不能被实例化**，主要用于被继承。
+
+### 2.2 抽象方法
+
+被 `abstract` 修饰的方法，**只有声明没有实现**（没有方法体）：
+
+```java
+public abstract class Animal {
+    String name;
+
+    // 普通方法
+    public void sleep() {
+        System.out.println(name + &quot; 在睡觉&quot;);
+    }
+
+    // 抽象方法：没有方法体，子类必须实现
+    public abstract void eat();
+    public abstract void speak();
+}
+```
+
+### 2.3 抽象类使用
+
+```java
+public class Dog extends Animal {
+    @Override
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+
+    @Override
+    public void speak() {
+        System.out.println(&quot;汪汪汪&quot;);
+    }
+}
+
+Animal a = new Dog();    // 抽象类不能 new，但可以多态引用
+a.eat();                  // 狗啃骨头
+```
+
+### 2.4 抽象类要点
+
+1. **有抽象方法的类必是抽象类**（但抽象类可以没有抽象方法）
+2. 抽象类**不能 new**，但**可以有构造器**（供子类调用）
+3. 子类必须实现所有抽象方法，否则子类也必须是抽象类
+4. 抽象类中可以有普通方法、构造器、属性、静态方法
+5. 抽象类只能单继承
+
+```java
+public abstract class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+}
+```
+
+---
+
+## 三、接口 ⭐⭐⭐
+
+### 3.1 什么是接口
+
+接口是**完全抽象的类型**（Java 8 之前），只定义**能力/规范**，不提供实现。
+
+### 3.2 接口定义
+
+```java
+public interface AnimalAction {
+    // 1. 常量（默认 public static final）
+    int MAX_AGE = 200;
+
+    // 2. 抽象方法（默认 public abstract）
+    void eat();
+    void sleep();
+
+    // Java 8+ 默认方法
+    default void breathe() {
+        System.out.println(&quot;呼吸&quot;);
+    }
+
+    // Java 8+ 静态方法
+    static void info() {
+        System.out.println(&quot;这是动物行为接口&quot;);
+    }
+
+    // Java 9+ 私有方法
+    private void helper() {
+        System.out.println(&quot;内部辅助&quot;);
+    }
+}
+```
+
+### 3.3 接口实现
+
+类用 `implements` 实现接口：
+
+```java
+public class Dog implements AnimalAction {
+    @Override
+    public void eat() {
+        System.out.println(&quot;狗啃骨头&quot;);
+    }
+
+    @Override
+    public void sleep() {
+        System.out.println(&quot;狗睡觉&quot;);
+    }
+}
+```
+
+### 3.4 接口的多实现 ⭐
+
+类可以**实现多个接口**（弥补单继承不足）：
+
+```java
+public class Dog implements AnimalAction, Swimmable, Runnable {
+    // 必须实现所有接口的抽象方法
+}
+
+interface Swimmable { void swim(); }
+interface Runnable { void run(); }
+```
+
+### 3.5 接口的多继承
+
+```java
+public interface C extends A, B { }
+// C 继承 A 和 B 的所有抽象方法
+```
+
+### 3.6 接口 vs 抽象类 ⭐⭐
+
+| 维度 | 抽象类 | 接口 |
+|------|--------|------|
+| 设计目的 | is-a（共性） | has-a（能力/规范） |
+| 方法 | 抽象 + 普通 | 主要抽象（Java 8+ 可有 default/static） |
+| 属性 | 普通属性 | 只能是 `public static final` 常量 |
+| 构造器 | 有 | 无 |
+| 继承 | 单继承 | 多实现 |
+| 关系 | 类与类 | 类与接口、接口与接口 |
+| 实例化 | 否 | 否 |
+
+&gt; &#128161; **经验**：
+&gt; - 抽象类：模板、共性
+&gt; - 接口：扩展能力、定义规范
+&gt; - 例子：`List` 是接口，`ArrayList` 是实现类
+
+### 3.7 接口的应用（策略模式）⭐
+
+```java
+// 定义排序策略接口
+interface SortStrategy {
+    void sort(int[] arr);
+}
+
+// 冒泡排序
+class BubbleSort implements SortStrategy {
+    @Override
+    public void sort(int[] arr) { /* ... */ }
+}
+
+// 快速排序
+class QuickSort implements SortStrategy {
+    @Override
+    public void sort(int[] arr) { /* ... */ }
+}
+
+// 上下文，动态切换策略
+class Sorter {
+    private SortStrategy strategy;
+    public void setStrategy(SortStrategy strategy) {
+        this.strategy = strategy;
+    }
+    public void doSort(int[] arr) {
+        strategy.sort(arr);    // 多态
+    }
+}
+```
+
+---
+
+## 四、内部类 ⭐⭐
+
+### 4.1 什么是内部类
+
+定义在**类里面**的类。
+
+### 4.2 成员内部类
+
+```java
+public class Outer {
+    private int x = 10;
+
+    public class Inner {
+        public void print() {
+            System.out.println(x);   // 内部类可直接访问外部类私有成员
+        }
+    }
+
+    public void test() {
+        Inner i = new Inner();
+        i.print();
+    }
+}
+
+// 外部使用
+Outer outer = new Outer();
+Outer.Inner inner = outer.new Inner();   // 注意语法
+```
+
+### 4.3 静态内部类
+
+```java
+public class Outer {
+    private static int x = 10;
+
+    public static class Inner {     // static 修饰
+        public void print() {
+            System.out.println(x);   // 只能访问外部类静态成员
+        }
+    }
+}
+
+// 使用：不需要外部类实例
+Outer.Inner inner = new Outer.Inner();
+```
+
+### 4.4 局部内部类
+
+```java
+public class Outer {
+    public void method() {
+        final int x = 10;          // Java 8+ 隐式 final
+
+        class LocalInner {        // 定义在方法内
+            public void print() {
+                System.out.println(x);
+            }
+        }
+
+        new LocalInner().print();
+    }
+}
+```
+
+### 4.5 匿名内部类 ⭐⭐⭐
+
+**最常用** —— 用于&quot;一次性&quot;的类实现，常配合接口使用。
+
+```java
+// 接口
+interface Greeting {
+    void sayHello();
+}
+
+// 匿名内部类
+public class Main {
+    public static void main(String[] args) {
+        Greeting g = new Greeting() {     // 没有类名，直接 new 接口
+            @Override
+            public void sayHello() {
+                System.out.println(&quot;Hello!&quot;);
+            }
+        };
+        g.sayHello();
+    }
+}
+```
+
+**Lambda 简化**（Java 8+）：
+```java
+Greeting g = () -&gt; System.out.println(&quot;Hello!&quot;);
+```
+
+### 4.6 匿名内部类应用 ⭐
+
+```java
+// 场景：按钮点击事件
+button.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println(&quot;按钮被点击&quot;);
+    }
+});
+
+// 简化（Java 8+）：
+button.addActionListener(e -&gt; System.out.println(&quot;按钮被点击&quot;));
+```
+
+---
+
+## 五、面试常问 ⭐⭐⭐
+
+&gt; &#128161; **抽象类和接口的区别？**
+&gt; | 抽象类 | 接口 |
+&gt; |--------|------|
+&gt; | is-a（同类共性） | has-a（扩展能力） |
+&gt; | 单继承 | 多实现 |
+&gt; | 可有构造器/普通方法/属性 | 无构造器，方法默认 public abstract，属性默认 public static final |
+&gt; | 设计目的：模板 | 设计目的：规范 |
+
+&gt; &#128161; **接口能继承抽象类吗？**
+&gt; 可以，Java 允许（语法上接口继承类，但实际不推荐）
+
+&gt; &#128161; **抽象类能实现接口吗？**
+&gt; 可以，且可以只实现部分方法
+
+&gt; &#128161; **匿名内部类为什么只能用一次？**
+&gt; 因为没有名字，new 一次就创建一次新对象，无法重复使用
+
+&gt; &#128161; **内部类的作用？**
+&gt; - 访问外部类的私有成员
+&gt; - 隐藏类的实现细节
+&gt; - 方便组织逻辑相关的类
+
+---
+
+## 六、本章小结
+
+✅ 已掌握：
+- [ ] **抽象类**：abstract 修饰、不能实例化、子类必须实现
+- [ ] **接口**：完全抽象、多实现、Java 8 default/static 方法
+- [ ] **抽象类 vs 接口** 的设计取舍
+- [ ] 4 种内部类：成员、静态、局部、匿名
+- [ ] **匿名内部类的 Lambda 简化**
+
+✅ 易错点：
+- [ ] 抽象类可以有构造器（供子类调用），接口不能
+- [ ] 接口属性默认 public static final，必须初始化
+- [ ] 抽象类只能单继承，接口可以多实现
+- [ ] 匿名内部类在编译后生成独立的 .class 文件
+
+下一章：[08-异常处理.md](./08-异常处理.md)</pre>
