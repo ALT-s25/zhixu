@@ -88,7 +88,7 @@
   function drawAccount(){
     document.querySelectorAll('[data-account-name]').forEach(el=>el.textContent=session?(session.user.user_metadata?.display_name||session.user.email?.split('@')[0]||'我的账号'):'游客小芽');
     document.querySelectorAll('[data-sync-status]').forEach(el=>el.textContent=status);
-    document.querySelectorAll('[data-auth-open]').forEach(el=>{el.textContent=session?'账号与同步':'登录 / 注册'});
+    document.querySelectorAll('[data-auth-open]').forEach(el=>{el.textContent=session?'个人资料 / 账号':'登录 / 注册'});
     const signed=document.querySelector('#account-signed'),form=document.querySelector('#account-form');if(!signed)return;
     signed.hidden=!session;form.hidden=!!session;
     document.querySelector('#account-email').textContent=session?.user.email||'';
@@ -179,7 +179,13 @@
   }
   $('#cloud-use-remote').onclick=()=>resolve(false);$('#cloud-use-local').onclick=()=>resolve(true);
   $('#password-form').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{await request('/auth/v1/user',{password:$('#new-password').value},await token(),'PUT');$('#password-message').textContent='密码已更新，可以关闭此窗口。';$('#new-password').value=''}catch(error){$('#password-message').textContent=friendly(error)}finally{b.disabled=false}};
-  window.ZhixuAccount={save,get:()=>copy(record),user:()=>session?.user||null,download,importRecord(next){if(!ready)return;apply(next);dirty=!!session;cache();emit();if(session)sync()}};
+  window.ZhixuAccount={async updateProfile(data){
+    const epoch=generation,uid=session?.user.id;if(!uid)throw Error('请先登录');
+    const user=await request('/auth/v1/user',{data},await token(),'PUT');
+    if(epoch!==generation||session?.user.id!==uid)throw Error('账号已切换，请重新打开个人资料');
+    if(user?.id!==uid)throw Error('资料保存未完成，请重试');
+    session.user=user;storeSession();emit();return copy(user);
+  },save,get:()=>copy(record),user:()=>session?.user||null,download,importRecord(next){if(!ready)return;apply(next);dirty=!!session;cache();emit();if(session)sync()}};
   window.addEventListener('online',()=>{if(dirty)sync()});
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
   // Callback fragment is removed before any application navigation or network call.
