@@ -32,7 +32,7 @@
       let data=canvas.toDataURL('image/jpeg',.72);if(data.length>=18000)data=canvas.toDataURL('image/jpeg',.45);if(data.length>=18000)throw Error('图片细节过多，请换一张更简洁的头像');draft=data;preview();$('#profile-message').textContent='头像预览已更新，点击保存后生效。';
     }catch(error){if(epoch===fileEpoch)$('#profile-message').textContent=error.message||'图片读取失败，请换一张图片'}finally{if(epoch===fileEpoch){processing=false;$('#profile-save').disabled=false}}
   };
-  $('#profile-form').onsubmit=async e=>{e.preventDefault();if(processing||saving)return;const name=$('#profile-name').value.trim(),bio=$('#profile-bio').value.trim();if(!name||name.length>24||bio.length>80){$('#profile-message').textContent='请填写 1–24 字昵称，签名不超过 80 字。';return}if(A.user()?.id!==editingUser)return;
+  $('#profile-form').onsubmit=async e=>{e.preventDefault();if(processing||saving)return;if(typeof A.updateProfile!=='function'){$('#profile-message').textContent='账号组件版本未更新，请等待网站部署完成后按 Ctrl+F5 刷新；无需重新配置数据库。';return}const name=$('#profile-name').value.trim(),bio=$('#profile-bio').value.trim();if(!name||name.length>24||bio.length>80){$('#profile-message').textContent='请填写 1–24 字昵称，签名不超过 80 字。';return}if(A.user()?.id!==editingUser)return;
     saving=true;$('#profile-save').disabled=true;$('#profile-close').disabled=true;$('#profile-file').disabled=true;$('#profile-message').textContent='正在保存…';
     try{await A.updateProfile({display_name:name,bio,avatar:draft});$('#profile-message').textContent='名片已保存，下次登录也会带着它。';paint()}catch(error){$('#profile-message').textContent='保存失败：'+error.message}finally{saving=false;$('#profile-save').disabled=false;$('#profile-close').disabled=false;$('#profile-file').disabled=false}
   };
