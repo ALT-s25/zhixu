@@ -104,10 +104,11 @@
     <div class="account-top"><h2 id="account-title">带着小芽，一起成长</h2><button id="account-close" aria-label="关闭账号窗口">×</button></div>
     <p class="account-intro">完成的每一道题，都有自己的归处。</p>
     <p id="auth-unavailable" class="account-notice">云端账号还没有启用。你可以先以游客身份刷题，记录保存在当前浏览器。</p>
-    <form id="account-form"><div class="account-tabs"><button type="button" data-auth-mode="login" aria-pressed="true">登录</button><button type="button" data-auth-mode="signup" aria-pressed="false">注册</button></div>
+    <form id="account-form"><div class="account-tabs"><button type="button" data-auth-mode="login" aria-pressed="true">密码登录</button><button type="button" data-auth-mode="emailotp" aria-pressed="false">验证码登录</button><button type="button" data-auth-mode="signup" aria-pressed="false">注册</button></div>
     <label id="display-name-label" hidden>昵称<input id="auth-name" autocomplete="nickname" maxlength="24" placeholder="给你的冒险起个名字"></label>
     <label>邮箱<input id="auth-email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
     <label id="password-label">密码<input id="auth-password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required placeholder="至少 8 位密码"></label>
+    <div id="email-otp-panel" hidden><label>邮箱验证码<input id="auth-otp" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" placeholder="输入邮件中的数字验证码"></label><button type="button" id="auth-send-otp">发送验证码</button><p class="otp-help">已有邮箱进入原账号；新邮箱验证成功后自动注册。验证码只需在这里填写。</p></div>
     <button id="auth-submit" class="account-primary">登录，继续我的旅程</button><button type="button" id="auth-forgot" class="account-text">忘记密码</button>
     </form>
     <div id="account-signed" hidden><p id="account-email"></p><p data-sync-status role="status"></p>
@@ -119,20 +120,36 @@
   const $=s=>document.querySelector(s),message=t=>$('#auth-message').textContent=t;
   document.addEventListener('click',e=>{if(e.target.closest('[data-auth-open]')){$('#account-dialog').showModal();drawAccount()}});
   $('#account-close').onclick=()=>$('#account-dialog').close();$('#password-close').onclick=()=>$('#password-dialog').close();
-  let mode='login';
+  let mode='login',otpSending=false,otpNextSend=0,otpAddress='';
+  function refreshOtpButton(){const b=$('#auth-send-otp'),seconds=Math.max(0,Math.ceil((otpNextSend-Date.now())/1000));b.disabled=!enabled||otpSending||seconds>0;b.textContent=otpSending?'正在发送…':seconds?seconds+' 秒后可重发':'发送验证码';if(seconds)setTimeout(refreshOtpButton,1000)}
+  refreshOtpButton();
   document.querySelectorAll('[data-auth-mode]').forEach(button=>button.onclick=()=>{
-    mode=button.dataset.authMode;$('#display-name-label').hidden=mode!=='signup';$('#password-label').hidden=false;$('#auth-password').required=true;
+    mode=button.dataset.authMode;$('#display-name-label').hidden=mode!=='signup';$('#password-label').hidden=mode==='emailotp';$('#auth-password').required=mode!=='emailotp';$('#email-otp-panel').hidden=mode!=='emailotp';$('#auth-otp').required=mode==='emailotp';$('#auth-forgot').hidden=mode==='emailotp';$('#auth-otp').value='';
     $('#auth-password').autocomplete=mode==='signup'?'new-password':'current-password';
-    $('#auth-submit').textContent=mode==='login'?'登录，继续我的旅程':'注册，种下我的小芽';
+    $('#auth-submit').textContent=mode==='emailotp'?'验证并进入我的空间':mode==='login'?'登录，继续我的旅程':'注册，种下我的小芽';
     document.querySelectorAll('[data-auth-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));message('');
   });
-  $('#auth-forgot').onclick=()=>{mode='recover';$('#display-name-label').hidden=true;$('#password-label').hidden=true;$('#auth-password').required=false;$('#auth-submit').textContent='发送密码重置邮件';message('填写注册时的邮箱，我们会发送重置链接。')};
+  $('#auth-forgot').onclick=()=>{mode='recover';$('#email-otp-panel').hidden=true;$('#auth-otp').required=false;$('#display-name-label').hidden=true;$('#password-label').hidden=true;$('#auth-password').required=false;$('#auth-submit').textContent='发送密码重置邮件';message('填写注册时的邮箱，我们会发送重置链接。')};
   const redirect=()=>location.origin+location.pathname;
+  $('#auth-send-otp').onclick=async()=>{
+    if(!enabled||otpSending||Date.now()<otpNextSend)return;
+    const field=$('#auth-email');if(!field.reportValidity())return;
+    const email=field.value.trim();otpSending=true;refreshOtpButton();message('正在发送验证码…');
+    try{await request('/auth/v1/otp?redirect_to='+encodeURIComponent(redirect()),{email,create_user:true});otpAddress=email;otpNextSend=Date.now()+60000;message('验证码已发送，请检查收件箱和垃圾邮件。若邮件只有登录链接，也可以点击链接登录。');$('#auth-otp').focus()}
+    catch(error){if(error.status===429)otpNextSend=Date.now()+60000;message(friendly(error))}
+    finally{otpSending=false;refreshOtpButton()}
+  };
   $('#account-form').onsubmit=async e=>{
     e.preventDefault();if(!enabled)return;const button=$('#auth-submit');button.disabled=true;message('正在处理…');
     const email=$('#auth-email').value.trim(),password=$('#auth-password').value;
     try{
-      if(mode==='recover'){await request('/auth/v1/recover?redirect_to='+encodeURIComponent(redirect()),{email});message('如果邮箱已注册，你会收到重置邮件。请检查收件箱和垃圾邮件。')}
+      if(mode==='emailotp'){
+        const code=$('#auth-otp').value.trim();if(!/^[0-9]{6,10}$/.test(code))throw Error('请输入邮件中的 6–10 位数字验证码');
+        if(otpAddress&&otpAddress!==email)throw Error('邮箱已修改，请为当前邮箱重新获取验证码');
+        const s=await request('/auth/v1/verify',{email,token:code,type:'email'});if(!s?.access_token)throw Error('验证未完成，请重新获取验证码');
+        await connect(s);$('#auth-otp').value='';message(ready?'登录成功，已进入你的个人空间。':'验证成功，记录读取失败，请重新连接。');if(ready)$('#account-dialog').close();
+      }
+      else if(mode==='recover'){await request('/auth/v1/recover?redirect_to='+encodeURIComponent(redirect()),{email});message('如果邮箱已注册，你会收到重置邮件。请检查收件箱和垃圾邮件。')}
       else{
         const s=await request(mode==='login'?'/auth/v1/token?grant_type=password':'/auth/v1/signup?redirect_to='+encodeURIComponent(redirect()),{email,password,...(mode==='signup'?{data:{display_name:$('#auth-name').value.trim()||'小芽同学'}}:{})});
         if(s.access_token){await connect(s);message(ready?'已进入你的个人空间。':'账号已登录，记录读取失败，请重新连接。');if(ready)$('#account-dialog').close()}
