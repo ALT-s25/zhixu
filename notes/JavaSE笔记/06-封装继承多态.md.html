@@ -1,14 +1,11 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>06-封装继承多态</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 06 &#183; 封装继承多态 ⭐⭐⭐
-
-&gt; **难度**：中 | **学习建议**：2 天
-&gt; OOP **三大特性**，面试必问。本章是整个 JavaSE 的灵魂。
-
----
-
-## 一、知识框架
-
-```
-封装继承多态
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>06 · 封装继承多态 ⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/JavaSE笔记/06-封装继承多态.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a aria-current="page" href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>06 · 封装继承多态 ⭐⭐⭐</h1><div class="article-meta"><span>约 11 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：2 天
+OOP <strong>三大特性</strong>，面试必问。本章是整个 JavaSE 的灵魂。</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>封装继承多态
 ├── 6.1 封装 ⭐⭐
 ├── 6.2 继承 ⭐⭐⭐
 │   ├── extends 用法
@@ -21,362 +18,417 @@
     ├── instanceof
     ├── 动态绑定
     └── 经典应用
-```
-
----
-
-## 二、封装 ⭐⭐
-
-### 2.1 封装的好处（再总结）
-
-- **隐藏细节**：对外只暴露必要的方法
-- **数据校验**：可以在 setter 中检查数据合法性
-- **降低耦合**：内部修改不影响外部调用
-
-### 2.2 封装的 4 种访问修饰符
-
-| 修饰符 | 同一类 | 同一包 | 子类 | 其他包 |
-|--------|--------|--------|------|--------|
-| `private` | ✅ | ❌ | ❌ | ❌ |
-| (默认) | ✅ | ✅ | ❌ | ❌ |
-| `protected` | ✅ | ✅ | ✅ | ❌ |
-| `public` | ✅ | ✅ | ✅ | ✅ |
-
-&gt; &#128161; **记忆**：private 最小，public 最大。
-
----
-
-## 三、继承 ⭐⭐⭐
-
-### 3.1 什么是继承
-
-子类**复用父类**的属性和方法，是 is-a 的关系。
-
-```java
-public class Animal {        // 父类（基类、超类）
-    String name;
-    int age;
-
-    public void eat() {
-        System.out.println(name + &quot; 在吃东西&quot;);
-    }
-}
-
-public class Dog extends Animal {   // 子类（派生类）
-    public void bark() {
-        System.out.println(name + &quot; 汪汪叫&quot;);
-    }
-}
-
-public class Cat extends Animal {
-    public void catchMouse() {
-        System.out.println(name + &quot; 抓老鼠&quot;);
-    }
-}
-```
-
-### 3.2 继承的特点
-
-- Java 是**单继承**（一个类只能 extends 一个父类）
-- 但可以**多层继承**（祖父 → 父 → 子）
-- 所有类都直接或间接继承 `Object`
-
-### 3.3 super 关键字 ⭐⭐
-
-**含义**：代表**父类对象的引用**。
-
-```java
-public class Animal {
-    String name;
-
-    public Animal(String name) {
-        this.name = name;
-    }
-
-    public void eat() {
-        System.out.println(name + &quot; 在吃东西&quot;);
-    }
-}
-
-public class Dog extends Animal {
-    public Dog(String name) {
-        super(name);          // 调用父类构造器（必须第一行！）
-    }
-
-    public void eat() {       // 重写
-        super.eat();          // 调用父类被重写的方法
-        System.out.println(&quot;狗在啃骨头&quot;);
-    }
-
-    public void showTag() {
-        System.out.println(super.toString());   // 调用父类方法
-    }
-}
-```
-
-### 3.4 方法重写（Override）⭐⭐⭐
-
-**定义**：子类重新实现父类的某个方法。
-
-**规则**：
-1. 方法名、参数列表**完全相同**
-2. 返回类型**相同**或是其子类（Java 5+ 协变返回）
-3. 访问修饰符**不能比父类更严格**
-4. **不能重写** `static` 方法、构造器、`private` 方法、`final` 方法
-
-```java
-public class Animal {
-    public void eat() {
-        System.out.println(&quot;吃东西&quot;);
-    }
-}
-
-public class Dog extends Animal {
-    @Override    // 注解，编译器帮检查
-    public void eat() {
-        System.out.println(&quot;狗啃骨头&quot;);
-    }
-}
-```
-
-### 3.5 重载 vs 重写 ⭐⭐
-
-| 维度 | 重载 (Overload) | 重写 (Override) |
-|------|----------------|----------------|
-| 位置 | 同一个类中 | 子类与父类间 |
-| 参数列表 | **必须不同** | 必须相同 |
-| 返回类型 | 任意 | 相同或子类 |
-| 修��符 | 任意 | 不能更严格 |
-| 发生 | **编译时** | **运行时** |
-
-### 3.6 继承中的构造器 ⭐⭐
-
-```java
-public class Animal {
-    String name;
-
-    public Animal() {
-        System.out.println(&quot;Animal 无参构造&quot;);
-    }
-
-    public Animal(String name) {
-        this.name = name;
-        System.out.println(&quot;Animal 有参构造&quot;);
-    }
-}
-
-public class Dog extends Animal {
-    public Dog() {
-        super();            // 默认调用父类无参构造
-        System.out.println(&quot;Dog 无参构造&quot;);
-    }
-
-    public Dog(String name) {
-        super(name);        // 调用父类有参构造
-        System.out.println(&quot;Dog 有参构造&quot;);
-    }
-}
-
-new Dog(&quot;旺财&quot;);
-// 输出：
-// Animal 有参构造
-// Dog 有参构造
-```
-
-&gt; ⚠ **常见坑**：
-&gt; 1. 子类构造器**默认调用**父类无参构造（隐式 super()）
-&gt; 2. 父类**如果没有无参构造器**，子类必须**显式调用** super(args)
-&gt; 3. super() 必须放在子类构造器**第一行**
-&gt; 4. 因此建议父类**始终保留无参构造器**
-
-### 3.7 Object 类
-
-所有类都直接或间接继承 `Object`，常见方法：
-
-| 方法 | 作用 |
-|------|------|
-| `toString()` | 返回对象的字符串表示，建议所有类重�� |
-| `equals(Object)` | 比较两个对象是否相等，建议重写 |
-| `hashCode()` | 返回对象的哈希码，重写 equals 必重写 hashCode |
-| `getClass()` | 获取对象的运行时类 |
-| `clone()` | 克隆对象（需实现 Cloneable 接口） |
-| `finalize()` | GC 回收前调用（已废弃） |
-
-```java
-// 重写 toString
-@Override
-public String toString() {
-    return &quot;Student{name=&quot; + name + &quot;, age=&quot; + age + &quot;}&quot;;
-}
-
-// 重写 equals
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Student s = (Student) o;
-    return age == s.age &amp;&amp; Objects.equals(name, s.name);
-}
-```
-
----
-
-## 四、多态 ⭐⭐⭐
-
-### 4.1 什么是多态
-
-**同一个引用类型，调用同一个方法，实际表现不一样**（因为绑定的对象不同）。
-
-```java
-Animal a = new Dog();   // 父类引用指向子类对象（向上转型）
-a.eat();                  // 调的是 Dog 的 eat（动态绑定）
-```
-
-### 4.2 多态三要素
-
-1. **继承**（或实现接口）
-2. **方法重写**
-3. **父类引用指向子类对象**（向上转型）
-
-### 4.3 向上转型 ⭐⭐
-
-```java
-Animal a = new Dog();   // 自动转型
-
-// 能调用什么？看 Animal 的��法
-// 实际执行什么？看 Dog 的实现
-```
-
-&gt; ⚠ 向上转型后**不能调用子类特有的方法**：
-```java
-class Dog extends Animal {
-    public void bark() { }   // 子类特有
-}
-Animal a = new Dog();
-a.bark();   // ❌ 编译错误
-```
-
-### 4.4 向下转型 + instanceof ⭐⭐
-
-```java
-// 向下转型：将父类引用强制转为子类引用
-Animal a = new Dog();
-Dog d = (Dog) a;          // 强转
-d.bark();                 // ✅ 可以调用
-
-// 但强转不安全：ClassCastException
-Animal a2 = new Cat();
-Dog d2 = (Dog) a2;        // ❌ 运行时异常
-
-// instanceof 判断
-if (a instanceof Dog) {
-    Dog d = (Dog) a;
-    d.bark();
-}
-```
-
-&gt; &#128161; **Java 16+ 模式匹配**：
-```java
-if (a instanceof Dog d) {   // 自动转型为 d
-    d.bark();
-}
-```
-
-### 4.5 动态绑定（多态的本质）
-
-```java
-public class Demo {
-    public static void main(String[] args) {
-        Animal a = new Dog();
-        a.eat();   // 输出：&quot;狗啃骨头&quot;
-        // 虽然 a 声明为 Animal 类型
-        // 但 JVM 运行时发现 a 实际指向 Dog
-        // 所以调用 Dog 的 eat（而不是 Animal 的）
-    }
-}
-```
-
-&gt; &#128161; 这就是 **&quot;编译看左边，运行看右边&quot;**。
-
-### 4.6 多态经典应用 ⭐⭐
-
-```java
-// 1. 参数多态：方法参数是父类，传入子类
-public void feed(Animal a) {
-    a.eat();
-}
-feed(new Dog());    // 狗吃骨头
-feed(new Cat());    // 猫吃鱼
-
-// 2. 数组多态
-Animal[] animals = {new Dog(), new Cat(), new Dog()};
-for (Animal a : animals) {
-    a.eat();   // 多态调用
-}
-```
-
-### 4.7 多态的局限
-
-1. **不能调用子类特有方法**（需要向下转型）
-2. **字段没有多态性**（字段看左边，方法看右边）
-
-```java
-class A { int x = 1; }
-class B extends A { int x = 2; }
-
-A a = new B();
-System.out.println(a.x);   // 1（字段看左边，没有多态）
-a.method();                 // 多态，看右边
-```
-
----
-
-## 五、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **重载和重写的区别？**
-&gt; | 维度 | 重载 | 重写 |
-&gt; |------|------|------|
-&gt; | 范围 | 同类 | 子父类 |
-&gt; | 参数 | 必须不同 | 必须相同 |
-&gt; | 返回 | 任意 | 相同/子类 |
-&gt; | 修饰符 | 任意 | 不能更严格 |
-&gt; | 时期 | 编译时 | 运行时 |
-
-&gt; &#128161; **多态的三个必要条件？**
-&gt; 1. 继承或实现接口
-&gt; 2. 子类重写父类方法
-&gt; 3. 父类引用指向子类对象（向上转型）
-
-&gt; &#128161; **为什么字段没有多态？**
-&gt; 字段在编译时就被确定，运行时不会动态绑定。
-
-&gt; &#128161; **super 和 this 的区别？**
-&gt; - this：当前对象，访问本类成员
-&gt; - super：父类对象引用，访问父类成员
-
-&gt; &#128161; **构造器能被继承吗？能被重写吗？**
-&gt; 都不能。子类构造器必须调用父类构造器（super）。
-
----
-
-## 六、本章小结
-
-✅ 已掌握：
-- [ ] 4 种访问修饰符的作用范围
-- [ ] **继承的语法、特点、单继承/多层继承**
-- [ ] **super 关键字的三大用法**
-- [ ] **方法重写（override）的规则**
-- [ ] **重载 vs 重写 的区别**
-- [ ] 继承中的构造器调用顺序
-- [ ] Object 类常用方法的重写
-- [ ] **多态三要素 + 向上/向下转型**
-- [ ] **instanceof** 的使用
-- [ ] 动态绑定（编译看左，运行看右）
-
-✅ 易错点：
-- [ ] 子类构造器默认调用父类无参构造
-- [ ] 父类没有无参构造器时子类必须显式 super(args)
-- [ ] 多态字段不参与（字段看左边）
-- [ ] 向下转型前必须 instanceof 检查
-
-下一章：[07-抽象类接口内部类.md](./07-抽象类接口内部类.md)</pre>
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、封装 ⭐⭐</h2>
+<h3 id="section-2">2.1 封装的好处（再总结）</h3>
+<ul>
+<li><strong>隐藏细节</strong>：对外只暴露必要的方法</li>
+<li><strong>数据校验</strong>：可以在 setter 中检查数据合法性</li>
+<li><strong>降低耦合</strong>：内部修改不影响外部调用</li>
+</ul>
+<h3 id="section-3">2.2 封装的 4 种访问修饰符</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>同一类</th>
+<th>同一包</th>
+<th>子类</th>
+<th>其他包</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>private</code></td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>(默认)</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>protected</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>public</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>记忆</strong>：private 最小，public 最大。</p>
+</blockquote>
+<hr/>
+<h2 id="section-4">三、继承 ⭐⭐⭐</h2>
+<h3 id="section-5">3.1 什么是继承</h3>
+<p>子类<strong>复用父类</strong>的属性和方法，是 is-a 的关系。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span><span class="w">        </span><span class="c1">// 父类（基类、超类）</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" 在吃东西"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// 子类（派生类）</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">bark</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" 汪汪叫"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Cat</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">catchMouse</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" 抓老鼠"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-6">3.2 继承的特点</h3>
+<ul>
+<li>Java 是<strong>单继承</strong>（一个类只能 extends 一个父类）</li>
+<li>但可以<strong>多层继承</strong>（祖父 → 父 → 子）</li>
+<li>所有类都直接或间接继承 <code>Object</code></li>
+</ul>
+<h3 id="section-7">3.3 super 关键字 ⭐⭐</h3>
+<p><strong>含义</strong>：代表<strong>父类对象的引用</strong>。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Animal</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" 在吃东西"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Dog</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">name</span><span class="p">);</span><span class="w">          </span><span class="c1">// 调用父类构造器（必须第一行！）</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// 重写</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="w">          </span><span class="c1">// 调用父类被重写的方法</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗在啃骨头"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">showTag</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="kd">super</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span><span class="w">   </span><span class="c1">// 调用父类方法</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-8">3.4 方法重写（Override）⭐⭐⭐</h3>
+<p><strong>定义</strong>：子类重新实现父类的某个方法。</p>
+<p><strong>规则</strong>：</p>
+<ol>
+<li>方法名、参数列表<strong>完全相同</strong></li>
+<li>返回类型<strong>相同</strong>或是其子类（Java 5+ 协变返回）</li>
+<li>访问修饰符<strong>不能比父类更严格</strong></li>
+<li><strong>不能重写</strong> <code>static</code> 方法、构造器、<code>private</code> 方法、<code>final</code> 方法</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"吃东西"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span><span class="w">    </span><span class="c1">// 注解，编译器帮检查</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗啃骨头"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-9">3.5 重载 vs 重写 ⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>重载 (Overload)</th>
+<th>重写 (Override)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>位置</td>
+<td>同一个类中</td>
+<td>子类与父类间</td>
+</tr>
+<tr>
+<td>参数列表</td>
+<td><strong>必须不同</strong></td>
+<td>必须相同</td>
+</tr>
+<tr>
+<td>返回类型</td>
+<td>任意</td>
+<td>相同或子类</td>
+</tr>
+<tr>
+<td>修��符</td>
+<td>任意</td>
+<td>不能更严格</td>
+</tr>
+<tr>
+<td>发生</td>
+<td><strong>编译时</strong></td>
+<td><strong>运行时</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-10">3.6 继承中的构造器 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Animal</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Animal 无参构造"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Animal</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Animal 有参构造"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Dog</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">();</span><span class="w">            </span><span class="c1">// 默认调用父类无参构造</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Dog 无参构造"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Dog</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">name</span><span class="p">);</span><span class="w">        </span><span class="c1">// 调用父类有参构造</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Dog 有参构造"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">(</span><span class="s">"旺财"</span><span class="p">);</span>
+<span class="c1">// 输出：</span>
+<span class="c1">// Animal 有参构造</span>
+<span class="c1">// Dog 有参构造</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>常见坑</strong>：</p>
+<ol>
+<li>子类构造器<strong>默认调用</strong>父类无参构造（隐式 super()）</li>
+<li>父类<strong>如果没有无参构造器</strong>，子类必须<strong>显式调用</strong> super(args)</li>
+<li>super() 必须放在子类构造器<strong>第一行</strong></li>
+<li>因此建议父类<strong>始终保留无参构造器</strong></li>
+</ol>
+</blockquote>
+<h3 id="section-11">3.7 Object 类</h3>
+<p>所有类都直接或间接继承 <code>Object</code>，常见方法：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toString()</code></td>
+<td>返回对象的字符串表示，建议所有类重��</td>
+</tr>
+<tr>
+<td><code>equals(Object)</code></td>
+<td>比较两个对象是否相等，建议重写</td>
+</tr>
+<tr>
+<td><code>hashCode()</code></td>
+<td>返回对象的哈希码，重写 equals 必重写 hashCode</td>
+</tr>
+<tr>
+<td><code>getClass()</code></td>
+<td>获取对象的运行时类</td>
+</tr>
+<tr>
+<td><code>clone()</code></td>
+<td>克隆对象（需实现 Cloneable 接口）</td>
+</tr>
+<tr>
+<td><code>finalize()</code></td>
+<td>GC 回收前调用（已废弃）</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 重写 toString</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">"Student{name="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">", age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"}"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 重写 equals</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">name</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-12">四、多态 ⭐⭐⭐</h2>
+<h3 id="section-13">4.1 什么是多态</h3>
+<p><strong>同一个引用类型，调用同一个方法，实际表现不一样</strong>（因为绑定的对象不同）。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span><span class="w">   </span><span class="c1">// 父类引用指向子类对象（向上转型）</span>
+<span class="n">a</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="w">                  </span><span class="c1">// 调的是 Dog 的 eat（动态绑定）</span>
+</pre></div>
+</div><h3 id="section-14">4.2 多态三要素</h3>
+<ol>
+<li><strong>继承</strong>（或实现接口）</li>
+<li><strong>方法重写</strong></li>
+<li><strong>父类引用指向子类对象</strong>（向上转型）</li>
+</ol>
+<h3 id="section-15">4.3 向上转型 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span><span class="w">   </span><span class="c1">// 自动转型</span>
+
+<span class="c1">// 能调用什么？看 Animal 的��法</span>
+<span class="c1">// 实际执行什么？看 Dog 的实现</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ 向上转型后<strong>不能调用子类特有的方法</strong>：</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">bark</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// 子类特有</span>
+<span class="p">}</span>
+<span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="n">a</span><span class="p">.</span><span class="na">bark</span><span class="p">();</span><span class="w">   </span><span class="c1">// ❌ 编译错误</span>
+</pre></div>
+</div><h3 id="section-16">4.4 向下转型 + instanceof ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 向下转型：将父类引用强制转为子类引用</span>
+<span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="n">Dog</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Dog</span><span class="p">)</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w">          </span><span class="c1">// 强转</span>
+<span class="n">d</span><span class="p">.</span><span class="na">bark</span><span class="p">();</span><span class="w">                 </span><span class="c1">// ✅ 可以调用</span>
+
+<span class="c1">// 但强转不安全：ClassCastException</span>
+<span class="n">Animal</span><span class="w"> </span><span class="n">a2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="n">Dog</span><span class="w"> </span><span class="n">d2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Dog</span><span class="p">)</span><span class="w"> </span><span class="n">a2</span><span class="p">;</span><span class="w">        </span><span class="c1">// ❌ 运行时异常</span>
+
+<span class="c1">// instanceof 判断</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">Dog</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Dog</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Dog</span><span class="p">)</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="na">bark</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>Java 16+ 模式匹配</strong>：</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">Dog</span><span class="w"> </span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// 自动转型为 d</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="na">bark</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-17">4.5 动态绑定（多态的本质）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">a</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="w">   </span><span class="c1">// 输出："狗啃骨头"</span>
+<span class="w">        </span><span class="c1">// 虽然 a 声明为 Animal 类型</span>
+<span class="w">        </span><span class="c1">// 但 JVM 运行时发现 a 实际指向 Dog</span>
+<span class="w">        </span><span class="c1">// 所以调用 Dog 的 eat（而不是 Animal 的）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 这就是 <strong>"编译看左边，运行看右边"</strong>。</p>
+</blockquote>
+<h3 id="section-18">4.6 多态经典应用 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 参数多态：方法参数是父类，传入子类</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">feed</span><span class="p">(</span><span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="n">feed</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">());</span><span class="w">    </span><span class="c1">// 狗吃骨头</span>
+<span class="n">feed</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">());</span><span class="w">    </span><span class="c1">// 猫吃鱼</span>
+
+<span class="c1">// 2. 数组多态</span>
+<span class="n">Animal</span><span class="o">[]</span><span class="w"> </span><span class="n">animals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">(),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">(),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">()};</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Animal</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">animals</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="w">   </span><span class="c1">// 多态调用</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-19">4.7 多态的局限</h3>
+<ol>
+<li><strong>不能调用子类特有方法</strong>（需要向下转型）</li>
+<li><strong>字段没有多态性</strong>（字段看左边，方法看右边）</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="kd">class</span> <span class="nc">B</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="n">A</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">B</span><span class="p">();</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="na">x</span><span class="p">);</span><span class="w">   </span><span class="c1">// 1（字段看左边，没有多态）</span>
+<span class="n">a</span><span class="p">.</span><span class="na">method</span><span class="p">();</span><span class="w">                 </span><span class="c1">// 多态，看右边</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">五、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>重载和重写的区别？</strong>
+| 维度 | 重载 | 重写 |
+|------|------|------|
+| 范围 | 同类 | 子父类 |
+| 参数 | 必须不同 | 必须相同 |
+| 返回 | 任意 | 相同/子类 |
+| 修饰符 | 任意 | 不能更严格 |
+| 时期 | 编译时 | 运行时 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>多态的三个必要条件？</strong></p>
+<ol>
+<li>继承或实现接口</li>
+<li>子类重写父类方法</li>
+<li>父类引用指向子类对象（向上转型）</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong>为什么字段没有多态？</strong>
+字段在编译时就被确定，运行时不会动态绑定。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>super 和 this 的区别？</strong></p>
+<ul>
+<li>this：当前对象，访问本类成员</li>
+<li>super：父类对象引用，访问父类成员</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>构造器能被继承吗？能被重写吗？</strong>
+都不能。子类构造器必须调用父类构造器（super）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-21">六、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>4 种访问修饰符的作用范围</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>继承的语法、特点、单继承/多层继承</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>super 关键字的三大用法</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>方法重写（override）的规则</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>重载 vs 重写 的区别</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>继承中的构造器调用顺序</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Object 类常用方法的重写</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>多态三要素 + 向上/向下转型</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>instanceof</strong> 的使用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>动态绑定（编译看左，运行看右）</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>子类构造器默认调用父类无参构造</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>父类没有无参构造器时子类必须显式 super(args)</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>多态字段不参与（字段看左边）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>向下转型前必须 instanceof 检查</li>
+</ul>
+<p>下一章：<a href="./07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07-抽象类接口内部类.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html"><small>← 上一篇</small><strong>05 · 面向对象基础 ⭐⭐⭐</strong></a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html"><small>下一篇 →</small><strong>07 · 抽象类、接口、内部类 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、封装 ⭐⭐</a><a class="toc-h3" href="#section-2">2.1 封装的好处（再总结）</a><a class="toc-h3" href="#section-3">2.2 封装的 4 种访问修饰符</a><a class="toc-h2" href="#section-4">三、继承 ⭐⭐⭐</a><a class="toc-h3" href="#section-5">3.1 什么是继承</a><a class="toc-h3" href="#section-6">3.2 继承的特点</a><a class="toc-h3" href="#section-7">3.3 super 关键字 ⭐⭐</a><a class="toc-h3" href="#section-8">3.4 方法重写（Override）⭐⭐⭐</a><a class="toc-h3" href="#section-9">3.5 重载 vs 重写 ⭐⭐</a><a class="toc-h3" href="#section-10">3.6 继承中的构造器 ⭐⭐</a><a class="toc-h3" href="#section-11">3.7 Object 类</a><a class="toc-h2" href="#section-12">四、多态 ⭐⭐⭐</a><a class="toc-h3" href="#section-13">4.1 什么是多态</a><a class="toc-h3" href="#section-14">4.2 多态三要素</a><a class="toc-h3" href="#section-15">4.3 向上转型 ⭐⭐</a><a class="toc-h3" href="#section-16">4.4 向下转型 + instanceof ⭐⭐</a><a class="toc-h3" href="#section-17">4.5 动态绑定（多态的本质）</a><a class="toc-h3" href="#section-18">4.6 多态经典应用 ⭐⭐</a><a class="toc-h3" href="#section-19">4.7 多态的局限</a><a class="toc-h2" href="#section-20">五、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-21">六、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

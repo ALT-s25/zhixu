@@ -1,14 +1,11 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>14-注解与反射</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 14 &#183; 注解与反射 ⭐⭐⭐
-
-&gt; **难度**：中 | **学习建议**：1 天
-&gt; 本章是**所有 Java 框架（Spring/MyBatis/JPA）的基础**。不懂反射 = 不懂框架。
-
----
-
-## 一、知识框架
-
-```
-注解与反射
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>14 · 注解与反射 ⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/JavaSE笔记/14-注解与反射.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a aria-current="page" href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>14 · 注解与反射 ⭐⭐⭐</h1><div class="article-meta"><span>约 12 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：1 天
+本章是<strong>所有 Java 框架（Spring/MyBatis/JPA）的基础</strong>。不懂反射 = 不懂框架。</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>注解与反射
 ├── 14.1 注解（Annotation）⭐
 │   ├── 内置注解
 │   ├── 元注解
@@ -20,353 +17,375 @@
     ├── 调用方法
     ├── 操作字段
     └── 性能开销
-```
-
----
-
-## 二、注解（Annotation）⭐
-
-### 2.1 什么是注解
-
-注解是放在**源码**上的**元数据**，可以被编译器、工具、框架读取并使用。
-
-```java
-@Override      // 编译器检查
-@Deprecated    // 标记过时
-@SuppressWarnings(&quot;unchecked&quot;)   // 抑制警告
-```
-
-### 2.2 内置注解
-
-| 注解 | 作用 |
-|------|------|
-| `@Override` | 检查方法重写 |
-| `@Deprecated` | 标记已过时 |
-| `@SuppressWarnings` | 抑制警告 |
-| `@FunctionalInterface` | 函数式接口（Lambda） |
-| `@SafeVarargs` | 抑制可变参数警告 |
-
-### 2.3 元注解（修饰注解的注解）
-
-| 元注解 | 作用 |
-|--------|------|
-| `@Target` | 注解能用在哪些位置 |
-| `@Retention` | 注解的生命周期 |
-| `@Documented` | 是否包含在 Javadoc |
-| `@Inherited` | 子类能否继承父类的注解 |
-
-```java
-@Target({
-    ElementType.METHOD,        // 方法
-    ElementType.FIELD,         // 字段
-    ElementType.TYPE            // 类/接口
-})
-@Retention(RetentionPolicy.RUNTIME)   // 运行时保留（可被反射读取）
-public @interface MyAnnotation {
-    String value() default &quot;&quot;;       // 注解参数
-    int num() default 0;
-}
-```
-
-### 2.4 自定义注解 ⭐
-
-```java
-// 定义
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface MyTest {
-    String value() default &quot;test&quot;;  // 有默认值的参数
-    int timeout() default 1000;
-}
-
-// 使用
-public class MyTestDemo {
-    @MyTest(value = &quot;method1&quot;, timeout = 2000)
-    public void testMethod1() { }
-
-    @MyTest(&quot;method2&quot;)      // value 是特殊参数，可省略名
-    public void testMethod2() { }
-}
-```
-
----
-
-## 三、反射（Reflection）⭐⭐⭐
-
-### 3.1 什么是反���
-
-**运行时**动态获取类的信息、调用方法、操作属性的机制。
-
-&gt; 关键：**&quot;动态&quot;** —— 编译时不知道用哪个类，运行时才确定。
-
-### 3.2 反射的应用场景
-
-- Spring 依赖注入（@Autowired）
-- MyBatis ORM 映射（@Select 注解）
-- JUnit 测试（@Test）
-- Jackson JSON 序列化
-- 动态代理
-
-### 3.3 Class 对象 ⭐⭐⭐
-
-**每个类在 JVM 中只有一个 Class 对象**，存放类的元数据。
-
-```java
-// 3 种获取 Class 对象的方式
-Class&lt;?&gt; c1 = Student.class;            // 1. 类名.class
-Class&lt;?&gt; c2 = studentObj.getClass();    // 2. 对象.getClass()
-Class&lt;?&gt; c3 = Class.forName(&quot;com.kuangshen.Student&quot;);   // 3. Class.forName（最常用）
-
-System.out.println(c1 == c2);   // true（同一个 Class 对象）
-```
-
-### 3.4 反射获取类信息
-
-```java
-Class&lt;?&gt; c = Class.forName(&quot;com.kuangshen.Student&quot;);
-
-// 类名
-c.getName();        // 全限定名 com.kuangshen.Student
-c.getSimpleName();  // 类名 Student
-
-// 构造器
-Constructor&lt;?&gt;[] constructors = c.getDeclaredConstructors();
-Constructor&lt;?&gt; constructor = c.getDeclaredConstructor(String.class, int.class);
-
-// 字段
-Field[] fields = c.getDeclaredFields();
-Field nameField = c.getDeclaredField(&quot;name&quot;);
-
-// 方法
-Method[] methods = c.getDeclaredMethods();
-Method sayHello = c.getDeclaredMethod(&quot;sayHello&quot;, String.class);
-
-// 注解
-Annotation[] annotations = c.getAnnotations();
-```
-
-### 3.5 创建对象 ⭐⭐
-
-```java
-// 方式 1：调用无参构造器（必须有无参构造器）
-Student s = (Student) c.newInstance();   // 已废弃（Java 9+）
-
-// 方式 2：通过有参构造器
-Constructor&lt;?&gt; constructor = c.getConstructor(String.class, int.class);
-Student s = (Student) constructor.newInstance(&quot;张三&quot;, 18);
-
-// 方式 3（Java 9+ 推荐）
-Student s = (Student) c.getDeclaredConstructor(String.class, int.class)
-    .newInstance(&quot;张三&quot;, 18);
-```
-
-### 3.6 调用方法 ⭐⭐
-
-```java
-Student s = new Student(&quot;张三&quot;, 18);
-Method sayHello = s.getClass().getDeclaredMethod(&quot;sayHello&quot;, String.class);
-
-// 关键：invoke
-Object result = sayHello.invoke(s, &quot;World&quot;);
-System.out.println(result);
-```
-
-### 3.7 操作字段（含 private）⭐⭐
-
-```java
-Field nameField = s.getClass().getDeclaredField(&quot;name&quot;);
-
-// 关键：setAccessible(true) 关闭安全检查
-nameField.setAccessible(true);
-
-nameField.set(s, &quot;李四&quot;);   // 修改私有字段
-Object value = nameField.get(s);  // 读取私有字段
-```
-
-&gt; ⚠ **setAccessible(true)** 是反���最��用的&quot;突破&quot;手段。
-
-### 3.8 完整示例 ⭐⭐⭐
-
-```java
-public class ReflectionDemo {
-    public static void main(String[] args) throws Exception {
-        // 1. 通过反射创建对象
-        Class&lt;?&gt; c = Class.forName(&quot;com.kuangshen.Student&quot;);
-        Student s = (Student) c.getDeclaredConstructor(String.class, int.class)
-            .newInstance(&quot;张三&quot;, 18);
-
-        // 2. 调用方法
-        Method m = c.getDeclaredMethod(&quot;sayHello&quot;, String.class);
-        m.invoke(s, &quot;World&quot;);
-
-        // 3. 读取/修改私有字段
-        Field nameField = c.getDeclaredField(&quot;name&quot;);
-        nameField.setAccessible(true);
-        nameField.set(s, &quot;李四&quot;);
-
-        System.out.println(&quot;修改后：&quot; + nameField.get(s));
-    }
-}
-```
-
----
-
-## 四、反射的优缺点 ⭐
-
-### 4.1 优点
-
-- **动态**：运行时确定类、方法
-- **灵活**：框架必备
-
-### 4.2 缺点
-
-- **性能差**：反射调用比直接调用慢
-- **安全风险**：可访问 private，破坏封装
-- **可读性差**
-
-&gt; &#128161; 优化：**setAccessible(true)** 可大幅提升性能（关闭安全检查）。
-
----
-
-## 五、动态代理（了解）⭐⭐
-
-动态代理是反射的典型应用（Spring AOP 核心）。
-
-### 5.1 静态代理 vs 动态代理
-
-| 维度 | 静态代理 | 动态代理 |
-|------|---------|---------|
-| 代理类 | 手动编写 | 运行时生成 |
-| 灵活性 | 低 | 高 |
-
-### 5.2 JDK 动态代理
-
-```java
-// 接口
-interface UserService {
-    void add();
-}
-
-// 真实对象
-class UserServiceImpl implements UserService {
-    @Override
-    public void add() {
-        System.out.println(&quot;添加用户&quot;);
-    }
-}
-
-// 代理处理器
-class MyHandler implements InvocationHandler {
-    private Object target;
-
-    public MyHandler(Object target) {
-        this.target = target;
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println(&quot;前置增强&quot;);
-        Object result = method.invoke(target, args);
-        System.out.println(&quot;后置增强&quot;);
-        return result;
-    }
-}
-
-// 使用
-UserService target = new UserServiceImpl();
-UserService proxy = (UserService) Proxy.newProxyInstance(
-    target.getClass().getClassLoader(),
-    target.getClass().getInterfaces(),
-    new MyHandler(target)
-);
-proxy.add();
-// 输出：
-// 前置增强
-// 添加用户
-// 后置增强
-```
-
----
-
-## 六、ClassLoader（了解）
-
-类加载器将 .class 字节码加载�� JVM：
-
-```
-启动类加载器（Bootstrap）
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、注解（Annotation）⭐</h2>
+<h3 id="section-2">2.1 什么是注解</h3>
+<p>注解是放在<strong>源码</strong>上的<strong>元数据</strong>，可以被编译器、工具、框架读取并使用。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Override</span><span class="w">      </span><span class="c1">// 编译器检查</span>
+<span class="nd">@Deprecated</span><span class="w">    </span><span class="c1">// 标记过时</span>
+<span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s">"unchecked"</span><span class="p">)</span><span class="w">   </span><span class="c1">// 抑制警告</span>
+</pre></div>
+</div><h3 id="section-3">2.2 内置注解</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>注解</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Override</code></td>
+<td>检查方法重写</td>
+</tr>
+<tr>
+<td><code>@Deprecated</code></td>
+<td>标记已过时</td>
+</tr>
+<tr>
+<td><code>@SuppressWarnings</code></td>
+<td>抑制警告</td>
+</tr>
+<tr>
+<td><code>@FunctionalInterface</code></td>
+<td>函数式接口（Lambda）</td>
+</tr>
+<tr>
+<td><code>@SafeVarargs</code></td>
+<td>抑制可变参数警告</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4">2.3 元注解（修饰注解的注解）</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>元注解</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Target</code></td>
+<td>注解能用在哪些位置</td>
+</tr>
+<tr>
+<td><code>@Retention</code></td>
+<td>注解的生命周期</td>
+</tr>
+<tr>
+<td><code>@Documented</code></td>
+<td>是否包含在 Javadoc</td>
+</tr>
+<tr>
+<td><code>@Inherited</code></td>
+<td>子类能否继承父类的注解</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Target</span><span class="p">({</span>
+<span class="w">    </span><span class="n">ElementType</span><span class="p">.</span><span class="na">METHOD</span><span class="p">,</span><span class="w">        </span><span class="c1">// 方法</span>
+<span class="w">    </span><span class="n">ElementType</span><span class="p">.</span><span class="na">FIELD</span><span class="p">,</span><span class="w">         </span><span class="c1">// 字段</span>
+<span class="w">    </span><span class="n">ElementType</span><span class="p">.</span><span class="na">TYPE</span><span class="w">            </span><span class="c1">// 类/接口</span>
+<span class="p">})</span>
+<span class="nd">@Retention</span><span class="p">(</span><span class="n">RetentionPolicy</span><span class="p">.</span><span class="na">RUNTIME</span><span class="p">)</span><span class="w">   </span><span class="c1">// 运行时保留（可被反射读取）</span>
+<span class="kd">public</span><span class="w"> </span><span class="nd">@interface</span><span class="w"> </span><span class="n">MyAnnotation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">value</span><span class="p">()</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s">""</span><span class="p">;</span><span class="w">       </span><span class="c1">// 注解参数</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">num</span><span class="p">()</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-5">2.4 自定义注解 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 定义</span>
+<span class="nd">@Target</span><span class="p">(</span><span class="n">ElementType</span><span class="p">.</span><span class="na">METHOD</span><span class="p">)</span>
+<span class="nd">@Retention</span><span class="p">(</span><span class="n">RetentionPolicy</span><span class="p">.</span><span class="na">RUNTIME</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="nd">@interface</span><span class="w"> </span><span class="n">MyTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">value</span><span class="p">()</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s">"test"</span><span class="p">;</span><span class="w">  </span><span class="c1">// 有默认值的参数</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">timeout</span><span class="p">()</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 使用</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MyTestDemo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@MyTest</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"method1"</span><span class="p">,</span><span class="w"> </span><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2000</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testMethod1</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@MyTest</span><span class="p">(</span><span class="s">"method2"</span><span class="p">)</span><span class="w">      </span><span class="c1">// value 是特殊参数，可省略名</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testMethod2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-6">三、反射（Reflection）⭐⭐⭐</h2>
+<h3 id="section-7">3.1 什么是反���</h3>
+<p><strong>运行时</strong>动态获取类的信息、调用方法、操作属性的机制。</p>
+<blockquote>
+<p>关键：<strong>"动态"</strong> —— 编译时不知道用哪个类，运行时才确定。</p>
+</blockquote>
+<h3 id="section-8">3.2 反射的应用场景</h3>
+<ul>
+<li>Spring 依赖注入（@Autowired）</li>
+<li>MyBatis ORM 映射（@Select 注解）</li>
+<li>JUnit 测试（@Test）</li>
+<li>Jackson JSON 序列化</li>
+<li>动态代理</li>
+</ul>
+<h3 id="section-9">3.3 Class 对象 ⭐⭐⭐</h3>
+<p><strong>每个类在 JVM 中只有一个 Class 对象</strong>，存放类的元数据。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 3 种获取 Class 对象的方式</span>
+<span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Student</span><span class="p">.</span><span class="na">class</span><span class="p">;</span><span class="w">            </span><span class="c1">// 1. 类名.class</span>
+<span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">studentObj</span><span class="p">.</span><span class="na">getClass</span><span class="p">();</span><span class="w">    </span><span class="c1">// 2. 对象.getClass()</span>
+<span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">"com.kuangshen.Student"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 3. Class.forName（最常用）</span>
+
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c2</span><span class="p">);</span><span class="w">   </span><span class="c1">// true（同一个 Class 对象）</span>
+</pre></div>
+</div><h3 id="section-10">3.4 反射获取类信息</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">"com.kuangshen.Student"</span><span class="p">);</span>
+
+<span class="c1">// 类名</span>
+<span class="n">c</span><span class="p">.</span><span class="na">getName</span><span class="p">();</span><span class="w">        </span><span class="c1">// 全限定名 com.kuangshen.Student</span>
+<span class="n">c</span><span class="p">.</span><span class="na">getSimpleName</span><span class="p">();</span><span class="w">  </span><span class="c1">// 类名 Student</span>
+
+<span class="c1">// 构造器</span>
+<span class="n">Constructor</span><span class="o">&lt;?&gt;[]</span><span class="w"> </span><span class="n">constructors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredConstructors</span><span class="p">();</span>
+<span class="n">Constructor</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">constructor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="c1">// 字段</span>
+<span class="n">Field</span><span class="o">[]</span><span class="w"> </span><span class="n">fields</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredFields</span><span class="p">();</span>
+<span class="n">Field</span><span class="w"> </span><span class="n">nameField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">"name"</span><span class="p">);</span>
+
+<span class="c1">// 方法</span>
+<span class="n">Method</span><span class="o">[]</span><span class="w"> </span><span class="n">methods</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredMethods</span><span class="p">();</span>
+<span class="n">Method</span><span class="w"> </span><span class="n">sayHello</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredMethod</span><span class="p">(</span><span class="s">"sayHello"</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="c1">// 注解</span>
+<span class="n">Annotation</span><span class="o">[]</span><span class="w"> </span><span class="n">annotations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getAnnotations</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-11">3.5 创建对象 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 方式 1：调用无参构造器（必须有无参构造器）</span>
+<span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">newInstance</span><span class="p">();</span><span class="w">   </span><span class="c1">// 已废弃（Java 9+）</span>
+
+<span class="c1">// 方式 2：通过有参构造器</span>
+<span class="n">Constructor</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">constructor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getConstructor</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">constructor</span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+
+<span class="c1">// 方式 3（Java 9+ 推荐）</span>
+<span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-12">3.6 调用方法 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+<span class="n">Method</span><span class="w"> </span><span class="n">sayHello</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">getClass</span><span class="p">().</span><span class="na">getDeclaredMethod</span><span class="p">(</span><span class="s">"sayHello"</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="c1">// 关键：invoke</span>
+<span class="n">Object</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sayHello</span><span class="p">.</span><span class="na">invoke</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="s">"World"</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-13">3.7 操作字段（含 private）⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Field</span><span class="w"> </span><span class="n">nameField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">getClass</span><span class="p">().</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">"name"</span><span class="p">);</span>
+
+<span class="c1">// 关键：setAccessible(true) 关闭安全检查</span>
+<span class="n">nameField</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+<span class="n">nameField</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="s">"李四"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 修改私有字段</span>
+<span class="n">Object</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nameField</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w">  </span><span class="c1">// 读取私有字段</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>setAccessible(true)</strong> 是反���最��用的"突破"手段。</p>
+</blockquote>
+<h3 id="section-14">3.8 完整示例 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ReflectionDemo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 1. 通过反射创建对象</span>
+<span class="w">        </span><span class="n">Class</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">"com.kuangshen.Student"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredConstructor</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 调用方法</span>
+<span class="w">        </span><span class="n">Method</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredMethod</span><span class="p">(</span><span class="s">"sayHello"</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m</span><span class="p">.</span><span class="na">invoke</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="s">"World"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 3. 读取/修改私有字段</span>
+<span class="w">        </span><span class="n">Field</span><span class="w"> </span><span class="n">nameField</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getDeclaredField</span><span class="p">(</span><span class="s">"name"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">nameField</span><span class="p">.</span><span class="na">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">        </span><span class="n">nameField</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="s">"李四"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"修改后："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nameField</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">s</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-15">四、反射的优缺点 ⭐</h2>
+<h3 id="section-16">4.1 优点</h3>
+<ul>
+<li><strong>动态</strong>：运行时确定类、方法</li>
+<li><strong>灵活</strong>：框架必备</li>
+</ul>
+<h3 id="section-17">4.2 缺点</h3>
+<ul>
+<li><strong>性能差</strong>：反射调用比直接调用慢</li>
+<li><strong>安全风险</strong>：可访问 private，破坏封装</li>
+<li><strong>可读性差</strong></li>
+</ul>
+<blockquote>
+<p>💡 优化：<strong>setAccessible(true)</strong> 可大幅提升性能（关闭安全检查）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-18">五、动态代理（了解）⭐⭐</h2>
+<p>动态代理是反射的典型应用（Spring AOP 核心）。</p>
+<h3 id="section-19">5.1 静态代理 vs 动态代理</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>静态代理</th>
+<th>动态代理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代理类</td>
+<td>手动编写</td>
+<td>运行时生成</td>
+</tr>
+<tr>
+<td>灵活性</td>
+<td>低</td>
+<td>高</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-20">5.2 JDK 动态代理</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 接口</span>
+<span class="kd">interface</span> <span class="nc">UserService</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// 真实对象</span>
+<span class="kd">class</span> <span class="nc">UserServiceImpl</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">UserService</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"添加用户"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 代理处理器</span>
+<span class="kd">class</span> <span class="nc">MyHandler</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">InvocationHandler</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">target</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">MyHandler</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">proxy</span><span class="p">,</span><span class="w"> </span><span class="n">Method</span><span class="w"> </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"前置增强"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span><span class="p">.</span><span class="na">invoke</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">args</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"后置增强"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 使用</span>
+<span class="n">UserService</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserServiceImpl</span><span class="p">();</span>
+<span class="n">UserService</span><span class="w"> </span><span class="n">proxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">UserService</span><span class="p">)</span><span class="w"> </span><span class="n">Proxy</span><span class="p">.</span><span class="na">newProxyInstance</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target</span><span class="p">.</span><span class="na">getClass</span><span class="p">().</span><span class="na">getClassLoader</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">target</span><span class="p">.</span><span class="na">getClass</span><span class="p">().</span><span class="na">getInterfaces</span><span class="p">(),</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">MyHandler</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">proxy</span><span class="p">.</span><span class="na">add</span><span class="p">();</span>
+<span class="c1">// 输出：</span>
+<span class="c1">// 前置增强</span>
+<span class="c1">// 添加用户</span>
+<span class="c1">// 后置增强</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">六、ClassLoader（了解）</h2>
+<p>类加载器将 .class 字节码加载�� JVM：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>启动类加载器（Bootstrap）
   ↓
 扩展类加载器（Extension）
   ↓
 应用类加载器（Application）— classpath
   ↓
 自定义类加载器
-```
-
-**双亲委派**：类加载请求先委派给父加载器，父加载不了才自己加载。
-
----
-
-## 七、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **什么是反射？**
-&gt; 运行时动态获取类的信息、调用方法、操作属性的机制。
-
-&gt; &#128161; **获取 Class 对象的三种方式？**
-&gt; 1. `类名.class`
-&gt; 2. `对象.getClass()`
-&gt; 3. `Class.forName(&quot;全限定类名&quot;)`
-
-&gt; &#128161; **setAccessible(true) 的作用？**
-&gt; 关闭私有访问检查，可访问 private 字段/方法。
-
-&gt; &#128161; **注解的 @Retention 三种策略？**
-&gt; - SOURCE：源码期，编译后丢弃
-&gt; - CLASS：字节码期，默认
-&gt; - RUNTIME：运行时，可被反射读取
-
-&gt; &#128161; **注解的作用？**
-&gt; - 编译检查（@Override）
-&gt; - 编译时生成代码（Lombok）
-&gt; - 运行时被框架读取（Spring、MyBatis）
-
-&gt; &#128161; **反射的应用？**
-&gt; Spring IoC、AOP、ORM、测试框架、序列化
-
-&gt; &#128161; **Class.forName() 和 ClassLoader.loadClass() 区别？**
-&gt; - forName：会初始化类（执行 static 代码块）
-&gt; - loadClass：只加载，不初始化
-
----
-
-## 八、本章小结
-
-✅ 已掌握：
-- [ ] 4 种内置注解
-- [ ] 4 种元注解
-- [ ] 自定义注解定义和使用
-- [ ] **Class 对象的三种获取方式**
-- [ ] **反射创建对象、调用方法、操作字段**
-- [ ] setAccessible(true) 突破 private
-- [ ] 动态代理基本原理
-
-✅ 易错点：
-- [ ] 反射性能差（需 setAccessible 优化）
-- [ ] 反射可破坏封装，慎用
-- [ ] 注解 @Retention 必须选 RUNTIME 才能被反射读取
-- [ ] forName 会触发类初始化
-
----
-
-## 全部 JavaSE 章节完结 &#127881;
-
-到此 JavaSE 14 章全部学完，建议：
-
-1. **回到 README.md**，按复习路线查漏补缺
-2. **重点刷题**：[牛客网](https://www.nowcoder.com/) JavaSE 专项练习
-3. **动手项目**：
-   - 学生管理系统（集合 + IO）
-   - 简易 HTTP 服务器（网络 + 多线程）
-   - 自定义 ORM（注解 + 反射）
-4. **下一步**：进入 **JavaWeb / Spring Boot** 学习
-
-JavaSE 是后续所有 Java 技术的基石，二刷不丢人，磨刀不误砍柴工！&#128640;</pre>
+</pre></div>
+</div><p><strong>双亲委派</strong>：类加载请求先委派给父加载器，父加载不了才自己加载。</p>
+<hr/>
+<h2 id="section-22">七、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>什么是反射？</strong>
+运行时动态获取类的信息、调用方法、操作属性的机制。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>获取 Class 对象的三种方式？</strong></p>
+<ol>
+<li><code>类名.class</code></li>
+<li><code>对象.getClass()</code></li>
+<li><code>Class.forName("全限定类名")</code></li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong>setAccessible(true) 的作用？</strong>
+关闭私有访问检查，可访问 private 字段/方法。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>注解的 @Retention 三种策略？</strong></p>
+<ul>
+<li>SOURCE：源码期，编译后丢弃</li>
+<li>CLASS：字节码期，默认</li>
+<li>RUNTIME：运行时，可被反射读取</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>注解的作用？</strong></p>
+<ul>
+<li>编译检查（@Override）</li>
+<li>编译时生成代码（Lombok）</li>
+<li>运行时被框架读取（Spring、MyBatis）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>反射的应用？</strong>
+Spring IoC、AOP、ORM、测试框架、序列化</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Class.forName() 和 ClassLoader.loadClass() 区别？</strong></p>
+<ul>
+<li>forName：会初始化类（执行 static 代码块）</li>
+<li>loadClass：只加载，不初始化</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-23">八、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>4 种内置注解</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>4 种元注解</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>自定义注解定义和使用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Class 对象的三种获取方式</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>反射创建对象、调用方法、操作字段</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>setAccessible(true) 突破 private</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>动态代理基本原理</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>反射性能差（需 setAccessible 优化）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>反射可破坏封装，慎用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>注解 @Retention 必须选 RUNTIME 才能被反射读取</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>forName 会触发类初始化</li>
+</ul>
+<hr/>
+<h2 id="section-24">全部 JavaSE 章节完结 🎉</h2>
+<p>到此 JavaSE 14 章全部学完，建议：</p>
+<ol>
+<li><strong>回到 README.md</strong>，按复习路线查漏补缺</li>
+<li><strong>重点刷题</strong>：<a href="https://www.nowcoder.com/" rel="noopener noreferrer" target="_blank">牛客网</a> JavaSE 专项练习</li>
+<li><strong>动手项目</strong>：<ul>
+<li>学生管理系统（集合 + IO）</li>
+<li>简易 HTTP 服务器（网络 + 多线程）</li>
+<li>自定义 ORM（注解 + 反射）</li>
+</ul>
+</li>
+<li><strong>下一步</strong>：进入 <strong>JavaWeb / Spring Boot</strong> 学习</li>
+</ol>
+<p>JavaSE 是后续所有 Java 技术的基石，二刷不丢人，磨刀不误砍柴工！🚀</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html"><small>← 上一篇</small><strong>13 · 网络编程 ⭐⭐⭐</strong></a><a href="README.md.html"><small>下一篇 →</small><strong>JavaSE笔记 · 学习指南</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、注解（Annotation）⭐</a><a class="toc-h3" href="#section-2">2.1 什么是注解</a><a class="toc-h3" href="#section-3">2.2 内置注解</a><a class="toc-h3" href="#section-4">2.3 元注解（修饰注解的注解）</a><a class="toc-h3" href="#section-5">2.4 自定义注解 ⭐</a><a class="toc-h2" href="#section-6">三、反射（Reflection）⭐⭐⭐</a><a class="toc-h3" href="#section-7">3.1 什么是反���</a><a class="toc-h3" href="#section-8">3.2 反射的应用场景</a><a class="toc-h3" href="#section-9">3.3 Class 对象 ⭐⭐⭐</a><a class="toc-h3" href="#section-10">3.4 反射获取类信息</a><a class="toc-h3" href="#section-11">3.5 创建对象 ⭐⭐</a><a class="toc-h3" href="#section-12">3.6 调用方法 ⭐⭐</a><a class="toc-h3" href="#section-13">3.7 操作字段（含 private）⭐⭐</a><a class="toc-h3" href="#section-14">3.8 完整示例 ⭐⭐⭐</a><a class="toc-h2" href="#section-15">四、反射的优缺点 ⭐</a><a class="toc-h3" href="#section-16">4.1 优点</a><a class="toc-h3" href="#section-17">4.2 缺点</a><a class="toc-h2" href="#section-18">五、动态代理（了解）⭐⭐</a><a class="toc-h3" href="#section-19">5.1 静态代理 vs 动态代理</a><a class="toc-h3" href="#section-20">5.2 JDK 动态代理</a><a class="toc-h2" href="#section-21">六、ClassLoader（了解）</a><a class="toc-h2" href="#section-22">七、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-23">八、本章小结</a><a class="toc-h2" href="#section-24">全部 JavaSE 章节完结 🎉</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

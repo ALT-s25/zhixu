@@ -1,14 +1,11 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>06-面向对象基础</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 06 &#183; 面向对象基础 ⭐⭐⭐
-
-&gt; **难度**：中 | **学习建议**：2 天
-&gt; C++ OOP 的起点。**构造/析构函数、this 指针、访问控制**是核心。
-
----
-
-## 一、知识框架
-
-```
-面向对象基础
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>06 · 面向对象基础 ⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/C++笔记/06-面向对象基础.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>C++笔记</h2><nav aria-label="同专题笔记"><a href="01-C%2B%2B%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · C++ 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E4%B8%8E%E5%87%BD%E6%95%B0.md.html">03 · 流程控制与函数 ⭐</a><a href="04-%E6%95%B0%E7%BB%84%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2.md.html">04 · 数组与字符串 ⭐⭐</a><a href="05-%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8.md.html">05 · 指针与引用 ⭐⭐⭐</a><a aria-current="page" href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a href="07-%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">07 · 继承多态 ⭐⭐⭐⭐</a><a href="08-%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD%E4%B8%8E%E5%8F%8B%E5%85%83.md.html">08 · 运算符重载与友元 ⭐⭐⭐</a><a href="09-%E6%A8%A1%E6%9D%BF.md.html">09 · 模板 ⭐⭐⭐</a><a href="10-STL%E5%AE%B9%E5%99%A8.md.html">10 · STL 容器 ⭐⭐⭐⭐</a><a href="11-STL%E7%AE%97%E6%B3%95%E4%B8%8E%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1.md.html">11 · STL 算法与函数对象 ⭐⭐⭐</a><a href="12-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md.html">12 · 智能指针与内存管理 ⭐⭐⭐⭐</a><a href="13-%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E5%85%B3%E9%94%AE%E5%AD%97.md.html">13 · 类型转换与关键字 ⭐⭐</a><a href="14-%E7%8E%B0%E4%BB%A3C%2B%2B%E6%96%B0%E7%89%B9%E6%80%A7.md.html">14 · 现代 C++ 新特性 ⭐⭐⭐⭐</a><a href="15-%E5%BC%82%E5%B8%B8%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">15 · 异常与多线程 ⭐⭐⭐</a><a href="README.md.html">C++笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>C++笔记</div><h1>06 · 面向对象基础 ⭐⭐⭐</h1><div class="article-meta"><span>约 12 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：2 天
+C++ OOP 的起点。<strong>构造/析构函数、this 指针、访问控制</strong>是核心。</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>面向对象基础
 ├── 6.1 类与对象 ⭐⭐
 ├── 6.2 访问控制（public/private/protected）
 ├── 6.3 构造函数 ⭐⭐⭐
@@ -21,439 +18,406 @@
 ├── 6.6 static 成员
 ├── 6.7 const 成员
 └── 6.8 友元（friend）
-```
-
----
-
-## 二、类与对象 ⭐⭐
-
-### 2.1 类的定义
-
-```cpp
-class Student {
-private:                    // 私有（默认）
-    std::string name;
-    int age;
-
-public:                     // 公开
-    // 成员函数
-    void setName(const std::string&amp; n) { name = n; }
-    std::string getName() const { return name; }
-
-    void setAge(int a) {
-        if (a &gt;= 0) age = a;
-    }
-    int getAge() const { return age; }
-
-    void introduce() const {
-        std::cout &lt;&lt; &quot;I&#39;m &quot; &lt;&lt; name &lt;&lt; &quot;, &quot; &lt;&lt; age &lt;&lt; &quot; years old.\n&quot;;
-    }
-};
-```
-
-### 2.2 对象的创建与使用
-
-```cpp
-int main() {
-    // 1. 栈上创建（推荐）
-    Student s1;
-    s1.setName(&quot;张三&quot;);
-    s1.setAge(18);
-    s1.introduce();
-
-    // 2. 堆上创建（指针）
-    Student* p = new Student();
-    p-&gt;setName(&quot;李四&quot;);
-    p-&gt;introduce();
-    delete p;       // 必须手动释放！
-
-    // 3. 栈对象自动销毁，堆对象必须 delete
-}
-```
-
-### 2.3 类 vs struct
-
-```cpp
-// struct：默认 public（C 风格）
-struct Point {
-    int x;
-    int y;
-};
-
-// class：默认 private（C++ 推荐）
-class Point {
-    int x;          // 默认 private
-    int y;
-};
-```
-
-&gt; &#128161; **风格选择**：
-&gt; - **struct**：纯数据、没有行为（类似 C 的 struct）
-&gt; - **class**：有行为、有封装（有 OOP 设计）
-
----
-
-## 三、访问控制 ⭐⭐
-
-### 3.1 三种修饰符
-
-| 修饰符 | 类内 | 子类 | 类外 |
-|--------|------|------|------|
-| `public` | ✅ | ✅ | ✅ |
-| `protected` | ✅ | ✅ | ❌ |
-| `private` | ✅ | ❌ | ❌ |
-
-### 3.2 推荐写法
-
-```cpp
-class MyClass {
-public:
-    MyClass();                              // 构造
-    ~MyClass();                             // 析构
-
-    void publicMethod();                    // 公开接口
-
-protected:
-    void protectedMethod();                 // 给子类用
-
-private:
-    int data_;                              // 数据私有
-    void privateMethod();                   // 内部实现
-};
-```
-
-&gt; &#128161; **数据成员通常私有**（封装原则）。
-
----
-
-## 四、构造函数 ⭐⭐⭐（重要）
-
-构造函数是对象创建时**自动调用**的成员函数，**无返回值**。
-
-### 4.1 默认构造函数
-
-```cpp
-class Student {
-private:
-    std::string name;
-    int age;
-
-public:
-    Student() : name(&quot;未知&quot;), age(0) {       // 默认构造
-        std::cout &lt;&lt; &quot;默认构造\n&quot;;
-    }
-};
-
-Student s;    // 自动调用默认构造
-```
-
-### 4.2 参数化构造函数
-
-```cpp
-class Student {
-    std::string name;
-    int age;
-
-public:
-    Student(const std::string&amp; n, int a) : name(n), age(a) {
-        // 初始化列表（推荐）
-    }
-};
-
-Student s(&quot;张三&quot;, 18);
-```
-
-### 4.3 初始化列表 ⭐⭐
-
-```cpp
-// 推荐写法
-Student(const std::string&amp; n, int a) : name(n), age(a) { }
-
-// 不推荐（先默认构造再赋值）
-Student(const std::string&amp; n, int a) {
-    name = n;
-    age = a;
-}
-```
-
-&gt; ⚠ **必须用初始化列表的情况**：
-&gt; - `const` 成员
-&gt; - 引用成员
-&gt; - 没有默认构造的类成员
-
-### 4.4 拷贝构造函数 ⭐⭐
-
-```cpp
-class Student {
-    std::string name;
-    int age;
-
-public:
-    // 默认拷贝构造：浅拷贝
-    Student(const Student&amp; other) : name(other.name), age(other.age) {
-        std::cout &lt;&lt; &quot;拷贝构造\n&quot;;
-    }
-};
-
-Student s1(&quot;张三&quot;, 18);
-Student s2(s1);            // 调用拷贝构造
-Student s3 = s1;           // 同上
-```
-
-### 4.5 移动构造函数（C++11）⭐⭐
-
-```cpp
-class Student {
-    std::string name;
-    int* data;
-
-public:
-    // 移动构造：从临时对象&quot;窃取&quot;资源
-    Student(Student&amp;&amp; other) noexcept : name(std::move(other.name)), data(other.data) {
-        other.data = nullptr;    // 防止 double-free
-    }
-};
-```
-
-&gt; &#128161; **左值 vs 右值**：
-&gt; - 左值：有名字、可取地址（如变量）
-&gt; - 右值：临时值、字面值（如 `42`、`x+y`）
-
-### 4.6 = default / = delete ⭐⭐
-
-```cpp
-class MyClass {
-public:
-    MyClass() = default;                          // 强制编译器生成默认版本
-    MyClass(const MyClass&amp;) = delete;             // 禁止拷贝
-};
-```
-
-### 4.7 委托构造函数（C++11）
-
-```cpp
-class Student {
-    std::string name;
-    int age;
-
-public:
-    Student() : Student(&quot;未知&quot;, 0) { }     // 委托给下面那个
-
-    Student(const std::string&amp; n, int a) : name(n), age(a) { }
-};
-```
-
----
-
-## 五、析构函数 ⭐⭐⭐
-
-对象销毁时**自动调用**，用于清理资源（内存、文件、锁等）。
-
-```cpp
-class MyArray {
-    int* data;
-    int size;
-
-public:
-    MyArray(int n) : size(n) {
-        data = new int[n];          // 分配资源
-        std::cout &lt;&lt; &quot;构造\n&quot;;
-    }
-
-    ~MyArray() {                    // 析构函数（无参数、无返回值）
-        delete[] data;              // 释放资源
-        std::cout &lt;&lt; &quot;析构\n&quot;;
-    }
-};
-```
-
-&gt; ⚠ **没有析构 → 内存泄漏**！
-&gt; **有动态内存必须实现拷贝构造、operator=、析构**（Rule of Three）。
-
----
-
-## 六、this 指针
-
-每个非静态成员函数都有一个 `this` 指针，**指向当前对象**。
-
-```cpp
-class Student {
-    std::string name;
-
-public:
-    Student&amp; setName(const std::string&amp; name) {
-        this-&gt;name = name;      // 区分成员变量与参数
-        return *this;            // 返回当前对象（链式调用）
-    }
-};
-
-Student s;
-s.setName(&quot;张三&quot;).setName(&quot;李四&quot;);   // 链式调用
-```
-
----
-
-## 七、static 成员 ⭐
-
-### 7.1 静态成员变量
-
-所有对象**共享**。
-
-```cpp
-class Student {
-    static int count;            // 静态成员（类内声明）
-
-public:
-    Student() { count++; }
-    ~Student() { count--; }
-    static int getCount() { return count; }  // 静态成员函数
-};
-
-int Student::count = 0;          // 类外定义（必须）
-```
-
-### 7.2 静态成员函数
-
-- 没有 `this` 指针
-- 只能访问静态成员
-
-```cpp
-class Math {
-public:
-    static int add(int a, int b) { return a + b; }
-};
-
-Math::add(3, 5);   // 无需创建对象
-```
-
----
-
-## 八、const 成员 ⭐⭐
-
-### 8.1 const 成员变量
-
-```cpp
-class MyClass {
-    const int x = 10;           // 必须初始化
-    const int y;                 // 必须在初始化列表初始化
-public:
-    MyClass(int v) : y(v) { }
-};
-```
-
-### 8.2 const 成员函数
-
-```cpp
-class Student {
-    std::string name;
-
-public:
-    std::string getName() const {     // 不修改成员
-        return name;
-    }
-
-    // void setName(string n) const { name = n; }  // ❌ 错误
-};
-```
-
-&gt; &#128161; **const 对象只能调用 const 成员函数**。
-
-### 8.3 mutable 关键字
-
-在 const 函数中可以修改 `mutable` 成员：
-
-```cpp
-class Cache {
-    mutable int count_ = 0;
-
-public:
-    void touch() const {       // const 函数
-        count_++;               // ✅ 可以改
-    }
-};
-```
-
----
-
-## 九、友元（friend）⭐
-
-允许**非成员函数/类**访问私有成员（破坏封装，慎用）。
-
-```cpp
-class Student {
-    friend void print(const Student&amp; s);     // 友元函数
-    friend class Teacher;                     // 友元类
-
-private:
-    std::string name_;
-    int age_;
-};
-
-void print(const Student&amp; s) {
-    std::cout &lt;&lt; s.name_;       // ✅ 可访问私有
-}
-```
-
-&gt; ⚠ 友元**破坏封装**，尽量少用。
-
----
-
-## 十、对象内存布局 ⭐
-
-```cpp
-class Empty {};                    // sizeof(Empty) == 1（占位）
-class A { int x; };                // sizeof(A) == 4
-class B { int x; char c; };        // sizeof(B) == 8（对齐）
-class C { int x; char c; char d; }; // sizeof(C) == 8（c, d 合并）
-```
-
----
-
-## 十一、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **构造函数有哪几种？**
-&gt; - 默认构造（无参）
-&gt; - 参数化构造
-&gt; - 拷贝构造（const T&amp;）
-&gt; - 移动构造（T&amp;&amp;，C++11）
-
-&gt; &#128161; **拷贝构造和移动构造的区别？**
-&gt; - 拷贝：复制所有资源（**深拷贝**，慢）
-&gt; - 移动：转移资源所有权（**窃取**，快）
-
-&gt; &#128161; **Rule of Three / Five / Zero**
-&gt; - **Rule of Three**：定义了析构、拷贝构造、拷贝赋值之一，通常要定义其他两个
-&gt; - **Rule of Five**：再加移动构造、移动赋值
-&gt; - **Rule of Zero**：用智能指针 + 标准容器，无需自己写
-
-&gt; &#128161; **`this` 指针的本质？**
-&gt; 隐含的成员函数参数，指向当前对象。`this` 是 const 指针（不可修改指向）。
-
-&gt; &#128161; **`const` 成员函数的作用？**
-&gt; 承诺不修改对象状态。`const` 对象只能调用 `const` 成员函数。
-
-&gt; &#128161; **`mutable` 关键字？**
-&gt; 允许在 const 成员函数中修改该成员（如缓存计数）。
-
----
-
-## 十二、本章小结
-
-✅ 已掌握：
-- [ ] 类与对象的基本定义
-- [ ] **访问控制 public/private/protected**
-- [ ] **构造函数 4 种**（默认、参数化、拷贝、移动）
-- [ ] **初始化列表** 的使用
-- [ ] **析构函数** 与资源管理
-- [ ] this 指针与链式调用
-- [ ] static 成员
-- [ ] const 成员与 mutable
-- [ ] friend 友元
-
-✅ 易错点：
-- [ ] 没有默认构造时不能 `Student s;`
-- [ ] const 成员必须在初始化列表初始化
-- [ ] 拷贝构造和析构要配套出现
-- [ ] 静态成员类外必须定义
-
-下一章：[07-继承多态.md](./07-继承多态.md) — OOP 三大特性！</pre>
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、类与对象 ⭐⭐</h2>
+<h3 id="section-2">2.1 类的定义</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="k">private</span><span class="o">:</span><span class="w">                    </span><span class="c1">// 私有（默认）</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span><span class="w">                     </span><span class="c1">// 公开</span>
+<span class="w">    </span><span class="c1">// 成员函数</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">setName</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">setAge</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">getAge</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">introduce</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"I'm "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">", "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" years old.</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><h3 id="section-3">2.2 对象的创建与使用</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 栈上创建（推荐）</span>
+<span class="w">    </span><span class="n">Student</span><span class="w"> </span><span class="n">s1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s1</span><span class="p">.</span><span class="n">setName</span><span class="p">(</span><span class="s">"张三"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">s1</span><span class="p">.</span><span class="n">setAge</span><span class="p">(</span><span class="mi">18</span><span class="p">);</span>
+<span class="w">    </span><span class="n">s1</span><span class="p">.</span><span class="n">introduce</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 2. 堆上创建（指针）</span>
+<span class="w">    </span><span class="n">Student</span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">();</span>
+<span class="w">    </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">setName</span><span class="p">(</span><span class="s">"李四"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">introduce</span><span class="p">();</span>
+<span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">p</span><span class="p">;</span><span class="w">       </span><span class="c1">// 必须手动释放！</span>
+
+<span class="w">    </span><span class="c1">// 3. 栈对象自动销毁，堆对象必须 delete</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-4">2.3 类 vs struct</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// struct：默认 public（C 风格）</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">// class：默认 private（C++ 推荐）</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w">          </span><span class="c1">// 默认 private</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>风格选择</strong>：</p>
+<ul>
+<li><strong>struct</strong>：纯数据、没有行为（类似 C 的 struct）</li>
+<li><strong>class</strong>：有行为、有封装（有 OOP 设计）</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-5">三、访问控制 ⭐⭐</h2>
+<h3 id="section-6">3.1 三种修饰符</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>类内</th>
+<th>子类</th>
+<th>类外</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>public</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>protected</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>private</code></td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-7">3.2 推荐写法</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">MyClass</span><span class="p">();</span><span class="w">                              </span><span class="c1">// 构造</span>
+<span class="w">    </span><span class="o">~</span><span class="n">MyClass</span><span class="p">();</span><span class="w">                             </span><span class="c1">// 析构</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">publicMethod</span><span class="p">();</span><span class="w">                    </span><span class="c1">// 公开接口</span>
+
+<span class="k">protected</span><span class="o">:</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">protectedMethod</span><span class="p">();</span><span class="w">                 </span><span class="c1">// 给子类用</span>
+
+<span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">data_</span><span class="p">;</span><span class="w">                              </span><span class="c1">// 数据私有</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">privateMethod</span><span class="p">();</span><span class="w">                   </span><span class="c1">// 内部实现</span>
+<span class="p">};</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>数据成员通常私有</strong>（封装原则）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-8">四、构造函数 ⭐⭐⭐（重要）</h2>
+<p>构造函数是对象创建时<strong>自动调用</strong>的成员函数，<strong>无返回值</strong>。</p>
+<h3 id="section-9">4.1 默认构造函数</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">Student</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="p">(</span><span class="s">"未知"</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// 默认构造</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"默认构造</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w">    </span><span class="c1">// 自动调用默认构造</span>
+</pre></div>
+</div><h3 id="section-10">4.2 参数化构造函数</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">Student</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 初始化列表（推荐）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-11">4.3 初始化列表 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 推荐写法</span>
+<span class="n">Student</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 不推荐（先默认构造再赋值）</span>
+<span class="n">Student</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
+<span class="w">    </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>必须用初始化列表的情况</strong>：</p>
+<ul>
+<li><code>const</code> 成员</li>
+<li>引用成员</li>
+<li>没有默认构造的类成员</li>
+</ul>
+</blockquote>
+<h3 id="section-12">4.4 拷贝构造函数 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="c1">// 默认拷贝构造：浅拷贝</span>
+<span class="w">    </span><span class="n">Student</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Student</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"拷贝构造</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Student</span><span class="w"> </span><span class="n">s1</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+<span class="n">Student</span><span class="w"> </span><span class="nf">s2</span><span class="p">(</span><span class="n">s1</span><span class="p">);</span><span class="w">            </span><span class="c1">// 调用拷贝构造</span>
+<span class="n">Student</span><span class="w"> </span><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s1</span><span class="p">;</span><span class="w">           </span><span class="c1">// 同上</span>
+</pre></div>
+</div><h3 id="section-13">4.5 移动构造函数（C++11）⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">data</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="c1">// 移动构造：从临时对象"窃取"资源</span>
+<span class="w">    </span><span class="n">Student</span><span class="p">(</span><span class="n">Student</span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">name</span><span class="p">)),</span><span class="w"> </span><span class="n">data</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">other</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span><span class="w">    </span><span class="c1">// 防止 double-free</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>左值 vs 右值</strong>：</p>
+<ul>
+<li>左值：有名字、可取地址（如变量）</li>
+<li>右值：临时值、字面值（如 <code>42</code>、<code>x+y</code>）</li>
+</ul>
+</blockquote>
+<h3 id="section-14">4.6 = default / = delete ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">MyClass</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span><span class="p">;</span><span class="w">                          </span><span class="c1">// 强制编译器生成默认版本</span>
+<span class="w">    </span><span class="n">MyClass</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MyClass</span><span class="o">&amp;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">delete</span><span class="p">;</span><span class="w">             </span><span class="c1">// 禁止拷贝</span>
+<span class="p">};</span>
+</pre></div>
+</div><h3 id="section-15">4.7 委托构造函数（C++11）</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">Student</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"未知"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">     </span><span class="c1">// 委托给下面那个</span>
+
+<span class="w">    </span><span class="n">Student</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-16">五、析构函数 ⭐⭐⭐</h2>
+<p>对象销毁时<strong>自动调用</strong>，用于清理资源（内存、文件、锁等）。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyArray</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">data</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">MyArray</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="p">[</span><span class="n">n</span><span class="p">];</span><span class="w">          </span><span class="c1">// 分配资源</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"构造</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="o">~</span><span class="n">MyArray</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">                    </span><span class="c1">// 析构函数（无参数、无返回值）</span>
+<span class="w">        </span><span class="k">delete</span><span class="p">[]</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w">              </span><span class="c1">// 释放资源</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"析构</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>没有析构 → 内存泄漏</strong>！
+<strong>有动态内存必须实现拷贝构造、operator=、析构</strong>（Rule of Three）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-17">六、this 指针</h2>
+<p>每个非静态成员函数都有一个 <code>this</code> 指针，<strong>指向当前对象</strong>。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">Student</span><span class="o">&amp;</span><span class="w"> </span><span class="n">setName</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w">      </span><span class="c1">// 区分成员变量与参数</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="p">;</span><span class="w">            </span><span class="c1">// 返回当前对象（链式调用）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="n">s</span><span class="p">.</span><span class="n">setName</span><span class="p">(</span><span class="s">"张三"</span><span class="p">).</span><span class="n">setName</span><span class="p">(</span><span class="s">"李四"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 链式调用</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-18">七、static 成员 ⭐</h2>
+<h3 id="section-19">7.1 静态成员变量</h3>
+<p>所有对象<strong>共享</strong>。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w">            </span><span class="c1">// 静态成员（类内声明）</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">Student</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">count</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="o">~</span><span class="n">Student</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">count</span><span class="o">--</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">getCount</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">// 静态成员函数</span>
+<span class="p">};</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">Student</span><span class="o">::</span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">          </span><span class="c1">// 类外定义（必须）</span>
+</pre></div>
+</div><h3 id="section-20">7.2 静态成员函数</h3>
+<ul>
+<li>没有 <code>this</code> 指针</li>
+<li>只能访问静态成员</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Math</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">Math</span><span class="o">::</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">   </span><span class="c1">// 无需创建对象</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">八、const 成员 ⭐⭐</h2>
+<h3 id="section-22">8.1 const 成员变量</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">           </span><span class="c1">// 必须初始化</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w">                 </span><span class="c1">// 必须在初始化列表初始化</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">MyClass</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><h3 id="section-23">8.2 const 成员函数</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// 不修改成员</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// void setName(string n) const { name = n; }  // ❌ 错误</span>
+<span class="p">};</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>const 对象只能调用 const 成员函数</strong>。</p>
+</blockquote>
+<h3 id="section-24">8.3 mutable 关键字</h3>
+<p>在 const 函数中可以修改 <code>mutable</code> 成员：</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Cache</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">mutable</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">touch</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// const 函数</span>
+<span class="w">        </span><span class="n">count_</span><span class="o">++</span><span class="p">;</span><span class="w">               </span><span class="c1">// ✅ 可以改</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-25">九、友元（friend）⭐</h2>
+<p>允许<strong>非成员函数/类</strong>访问私有成员（破坏封装，慎用）。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">friend</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Student</span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">);</span><span class="w">     </span><span class="c1">// 友元函数</span>
+<span class="w">    </span><span class="k">friend</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">Teacher</span><span class="p">;</span><span class="w">                     </span><span class="c1">// 友元类</span>
+
+<span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name_</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age_</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Student</span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">name_</span><span class="p">;</span><span class="w">       </span><span class="c1">// ✅ 可访问私有</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ 友元<strong>破坏封装</strong>，尽量少用。</p>
+</blockquote>
+<hr/>
+<h2 id="section-26">十、对象内存布局 ⭐</h2>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Empty</span><span class="w"> </span><span class="p">{};</span><span class="w">                    </span><span class="c1">// sizeof(Empty) == 1（占位）</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="p">};</span><span class="w">                </span><span class="c1">// sizeof(A) == 4</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">B</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"> </span><span class="p">};</span><span class="w">        </span><span class="c1">// sizeof(B) == 8（对齐）</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">C</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">d</span><span class="p">;</span><span class="w"> </span><span class="p">};</span><span class="w"> </span><span class="c1">// sizeof(C) == 8（c, d 合并）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-27">十一、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>构造函数有哪几种？</strong></p>
+<ul>
+<li>默认构造（无参）</li>
+<li>参数化构造</li>
+<li>拷贝构造（const T&amp;）</li>
+<li>移动构造（T&amp;&amp;，C++11）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>拷贝构造和移动构造的区别？</strong></p>
+<ul>
+<li>拷贝：复制所有资源（<strong>深拷贝</strong>，慢）</li>
+<li>移动：转移资源所有权（<strong>窃取</strong>，快）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Rule of Three / Five / Zero</strong></p>
+<ul>
+<li><strong>Rule of Three</strong>：定义了析构、拷贝构造、拷贝赋值之一，通常要定义其他两个</li>
+<li><strong>Rule of Five</strong>：再加移动构造、移动赋值</li>
+<li><strong>Rule of Zero</strong>：用智能指针 + 标准容器，无需自己写</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>this</code> 指针的本质？</strong>
+隐含的成员函数参数，指向当前对象。<code>this</code> 是 const 指针（不可修改指向）。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>const</code> 成员函数的作用？</strong>
+承诺不修改对象状态。<code>const</code> 对象只能调用 <code>const</code> 成员函数。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>mutable</code> 关键字？</strong>
+允许在 const 成员函数中修改该成员（如缓存计数）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-28">十二、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>类与对象的基本定义</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>访问控制 public/private/protected</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>构造函数 4 种</strong>（默认、参数化、拷贝、移动）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>初始化列表</strong> 的使用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>析构函数</strong> 与资源管理</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>this 指针与链式调用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>static 成员</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>const 成员与 mutable</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>friend 友元</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>没有默认构造时不能 <code>Student s;</code></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>const 成员必须在初始化列表初始化</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>拷贝构造和析构要配套出现</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>静态成员类外必须定义</li>
+</ul>
+<p>下一章：<a href="./07-%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">07-继承多态.md</a> — OOP 三大特性！</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="05-%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8.md.html"><small>← 上一篇</small><strong>05 · 指针与引用 ⭐⭐⭐</strong></a><a href="07-%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html"><small>下一篇 →</small><strong>07 · 继承多态 ⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、类与对象 ⭐⭐</a><a class="toc-h3" href="#section-2">2.1 类的定义</a><a class="toc-h3" href="#section-3">2.2 对象的创建与使用</a><a class="toc-h3" href="#section-4">2.3 类 vs struct</a><a class="toc-h2" href="#section-5">三、访问控制 ⭐⭐</a><a class="toc-h3" href="#section-6">3.1 三种修饰符</a><a class="toc-h3" href="#section-7">3.2 推荐写法</a><a class="toc-h2" href="#section-8">四、构造函数 ⭐⭐⭐（重要）</a><a class="toc-h3" href="#section-9">4.1 默认构造函数</a><a class="toc-h3" href="#section-10">4.2 参数化构造函数</a><a class="toc-h3" href="#section-11">4.3 初始化列表 ⭐⭐</a><a class="toc-h3" href="#section-12">4.4 拷贝构造函数 ⭐⭐</a><a class="toc-h3" href="#section-13">4.5 移动构造函数（C++11）⭐⭐</a><a class="toc-h3" href="#section-14">4.6 = default / = delete ⭐⭐</a><a class="toc-h3" href="#section-15">4.7 委托构造函数（C++11）</a><a class="toc-h2" href="#section-16">五、析构函数 ⭐⭐⭐</a><a class="toc-h2" href="#section-17">六、this 指针</a><a class="toc-h2" href="#section-18">七、static 成员 ⭐</a><a class="toc-h3" href="#section-19">7.1 静态成员变量</a><a class="toc-h3" href="#section-20">7.2 静态成员函数</a><a class="toc-h2" href="#section-21">八、const 成员 ⭐⭐</a><a class="toc-h3" href="#section-22">8.1 const 成员变量</a><a class="toc-h3" href="#section-23">8.2 const 成员函数</a><a class="toc-h3" href="#section-24">8.3 mutable 关键字</a><a class="toc-h2" href="#section-25">九、友元（friend）⭐</a><a class="toc-h2" href="#section-26">十、对象内存布局 ⭐</a><a class="toc-h2" href="#section-27">十一、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-28">十二、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

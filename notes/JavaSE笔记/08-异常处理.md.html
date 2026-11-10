@@ -1,14 +1,11 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>08-异常处理</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 08 &#183; 异常处理 ⭐⭐
-
-&gt; **难度**：中 | **学习建议**：1 天
-&gt; 二刷重点：**异常体系、try-catch-finally、throws vs throw、自定义异常**
-
----
-
-## 一、知识框架
-
-```
-异常处理
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>08 · 异常处理 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/JavaSE笔记/08-异常处理.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a aria-current="page" href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>08 · 异常处理 ⭐⭐</h1><div class="article-meta"><span>约 9 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：1 天
+二刷重点：<strong>异常体系、try-catch-finally、throws vs throw、自定义异常</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>异常处理
 ├── 8.1 异常体系 ⭐⭐⭐
 ├── 8.2 异常分类（编译期/运行时）
 ├── 8.3 异常处理机制
@@ -17,16 +14,11 @@
 │   └── throw ⭐
 ├── 8.4 自定义异常
 └── 8.5 异常实践建议
-```
-
----
-
-## 二、异常体系 ⭐⭐⭐
-
-### 2.1 顶级父类
-
-```
-Throwable (可抛出的)
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、异常体系 ⭐⭐⭐</h2>
+<h3 id="section-2">2.1 顶级父类</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Throwable (可抛出的)
 ├── Error (错误)               —— 严重，无法处理
 │   ├── OutOfMemoryError
 │   └── StackOverflowError
@@ -39,249 +31,266 @@ Throwable (可抛出的)
         ├── ArithmeticException
         ├── NumberFormatException
         └── ClassCastException
-```
+</pre></div>
+</div><h3 id="section-3">2.2 受检异常 vs 非受检异常</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>受检异常 (Checked)</th>
+<th>非受检异常 (Unchecked)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>继承</td>
+<td><code>Exception</code> 及其子类（除 RuntimeException）</td>
+<td><code>RuntimeException</code> 及其子类</td>
+</tr>
+<tr>
+<td>编译</td>
+<td><strong>必须处理</strong>（try-catch 或 throws）</td>
+<td>不强制处理</td>
+</tr>
+<tr>
+<td>原因</td>
+<td>外部因素（IO、数据库）</td>
+<td>程序员逻辑错误</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>IOException、SQLException</td>
+<td>空指针、数组越界</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 受检异常示例</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">readFile</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// 必须声明 throws</span>
+<span class="w">    </span><span class="n">FileReader</span><span class="w"> </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"a.txt"</span><span class="p">);</span>
+<span class="p">}</span>
 
-### 2.2 受检异常 vs 非受检异常
+<span class="c1">// 非受检异常示例</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w">     </span><span class="c1">// b=0 会抛 ArithmeticException，无需声明</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-4">三、异常处理机制 ⭐⭐⭐</h2>
+<h3 id="section-5">3.1 try-catch-finally</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 可能出现异常的代码</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">ArithmeticException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// 捕获特定异常</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"除数不能为零"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">              </span><span class="c1">// 打印栈轨迹</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                </span><span class="c1">// 兜底异常</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"其他异常"</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 无论是否异常都执行（通常用于��放资源）</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"执行 finally"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-6">3.2 多个 catch 规则</h3>
+<ol>
+<li>子类异常<strong>必须放在父类之前</strong></li>
+<li>多个 catch 只匹配<strong>第一个</strong>满足的类型</li>
+<li>Java 7+ 可用 <code>|</code> 多异常捕获</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NullPointerException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ArrayIndexOutOfBoundsException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"空指针或数组越界"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-7">3.3 try-with-resources（Java 7+）⭐</h3>
+<p>自动关闭实现了 <code>AutoCloseable</code> 接口的资源：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 传统写法</span>
+<span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"a.txt"</span><span class="p">));</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">();</span>
+<span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">br</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
 
-| 维度 | 受检异常 (Checked) | 非受检异常 (Unchecked) |
-|------|------------------|---------------------|
-| 继承 | `Exception` 及其子类（除 RuntimeException） | `RuntimeException` 及其子类 |
-| 编译 | **必须处理**（try-catch 或 throws） | 不强制处理 |
-| 原因 | 外部因素（IO、数据库） | 程序员逻辑错误 |
-| 例子 | IOException、SQLException | 空指针、数组越界 |
+<span class="c1">// try-with-resources（推荐）</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"a.txt"</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">();</span>
+<span class="p">}</span><span class="w">    </span><span class="c1">// 自动调用 br.close()</span>
+</pre></div>
+</div><h3 id="section-8">3.4 throws（声明抛出）⭐⭐</h3>
+<p>将异常<strong>抛给调用者</strong>处理：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">readFile</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// 声明可能抛出</span>
+<span class="w">    </span><span class="n">FileReader</span><span class="w"> </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"a.txt"</span><span class="p">);</span><span class="w">    </span><span class="c1">// 受检异常必须 throws</span>
+<span class="p">}</span>
 
-```java
-// 受检异常示例
-public void readFile() throws IOException {     // 必须声明 throws
-    FileReader fr = new FileReader(&quot;a.txt&quot;);
-}
+<span class="c1">// 调用方必须处理</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">caller</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">readFile</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-// 非受检异常示例
-public int divide(int a, int b) {
-    return a / b;     // b=0 会抛 ArithmeticException，无需声明
-}
-```
+<span class="c1">// 也可以继续向上 throws</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">caller</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">readFile</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-9">3.5 throw（手动抛出）⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setAge</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">"年龄不能为负："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-10">3.6 throws vs throw</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>throws</th>
+<th>throw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>位置</td>
+<td>方法声明</td>
+<td>方法体内</td>
+</tr>
+<tr>
+<td>后面</td>
+<td>异常类名（可多个）</td>
+<td>异常对象（只能一个）</td>
+</tr>
+<tr>
+<td>作用</td>
+<td>声明可能抛出</td>
+<td>主动抛出</td>
+</tr>
+<tr>
+<td>个数</td>
+<td>可声明多个异常</td>
+<td>每次抛一个</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-11">四、异常常用方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">          </span><span class="c1">// 打印栈轨迹（开发时最常用）</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">();</span><span class="w">                </span><span class="c1">// 返回异常信息</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">                  </span><span class="c1">// 返回异常的字符串表示</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="na">fillInStackTrace</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-12">五、自定义异常 ⭐</h2>
+<h3 id="section-13">5.1 为什么需要自定义异常</h3>
+<ul>
+<li>Java 内置异常不够用</li>
+<li>业务相关的异常描述</li>
+</ul>
+<h3 id="section-14">5.2 自定义步骤</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 继承 Exception（受检）或 RuntimeException（非受检）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LoginException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">RuntimeException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginException</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
 
----
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w">     </span><span class="c1">// 传给父类</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-## 三、异常处理机制 ⭐⭐⭐
-
-### 3.1 try-catch-finally
-
-```java
-try {
-    // 可能出现异常的代码
-    int result = 10 / 0;
-} catch (ArithmeticException e) {     // 捕获特定异常
-    System.out.println(&quot;除数不能为零&quot;);
-    e.printStackTrace();              // 打印栈轨迹
-} catch (Exception e) {                // 兜底异常
-    System.out.println(&quot;其他异常&quot;);
-} finally {
-    // 无论是否异常都执行（通常用于��放资源）
-    System.out.println(&quot;执行 finally&quot;);
-}
-```
-
-### 3.2 多个 catch 规则
-
-1. 子类异常**必须放在父类之前**
-2. 多个 catch 只匹配**第一个**满足的类型
-3. Java 7+ 可用 `|` 多异常捕获
-
-```java
-try {
-    // ...
-} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-    System.out.println(&quot;空指针或数组越界&quot;);
-}
-```
-
-### 3.3 try-with-resources（Java 7+）⭐
-
-自动关闭实现了 `AutoCloseable` 接口的资源：
-
-```java
-// 传统写法
-BufferedReader br = null;
-try {
-    br = new BufferedReader(new FileReader(&quot;a.txt&quot;));
-    return br.readLine();
-} finally {
-    if (br != null) br.close();
-}
-
-// try-with-resources（推荐）
-try (BufferedReader br = new BufferedReader(new FileReader(&quot;a.txt&quot;))) {
-    return br.readLine();
-}    // 自动调用 br.close()
-```
-
-### 3.4 throws（声明抛出）⭐⭐
-
-将异常**抛给调用者**处理：
-
-```java
-public void readFile() throws IOException {     // 声明可能抛出
-    FileReader fr = new FileReader(&quot;a.txt&quot;);    // 受检异常必须 throws
-}
-
-// 调用方必须处理
-public void caller() {
-    try {
-        readFile();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-
-// 也可以继续向上 throws
-public void caller() throws IOException {
-    readFile();
-}
-```
-
-### 3.5 throw（手动抛出）⭐
-
-```java
-public void setAge(int age) {
-    if (age &lt; 0) {
-        throw new IllegalArgumentException(&quot;年龄不能为负：&quot; + age);
-    }
-    this.age = age;
-}
-```
-
-### 3.6 throws vs throw
-
-| 维度 | throws | throw |
-|------|--------|-------|
-| 位置 | 方法声明 | 方法体内 |
-| 后面 | 异常类名（可多个） | 异常对象（只能一个） |
-| 作用 | 声明可能抛出 | 主动抛出 |
-| 个数 | 可声明多个异常 | 每次抛一个 |
-
----
-
-## 四、异常常用方法
-
-```java
-catch (Exception e) {
-    e.printStackTrace();          // 打印栈轨迹（开发时最常用）
-    e.getMessage();                // 返回异常信息
-    e.toString();                  // 返回异常的字符串表示
-    System.out.println(e.fillInStackTrace());
-}
-```
-
----
-
-## 五、自定义异常 ⭐
-
-### 5.1 为什么需要自定义异常
-
-- Java 内置异常不够用
-- 业务相关的异常描述
-
-### 5.2 自定义步骤
-
-```java
-// 1. 继承 Exception（受检）或 RuntimeException（非受检）
-public class LoginException extends RuntimeException {
-    public LoginException() {
-        super();
-    }
-
-    public LoginException(String message) {
-        super(message);     // 传给父类
-    }
-}
-
-// 2. 使用
-public void login(String username, String password) {
-    if (!&quot;admin&quot;.equals(username) || !&quot;123&quot;.equals(password)) {
-        throw new LoginException(&quot;用户名或密码错误！&quot;);
-    }
-}
-```
-
----
-
-## 六、异常实践建议 ⭐⭐
-
-### 6.1 应该捕获异常的场景
-
-✅ 网络请求失败
+<span class="c1">// 2. 使用</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="s">"admin"</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">username</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="s">"123"</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">password</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoginException</span><span class="p">(</span><span class="s">"用户名或密码错误！"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-15">六、异常实践建议 ⭐⭐</h2>
+<h3 id="section-16">6.1 应该捕获异常的场景</h3>
+<p>✅ 网络请求失败
 ✅ 文件读写
 ✅ 数据库操作
-✅ 用户输入校验
+✅ 用户输入校验</p>
+<h3 id="section-17">6.2 不应该捕获异常的场景</h3>
+<p>❌ <strong>捕获但不处理</strong>（catch 块为空）—— 隐藏了问题
+❌ <strong>捕获 Exception 兜底</strong> —— 应该捕获具体异常
+❌ <strong>异常用于控制流程</strong> —— 性能差，应使用 if-else</p>
+<h3 id="section-18">6.3 良好的实践</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ✅ 好的写法</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 业务代码</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">"文件未找到：{}"</span><span class="p">,</span><span class="w"> </span><span class="n">filePath</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BusinessException</span><span class="p">(</span><span class="s">"文件不存在"</span><span class="p">);</span>
+<span class="p">}</span>
 
-### 6.2 不应该捕获异常的场景
-
-❌ **捕获但不处理**（catch 块为空）—— 隐藏了问题
-❌ **捕获 Exception 兜底** —— 应该捕获具体异常
-❌ **异常用于控制流程** —— 性能差，应使用 if-else
-
-### 6.3 良好的实践
-
-```java
-// ✅ 好的写法
-try {
-    // 业务代码
-} catch (FileNotFoundException e) {
-    logger.error(&quot;文件未找到：{}&quot;, filePath, e);
-    throw new BusinessException(&quot;文件不存在&quot;);
-}
-
-// ❌ 不好的写法
-try {
-    // 业务代码
-} catch (Exception e) {
-    // 什么都不做
-}
-```
-
----
-
-## 七、面试常问 ⭐⭐
-
-&gt; &#128161; **Error 和 Exception 的区别？**
-&gt; - Error：严重错误（JVM 内部），程序无法处理
-&gt; - Exception：程序可以处理的异常
-
-&gt; &#128161; **受��异常和运行时异常的区别？**
-&gt; - 受检异常：编译时必须处理（throws 或 try-catch）
-&gt; - 运行时异常：编译时不强制，一般是程序 bug
-
-&gt; &#128161; **final、finally、finalize 的区别？**
-&gt; - `final`：修饰类（不可继承）、方法（不可重写）、变量（常量）
-&gt; - `finally`：try-catch 始终执行的代码块（除非 JVM 退出）
-&gt; - `finalize`：Object 的方法，GC 前调用，**已废弃**
-
-&gt; &#128161; **try-catch-finally 中哪个部分可以省略？**
-&gt; catch 和 finally 不能同时省略。但 try-finally 可以（无 catch 不处理）。
-
-&gt; &#128161; **try 中 return 后 finally 还执行吗？**
-&gt; 执行。finally 在 return 前执行（修改返回值不影响原 return）。
-&gt; 但 `System.exit()` 会阻止 finally。
-
----
-
-## 八、本章小结
-
-✅ 已掌握：
-- [ ] **异常体系**：Throwable → Error / Exception → RuntimeException
-- [ ] 受检异常 vs 运行时异常
-- [ ] **try-catch-finally** 用法
-- [ ] **throws** 声明异常
-- [ ] **throw** 手动抛出
-- [ ] 自定义异常
-- [ ] try-with-resources 自动关闭资源
-
-✅ 易错点：
-- [ ] catch 必须从小到大（子类 → 父类）
-- [ ] 受检异常必须处理
-- [ ] finally 在 return 前执行
-- [ ] finally 不执行的特殊情况：System.exit()、JVM 崩溃
-
-下一章：[09-常用类与包装类.md](./09-常用类与包装类.md)</pre>
+<span class="c1">// ❌ 不好的写法</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 业务代码</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 什么都不做</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-19">七、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>Error 和 Exception 的区别？</strong></p>
+<ul>
+<li>Error：严重错误（JVM 内部），程序无法处理</li>
+<li>Exception：程序可以处理的异常</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>受��异常和运行时异常的区别？</strong></p>
+<ul>
+<li>受检异常：编译时必须处理（throws 或 try-catch）</li>
+<li>运行时异常：编译时不强制，一般是程序 bug</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>final、finally、finalize 的区别？</strong></p>
+<ul>
+<li><code>final</code>：修饰类（不可继承）、方法（不可重写）、变量（常量）</li>
+<li><code>finally</code>：try-catch 始终执行的代码块（除非 JVM 退出）</li>
+<li><code>finalize</code>：Object 的方法，GC 前调用，<strong>已废弃</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>try-catch-finally 中哪个部分可以省略？</strong>
+catch 和 finally 不能同时省略。但 try-finally 可以（无 catch 不处理）。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>try 中 return 后 finally 还执行吗？</strong>
+执行。finally 在 return 前执行（修改返回值不影响原 return）。
+但 <code>System.exit()</code> 会阻止 finally。</p>
+</blockquote>
+<hr/>
+<h2 id="section-20">八、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>异常体系</strong>：Throwable → Error / Exception → RuntimeException</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>受检异常 vs 运行时异常</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>try-catch-finally</strong> 用法</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>throws</strong> 声明异常</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>throw</strong> 手动抛出</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>自定义异常</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>try-with-resources 自动关闭资源</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>catch 必须从小到大（子类 → 父类）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>受检异常必须处理</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>finally 在 return 前执行</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>finally 不执行的特殊情况：System.exit()、JVM 崩溃</li>
+</ul>
+<p>下一章：<a href="./09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09-常用类与包装类.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html"><small>← 上一篇</small><strong>07 · 抽象类、接口、内部类 ⭐⭐⭐</strong></a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html"><small>下一篇 →</small><strong>09 · 常用类与包装类 ⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、异常体系 ⭐⭐⭐</a><a class="toc-h3" href="#section-2">2.1 顶级父类</a><a class="toc-h3" href="#section-3">2.2 受检异常 vs 非受检异常</a><a class="toc-h2" href="#section-4">三、异常处理机制 ⭐⭐⭐</a><a class="toc-h3" href="#section-5">3.1 try-catch-finally</a><a class="toc-h3" href="#section-6">3.2 多个 catch 规则</a><a class="toc-h3" href="#section-7">3.3 try-with-resources（Java 7+）⭐</a><a class="toc-h3" href="#section-8">3.4 throws（声明抛出）⭐⭐</a><a class="toc-h3" href="#section-9">3.5 throw（手动抛出）⭐</a><a class="toc-h3" href="#section-10">3.6 throws vs throw</a><a class="toc-h2" href="#section-11">四、异常常用方法</a><a class="toc-h2" href="#section-12">五、自定义异常 ⭐</a><a class="toc-h3" href="#section-13">5.1 为什么需要自定义异常</a><a class="toc-h3" href="#section-14">5.2 自定义步骤</a><a class="toc-h2" href="#section-15">六、异常实践建议 ⭐⭐</a><a class="toc-h3" href="#section-16">6.1 应该捕获异常的场景</a><a class="toc-h3" href="#section-17">6.2 不应该捕获异常的场景</a><a class="toc-h3" href="#section-18">6.3 良好的实践</a><a class="toc-h2" href="#section-19">七、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-20">八、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

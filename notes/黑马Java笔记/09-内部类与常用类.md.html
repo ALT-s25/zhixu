@@ -1,15 +1,12 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>09-内部类与常用类</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 09 &#183; 内部类与常用类 ⭐⭐
-
-&gt; **难度**：中 | **学习建议**：2 天
-&gt; 对应黑马视频：第 136 ~ 158 集
-&gt; 项目导向：**内部类是事件处理的灵魂**，包装类/日期是基础工具
-
----
-
-## 一、知识框架
-
-```
-内部类与常用类
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>09 · 内部类与常用类 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/黑马Java笔记/09-内部类与常用类.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>黑马Java笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8.md.html">01 · Java 入门 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%95%B0%E7%BB%84.md.html">04 · 数组 ⭐⭐</a><a href="05-%E6%96%B9%E6%B3%95.md.html">05 · 方法 ⭐⭐</a><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a href="07-%E5%B8%B8%E7%94%A8API.md.html">07 · 常用 API ⭐⭐</a><a href="08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html">08 · 面向对象进阶 ⭐⭐⭐</a><a aria-current="page" href="09-%E5%86%85%E9%83%A8%E7%B1%BB%E4%B8%8E%E5%B8%B8%E7%94%A8%E7%B1%BB.md.html">09 · 内部类与常用类 ⭐⭐</a><a href="10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">10 · 异常处理 ⭐⭐</a><a href="11-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">11 · 集合框架 ⭐⭐⭐⭐</a><a href="12-IO%E6%B5%81.md.html">12 · IO 流 ⭐⭐⭐</a><a href="13-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">13 · 多线程 ⭐⭐⭐⭐</a><a href="14-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">14 · 网络编程 ⭐⭐⭐</a><a href="15-%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">15 · 反射与注解 ⭐⭐⭐</a><a href="16-Lambda%E4%B8%8EStream.md.html">16 · Lambda 与 Stream ⭐⭐⭐</a><a href="17-%E6%9E%9A%E4%B8%BE%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">17 · 枚举与设计模式 ⭐⭐⭐</a><a href="18-%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE.md.html">18 · 实战项目 ⭐⭐⭐⭐</a><a href="README.md.html">黑马Java笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>黑马Java笔记</div><h1>09 · 内部类与常用类 ⭐⭐</h1><div class="article-meta"><span>约 11 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：2 天
+对应黑马视频：第 136 ~ 158 集
+项目导向：<strong>内部类是事件处理的灵魂</strong>，包装类/日期是基础工具</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>内部类与常用类
 ├── 9.1 内部类 ⭐⭐
 │   ├── 成员内部类
 │   ├── 静态内部类
@@ -23,364 +20,346 @@
 │   ├── Calendar
 │   └── JDK 8 新 API
 └── 9.5 Math / System / Runtime（已述）
-```
-
----
-
-## 二、内部类 ⭐⭐
-
-### 2.1 什么是内部类
-
-定义在**类里面**的类。
-
-### 2.2 成员内部类
-
-```java
-public class Outer {
-    private int x = 10;
-
-    public class Inner {
-        public void print() {
-            System.out.println(x);   // 直接访问外部类私有成员
-        }
-    }
-
-    public void test() {
-        new Inner().print();
-    }
-}
-
-// 使用
-Outer outer = new Outer();
-Outer.Inner inner = outer.new Inner();
-inner.print();
-```
-
-### 2.3 静态内部类
-
-```java
-public class Outer {
-    private static int x = 10;
-
-    public static class Inner {
-        public void print() {
-            System.out.println(x);
-        }
-    }
-}
-
-// 使用
-Outer.Inner inner = new Outer.Inner();
-inner.print();
-```
-
-### 2.4 局部内部类
-
-```java
-public class Outer {
-    public void method() {
-        final int x = 10;     // Java 8+ 隐式 final
-
-        class LocalInner {
-            public void print() {
-                System.out.println(x);
-            }
-        }
-
-        new LocalInner().print();
-    }
-}
-```
-
-### 2.5 匿名内部类 ⭐⭐⭐
-
-**没有名字的类**，一次性使用。常配合接口使用。
-
-```java
-interface Greeting {
-    void sayHello();
-}
-
-public class Main {
-    public static void main(String[] args) {
-        // 匿名内部类
-        Greeting g = new Greeting() {
-            @Override
-            public void sayHello() {
-                System.out.println(&quot;Hello!&quot;);
-            }
-        };
-        g.sayHello();
-
-        // Lambda 简化（Java 8+）
-        Greeting g2 = () -&gt; System.out.println(&quot;Hello from Lambda!&quot;);
-        g2.sayHello();
-    }
-}
-```
-
-### 2.6 黑马经典案例：按钮事件 ⭐⭐
-
-```java
-button.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println(&quot;按钮被点击&quot;);
-    }
-});
-```
-
-&gt; ⚠ Lambda 优先。
-
----
-
-## 三、包装类 ⭐⭐
-
-### 3.1 8 种包装类
-
-| 基本类型 | 包装类 |
-|---------|--------|
-| byte | Byte |
-| short | Short |
-| int | **Integer** |
-| long | Long |
-| float | Float |
-| double | Double |
-| char | Character |
-| boolean | Boolean |
-
-### 3.2 装箱与拆箱
-
-```java
-// 装箱：基本 → 包装
-Integer i = 10;            // 自动装箱
-Integer j = Integer.valueOf(10);
-
-// 拆箱：包装 → 基本
-int n = i;                  // 自动拆箱
-int m = i.intValue();
-```
-
-### 3.3 自动装箱的坑 ⭐⭐
-
-```java
-Integer a = 127;
-Integer b = 127;
-System.out.println(a == b);   // true（缓存池）
-
-Integer c = 128;
-Integer d = 128;
-System.out.println(c == d);   // false（超出缓存池）
-```
-
-&gt; &#128161; **缓存池范围** -128~127，超出后 == 失效，**必须用 equals**。
-
-### 3.4 包装类常用方法
-
-```java
-int n = Integer.parseInt(&quot;123&quot;);       // 字符串 → int
-String s = Integer.toString(123);       // int → 字符串
-String s2 = String.valueOf(123);
-int max = Integer.MAX_VALUE;
-int min = Integer.MIN_VALUE;
-```
-
-### 3.5 黑马案例：字符串数字相加
-
-```java
-String s = &quot;100&quot;;
-int n = Integer.parseInt(s);
-int result = n + 1;     // 101
-```
-
----
-
-## 四、日期类 ⭐⭐
-
-### 4.1 Date 类（老）
-
-```java
-import java.util.Date;
-
-Date d = new Date();
-System.out.println(d);     // 当前时间
-System.out.println(d.getTime());    // 时间戳（毫秒）
-```
-
-### 4.2 SimpleDateFormat
-
-```java
-import java.text.SimpleDateFormat;
-
-SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
-
-// Date → String
-Date d = new Date();
-String s = sdf.format(d);
-
-// String → Date
-Date d2 = sdf.parse(&quot;2025-01-01 12:00:00&quot;);
-```
-
-**格式化符号**：
-- `yyyy`：年
-- `MM`：月
-- `dd`：日
-- `HH`：时（24 小时）
-- `mm`：分
-- `ss`：秒
-
-### 4.3 Calendar 类
-
-```java
-import java.util.Calendar;
-
-Calendar c = Calendar.getInstance();
-c.set(2025, Calendar.JANUARY, 1);    // 设置日期
-c.add(Calendar.DAY_OF_MONTH, 7);      // 加 7 天
-Date d = c.getTime();
-```
-
-### 4.4 JDK 8 新时间 API ⭐⭐（推荐）
-
-```java
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
-LocalDate today = LocalDate.now();
-LocalDate tomorrow = today.plusDays(1);
-
-LocalDateTime now = LocalDateTime.now();
-
-DateTimeFormatter fmt = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);
-String s = now.format(fmt);
-```
-
-### 4.5 黑马经典案例 ⭐⭐
-
-**计算两个日期相差多少天**：
-```java
-public static long daysBetween(Date d1, Date d2) {
-    long diff = d2.getTime() - d1.getTime();
-    return diff / (1000 * 60 * 60 * 24);
-}
-```
-
----
-
-## 五、综合案例：黑马学生管理系统（升级版）⭐⭐⭐
-
-```java
-// Student.java
-public class Student {
-    private String id;
-    private String name;
-    private int age;
-    private String gender;
-
-    public Student() {}
-    public Student(String id, String name, int age, String gender) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
-
-    // getter/setter 略
-
-    @Override
-    public String toString() {
-        return &quot;Student{id=&quot; + id + &quot;, name=&quot; + name + &quot;, age=&quot; + age + &quot;, gender=&quot; + gender + &quot;}&quot;;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Student s = (Student) o;
-        return Objects.equals(id, s.id);
-    }
-}
-
-// StudentManager.java
-public class StudentManager {
-    private ArrayList&lt;Student&gt; students = new ArrayList&lt;&gt;();
-
-    public void addStudent(Student s) {
-        students.add(s);
-    }
-
-    public void removeStudent(String id) {
-        students.removeIf(s -&gt; s.getId().equals(id));
-    }
-
-    public Student findById(String id) {
-        for (Student s : students) {
-            if (s.getId().equals(id)) return s;
-        }
-        return null;
-    }
-
-    public void printAll() {
-        for (Student s : students) {
-            System.out.println(s);
-        }
-    }
-}
-```
-
----
-
-## 六、面试常问 ⭐
-
-&gt; &#128161; **`int` 和 `Integer` 区别？**
-&gt; - int：基本类型，默认 0
-&gt; - Integer：包装类，默认 null
-
-&gt; &#128161; **自动装箱的缓存池？**
-&gt; -128~127
-
-&gt; &#128161; **Date、Calendar、LocalDate 区别？**
-&gt; | Date | Calendar | LocalDate |
-&gt; |------|----------|-----------|
-&gt; | 老（可变线程不安全） | 老（线程安全但麻烦） | 新（线程安全，清晰） |
-
-&gt; &#128161; **内部类的作用？**
-&gt; - 访问外部类私有成员
-&gt; - 隐藏类的实现
-&gt; - 便于组织代码
-
----
-
-## 七、本章小结
-
-✅ 已掌握：
-- [ ] **4 种内部类**（成员、静态、局部、匿名）
-- [ ] **匿名内部类** + Lambda 简化
-- [ ] **8 种包装类 + 自动装箱拆箱**
-- [ ] **Integer 缓存池陷阱**
-- [ ] Date、SimpleDateFormat、Calendar
-- [ ] **JDK 8 新时间 API**（LocalDate 等）
-
-✅ 易错点：
-- [ ] Integer 缓存池 -128~127
-- [ ] 包装类比较必须用 equals
-- [ ] SimpleDateFormat 不是线程安全的
-- [ ] 老日期 API 可变线程不安全
-
----
-
-## 上部完结 &#127881;
-
-到此黑马 Java **上部（9 章）全部完成**！
-
-✅ 上部已掌握：
-- Java 入门与环境
-- 基础语法、流程控制
-- 数组、方法
-- 面向对象（基础 + 进阶）
-- 常用 API、内部类、包装类、日期
-
-可以继续学习：[10-异常处理.md](./10-异常处理.md)（下部开始）</pre>
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、内部类 ⭐⭐</h2>
+<h3 id="section-2">2.1 什么是内部类</h3>
+<p>定义在<strong>类里面</strong>的类。</p>
+<h3 id="section-3">2.2 成员内部类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Outer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Inner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">print</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">   </span><span class="c1">// 直接访问外部类私有成员</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">test</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Inner</span><span class="p">().</span><span class="na">print</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 使用</span>
+<span class="n">Outer</span><span class="w"> </span><span class="n">outer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Outer</span><span class="p">();</span>
+<span class="n">Outer</span><span class="p">.</span><span class="na">Inner</span><span class="w"> </span><span class="n">inner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outer</span><span class="p">.</span><span class="na">new</span><span class="w"> </span><span class="nf">Inner</span><span class="p">();</span>
+<span class="n">inner</span><span class="p">.</span><span class="na">print</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-4">2.3 静态内部类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Outer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Inner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">print</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 使用</span>
+<span class="n">Outer</span><span class="p">.</span><span class="na">Inner</span><span class="w"> </span><span class="n">inner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Outer</span><span class="p">.</span><span class="na">Inner</span><span class="p">();</span>
+<span class="n">inner</span><span class="p">.</span><span class="na">print</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-5">2.4 局部内部类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Outer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">     </span><span class="c1">// Java 8+ 隐式 final</span>
+
+<span class="w">        </span><span class="kd">class</span> <span class="nc">LocalInner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">print</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">LocalInner</span><span class="p">().</span><span class="na">print</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-6">2.5 匿名内部类 ⭐⭐⭐</h3>
+<p><strong>没有名字的类</strong>，一次性使用。常配合接口使用。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">interface</span> <span class="nc">Greeting</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">sayHello</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 匿名内部类</span>
+<span class="w">        </span><span class="n">Greeting</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Greeting</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nd">@Override</span>
+<span class="w">            </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sayHello</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Hello!"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">};</span>
+<span class="w">        </span><span class="n">g</span><span class="p">.</span><span class="na">sayHello</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// Lambda 简化（Java 8+）</span>
+<span class="w">        </span><span class="n">Greeting</span><span class="w"> </span><span class="n">g2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Hello from Lambda!"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">g2</span><span class="p">.</span><span class="na">sayHello</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-7">2.6 黑马经典案例：按钮事件 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">button</span><span class="p">.</span><span class="na">addActionListener</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ActionListener</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">actionPerformed</span><span class="p">(</span><span class="n">ActionEvent</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"按钮被点击"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ Lambda 优先。</p>
+</blockquote>
+<hr/>
+<h2 id="section-8">三、包装类 ⭐⭐</h2>
+<h3 id="section-9">3.1 8 种包装类</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>基本类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td><strong>Integer</strong></td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-10">3.2 装箱与拆箱</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 装箱：基本 → 包装</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">            </span><span class="c1">// 自动装箱</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="c1">// 拆箱：包装 → 基本</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 自动拆箱</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="na">intValue</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-11">3.3 自动装箱的坑 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Integer</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">127</span><span class="p">;</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">127</span><span class="p">;</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w">   </span><span class="c1">// true（缓存池）</span>
+
+<span class="n">Integer</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">d</span><span class="p">);</span><span class="w">   </span><span class="c1">// false（超出缓存池）</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>缓存池范围</strong> -128~127，超出后 == 失效，<strong>必须用 equals</strong>。</p>
+</blockquote>
+<h3 id="section-12">3.4 包装类常用方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="s">"123"</span><span class="p">);</span><span class="w">       </span><span class="c1">// 字符串 → int</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span><span class="w">       </span><span class="c1">// int → 字符串</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">MAX_VALUE</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">MIN_VALUE</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-13">3.5 黑马案例：字符串数字相加</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"100"</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">     </span><span class="c1">// 101</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">四、日期类 ⭐⭐</h2>
+<h3 id="section-15">4.1 Date 类（老）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Date</span><span class="p">;</span>
+
+<span class="n">Date</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">();</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">d</span><span class="p">);</span><span class="w">     </span><span class="c1">// 当前时间</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span><span class="w">    </span><span class="c1">// 时间戳（毫秒）</span>
+</pre></div>
+</div><h3 id="section-16">4.2 SimpleDateFormat</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.text.SimpleDateFormat</span><span class="p">;</span>
+
+<span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">sdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="p">);</span>
+
+<span class="c1">// Date → String</span>
+<span class="n">Date</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">();</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+
+<span class="c1">// String → Date</span>
+<span class="n">Date</span><span class="w"> </span><span class="n">d2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">"2025-01-01 12:00:00"</span><span class="p">);</span>
+</pre></div>
+</div><p><strong>格式化符号</strong>：</p>
+<ul>
+<li><code>yyyy</code>：年</li>
+<li><code>MM</code>：月</li>
+<li><code>dd</code>：日</li>
+<li><code>HH</code>：时（24 小时）</li>
+<li><code>mm</code>：分</li>
+<li><code>ss</code>：秒</li>
+</ul>
+<h3 id="section-17">4.3 Calendar 类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Calendar</span><span class="p">;</span>
+
+<span class="n">Calendar</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Calendar</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="n">c</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span><span class="w"> </span><span class="n">Calendar</span><span class="p">.</span><span class="na">JANUARY</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">    </span><span class="c1">// 设置日期</span>
+<span class="n">c</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">DAY_OF_MONTH</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span><span class="w">      </span><span class="c1">// 加 7 天</span>
+<span class="n">Date</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getTime</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-18">4.4 JDK 8 新时间 API ⭐⭐（推荐）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalDate</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalDateTime</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalTime</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.time.format.DateTimeFormatter</span><span class="p">;</span>
+
+<span class="n">LocalDate</span><span class="w"> </span><span class="n">today</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="n">LocalDate</span><span class="w"> </span><span class="n">tomorrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">today</span><span class="p">.</span><span class="na">plusDays</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="n">LocalDateTime</span><span class="w"> </span><span class="n">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+
+<span class="n">DateTimeFormatter</span><span class="w"> </span><span class="n">fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-19">4.5 黑马经典案例 ⭐⭐</h3>
+<p><strong>计算两个日期相差多少天</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">daysBetween</span><span class="p">(</span><span class="n">Date</span><span class="w"> </span><span class="n">d1</span><span class="p">,</span><span class="w"> </span><span class="n">Date</span><span class="w"> </span><span class="n">d2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d2</span><span class="p">.</span><span class="na">getTime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="na">getTime</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">24</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">五、综合案例：黑马学生管理系统（升级版）⭐⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// Student.java</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">gender</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Student</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Student</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">gender</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">gender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gender</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// getter/setter 略</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Student{id="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">", name="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">", age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">", gender="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">gender</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"}"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// StudentManager.java</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">StudentManager</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="n">students</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addStudent</span><span class="p">(</span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">students</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">removeStudent</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">students</span><span class="p">.</span><span class="na">removeIf</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">getId</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Student</span><span class="w"> </span><span class="nf">findById</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">students</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="na">getId</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">id</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">printAll</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">students</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">六、面试常问 ⭐</h2>
+<blockquote>
+<p>💡 <strong><code>int</code> 和 <code>Integer</code> 区别？</strong></p>
+<ul>
+<li>int：基本类型，默认 0</li>
+<li>Integer：包装类，默认 null</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>自动装箱的缓存池？</strong>
+-128~127</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Date、Calendar、LocalDate 区别？</strong>
+| Date | Calendar | LocalDate |
+|------|----------|-----------|
+| 老（可变线程不安全） | 老（线程安全但麻烦） | 新（线程安全，清晰） |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>内部类的作用？</strong></p>
+<ul>
+<li>访问外部类私有成员</li>
+<li>隐藏类的实现</li>
+<li>便于组织代码</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-22">七、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>4 种内部类</strong>（成员、静态、局部、匿名）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>匿名内部类</strong> + Lambda 简化</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>8 种包装类 + 自动装箱拆箱</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Integer 缓存池陷阱</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Date、SimpleDateFormat、Calendar</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>JDK 8 新时间 API</strong>（LocalDate 等）</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Integer 缓存池 -128~127</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>包装类比较必须用 equals</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>SimpleDateFormat 不是线程安全的</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>老日期 API 可变线程不安全</li>
+</ul>
+<hr/>
+<h2 id="section-23">上部完结 🎉</h2>
+<p>到此黑马 Java <strong>上部（9 章）全部完成</strong>！</p>
+<p>✅ 上部已掌握：</p>
+<ul>
+<li>Java 入门与环境</li>
+<li>基础语法、流程控制</li>
+<li>数组、方法</li>
+<li>面向对象（基础 + 进阶）</li>
+<li>常用 API、内部类、包装类、日期</li>
+</ul>
+<p>可以继续学习：<a href="./10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">10-异常处理.md</a>（下部开始）</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html"><small>← 上一篇</small><strong>08 · 面向对象进阶 ⭐⭐⭐</strong></a><a href="10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html"><small>下一篇 →</small><strong>10 · 异常处理 ⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、内部类 ⭐⭐</a><a class="toc-h3" href="#section-2">2.1 什么是内部类</a><a class="toc-h3" href="#section-3">2.2 成员内部类</a><a class="toc-h3" href="#section-4">2.3 静态内部类</a><a class="toc-h3" href="#section-5">2.4 局部内部类</a><a class="toc-h3" href="#section-6">2.5 匿名内部类 ⭐⭐⭐</a><a class="toc-h3" href="#section-7">2.6 黑马经典案例：按钮事件 ⭐⭐</a><a class="toc-h2" href="#section-8">三、包装类 ⭐⭐</a><a class="toc-h3" href="#section-9">3.1 8 种包装类</a><a class="toc-h3" href="#section-10">3.2 装箱与拆箱</a><a class="toc-h3" href="#section-11">3.3 自动装箱的坑 ⭐⭐</a><a class="toc-h3" href="#section-12">3.4 包装类常用方法</a><a class="toc-h3" href="#section-13">3.5 黑马案例：字符串数字相加</a><a class="toc-h2" href="#section-14">四、日期类 ⭐⭐</a><a class="toc-h3" href="#section-15">4.1 Date 类（老）</a><a class="toc-h3" href="#section-16">4.2 SimpleDateFormat</a><a class="toc-h3" href="#section-17">4.3 Calendar 类</a><a class="toc-h3" href="#section-18">4.4 JDK 8 新时间 API ⭐⭐（推荐）</a><a class="toc-h3" href="#section-19">4.5 黑马经典案例 ⭐⭐</a><a class="toc-h2" href="#section-20">五、综合案例：黑马学生管理系统（升级版）⭐⭐⭐</a><a class="toc-h2" href="#section-21">六、面试常问 ⭐</a><a class="toc-h2" href="#section-22">七、本章小结</a><a class="toc-h2" href="#section-23">上部完结 🎉</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

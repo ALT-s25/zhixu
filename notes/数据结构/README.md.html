@@ -1,80 +1,207 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>README</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 王道计算机考研 &#183; 数据结构笔记
-
-&gt; 浓缩版知识体系笔记，按章切分，方便按章节复习与查阅。
-
-## &#128193; 文件清单
-
-| 序号 | 文件 | 章节 | 优先级 |
-|------|------|------|--------|
-| 00 | [README.md](./README.md) | 复习地图（本文） | ⭐ |
-| 01 | [01-绪论.md](./01-绪论.md) | 数据结构与算法基础 | ⭐ |
-| 02 | [02-线性表.md](./02-线性表.md) | 顺序表与链表 | ⭐⭐⭐ |
-| 03 | [03-栈和队列.md](./03-栈和队列.md) | 栈与队列及其应用 | ⭐⭐⭐ |
-| 04 | [04-串.md](./04-串.md) | 串与 KMP 算法 | ⭐⭐ |
-| 05 | [05-树与二叉树.md](./05-树与二叉树.md) | 二叉树、线索、哈夫曼 | ⭐⭐⭐⭐⭐ |
-| 06 | [06-图.md](./06-图.md) | 图的存储、遍历、最短路径 | ⭐⭐⭐⭐⭐ |
-| 07 | [07-查找.md](./07-查找.md) | BST、AVL、B 树、哈希 | ⭐⭐⭐⭐⭐ |
-| 08 | [08-排序.md](./08-排序.md) | 插入/交换/选择/归并/基数 | ⭐⭐⭐⭐⭐ |
-
----
-
-## &#127919; 8 章分值与优先级（408 真题分布）
-
-| 章节 | 选择题 | 大题 | 总分占比 | 优先级 |
-|------|--------|------|----------|--------|
-| 第 1 章 &#183; 绪论 | 1~2 | 0 | ~3% | 低（送分） |
-| 第 2 章 &#183; 线性表 | 2~4 | ~6 | ~12% | 高 |
-| 第 3 章 &#183; 栈和队列 | 2~3 | ~4 | ~8% | 高 |
-| 第 4 章 &#183; 串 | 1~2 | ~4 | ~5% | 中（KMP 必考） |
-| 第 5 章 &#183; 树与二叉树 | 3~4 | ~8 | ~18% | ⭐⭐⭐⭐⭐ |
-| 第 6 章 &#183; 图 | 3~4 | ~6 | ~16% | ⭐⭐⭐⭐⭐ |
-| 第 7 章 &#183; 查找 | 3~4 | ~6 | ~16% | ⭐⭐⭐⭐⭐ |
-| 第 8 章 &#183; 排序 | 2~3 | ~6 | ~12% | ⭐⭐⭐⭐⭐ |
-
----
-
-## &#128640; 复习路线建议
-
-1. **第一轮（30 天）**：2 倍速刷王道视频，每章配合王道书课后题
-2. **第二轮（15 天）**：只看不熟的章节 + 整理错题本
-3. **第三轮（10 天）**：9 套必背代码闭卷默写 + 真题 2020-2025
-4. **第四轮（5 天）**：全章节概念清单快速回顾
-
----
-
-## &#128187; 9 套必背代码（上考场前默写）
-
-1. 链表合并（两个有序链表）
-2. 链表逆置（头插法 / 三指针）
-3. 二叉树遍历（递归 + 非递归，至少会中序）
-4. 层次遍历（队列）
-5. KMP next 数组手算
-6. AVL 4 种调整画图
-7. 快速排序（含 Partition）
-8. 堆排序（建堆 + sift down）
-9. Dijkstra 手算（更新 dist 数组）
-
----
-
-## ⏱ 408 考试时间分配
-
-| 题型 | 题数 | 分值 | ��议用时 |
-|------|------|------|----------|
-| 单选题 | 10 | 15 分 | 15 min |
-| 综合应用题 | 3 | 45 分 | 75 min |
-| 算法设计题 | 1 | 15 分 | 20 min |
-
-**铁律**：单选每题 1.5 分钟，遇到不会的先跳过标记，不要死磕。综合题先写&quot;思路分&quot;，再补代码。
-
----
-
-## &#128218; 推荐补充资料
-
-- 《算法导论》：理解性补充，不强求
-- 《数据结构 1800 题》：题海战术可选
-- LeetCode 热题 HOT 100：代码手感
-- 王道论坛 / 知乎 408 经验贴：考试技巧
-
----
-
-祝学习顺利！&#127919;</pre>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>数据结构 · 学习指南 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/数据结构/README.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>数据结构</h2><nav aria-label="同专题笔记"><a href="01-%E7%BB%AA%E8%AE%BA.md.html">第 1 章 · 绪论 ⭐</a><a href="02-%E7%BA%BF%E6%80%A7%E8%A1%A8.md.html">第 2 章 · 线性表 ⭐⭐⭐</a><a href="03-%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97.md.html">第 3 章 · 栈和队列 ⭐⭐⭐</a><a href="04-%E4%B8%B2.md.html">第 4 章 · 串 ⭐⭐</a><a href="05-%E6%A0%91%E4%B8%8E%E4%BA%8C%E5%8F%89%E6%A0%91.md.html">第 5 章 · 树与二叉树 ⭐⭐⭐⭐⭐</a><a href="06-%E5%9B%BE.md.html">第 6 章 · 图 ⭐⭐⭐⭐⭐</a><a href="07-%E6%9F%A5%E6%89%BE.md.html">第 7 章 · 查找 ⭐⭐⭐⭐⭐</a><a href="08-%E6%8E%92%E5%BA%8F.md.html">第 8 章 · 排序 ⭐⭐⭐⭐⭐</a><a aria-current="page" href="README.md.html">数据结构 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>数据结构</div><h1>数据结构 · 学习指南</h1><div class="article-meta"><span>约 3 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>浓缩版知识体系笔记，按章切分，方便按章节复习与查阅。</p>
+</blockquote>
+<h2 id="section-0">📁 文件清单</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>文件</th>
+<th>章节</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td><a href="./README.md.html">README.md</a></td>
+<td>复习地图（本文）</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>01</td>
+<td><a href="./01-%E7%BB%AA%E8%AE%BA.md.html">01-绪论.md</a></td>
+<td>数据结构与算法基础</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="./02-%E7%BA%BF%E6%80%A7%E8%A1%A8.md.html">02-线性表.md</a></td>
+<td>顺序表与链表</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="./03-%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97.md.html">03-栈和队列.md</a></td>
+<td>栈与队列及其应用</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="./04-%E4%B8%B2.md.html">04-串.md</a></td>
+<td>串与 KMP 算法</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="./05-%E6%A0%91%E4%B8%8E%E4%BA%8C%E5%8F%89%E6%A0%91.md.html">05-树与二叉树.md</a></td>
+<td>二叉树、线索、哈夫曼</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="./06-%E5%9B%BE.md.html">06-图.md</a></td>
+<td>图的存储、遍历、最短路径</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="./07-%E6%9F%A5%E6%89%BE.md.html">07-查找.md</a></td>
+<td>BST、AVL、B 树、哈希</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="./08-%E6%8E%92%E5%BA%8F.md.html">08-排序.md</a></td>
+<td>插入/交换/选择/归并/基数</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-1">🎯 8 章分值与优先级（408 真题分布）</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>章节</th>
+<th>选择题</th>
+<th>大题</th>
+<th>总分占比</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 1 章 · 绪论</td>
+<td>1~2</td>
+<td>0</td>
+<td>~3%</td>
+<td>低（送分）</td>
+</tr>
+<tr>
+<td>第 2 章 · 线性表</td>
+<td>2~4</td>
+<td>~6</td>
+<td>~12%</td>
+<td>高</td>
+</tr>
+<tr>
+<td>第 3 章 · 栈和队列</td>
+<td>2~3</td>
+<td>~4</td>
+<td>~8%</td>
+<td>高</td>
+</tr>
+<tr>
+<td>第 4 章 · 串</td>
+<td>1~2</td>
+<td>~4</td>
+<td>~5%</td>
+<td>中（KMP 必考）</td>
+</tr>
+<tr>
+<td>第 5 章 · 树与二叉树</td>
+<td>3~4</td>
+<td>~8</td>
+<td>~18%</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>第 6 章 · 图</td>
+<td>3~4</td>
+<td>~6</td>
+<td>~16%</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>第 7 章 · 查找</td>
+<td>3~4</td>
+<td>~6</td>
+<td>~16%</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>第 8 章 · 排序</td>
+<td>2~3</td>
+<td>~6</td>
+<td>~12%</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-2">🚀 复习路线建议</h2>
+<ol>
+<li><strong>第一轮（30 天）</strong>：2 倍速刷王道视频，每章配合王道书课后题</li>
+<li><strong>第二轮（15 天）</strong>：只看不熟的章节 + 整理错题本</li>
+<li><strong>第三轮（10 天）</strong>：9 套必背代码闭卷默写 + 真题 2020-2025</li>
+<li><strong>第四轮（5 天）</strong>：全章节概念清单快速回顾</li>
+</ol>
+<hr/>
+<h2 id="section-3">💻 9 套必背代码（上考场前默写）</h2>
+<ol>
+<li>链表合并（两个有序链表）</li>
+<li>链表逆置（头插法 / 三指针）</li>
+<li>二叉树遍历（递归 + 非递归，至少会中序）</li>
+<li>层次遍历（队列）</li>
+<li>KMP next 数组手算</li>
+<li>AVL 4 种调整画图</li>
+<li>快速排序（含 Partition）</li>
+<li>堆排序（建堆 + sift down）</li>
+<li>Dijkstra 手算（更新 dist 数组）</li>
+</ol>
+<hr/>
+<h2 id="section-4">⏱ 408 考试时间分配</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>题型</th>
+<th>题数</th>
+<th>分值</th>
+<th>��议用时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单选题</td>
+<td>10</td>
+<td>15 分</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>综合应用题</td>
+<td>3</td>
+<td>45 分</td>
+<td>75 min</td>
+</tr>
+<tr>
+<td>算法设计题</td>
+<td>1</td>
+<td>15 分</td>
+<td>20 min</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>铁律</strong>：单选每题 1.5 分钟，遇到不会的先跳过标记，不要死磕。综合题先写"思路分"，再补代码。</p>
+<hr/>
+<h2 id="section-5">📚 推荐补充资料</h2>
+<ul>
+<li>《算法导论》：理解性补充，不强求</li>
+<li>《数据结构 1800 题》：题海战术可选</li>
+<li>LeetCode 热题 HOT 100：代码手感</li>
+<li>王道论坛 / 知乎 408 经验贴：考试技巧</li>
+</ul>
+<hr/>
+<p>祝学习顺利！🎯</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="08-%E6%8E%92%E5%BA%8F.md.html"><small>← 上一篇</small><strong>第 8 章 · 排序 ⭐⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">📁 文件清单</a><a class="toc-h2" href="#section-1">🎯 8 章分值与优先级（408 真题分布）</a><a class="toc-h2" href="#section-2">🚀 复习路线建议</a><a class="toc-h2" href="#section-3">💻 9 套必背代码（上考场前默写）</a><a class="toc-h2" href="#section-4">⏱ 408 考试时间分配</a><a class="toc-h2" href="#section-5">📚 推荐补充资料</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

@@ -1,15 +1,12 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>10-异常处理</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 10 &#183; 异常处理 ⭐⭐
-
-&gt; **难度**：中 | **学习建议**：1 天
-&gt; 对应黑马视频：下部第 1 ~ 12 集
-&gt; 项目导向：**每个项目都有异常处理**，学会让程序不崩溃
-
----
-
-## 一、知识框架
-
-```
-异常处理
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10 · 异常处理 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/黑马Java笔记/10-异常处理.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>黑马Java笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8.md.html">01 · Java 入门 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%95%B0%E7%BB%84.md.html">04 · 数组 ⭐⭐</a><a href="05-%E6%96%B9%E6%B3%95.md.html">05 · 方法 ⭐⭐</a><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a href="07-%E5%B8%B8%E7%94%A8API.md.html">07 · 常用 API ⭐⭐</a><a href="08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html">08 · 面向对象进阶 ⭐⭐⭐</a><a href="09-%E5%86%85%E9%83%A8%E7%B1%BB%E4%B8%8E%E5%B8%B8%E7%94%A8%E7%B1%BB.md.html">09 · 内部类与常用类 ⭐⭐</a><a aria-current="page" href="10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">10 · 异常处理 ⭐⭐</a><a href="11-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">11 · 集合框架 ⭐⭐⭐⭐</a><a href="12-IO%E6%B5%81.md.html">12 · IO 流 ⭐⭐⭐</a><a href="13-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">13 · 多线程 ⭐⭐⭐⭐</a><a href="14-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">14 · 网络编程 ⭐⭐⭐</a><a href="15-%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">15 · 反射与注解 ⭐⭐⭐</a><a href="16-Lambda%E4%B8%8EStream.md.html">16 · Lambda 与 Stream ⭐⭐⭐</a><a href="17-%E6%9E%9A%E4%B8%BE%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">17 · 枚举与设计模式 ⭐⭐⭐</a><a href="18-%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE.md.html">18 · 实战项目 ⭐⭐⭐⭐</a><a href="README.md.html">黑马Java笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>黑马Java笔记</div><h1>10 · 异常处理 ⭐⭐</h1><div class="article-meta"><span>约 10 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：1 天
+对应黑马视频：下部第 1 ~ 12 集
+项目导向：<strong>每个项目都有异常处理</strong>，学会让程序不崩溃</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>异常处理
 ├── 10.1 异常体系 ⭐⭐⭐
 ├── 10.2 异常分类（编译期/运行期）
 ├── 10.3 异常处理 ⭐⭐
@@ -18,14 +15,10 @@
 │   └── throw
 ├── 10.4 自定义异常
 └── 10.5 异常实践
-```
-
----
-
-## 二、异常体系 ⭐⭐⭐
-
-```
-Throwable
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、异常体系 ⭐⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Throwable
 ├── Error（严重错误，程序无法处理）
 │   ├── OutOfMemoryError
 │   └── StackOverflowError
@@ -38,282 +31,263 @@ Throwable
         ├── ArrayIndexOutOfBoundsException ⭐
         ├── ArithmeticException
         └── ClassCastException
-```
+</pre></div>
+</div><hr/>
+<h2 id="section-2">三、异常分类 ⭐⭐</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>编译期异常</th>
+<th>运行期异常</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>继承</td>
+<td>Exception 子类（除 RuntimeException）</td>
+<td>RuntimeException 子类</td>
+</tr>
+<tr>
+<td>处理</td>
+<td><strong>必须</strong>（throws/try-catch）</td>
+<td>不强制</td>
+</tr>
+<tr>
+<td>原因</td>
+<td>外部因素</td>
+<td>程序逻辑错误</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>IOException、SQLException</td>
+<td>空指针、数组越界</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠ <strong>黑马经典</strong>：编译期异常不处理<strong>编译不通过</strong>，运行期异常可处理也可不处理。</p>
+</blockquote>
+<hr/>
+<h2 id="section-3">四、try-catch-finally ⭐⭐</h2>
+<h3 id="section-4">4.1 基本用法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 可能出现异常的代码</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">ArithmeticException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"除数不能为零"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">          </span><span class="c1">// 打印栈轨迹</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">            </span><span class="c1">// 兜底</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"其他异常"</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"一定执行"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-5">4.2 多个 catch 规则</h3>
+<ul>
+<li>子类异常<strong>必须放在父类之前</strong></li>
+<li>Java 7+ 支持 <code>|</code> 多异常</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NullPointerException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ArrayIndexOutOfBoundsException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"空指针或数组越界"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-6">4.3 try-with-resources ⭐</h3>
+<p>自动关闭资源（实现了 AutoCloseable 接口）：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"a.txt"</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">();</span>
+<span class="p">}</span><span class="w">   </span><span class="c1">// 自动 close</span>
+</pre></div>
+</div><h3 id="section-7">4.4 黑马经典案例 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">};</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr</span><span class="o">[</span><span class="mi">5</span><span class="o">]</span><span class="p">);</span><span class="w">    </span><span class="c1">// ArrayIndexOutOfBoundsException</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">ArrayIndexOutOfBoundsException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"数组越界"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 
----
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">());</span><span class="w">   </span><span class="c1">// NullPointerException</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NullPointerException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"空指针"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 
-## 三、异常分类 ⭐⭐
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w">        </span><span class="c1">// ArithmeticException</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">ArithmeticException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"算术异常"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-8">五、throws（声明抛出）⭐⭐</h2>
+<p>把异常<strong>抛给调用者</strong>处理：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">readFile</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileReader</span><span class="w"> </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"a.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
 
-| 维度 | 编译期异常 | 运行期异常 |
-|------|-----------|----------|
-| 继承 | Exception 子类（除 RuntimeException） | RuntimeException 子类 |
-| 处理 | **必须**（throws/try-catch） | 不强制 |
-| 原因 | 外部因素 | 程序逻辑错误 |
-| 例子 | IOException、SQLException | 空指针、数组越界 |
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">readFile</span><span class="p">();</span><span class="w">   </span><span class="c1">// 也可继续抛</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-9">六、throw（手动抛出）⭐</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setAge</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">"年龄非法："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-10">七、自定义异常 ⭐</h2>
+<h3 id="section-11">7.1 定义</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 受检异常（必须处理）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LoginException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginException</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-&gt; ⚠ **黑马经典**：编译期异常不处理**编译不通过**，运行期异常可处理也可不处理。
+<span class="c1">// 非受检（可选处理）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LoginRuntimeException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">RuntimeException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginRuntimeException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-12">7.2 黑马经典案例：用户登录 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UserService</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">LoginException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="s">"admin"</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">username</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoginException</span><span class="p">(</span><span class="s">"用户名不存在"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="s">"123"</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">password</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoginException</span><span class="p">(</span><span class="s">"密码错误"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"登录成功"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
----
-
-## 四、try-catch-finally ⭐⭐
-
-### 4.1 基本用法
-
-```java
-try {
-    // 可能出现异常的代码
-    int result = 10 / 0;
-} catch (ArithmeticException e) {
-    System.out.println(&quot;除数不能为零&quot;);
-    e.printStackTrace();          // 打印栈轨迹
-} catch (Exception e) {            // 兜底
-    System.out.println(&quot;其他异常&quot;);
-} finally {
-    System.out.println(&quot;一定执行&quot;);
-}
-```
-
-### 4.2 多个 catch 规则
-
-- 子类异常**必须放在父类之前**
-- Java 7+ 支持 `|` 多异常
-
-```java
-try {
-    // ...
-} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-    System.out.println(&quot;空指针或数组越界&quot;);
-}
-```
-
-### 4.3 try-with-resources ⭐
-
-自动关闭资源（实现了 AutoCloseable 接口）：
-
-```java
-try (BufferedReader br = new BufferedReader(new FileReader(&quot;a.txt&quot;))) {
-    return br.readLine();
-}   // 自动 close
-```
-
-### 4.4 黑马经典案例 ⭐
-
-```java
-public static void main(String[] args) {
-    try {
-        int[] arr = {1, 2, 3};
-        System.out.println(arr[5]);    // ArrayIndexOutOfBoundsException
-    } catch (ArrayIndexOutOfBoundsException e) {
-        System.out.println(&quot;数组越界&quot;);
-    }
-
-    try {
-        String s = null;
-        System.out.println(s.length());   // NullPointerException
-    } catch (NullPointerException e) {
-        System.out.println(&quot;空指针&quot;);
-    }
-
-    try {
-        int a = 10, b = 0;
-        System.out.println(a / b);        // ArithmeticException
-    } catch (ArithmeticException e) {
-        System.out.println(&quot;算术异常&quot;);
-    }
-}
-```
-
----
-
-## 五、throws（声明抛出）⭐⭐
-
-把异常**抛给调用者**处理：
-
-```java
-public static void readFile() throws IOException {
-    FileReader fr = new FileReader(&quot;a.txt&quot;);
-    // ...
-}
-
-public static void main(String[] args) throws IOException {
-    readFile();   // 也可继续抛
-}
-```
-
----
-
-## 六、throw（手动抛出）⭐
-
-```java
-public static void setAge(int age) {
-    if (age &lt; 0 || age &gt; 150) {
-        throw new IllegalArgumentException(&quot;年龄非法：&quot; + age);
-    }
-}
-```
-
----
-
-## 七、自定义异常 ⭐
-
-### 7.1 定义
-
-```java
-// 受检异常（必须处理）
-public class LoginException extends Exception {
-    public LoginException() {}
-    public LoginException(String message) {
-        super(message);
-    }
-}
-
-// 非受检（可选处理）
-public class LoginRuntimeException extends RuntimeException {
-    public LoginRuntimeException(String message) {
-        super(message);
-    }
-}
-```
-
-### 7.2 黑马经典案例：用户登录 ⭐⭐
-
-```java
-public class UserService {
-    public void login(String username, String password) throws LoginException {
-        if (!&quot;admin&quot;.equals(username)) {
-            throw new LoginException(&quot;用户名不存在&quot;);
-        }
-        if (!&quot;123&quot;.equals(password)) {
-            throw new LoginException(&quot;密码错误&quot;);
-        }
-        System.out.println(&quot;登录成功&quot;);
-    }
-}
-
-public static void main(String[] args) {
-    UserService service = new UserService();
-    try {
-        service.login(&quot;admin&quot;, &quot;123&quot;);
-    } catch (LoginException e) {
-        System.out.println(&quot;登录失败：&quot; + e.getMessage());
-    }
-}
-```
-
----
-
-## 八、异常实践 ⭐⭐
-
-### 8.1 应该捕获的场景
-
-✅ 网络请求
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">UserService</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserService</span><span class="p">();</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">service</span><span class="p">.</span><span class="na">login</span><span class="p">(</span><span class="s">"admin"</span><span class="p">,</span><span class="w"> </span><span class="s">"123"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">LoginException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"登录失败："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-13">八、异常实践 ⭐⭐</h2>
+<h3 id="section-14">8.1 应该捕获的场景</h3>
+<p>✅ 网络请求
 ✅ 文件读写
 ✅ 数据库操作
-✅ 用户输入校验
-
-### 8.2 不应该捕获的场景
-
-❌ **空 catch 块**（隐藏问题）
+✅ 用户输入校验</p>
+<h3 id="section-15">8.2 不应该捕获的场景</h3>
+<p>❌ <strong>空 catch 块</strong>（隐藏问题）
 ❌ 异常用于控制流程（性能差）
-❌ **捕获 Exception 兜底**（应该捕获具体异常）
+❌ <strong>捕获 Exception 兜底</strong>（应该捕获具体异常）</p>
+<h3 id="section-16">8.3 良好的写法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ✅ 好的写法</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 业务代码</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">"文件未找到：{}"</span><span class="p">,</span><span class="w"> </span><span class="n">filePath</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BusinessException</span><span class="p">(</span><span class="s">"文件不存在"</span><span class="p">);</span>
+<span class="p">}</span>
 
-### 8.3 良好的写法
-
-```java
-// ✅ 好的写法
-try {
-    // 业务代码
-} catch (FileNotFoundException e) {
-    logger.error(&quot;文件未找到：{}&quot;, filePath, e);
-    throw new BusinessException(&quot;文件不存在&quot;);
-}
-
-// ❌ 不好的写法
-try {
-    // 业务代码
-} catch (Exception e) {
-    // 什么都不做
-}
-```
-
----
-
-## 九、项目场景（实战导向）⭐
-
-### &#127919; 场景 1：用户输入校验
-
-```java
-public static int inputAge(Scanner sc) {
-    while (true) {
-        try {
-            System.out.print(&quot;请输入年龄：&quot;);
-            int age = Integer.parseInt(sc.nextLine());
-            if (age &lt; 0 || age &gt; 150) {
-                System.out.println(&quot;年龄非法&quot;);
-                continue;
-            }
-            return age;
-        } catch (NumberFormatException e) {
-            System.out.println(&quot;输入不是整数，请重试&quot;);
-        }
-    }
-}
-```
-
-### &#127919; 场景 2：文件操作
-
-```java
-public static String readFile(String path) {
-    try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-        return br.readLine();
-    } catch (FileNotFoundException e) {
-        System.out.println(&quot;文件不存在&quot;);
-        return null;
-    } catch (IOException e) {
-        System.out.println(&quot;读取失败&quot;);
-        return null;
-    }
-}
-```
-
----
-
-## 十、面试常问 ⭐⭐
-
-&gt; &#128161; **Error vs Exception？**
-&gt; - Error：JVM 内部严重错误（OOM、栈溢出）
-&gt; - Exception：程序可处理的异常
-
-&gt; &#128161; **受检 vs 非受检？**
-&gt; | 维度 | 受检 | 非受检 |
-&gt; |------|------|--------|
-&gt; | 编译 | 必须处理 | 不强制 |
-&gt; | 原因 | 外部 | 逻辑错误 |
-
-&gt; &#128161; **final、finally、finalize？**
-&gt; - `final`：修饰类/方法/变量
-&gt; - `finally`：try-catch 始终执行
-&gt; - `finalize`：Object 方法（已废弃）
-
-&gt; &#128161; **try 中 return 后 finally 还执行吗？**
-&gt; 执行。finally 在 return 前执行（除非 `System.exit()`）。
-
----
-
-## 十一、本章小结
-
-✅ 已掌握：
-- [ ] **异常体系**（Throwable → Error/Exception → RuntimeException）
-- [ ] **受检 vs 运行期**
-- [ ] **try-catch-finally**
-- [ ] **throws / throw**
-- [ ] 自定义异常
-- [ ] **try-with-resources** 自动关闭
-
-✅ 易错点：
-- [ ] catch 必须从小到大（子类 → 父类）
-- [ ] 受检异常必须处理
-- [ ] finally 在 return 前执行
-- [ ] 空 catch 块是坏习惯
-
-下一章：[11-集合框架.md](./11-集合框架.md) — Java 核心！</pre>
+<span class="c1">// ❌ 不好的写法</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 业务代码</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 什么都不做</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-17">九、项目场景（实战导向）⭐</h2>
+<h3 id="section-18">🎯 场景 1：用户输入校验</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">inputAge</span><span class="p">(</span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"请输入年龄："</span><span class="p">);</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="na">nextLine</span><span class="p">());</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"年龄非法"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NumberFormatException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"输入不是整数，请重试"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-19">🎯 场景 2：文件操作</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">readFile</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"文件不存在"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"读取失败"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">十、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>Error vs Exception？</strong></p>
+<ul>
+<li>Error：JVM 内部严重错误（OOM、栈溢出）</li>
+<li>Exception：程序可处理的异常</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>受检 vs 非受检？</strong>
+| 维度 | 受检 | 非受检 |
+|------|------|--------|
+| 编译 | 必须处理 | 不强制 |
+| 原因 | 外部 | 逻辑错误 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>final、finally、finalize？</strong></p>
+<ul>
+<li><code>final</code>：修饰类/方法/变量</li>
+<li><code>finally</code>：try-catch 始终执行</li>
+<li><code>finalize</code>：Object 方法（已废弃）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>try 中 return 后 finally 还执行吗？</strong>
+执行。finally 在 return 前执行（除非 <code>System.exit()</code>）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-21">十一、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>异常体系</strong>（Throwable → Error/Exception → RuntimeException）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>受检 vs 运行期</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>try-catch-finally</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>throws / throw</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>自定义异常</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>try-with-resources</strong> 自动关闭</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>catch 必须从小到大（子类 → 父类）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>受检异常必须处理</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>finally 在 return 前执行</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>空 catch 块是坏习惯</li>
+</ul>
+<p>下一章：<a href="./11-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">11-集合框架.md</a> — Java 核心！</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="09-%E5%86%85%E9%83%A8%E7%B1%BB%E4%B8%8E%E5%B8%B8%E7%94%A8%E7%B1%BB.md.html"><small>← 上一篇</small><strong>09 · 内部类与常用类 ⭐⭐</strong></a><a href="11-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html"><small>下一篇 →</small><strong>11 · 集合框架 ⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、异常体系 ⭐⭐⭐</a><a class="toc-h2" href="#section-2">三、异常分类 ⭐⭐</a><a class="toc-h2" href="#section-3">四、try-catch-finally ⭐⭐</a><a class="toc-h3" href="#section-4">4.1 基本用法</a><a class="toc-h3" href="#section-5">4.2 多个 catch 规则</a><a class="toc-h3" href="#section-6">4.3 try-with-resources ⭐</a><a class="toc-h3" href="#section-7">4.4 黑马经典案例 ⭐</a><a class="toc-h2" href="#section-8">五、throws（声明抛出）⭐⭐</a><a class="toc-h2" href="#section-9">六、throw（手动抛出）⭐</a><a class="toc-h2" href="#section-10">七、自定义异常 ⭐</a><a class="toc-h3" href="#section-11">7.1 定义</a><a class="toc-h3" href="#section-12">7.2 黑马经典案例：用户登录 ⭐⭐</a><a class="toc-h2" href="#section-13">八、异常实践 ⭐⭐</a><a class="toc-h3" href="#section-14">8.1 应该捕获的场景</a><a class="toc-h3" href="#section-15">8.2 不应该捕获的场景</a><a class="toc-h3" href="#section-16">8.3 良好的写法</a><a class="toc-h2" href="#section-17">九、项目场景（实战导向）⭐</a><a class="toc-h3" href="#section-18">🎯 场景 1：用户输入校验</a><a class="toc-h3" href="#section-19">🎯 场景 2：文件操作</a><a class="toc-h2" href="#section-20">十、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-21">十一、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

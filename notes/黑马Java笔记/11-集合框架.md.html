@@ -1,15 +1,12 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>11-集合框架</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 11 &#183; 集合框架 ⭐⭐⭐⭐
-
-&gt; **难度**：核心 | **学习建议**：5 天
-&gt; 对应黑马视频：下部第 13 ~ 60 集
-&gt; 项目导向：**80% 的工作都在用 ArrayList 和 HashMap**，集合学不好等于不会写 Java
-
----
-
-## 一、知识框架
-
-```
-集合框架
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>11 · 集合框架 ⭐⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/黑马Java笔记/11-集合框架.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>黑马Java笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8.md.html">01 · Java 入门 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%95%B0%E7%BB%84.md.html">04 · 数组 ⭐⭐</a><a href="05-%E6%96%B9%E6%B3%95.md.html">05 · 方法 ⭐⭐</a><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a href="07-%E5%B8%B8%E7%94%A8API.md.html">07 · 常用 API ⭐⭐</a><a href="08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html">08 · 面向对象进阶 ⭐⭐⭐</a><a href="09-%E5%86%85%E9%83%A8%E7%B1%BB%E4%B8%8E%E5%B8%B8%E7%94%A8%E7%B1%BB.md.html">09 · 内部类与常用类 ⭐⭐</a><a href="10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">10 · 异常处理 ⭐⭐</a><a aria-current="page" href="11-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">11 · 集合框架 ⭐⭐⭐⭐</a><a href="12-IO%E6%B5%81.md.html">12 · IO 流 ⭐⭐⭐</a><a href="13-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">13 · 多线程 ⭐⭐⭐⭐</a><a href="14-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">14 · 网络编程 ⭐⭐⭐</a><a href="15-%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">15 · 反射与注解 ⭐⭐⭐</a><a href="16-Lambda%E4%B8%8EStream.md.html">16 · Lambda 与 Stream ⭐⭐⭐</a><a href="17-%E6%9E%9A%E4%B8%BE%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">17 · 枚举与设计模式 ⭐⭐⭐</a><a href="18-%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE.md.html">18 · 实战项目 ⭐⭐⭐⭐</a><a href="README.md.html">黑马Java笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>黑马Java笔记</div><h1>11 · 集合框架 ⭐⭐⭐⭐</h1><div class="article-meta"><span>约 16 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：核心 | <strong>学习建议</strong>：5 天
+对应黑马视频：下部第 13 ~ 60 集
+项目导向：<strong>80% 的工作都在用 ArrayList 和 HashMap</strong>，集合学不好等于不会写 Java</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>集合框架
 ├── 11.1 集合体系总览 ⭐⭐⭐
 ├── 11.2 Collection 接口
 ├── 11.3 List 接口（ArrayList、LinkedList）⭐⭐⭐
@@ -18,14 +15,10 @@
 ├── 11.6 Map 接口（HashMap、TreeMap、LinkedHashMap）⭐⭐⭐⭐
 ├── 11.7 Collections 工具类
 └── 11.8 综合实战：黑马学生系统
-```
-
----
-
-## 二、集合体系总览 ⭐⭐⭐
-
-```
-Collection (单列)
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、集合体系总览 ⭐⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Collection (单列)
 ├── List (接口)：有序、可重复
 │   ├── ArrayList：数组实现，查询快
 │   ├── LinkedList：双向链表，增删快
@@ -40,465 +33,444 @@ Map (双列，键值对)
 ├── LinkedHashMap：保留插入顺序
 ├── Hashtable：古老线程安全
 └── TreeMap：红黑树，键可排序
-```
-
----
-
-## 三、Collection 接口 ⭐
-
-公共方法：
-
-```java
-Collection&lt;String&gt; c = new ArrayList&lt;&gt;();
-
-c.add(&quot;A&quot;);
-c.remove(&quot;A&quot;);
-c.contains(&quot;A&quot;);
-c.size();
-c.isEmpty();
-c.clear();
-c.toArray();
-```
-
----
-
-## 四、List 接口 ⭐⭐⭐
-
-### 4.1 特点
-
-- **有序**：按插入顺序
-- **可重复**：相同元素可多次出现
-- 可按下标访问
-
-### 4.2 ArrayList ⭐⭐⭐（黑马重点）
-
-**底层**：动态数组，初始 10，扩容 1.5 倍。
-
-```java
-List&lt;String&gt; list = new ArrayList&lt;&gt;();
-
-// 增删改查
-list.add(&quot;A&quot;);
-list.add(1, &quot;B&quot;);           // 指定位置插入
-list.remove(&quot;A&quot;);            // 按值删除
-list.remove(0);              // 按下标
-list.set(0, &quot;C&quot;);
-list.get(0);
-list.contains(&quot;A&quot;);
-list.indexOf(&quot;A&quot;);
-list.size();
-list.isEmpty();
-list.clear();
-
-// 遍历
-for (int i = 0; i &lt; list.size(); i++) System.out.println(list.get(i));
-for (String s : list) System.out.println(s);
-```
-
-### 4.3 LinkedList
-
-**底层**：双向链表。
-
-```java
-LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
-
-list.addFirst(&quot;A&quot;);
-list.addLast(&quot;B&quot;);
-list.removeFirst();
-list.removeLast();
-list.getFirst();
-list.getLast();
-```
-
-### 4.4 ArrayList vs LinkedList ⭐⭐
-
-| 维度 | ArrayList | LinkedList |
-|------|-----------|------------|
-| 底层 | 数组 | 双向链表 |
-| 随机访问 | O(1) | O(n) |
-| 头尾增删 | O(n) | O(1) |
-| 内存 | 少 | 多 |
-| 场景 | 读多写少 | 增删频繁 |
-
----
-
-## 五、Set 接口 ⭐⭐
-
-### 5.1 特点
-
-- **无序**（不保证插入顺序）
-- **不可重复**（通过 hashCode + equals 判定）
-
-### 5.2 HashSet ⭐⭐⭐（黑马重点）
-
-```java
-Set&lt;String&gt; set = new HashSet&lt;&gt;();
-
-set.add(&quot;A&quot;);
-set.add(&quot;B&quot;);
-set.add(&quot;A&quot;);     // 不会重复添加
-set.size();          // 2
-
-for (String s : set) System.out.println(s);
-```
-
-### 5.3 HashSet 去重原理 ⭐⭐⭐
-
-```java
-class Student {
-    String name;
-    int age;
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, age);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Student s = (Student) o;
-        return age == s.age &amp;&amp; Objects.equals(name, s.name);
-    }
-}
-```
-
-&gt; ⚠ **黑马经典**：放进 HashSet 必须重写 `equals` 和 `hashCode`。
-
-### 5.4 LinkedHashSet
-
-保留**插入顺序**。
-
-### 5.5 TreeSet ⭐
-
-**自动排序**（红黑树）：
-
-```java
-Set&lt;Integer&gt; set = new TreeSet&lt;&gt;();
-set.add(5); set.add(2); set.add(8);
-System.out.println(set);   // [2, 5, 8]
-```
-
----
-
-## 六、泛型 ⭐⭐
-
-### 6.1 为什么用泛型
-
-```java
-// 没有泛型
-List list = new ArrayList();
-list.add(&quot;hello&quot;);
-list.add(123);          // 可以放任何类型
-String s = (String) list.get(0);   // 必须强转
-
-// 有泛型
-List&lt;String&gt; list = new ArrayList&lt;&gt;();
-list.add(&quot;hello&quot;);
-list.add(123);          // ❌ 编译错误
-String s = list.get(0);   // 不需要强转
-```
-
-### 6.2 自定义泛型类
-
-```java
-public class Box&lt;T&gt; {
-    private T value;
-
-    public T getValue() { return value; }
-    public void setValue(T value) { this.value = value; }
-}
-
-Box&lt;String&gt; box = new Box&lt;&gt;();
-box.setValue(&quot;hello&quot;);
-String s = box.getValue();
-```
-
-### 6.3 泛型方法
-
-```java
-public &lt;T&gt; T getFirst(List&lt;T&gt; list) {
-    return list.isEmpty() ? null : list.get(0);
-}
-```
-
-### 6.4 通配符
-
-```java
-// ? extends：上限通配
-public void process(List&lt;? extends Number&gt; list) { }
-// ? super：下限通配
-public void add(List&lt;? super Integer&gt; list) { }
-```
-
-&gt; ⚠ **黑马经典**：PECS 原则（Producer Extends, Consumer Super）。
-
----
-
-## 七、Map 接口 ⭐⭐⭐⭐
-
-### 7.1 特点
-
-- **键值对**（key-value）
-- **键不可重复**，值可以
-
-### 7.2 HashMap ⭐⭐⭐⭐（黑马重点，面试必问）
-
-```java
-Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
-
-map.put(&quot;apple&quot;, 5);
-map.put(&quot;banana&quot;, 3);
-map.put(&quot;apple&quot;, 8);        // 覆盖
-
-map.get(&quot;apple&quot;);            // 8
-map.getOrDefault(&quot;pear&quot;, 0); // 不存在返回默认值
-map.containsKey(&quot;apple&quot;);
-map.containsValue(5);
-map.remove(&quot;banana&quot;);
-map.size();
-map.clear();
-
-// 遍历（三种方式）
-// 1. 遍历 key
-for (String key : map.keySet()) {
-    System.out.println(key + &quot;=&quot; + map.get(key));
-}
-
-// 2. 遍历 entry（推荐）
-for (Map.Entry&lt;String, Integer&gt; e : map.entrySet()) {
-    System.out.println(e.getKey() + &quot;=&quot; + e.getValue());
-}
-
-// 3. 遍历 value
-for (Integer v : map.values()) {
-    System.out.println(v);
-}
-```
-
-### 7.3 HashMap 原理（黑马讲+面试必问）⭐⭐⭐⭐
-
-**JDK 8+ 结构**：数组 + 链表 + 红黑树
-
-```
-table（默认 16）
+</pre></div>
+</div><hr/>
+<h2 id="section-2">三、Collection 接口 ⭐</h2>
+<p>公共方法：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="n">c</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">c</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">c</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">c</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
+<span class="n">c</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">();</span>
+<span class="n">c</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+<span class="n">c</span><span class="p">.</span><span class="na">toArray</span><span class="p">();</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-3">四、List 接口 ⭐⭐⭐</h2>
+<h3 id="section-4">4.1 特点</h3>
+<ul>
+<li><strong>有序</strong>：按插入顺序</li>
+<li><strong>可重复</strong>：相同元素可多次出现</li>
+<li>可按下标访问</li>
+</ul>
+<h3 id="section-5">4.2 ArrayList ⭐⭐⭐（黑马重点）</h3>
+<p><strong>底层</strong>：动态数组，初始 10，扩容 1.5 倍。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="c1">// 增删改查</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">"B"</span><span class="p">);</span><span class="w">           </span><span class="c1">// 指定位置插入</span>
+<span class="n">list</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span><span class="w">            </span><span class="c1">// 按值删除</span>
+<span class="n">list</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">              </span><span class="c1">// 按下标</span>
+<span class="n">list</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">"C"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">indexOf</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+
+<span class="c1">// 遍历</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-6">4.3 LinkedList</h3>
+<p><strong>底层</strong>：双向链表。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LinkedList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="n">list</span><span class="p">.</span><span class="na">addFirst</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">addLast</span><span class="p">(</span><span class="s">"B"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">removeFirst</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">removeLast</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">getFirst</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">getLast</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-7">4.4 ArrayList vs LinkedList ⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>ArrayList</th>
+<th>LinkedList</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>底层</td>
+<td>数组</td>
+<td>双向链表</td>
+</tr>
+<tr>
+<td>随机访问</td>
+<td>O(1)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>头尾增删</td>
+<td>O(n)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>少</td>
+<td>多</td>
+</tr>
+<tr>
+<td>场景</td>
+<td>读多写少</td>
+<td>增删频繁</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-8">五、Set 接口 ⭐⭐</h2>
+<h3 id="section-9">5.1 特点</h3>
+<ul>
+<li><strong>无序</strong>（不保证插入顺序）</li>
+<li><strong>不可重复</strong>（通过 hashCode + equals 判定）</li>
+</ul>
+<h3 id="section-10">5.2 HashSet ⭐⭐⭐（黑马重点）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="n">set</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span>
+<span class="n">set</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"B"</span><span class="p">);</span>
+<span class="n">set</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"A"</span><span class="p">);</span><span class="w">     </span><span class="c1">// 不会重复添加</span>
+<span class="n">set</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w">          </span><span class="c1">// 2</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">set</span><span class="p">)</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-11">5.3 HashSet 去重原理 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">hashCode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">hash</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">name</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>黑马经典</strong>：放进 HashSet 必须重写 <code>equals</code> 和 <code>hashCode</code>。</p>
+</blockquote>
+<h3 id="section-12">5.4 LinkedHashSet</h3>
+<p>保留<strong>插入顺序</strong>。</p>
+<h3 id="section-13">5.5 TreeSet ⭐</h3>
+<p><strong>自动排序</strong>（红黑树）：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TreeSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">set</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"> </span><span class="n">set</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="n">set</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">set</span><span class="p">);</span><span class="w">   </span><span class="c1">// [2, 5, 8]</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">六、泛型 ⭐⭐</h2>
+<h3 id="section-15">6.1 为什么用泛型</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 没有泛型</span>
+<span class="n">List</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span><span class="w">          </span><span class="c1">// 可以放任何类型</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">// 必须强转</span>
+
+<span class="c1">// 有泛型</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span><span class="w">          </span><span class="c1">// ❌ 编译错误</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">// 不需要强转</span>
+</pre></div>
+</div><h3 id="section-16">6.2 自定义泛型类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Box</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">getValue</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setValue</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">Box</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">box</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Box</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">box</span><span class="p">.</span><span class="na">setValue</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="na">getValue</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-17">6.3 泛型方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">getFirst</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-18">6.4 通配符</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ? extends：上限通配</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Number</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="c1">// ? super：下限通配</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">super</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>黑马经典</strong>：PECS 原则（Producer Extends, Consumer Super）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-19">七、Map 接口 ⭐⭐⭐⭐</h2>
+<h3 id="section-20">7.1 特点</h3>
+<ul>
+<li><strong>键值对</strong>（key-value）</li>
+<li><strong>键不可重复</strong>，值可以</li>
+</ul>
+<h3 id="section-21">7.2 HashMap ⭐⭐⭐⭐（黑马重点，面试必问）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="n">map</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">"apple"</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+<span class="n">map</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">"banana"</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="n">map</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">"apple"</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span><span class="w">        </span><span class="c1">// 覆盖</span>
+
+<span class="n">map</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">"apple"</span><span class="p">);</span><span class="w">            </span><span class="c1">// 8</span>
+<span class="n">map</span><span class="p">.</span><span class="na">getOrDefault</span><span class="p">(</span><span class="s">"pear"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// 不存在返回默认值</span>
+<span class="n">map</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="s">"apple"</span><span class="p">);</span>
+<span class="n">map</span><span class="p">.</span><span class="na">containsValue</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">map</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="s">"banana"</span><span class="p">);</span>
+<span class="n">map</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
+<span class="n">map</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+
+<span class="c1">// 遍历（三种方式）</span>
+<span class="c1">// 1. 遍历 key</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">keySet</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="c1">// 2. 遍历 entry（推荐）</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">entrySet</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="na">getKey</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getValue</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="c1">// 3. 遍历 value</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">values</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-22">7.3 HashMap 原理（黑马讲+面试必问）⭐⭐⭐⭐</h3>
+<p><strong>JDK 8+ 结构</strong>：数组 + 链表 + 红黑树</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>table（默认 16）
    ↓
 [i] → 链表（&lt; 8）→ 红黑树（≥ 8）
-```
+</pre></div>
+</div><p><strong>put 流程</strong>：</p>
+<ol>
+<li>算 key 的 hash</li>
+<li>定位桶</li>
+<li>桶空：直接插入</li>
+<li>桶不空：遍历链表，key 相同覆盖；否则插入尾部</li>
+<li>链表 &gt; 8 且数组 ≥ 64：转红黑树</li>
+<li>size &gt; threshold（容量 × 0.75）：扩容 2 倍</li>
+</ol>
+<h3 id="section-23">7.4 LinkedHashMap</h3>
+<p>保留<strong>插入顺序</strong>。</p>
+<h3 id="section-24">7.5 TreeMap ⭐</h3>
+<p><strong>键自动排序</strong>（红黑树）。</p>
+<h3 id="section-25">7.6 HashMap vs Hashtable ⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>HashMap</th>
+<th>Hashtable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>线程</td>
+<td>不安全</td>
+<td>安全</td>
+</tr>
+<tr>
+<td>null</td>
+<td>允许 key/value</td>
+<td>不允许</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>高</td>
+<td>低</td>
+</tr>
+<tr>
+<td>推荐</td>
+<td>单线程</td>
+<td>❌（基本被淘汰）</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-26">八、Collections 工具类 ⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">));</span>
 
-**put 流程**：
-1. 算 key 的 hash
-2. 定位桶
-3. 桶空：直接插入
-4. 桶不空：遍历链表，key 相同覆盖；否则插入尾部
-5. 链表 &gt; 8 且数组 ≥ 64：转红黑树
-6. size &gt; threshold（容量 &#215; 0.75）：扩容 2 倍
+<span class="n">Collections</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">list</span><span class="p">);</span><span class="w">                      </span><span class="c1">// 升序</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="n">Comparator</span><span class="p">.</span><span class="na">reverseOrder</span><span class="p">());</span><span class="w">  </span><span class="c1">// 降序</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">reverse</span><span class="p">(</span><span class="n">list</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 反转</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">shuffle</span><span class="p">(</span><span class="n">list</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 随机打乱</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">max</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">min</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">frequency</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">             </span><span class="c1">// 1 出现的次数</span>
+<span class="n">Collections</span><span class="p">.</span><span class="na">binarySearch</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">          </span><span class="c1">// 二分查找</span>
 
-### 7.4 LinkedHashMap
+<span class="c1">// 线程安全包装</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">syncList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Collections</span><span class="p">.</span><span class="na">synchronizedList</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-27">九、黑马小项目：学生成绩管理系统（集合版）⭐⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">StudentManager</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="n">students</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-保留**插入顺序**。
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addStudent</span><span class="p">(</span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">students</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="na">getId</span><span class="p">(),</span><span class="w"> </span><span class="n">s</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 
-### 7.5 TreeMap ⭐
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Student</span><span class="w"> </span><span class="nf">findById</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 
-**键自动排序**（红黑树）。
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">removeById</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">students</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 
-### 7.6 HashMap vs Hashtable ⭐
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findAll</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">students</span><span class="p">.</span><span class="na">values</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
 
-| 维度 | HashMap | Hashtable |
-|------|---------|-----------|
-| 线程 | 不安全 | 安全 |
-| null | 允许 key/value | 不允许 |
-| 性能 | 高 | 低 |
-| 推荐 | 单线程 | ❌（基本被淘汰） |
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByScoreRange</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">min</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">values</span><span class="p">().</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">getScore</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">min</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">getScore</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">max</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
 
----
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">printAll</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">values</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
 
-## 八、Collections 工具类 ⭐⭐
+<span class="w">    </span><span class="c1">// 按成绩排序</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">sortByScore</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">students</span><span class="p">.</span><span class="na">values</span><span class="p">());</span>
+<span class="w">        </span><span class="n">Collections</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">getScore</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="na">getScore</span><span class="p">());</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">list</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-28">十、项目场景（实战导向）⭐</h2>
+<h3 id="section-29">🎯 场景 1：缓存（HashMap）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Cache</span><span class="o">&lt;</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-```java
-List&lt;Integer&gt; list = new ArrayList&lt;&gt;(Arrays.asList(3, 1, 4, 1, 5));
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">V</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">K</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Function</span><span class="o">&lt;</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="n">loader</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">computeIfAbsent</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">loader</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-Collections.sort(list);                      // 升序
-Collections.sort(list, Comparator.reverseOrder());  // 降序
-Collections.reverse(list);                  // 反转
-Collections.shuffle(list);                  // 随机打乱
-Collections.max(list);
-Collections.min(list);
-Collections.frequency(list, 1);             // 1 出现的次数
-Collections.binarySearch(list, 3);          // 二分查找
-
-// 线程安全包装
-List&lt;Integer&gt; syncList = Collections.synchronizedList(list);
-```
-
----
-
-## 九、黑马小项目：学生成绩管理系统（集合版）⭐⭐⭐
-
-```java
-public class StudentManager {
-    private Map&lt;String, Student&gt; students = new HashMap&lt;&gt;();
-
-    public void addStudent(Student s) {
-        students.put(s.getId(), s);
-    }
-
-    public Student findById(String id) {
-        return students.get(id);
-    }
-
-    public void removeById(String id) {
-        students.remove(id);
-    }
-
-    public List&lt;Student&gt; findAll() {
-        return new ArrayList&lt;&gt;(students.values());
-    }
-
-    public List&lt;Student&gt; findByScoreRange(int min, int max) {
-        return students.values().stream()
-            .filter(s -&gt; s.getScore() &gt;= min &amp;&amp; s.getScore() &lt;= max)
-            .collect(Collectors.toList());
-    }
-
-    public void printAll() {
-        for (Student s : students.values()) {
-            System.out.println(s);
-        }
-    }
-
-    // 按成绩排序
-    public List&lt;Student&gt; sortByScore() {
-        List&lt;Student&gt; list = new ArrayList&lt;&gt;(students.values());
-        Collections.sort(list, (a, b) -&gt; b.getScore() - a.getScore());
-        return list;
-    }
-}
-```
-
----
-
-## 十、项目场景（实战导向）⭐
-
-### &#127919; 场景 1：缓存（HashMap）
-
-```java
-public class Cache&lt;K, V&gt; {
-    private Map&lt;K, V&gt; map = new HashMap&lt;&gt;();
-
-    public V get(K key, Function&lt;K, V&gt; loader) {
-        return map.computeIfAbsent(key, loader);
-    }
-}
-
-Cache&lt;String, User&gt; userCache = new Cache&lt;&gt;();
-User u = userCache.get(&quot;admin&quot;, id -&gt; userDao.findById(id));
-```
-
-### &#127919; 场景 2：统计字符出现次数
-
-```java
-public static Map&lt;Character, Integer&gt; countChars(String s) {
-    Map&lt;Character, Integer&gt; map = new HashMap&lt;&gt;();
-    for (char c : s.toCharArray()) {
-        map.merge(c, 1, Integer::sum);   // 累加
-    }
-    return map;
-}
-```
-
-### &#127919; 场景 3：List 去重（Stream）
-
-```java
-List&lt;String&gt; list = Arrays.asList(&quot;A&quot;, &quot;B&quot;, &quot;A&quot;, &quot;C&quot;, &quot;B&quot;);
-List&lt;String&gt; distinct = list.stream().distinct().collect(Collectors.toList());
-// [A, B, C]
-```
-
----
-
-## 十一、力扣实战 ⭐⭐
-
-### LeetCode 1. 两数之和
-
-```java
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
-        for (int i = 0; i &lt; nums.length; i++) {
-            int complement = target - nums[i];
-            if (map.containsKey(complement)) {
-                return new int[]{map.get(complement), i};
-            }
-            map.put(nums[i], i);
-        }
-        return new int[0];
-    }
-}
-```
-
-### LeetCode 49. 字母异位词分组
-
-```java
-class Solution {
-    public List&lt;List&lt;String&gt;&gt; groupAnagrams(String[] strs) {
-        Map&lt;String, List&lt;String&gt;&gt; map = new HashMap&lt;&gt;();
-        for (String s : strs) {
-            char[] arr = s.toCharArray();
-            Arrays.sort(arr);
-            String key = new String(arr);
-            map.computeIfAbsent(key, k -&gt; new ArrayList&lt;&gt;()).add(s);
-        }
-        return new ArrayList&lt;&gt;(map.values());
-    }
-}
-```
-
----
-
-## 十二、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **ArrayList vs LinkedList？**
-&gt; - ArrayList：数组，随机访问 O(1)，增删 O(n)
-&gt; - LinkedList：链表，随机访问 O(n)，增删 O(1)
-
-&gt; &#128161; **HashMap put 流程？**
-&gt; 1. 算 hash → 定位桶
-&gt; 2. 桶空：直接插入
-&gt; 3. 桶不空：遍历链表，key 相同覆盖；否则插入尾部
-&gt; 4. 链表 &gt; 8 转红黑树
-&gt; 5. size &gt; threshold 扩容 2 倍
-
-&gt; &#128161; **HashMap 为什么用红黑树而不是 AVL？**
-&gt; 红黑树近似平衡，插入删除更快。
-
-&gt; &#128161; **HashSet 去重原理？**
-&gt; hashCode + equals。
-&gt; 1. 先算 hash 找桶
-&gt; 2. 桶中无元素直接放
-&gt; 3. 有元素调 equals，相同则放弃
-
-&gt; &#128161; **ConcurrentHashMap 1.7 vs 1.8？**
-&gt; 1.7 分段锁，1.8 CAS + synchronized。
-
----
-
-## 十三、本章小结
-
-✅ 已掌握：
-- [ ] **集合框架整体结构**
-- [ ] **ArrayList / LinkedList** 的使用和区别
-- [ ] **HashSet 去重原理**
-- [ ] **泛型**（类、方法、通配符）
-- [ ] **HashMap 原理**（重点）
-- [ ] HashMap vs Hashtable
-- [ ] Collections 工具类
-
-✅ 易错点：
-- [ ] HashSet 自定义类必须重写 equals + hashCode
-- [ ] HashMap 允许 null 键值
-- [ ] HashMap 键必须不可变
-- [ ] 遍历时不能 add/remove（要用迭代器）
-
-下一章：[12-IO流.md](./12-IO流.md)</pre>
+<span class="n">Cache</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">userCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cache</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">User</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userCache</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">"admin"</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">userDao</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
+</pre></div>
+</div><h3 id="section-30">🎯 场景 2：统计字符出现次数</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">countChars</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">map</span><span class="p">.</span><span class="na">merge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="p">::</span><span class="n">sum</span><span class="p">);</span><span class="w">   </span><span class="c1">// 累加</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-31">🎯 场景 3：List 去重（Stream）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">"A"</span><span class="p">,</span><span class="w"> </span><span class="s">"B"</span><span class="p">,</span><span class="w"> </span><span class="s">"A"</span><span class="p">,</span><span class="w"> </span><span class="s">"C"</span><span class="p">,</span><span class="w"> </span><span class="s">"B"</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">distinct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">distinct</span><span class="p">().</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">());</span>
+<span class="c1">// [A, B, C]</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-32">十一、力扣实战 ⭐⭐</h2>
+<h3 id="section-33">LeetCode 1. 两数之和</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Solution</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="nf">twoSum</span><span class="p">(</span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">nums</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nums</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">complement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">map</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="n">complement</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="n">map</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">complement</span><span class="p">),</span><span class="w"> </span><span class="n">i</span><span class="p">};</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">map</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-34">LeetCode 49. 字母异位词分组</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Solution</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">groupAnagrams</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">strs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">strs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">();</span>
+<span class="w">            </span><span class="n">Arrays</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+<span class="w">            </span><span class="n">map</span><span class="p">.</span><span class="na">computeIfAbsent</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">()).</span><span class="na">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">map</span><span class="p">.</span><span class="na">values</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-35">十二、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>ArrayList vs LinkedList？</strong></p>
+<ul>
+<li>ArrayList：数组，随机访问 O(1)，增删 O(n)</li>
+<li>LinkedList：链表，随机访问 O(n)，增删 O(1)</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>HashMap put 流程？</strong></p>
+<ol>
+<li>算 hash → 定位桶</li>
+<li>桶空：直接插入</li>
+<li>桶不空：遍历链表，key 相同覆盖；否则插入尾部</li>
+<li>链表 &gt; 8 转红黑树</li>
+<li>size &gt; threshold 扩容 2 倍</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong>HashMap 为什么用红黑树而不是 AVL？</strong>
+红黑树近似平衡，插入删除更快。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>HashSet 去重原理？</strong>
+hashCode + equals。</p>
+<ol>
+<li>先算 hash 找桶</li>
+<li>桶中无元素直接放</li>
+<li>有元素调 equals，相同则放弃</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong>ConcurrentHashMap 1.7 vs 1.8？</strong>
+1.7 分段锁，1.8 CAS + synchronized。</p>
+</blockquote>
+<hr/>
+<h2 id="section-36">十三、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>集合框架整体结构</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>ArrayList / LinkedList</strong> 的使用和区别</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>HashSet 去重原理</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>泛型</strong>（类、方法、通配符）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>HashMap 原理</strong>（重点）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>HashMap vs Hashtable</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Collections 工具类</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>HashSet 自定义类必须重写 equals + hashCode</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>HashMap 允许 null 键值</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>HashMap 键必须不可变</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>遍历时不能 add/remove（要用迭代器）</li>
+</ul>
+<p>下一章：<a href="./12-IO%E6%B5%81.md.html">12-IO流.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html"><small>← 上一篇</small><strong>10 · 异常处理 ⭐⭐</strong></a><a href="12-IO%E6%B5%81.md.html"><small>下一篇 →</small><strong>12 · IO 流 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、集合体系总览 ⭐⭐⭐</a><a class="toc-h2" href="#section-2">三、Collection 接口 ⭐</a><a class="toc-h2" href="#section-3">四、List 接口 ⭐⭐⭐</a><a class="toc-h3" href="#section-4">4.1 特点</a><a class="toc-h3" href="#section-5">4.2 ArrayList ⭐⭐⭐（黑马重点）</a><a class="toc-h3" href="#section-6">4.3 LinkedList</a><a class="toc-h3" href="#section-7">4.4 ArrayList vs LinkedList ⭐⭐</a><a class="toc-h2" href="#section-8">五、Set 接口 ⭐⭐</a><a class="toc-h3" href="#section-9">5.1 特点</a><a class="toc-h3" href="#section-10">5.2 HashSet ⭐⭐⭐（黑马重点）</a><a class="toc-h3" href="#section-11">5.3 HashSet 去重原理 ⭐⭐⭐</a><a class="toc-h3" href="#section-12">5.4 LinkedHashSet</a><a class="toc-h3" href="#section-13">5.5 TreeSet ⭐</a><a class="toc-h2" href="#section-14">六、泛型 ⭐⭐</a><a class="toc-h3" href="#section-15">6.1 为什么用泛型</a><a class="toc-h3" href="#section-16">6.2 自定义泛型类</a><a class="toc-h3" href="#section-17">6.3 泛型方法</a><a class="toc-h3" href="#section-18">6.4 通配符</a><a class="toc-h2" href="#section-19">七、Map 接口 ⭐⭐⭐⭐</a><a class="toc-h3" href="#section-20">7.1 特点</a><a class="toc-h3" href="#section-21">7.2 HashMap ⭐⭐⭐⭐（黑马重点，面试必问）</a><a class="toc-h3" href="#section-22">7.3 HashMap 原理（黑马讲+面试必问）⭐⭐⭐⭐</a><a class="toc-h3" href="#section-23">7.4 LinkedHashMap</a><a class="toc-h3" href="#section-24">7.5 TreeMap ⭐</a><a class="toc-h3" href="#section-25">7.6 HashMap vs Hashtable ⭐</a><a class="toc-h2" href="#section-26">八、Collections 工具类 ⭐⭐</a><a class="toc-h2" href="#section-27">九、黑马小项目：学生成绩管理系统（集合版）⭐⭐⭐</a><a class="toc-h2" href="#section-28">十、项目场景（实战导向）⭐</a><a class="toc-h3" href="#section-29">🎯 场景 1：缓存（HashMap）</a><a class="toc-h3" href="#section-30">🎯 场景 2：统计字符出现次数</a><a class="toc-h3" href="#section-31">🎯 场景 3：List 去重（Stream）</a><a class="toc-h2" href="#section-32">十一、力扣实战 ⭐⭐</a><a class="toc-h3" href="#section-33">LeetCode 1. 两数之和</a><a class="toc-h3" href="#section-34">LeetCode 49. 字母异位词分组</a><a class="toc-h2" href="#section-35">十二、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-36">十三、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

@@ -1,14 +1,11 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>12-多线程</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 12 &#183; 多线程 ⭐⭐⭐⭐
-
-&gt; **难度**：高 | **学习建议**：2 天
-&gt; **面试必考**。二刷重点：**线程状态、同步机制、锁升级、生产者消费者**
-
----
-
-## 一、知识框架
-
-```
-多线程
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>12 · 多线程 ⭐⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/JavaSE笔记/12-多线程.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a aria-current="page" href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>12 · 多线程 ⭐⭐⭐⭐</h1><div class="article-meta"><span>约 15 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：高 | <strong>学习建议</strong>：2 天
+<strong>面试必考</strong>。二刷重点：<strong>线程状态、同步机制、锁升级、生产者消费者</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>多线程
 ├── 12.1 进程 vs 线程 ⭐
 ├── 12.2 线程创建（3 种方式）⭐⭐
 ├── 12.3 线程状态 ⭐⭐⭐
@@ -25,470 +22,482 @@
 │   ├── wait / notify
 │   └── 生产者-消费者
 └── 12.8 线程池 ⭐⭐
-```
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、进程 vs 线程 ⭐</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>进程</th>
+<th>线程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>概念</td>
+<td>运行的程序</td>
+<td>进程内的执行流</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>独立内存</td>
+<td>共享进程内存</td>
+</tr>
+<tr>
+<td>开销</td>
+<td>大</td>
+<td>小</td>
+</tr>
+<tr>
+<td>通信</td>
+<td>复杂（IPC）</td>
+<td>简单（共享变量）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>类比</strong>：进程 = 工厂，线程 = 工人。</p>
+<hr/>
+<h2 id="section-2">三、线程创建（3 种方式）⭐⭐</h2>
+<h3 id="section-3">3.1 继承 Thread</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MyThread</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// 线程执行的代码</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">": "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
----
+<span class="c1">// 启动</span>
+<span class="n">MyThread</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MyThread</span><span class="p">();</span>
+<span class="n">t</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">     </span><span class="c1">// 启动新线程，会自动调 run()</span>
+<span class="c1">// t.run();     ❌ 这只是普通方法调用，不会启动新线程</span>
+</pre></div>
+</div><h3 id="section-4">3.2 实现 Runnable（更灵活）⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MyRunnable</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">": "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-## 二、进程 vs 线程 ⭐
+<span class="c1">// 启动</span>
+<span class="n">Thread</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyRunnable</span><span class="p">());</span>
+<span class="n">t</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
 
-| 维度 | 进程 | 线程 |
-|------|------|------|
-| 概念 | 运行的程序 | 进程内的执行流 |
-| 资源 | 独立内存 | 共享进程内存 |
-| 开销 | 大 | 小 |
-| 通信 | 复杂（IPC） | 简单（共享变量） |
+<span class="c1">// 简化（Lambda）</span>
+<span class="n">Thread</span><span class="w"> </span><span class="n">t2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Hello from "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getName</span><span class="p">());</span>
+<span class="p">});</span>
+<span class="n">t2</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-5">3.3 实现 Callable（有返回值）⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MyCallable</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Callable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="nf">call</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-**类比**：进程 = 工厂，线程 = 工人。
-
----
-
-## 三、线程创建（3 种方式）⭐⭐
-
-### 3.1 继承 Thread
-
-```java
-public class MyThread extends Thread {
-    @Override
-    public void run() {     // 线程执行的代码
-        for (int i = 0; i &lt; 100; i++) {
-            System.out.println(getName() + &quot;: &quot; + i);
-        }
-    }
-}
-
-// 启动
-MyThread t = new MyThread();
-t.start();     // 启动新线程，会自动调 run()
-// t.run();     ❌ 这只是普通方法调用，不会启动新线程
-```
-
-### 3.2 实现 Runnable（更灵活）⭐
-
-```java
-public class MyRunnable implements Runnable {
-    @Override
-    public void run() {
-        for (int i = 0; i &lt; 100; i++) {
-            System.out.println(Thread.currentThread().getName() + &quot;: &quot; + i);
-        }
-    }
-}
-
-// 启动
-Thread t = new Thread(new MyRunnable());
-t.start();
-
-// 简化（Lambda）
-Thread t2 = new Thread(() -&gt; {
-    System.out.println(&quot;Hello from &quot; + Thread.currentThread().getName());
-});
-t2.start();
-```
-
-### 3.3 实现 Callable（有返回值）⭐
-
-```java
-public class MyCallable implements Callable&lt;Integer&gt; {
-    @Override
-    public Integer call() throws Exception {
-        int sum = 0;
-        for (int i = 0; i &lt; 100; i++) sum += i;
-        return sum;
-    }
-}
-
-// 启动
-ExecutorService es = Executors.newSingleThreadExecutor();
-Future&lt;Integer&gt; future = es.submit(new MyCallable());
-Integer result = future.get();    // 阻塞获取返回值
-System.out.println(result);   // 4950
-es.shutdown();
-```
-
-&gt; &#128161; **推荐**：实现 Runnable + 线程池，而非继承 Thread。
-
----
-
-## 四、线程状态 ⭐⭐⭐
-
-### 4.1 六种状态
-
-```
-   新建
+<span class="c1">// 启动</span>
+<span class="n">ExecutorService</span><span class="w"> </span><span class="n">es</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newSingleThreadExecutor</span><span class="p">();</span>
+<span class="n">Future</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">es</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyCallable</span><span class="p">());</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">future</span><span class="p">.</span><span class="na">get</span><span class="p">();</span><span class="w">    </span><span class="c1">// 阻塞获取返回值</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">);</span><span class="w">   </span><span class="c1">// 4950</span>
+<span class="n">es</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>推荐</strong>：实现 Runnable + 线程池，而非继承 Thread。</p>
+</blockquote>
+<hr/>
+<h2 id="section-6">四、线程状态 ⭐⭐⭐</h2>
+<h3 id="section-7">4.1 六种状态</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>   新建
      ↓ start()
    就绪 ────→ 运行 ──→ 阻塞
      ↑          ↓         ↓
      └──────────┴─────────┘
                 ↓
               死亡
-```
-
-| 状态 | 说明 |
-|------|------|
-| **NEW** | 新建，未启动 |
-| **RUNNABLE** | 就绪 + 运行中（JVM 调度） |
-| **BLOCKED** | 等待获取锁（synchronized） |
-| **WAITING** | 等待（wait/join） |
-| **TIMED_WAITING** | 限时等待（sleep/wait(time)） |
-| **TERMINATED** | 死亡，run() 执行完 |
-
-```java
-Thread t = new Thread(() -&gt; {
-    System.out.println(t.getState());   // RUNNABLE
-});
-t.start();
-```
-
----
-
-## 五、线程常用方法 ⭐
-
-### 5.1 sleep / yield / join
-
-```java
-// sleep：当前线程休眠指定毫秒（不释放锁）
-Thread.sleep(1000);
-
-// yield：让出 CPU，回到就绪状态
-Thread.yield();
-
-// join：等待调用 join 的线程执行完，再继续当前线程
-Thread t = new Thread(() -&gt; {
-    try { Thread.sleep(1000); } catch (InterruptedException e) {}
-});
-t.start();
-t.join();   // 当前线程阻塞，直到 t 执行完
-```
-
-### 5.2 优先级（1-10）
-
-```java
-t.setPriority(Thread.MAX_PRIORITY);   // 10
-t.setPriority(Thread.MIN_PRIORITY);   // 1
-```
-
-&gt; ⚠ 优先级只是建议，不保证执行顺序。
-
-### 5.3 守护线程
-
-```java
-t.setDaemon(true);   // 设置为守护线程
-```
-
-**特点**：所有非守护线程结束后，守护线程自动结束（如 GC 线程）。
-
-### 5.4 中断
-
-```java
-t.interrupt();    // 中断标记（不强制停止）
-
-// 在 run 中判断
-while (!Thread.currentThread().isInterrupted()) {
-    // 业务
-}
-```
-
----
-
-## 六、线程同步 ⭐⭐⭐
-
-### 6.1 什么是线程安全
-
-**多线程同时操作共享数据**时，可能产生数据不一致。
-
-### 6.2 synchronized ⭐⭐⭐
-
-#### 6.2.1 同步方法
-
-```java
-public synchronized void increment() {  // 锁 this
-    count++;
-}
-```
-
-#### 6.2.2 同步代码块
-
-```java
-public void increment() {
-    synchronized (this) {       // 锁 this
-        count++;
-    }
-}
-```
-
-#### 6.2.3 静态同步方法
-
-```java
-public static synchronized void increment() {  // 锁 类.class
-    count++;
-}
-```
-
-&gt; &#128161; **锁的级别**：
-&gt; - 实例方法：锁当前对象（this）
-&gt; - 静态方法：锁 Class 对象（类.class）
-
-#### 6.2.4 synchronized 特性
-
-- **互斥性**：同一时刻只有一个线程执行
-- **可见性**：释放锁时会刷新到主内存
-- **可重入**：同一个线程可以多次获取同一把锁
-
-```java
-public synchronized void method1() {
-    method2();   // 可重入，同一线程可继续获取锁
-}
-public synchronized void method2() { }
-```
-
-### 6.3 volatile ⭐⭐
-
-**作用**：保证**变量的可见性**（一个线程修改，其他线程立即可见）。
-
-```java
-private volatile boolean flag = false;
-
-public void stop() {
-    flag = true;       // 对其他线程立即可见
-}
-```
-
-&gt; ⚠ **volatile 不保证原子性**。仅适合&quot;一写多读&quot;场景。
-
-### 6.4 Lock 接口（JDK 5+）⭐⭐
-
-比 synchronized 更灵活：
-
-```java
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.Lock;
-
-Lock lock = new ReentrantLock();
-
-public void increment() {
-    lock.lock();
-    try {
-        count++;
-    } finally {
-        lock.unlock();   // 必须手动释放！
-    }
-}
-```
-
-&gt; &#128161; **tryLock**：尝试获取锁，失败立即返回���
-
-### 6.5 synchronized vs Lock ⭐⭐
-
-| 维度 | synchronized | Lock |
-|------|-------------|------|
-| 释放 | 自动 | 手动（finally） |
-| 等待 | 阻塞等待 | 可 tryLock / 中断 |
-| 公平 | ❌ 非公平 | 可公平锁 |
-| 性能 | JDK 6+ 优化后差距不大 | 略好 |
-
----
-
-## 七、死锁 ⭐
-
-**四个必要条件**（破坏任一即可避免）：
-1. 互斥
-2. 持有并等待
-3. 不可剥夺
-4. 循环等待
-
-```java
-// 死锁示例
-Object lockA = new Object();
-Object lockB = new Object();
-
-new Thread(() -&gt; {
-    synchronized (lockA) {
-        sleep(100);
-        synchronized (lockB) { }   // 等待 lockB
-    }
-}).start();
-
-new Thread(() -&gt; {
-    synchronized (lockB) {
-        sleep(100);
-        synchronized (lockA) { }   // 等待 lockA
-    }
-}).start();
-```
-
-**避免方法**：固定加锁顺序、使用 tryLock、减少嵌套。
-
----
-
-## 八、线程通信 ⭐⭐
-
-### 8.1 wait / notify / notifyAll
-
-```java
-// 必须在 synchronized 中调用
-synchronized (lock) {
-    lock.wait();         // 当前线程等待，释放锁
-    lock.notify();        // 唤醒一个等待线程
-    lock.notifyAll();     // 唤醒所有等待线程
-}
-```
-
-&gt; ⚠ **wait() 释放锁，sleep() 不释放锁**。
-
-### 8.2 生产者-消费者模型 ⭐⭐⭐
-
-```java
-public class ProducerConsumer {
-    private static final int CAPACITY = 10;
-    private Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
-    private Object lock = new Object();
-
-    public void produce() throws InterruptedException {
-        while (true) {
-            synchronized (lock) {
-                while (queue.size() == CAPACITY) {
-                    System.out.println(&quot;队列满，等待消费&quot;);
-                    lock.wait();
-                }
-                int item = (int) (Math.random() * 100);
-                queue.offer(item);
-                System.out.println(&quot;生产：&quot; + item);
-                lock.notify();       // 唤醒消费者
-                Thread.sleep(500);
-            }
-        }
-    }
-
-    public void consume() throws InterruptedException {
-        while (true) {
-            synchronized (lock) {
-                while (queue.isEmpty()) {
-                    System.out.println(&quot;队列空，等待生产&quot;);
-                    lock.wait();
-                }
-                int item = queue.poll();
-                System.out.println(&quot;���费：&quot; + item);
-                lock.notify();       // 唤醒生产者
-                Thread.sleep(500);
-            }
-        }
-    }
-}
-```
-
-&gt; ⚠ **必须用 while 不是 if**！防止虚假唤醒。
-
-### 8.3 Condition（Lock 的通信）
-
-```java
-Lock lock = new ReentrantLock();
-Condition notFull = lock.newCondition();
-Condition notEmpty = lock.newCondition();
-
-// 更灵活：一个锁配多个 Condition
-notFull.await();      // 等同于 wait
-notEmpty.signal();    // 等同于 notify
-```
-
----
-
-## 九、线程池 ⭐⭐
-
-### 9.1 为什么用线程池
-
-- 减少线程创建/销毁的开销
-- 限制线程数，防止资源耗尽
-
-### 9.2 创建线程池
-
-```java
-ExecutorService pool = Executors.newFixedThreadPool(5);    // 固定 5 线程
-ExecutorService pool2 = Executors.newCachedThreadPool();  // 弹性伸缩
-ExecutorService pool3 = Executors.newSingleThreadExecutor(); // 单线程
-ExecutorService pool4 = Executors.newScheduledThreadPool(5); // 定时
-
-pool.execute(() -&gt; System.out.println(&quot;Task&quot;));
-pool.shutdown();   // 不再接受新任务
-```
-
-### 9.3 自定义线程池（推荐）⭐⭐
-
-```java
-ThreadPoolExecutor pool = new ThreadPoolExecutor(
-    5,                      // corePoolSize 核心线程数
-    10,                     // maximumPoolSize 最大线程数
-    60, TimeUnit.SECONDS,   // keepAliveTime 空闲线程存活时间
-    new LinkedBlockingQueue&lt;&gt;(100),  // workQueue 任务队列
-    Executors.defaultThreadFactory(),
-    new ThreadPoolExecutor.CallerRunsPolicy()   // 拒绝策略
-);
-```
-
-&gt; &#128161; **拒绝策略**：
-&gt; - AbortPolicy（默认）：抛异常
-&gt; - CallerRunsPolicy：调用者执行
-&gt; - DiscardPolicy：丢弃
-&gt; - DiscardOldestPolicy：丢弃最老任务
-
----
-
-## 十、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **进程和线程的区别？**
-&gt; 进程是资源分配的基本单位，线程是 CPU 调度的基本单位。同一进程的线程共享内存。
-
-&gt; &#128161; **创建线程的 3 种方式？**
-&gt; 1. 继承 Thread
-&gt; 2. 实现 Runnable
-&gt; 3. 实现 Callable（有返回值）
-
-&gt; &#128161; **run() 和 start() 的区别？**
-&gt; - run()：普通方法调用
-&gt; - start()：启动新线程，由 JVM 调用 run()
-
-&gt; &#128161; **synchronized 和 volatile 的区别？**
-&gt; | 维度 | synchronized | volatile |
-&gt; |------|-------------|----------|
-&gt; | 原子性 | ✅ | ❌ |
-&gt; | 可见性 | ✅ | ✅ |
-&gt; | 阻塞 | 会 | 不 |
-&gt; | 修饰 | 方法/代码块 | 变量 |
-
-&gt; &#128161; **sleep() 和 wait() 的区别？**
-&gt; | 维度 | sleep | wait |
-&gt; |------|-------|------|
-&gt; | 释放锁 | ❌ | ✅ |
-&gt; | 调用 | Thread | Object |
-&gt; | 用途 | 暂停 | 线程通信 |
-
-&gt; &#128161; **线程池参数？**
-&gt; corePoolSize、maximumPoolSize、keepAliveTime、unit、workQueue、threadFactory、handler
-
-&gt; &#128161; **Java 内存模型 JMM？**
-&gt; - 主内存（共享）
-&gt; - 工作内存（线程私有）
-&gt; - 8 个原子操作（read、load、use、assign、store、write、lock、unlock）
-
----
-
-## 十一、本章小结
-
-✅ 已掌握：
-- [ ] 进程 vs 线程
-- [ ] **3 种线程创建方式**
-- [ ] **6 种线程状态**
-- [ ] **synchronized** 同步方法/代码块
-- [ ] **volatile** 可见性
-- [ ] Lock 接口使用
-- [ ] 死锁产生与避免
-- [ ] **wait / notify** 线程通信
-- [ ] **生产者-消费者模型**
-- [ ] 线程池创建与使用
-
-✅ 易错点：
-- [ ] start() 而非 run() 启动线程
-- [ ] wait/notify 必须在 synchronized 中
-- [ ] 生产者-消费者必须用 while 判条件（防虚假唤醒）
-- [ ] Lock 必须手动 unlock（finally）
-
-下一章：[13-网络编程.md](./13-网络编程.md)</pre>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NEW</strong></td>
+<td>新建，未启动</td>
+</tr>
+<tr>
+<td><strong>RUNNABLE</strong></td>
+<td>就绪 + 运行中（JVM 调度）</td>
+</tr>
+<tr>
+<td><strong>BLOCKED</strong></td>
+<td>等待获取锁（synchronized）</td>
+</tr>
+<tr>
+<td><strong>WAITING</strong></td>
+<td>等待（wait/join）</td>
+</tr>
+<tr>
+<td><strong>TIMED_WAITING</strong></td>
+<td>限时等待（sleep/wait(time)）</td>
+</tr>
+<tr>
+<td><strong>TERMINATED</strong></td>
+<td>死亡，run() 执行完</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Thread</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="na">getState</span><span class="p">());</span><span class="w">   </span><span class="c1">// RUNNABLE</span>
+<span class="p">});</span>
+<span class="n">t</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-8">五、线程常用方法 ⭐</h2>
+<h3 id="section-9">5.1 sleep / yield / join</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// sleep：当前线程休眠指定毫秒（不释放锁）</span>
+<span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+
+<span class="c1">// yield：让出 CPU，回到就绪状态</span>
+<span class="n">Thread</span><span class="p">.</span><span class="na">yield</span><span class="p">();</span>
+
+<span class="c1">// join：等待调用 join 的线程执行完，再继续当前线程</span>
+<span class="n">Thread</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">});</span>
+<span class="n">t</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="n">t</span><span class="p">.</span><span class="na">join</span><span class="p">();</span><span class="w">   </span><span class="c1">// 当前线程阻塞，直到 t 执行完</span>
+</pre></div>
+</div><h3 id="section-10">5.2 优先级（1-10）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">t</span><span class="p">.</span><span class="na">setPriority</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">MAX_PRIORITY</span><span class="p">);</span><span class="w">   </span><span class="c1">// 10</span>
+<span class="n">t</span><span class="p">.</span><span class="na">setPriority</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">MIN_PRIORITY</span><span class="p">);</span><span class="w">   </span><span class="c1">// 1</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ 优先级只是建议，不保证执行顺序。</p>
+</blockquote>
+<h3 id="section-11">5.3 守护线程</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">t</span><span class="p">.</span><span class="na">setDaemon</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">   </span><span class="c1">// 设置为守护线程</span>
+</pre></div>
+</div><p><strong>特点</strong>：所有非守护线程结束后，守护线程自动结束（如 GC 线程）。</p>
+<h3 id="section-12">5.4 中断</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">t</span><span class="p">.</span><span class="na">interrupt</span><span class="p">();</span><span class="w">    </span><span class="c1">// 中断标记（不强制停止）</span>
+
+<span class="c1">// 在 run 中判断</span>
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">isInterrupted</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 业务</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-13">六、线程同步 ⭐⭐⭐</h2>
+<h3 id="section-14">6.1 什么是线程安全</h3>
+<p><strong>多线程同时操作共享数据</strong>时，可能产生数据不一致。</p>
+<h3 id="section-15">6.2 synchronized ⭐⭐⭐</h3>
+<h4 id="section-16">6.2.1 同步方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">synchronized</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 锁 this</span>
+<span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-17">6.2.2 同步代码块</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// 锁 this</span>
+<span class="w">        </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-18">6.2.3 静态同步方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">synchronized</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 锁 类.class</span>
+<span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>锁的级别</strong>：</p>
+<ul>
+<li>实例方法：锁当前对象（this）</li>
+<li>静态方法：锁 Class 对象（类.class）</li>
+</ul>
+</blockquote>
+<h4 id="section-19">6.2.4 synchronized 特性</h4>
+<ul>
+<li><strong>互斥性</strong>：同一时刻只有一个线程执行</li>
+<li><strong>可见性</strong>：释放锁时会刷新到主内存</li>
+<li><strong>可重入</strong>：同一个线程可以多次获取同一把锁</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">synchronized</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method1</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">method2</span><span class="p">();</span><span class="w">   </span><span class="c1">// 可重入，同一线程可继续获取锁</span>
+<span class="p">}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">synchronized</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method2</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div><h3 id="section-20">6.3 volatile ⭐⭐</h3>
+<p><strong>作用</strong>：保证<strong>变量的可见性</strong>（一个线程修改，其他线程立即可见）。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">stop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">       </span><span class="c1">// 对其他线程立即可见</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>volatile 不保证原子性</strong>。仅适合"一写多读"场景。</p>
+</blockquote>
+<h3 id="section-21">6.4 Lock 接口（JDK 5+）⭐⭐</h3>
+<p>比 synchronized 更灵活：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.locks.ReentrantLock</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.locks.Lock</span><span class="p">;</span>
+
+<span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ReentrantLock</span><span class="p">();</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span><span class="w">   </span><span class="c1">// 必须手动释放！</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>tryLock</strong>：尝试获取锁，失败立即返回���</p>
+</blockquote>
+<h3 id="section-22">6.5 synchronized vs Lock ⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>synchronized</th>
+<th>Lock</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>释放</td>
+<td>自动</td>
+<td>手动（finally）</td>
+</tr>
+<tr>
+<td>等待</td>
+<td>阻塞等待</td>
+<td>可 tryLock / 中断</td>
+</tr>
+<tr>
+<td>公平</td>
+<td>❌ 非公平</td>
+<td>可公平锁</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>JDK 6+ 优化后差距不大</td>
+<td>略好</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-23">七、死锁 ⭐</h2>
+<p><strong>四个必要条件</strong>（破坏任一即可避免）：</p>
+<ol>
+<li>互斥</li>
+<li>持有并等待</li>
+<li>不可剥夺</li>
+<li>循环等待</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 死锁示例</span>
+<span class="n">Object</span><span class="w"> </span><span class="n">lockA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="p">();</span>
+<span class="n">Object</span><span class="w"> </span><span class="n">lockB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="p">();</span>
+
+<span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lockA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">sleep</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lockB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// 等待 lockB</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}).</span><span class="na">start</span><span class="p">();</span>
+
+<span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lockB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">sleep</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+<span class="w">        </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lockA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// 等待 lockA</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}).</span><span class="na">start</span><span class="p">();</span>
+</pre></div>
+</div><p><strong>避免方法</strong>：固定加锁顺序、使用 tryLock、减少嵌套。</p>
+<hr/>
+<h2 id="section-24">八、线程通信 ⭐⭐</h2>
+<h3 id="section-25">8.1 wait / notify / notifyAll</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 必须在 synchronized 中调用</span>
+<span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">wait</span><span class="p">();</span><span class="w">         </span><span class="c1">// 当前线程等待，释放锁</span>
+<span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">notify</span><span class="p">();</span><span class="w">        </span><span class="c1">// 唤醒一个等待线程</span>
+<span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">notifyAll</span><span class="p">();</span><span class="w">     </span><span class="c1">// 唤醒所有等待线程</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>wait() 释放锁，sleep() 不释放锁</strong>。</p>
+</blockquote>
+<h3 id="section-26">8.2 生产者-消费者模型 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ProducerConsumer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">CAPACITY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Queue</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">queue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LinkedList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">produce</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">InterruptedException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="na">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">CAPACITY</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"队列满，等待消费"</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">lock</span><span class="p">.</span><span class="na">wait</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="kt">int</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="w">                </span><span class="n">queue</span><span class="p">.</span><span class="na">offer</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"生产："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">item</span><span class="p">);</span>
+<span class="w">                </span><span class="n">lock</span><span class="p">.</span><span class="na">notify</span><span class="p">();</span><span class="w">       </span><span class="c1">// 唤醒消费者</span>
+<span class="w">                </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">consume</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">InterruptedException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"队列空，等待生产"</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">lock</span><span class="p">.</span><span class="na">wait</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="kt">int</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">queue</span><span class="p">.</span><span class="na">poll</span><span class="p">();</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"���费："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">item</span><span class="p">);</span>
+<span class="w">                </span><span class="n">lock</span><span class="p">.</span><span class="na">notify</span><span class="p">();</span><span class="w">       </span><span class="c1">// 唤醒生产者</span>
+<span class="w">                </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>必须用 while 不是 if</strong>！防止虚假唤醒。</p>
+</blockquote>
+<h3 id="section-27">8.3 Condition（Lock 的通信）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ReentrantLock</span><span class="p">();</span>
+<span class="n">Condition</span><span class="w"> </span><span class="n">notFull</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">newCondition</span><span class="p">();</span>
+<span class="n">Condition</span><span class="w"> </span><span class="n">notEmpty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">newCondition</span><span class="p">();</span>
+
+<span class="c1">// 更灵活：一个锁配多个 Condition</span>
+<span class="n">notFull</span><span class="p">.</span><span class="na">await</span><span class="p">();</span><span class="w">      </span><span class="c1">// 等同于 wait</span>
+<span class="n">notEmpty</span><span class="p">.</span><span class="na">signal</span><span class="p">();</span><span class="w">    </span><span class="c1">// 等同于 notify</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-28">九、线程池 ⭐⭐</h2>
+<h3 id="section-29">9.1 为什么用线程池</h3>
+<ul>
+<li>减少线程创建/销毁的开销</li>
+<li>限制线程数，防止资源耗尽</li>
+</ul>
+<h3 id="section-30">9.2 创建线程池</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">ExecutorService</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newFixedThreadPool</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">    </span><span class="c1">// 固定 5 线程</span>
+<span class="n">ExecutorService</span><span class="w"> </span><span class="n">pool2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newCachedThreadPool</span><span class="p">();</span><span class="w">  </span><span class="c1">// 弹性伸缩</span>
+<span class="n">ExecutorService</span><span class="w"> </span><span class="n">pool3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newSingleThreadExecutor</span><span class="p">();</span><span class="w"> </span><span class="c1">// 单线程</span>
+<span class="n">ExecutorService</span><span class="w"> </span><span class="n">pool4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newScheduledThreadPool</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"> </span><span class="c1">// 定时</span>
+
+<span class="n">pool</span><span class="p">.</span><span class="na">execute</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Task"</span><span class="p">));</span>
+<span class="n">pool</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span><span class="w">   </span><span class="c1">// 不再接受新任务</span>
+</pre></div>
+</div><h3 id="section-31">9.3 自定义线程池（推荐）⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">ThreadPoolExecutor</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ThreadPoolExecutor</span><span class="p">(</span>
+<span class="w">    </span><span class="mi">5</span><span class="p">,</span><span class="w">                      </span><span class="c1">// corePoolSize 核心线程数</span>
+<span class="w">    </span><span class="mi">10</span><span class="p">,</span><span class="w">                     </span><span class="c1">// maximumPoolSize 最大线程数</span>
+<span class="w">    </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">,</span><span class="w">   </span><span class="c1">// keepAliveTime 空闲线程存活时间</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">LinkedBlockingQueue</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">  </span><span class="c1">// workQueue 任务队列</span>
+<span class="w">    </span><span class="n">Executors</span><span class="p">.</span><span class="na">defaultThreadFactory</span><span class="p">(),</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">ThreadPoolExecutor</span><span class="p">.</span><span class="na">CallerRunsPolicy</span><span class="p">()</span><span class="w">   </span><span class="c1">// 拒绝策略</span>
+<span class="p">);</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>拒绝策略</strong>：</p>
+<ul>
+<li>AbortPolicy（默认）：抛异常</li>
+<li>CallerRunsPolicy：调用者执行</li>
+<li>DiscardPolicy：丢弃</li>
+<li>DiscardOldestPolicy：丢弃最老任务</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-32">十、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>进程和线程的区别？</strong>
+进程是资源分配的基本单位，线程是 CPU 调度的基本单位。同一进程的线程共享内存。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>创建线程的 3 种方式？</strong></p>
+<ol>
+<li>继承 Thread</li>
+<li>实现 Runnable</li>
+<li>实现 Callable（有返回值）</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong>run() 和 start() 的区别？</strong></p>
+<ul>
+<li>run()：普通方法调用</li>
+<li>start()：启动新线程，由 JVM 调用 run()</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>synchronized 和 volatile 的区别？</strong>
+| 维度 | synchronized | volatile |
+|------|-------------|----------|
+| 原子性 | ✅ | ❌ |
+| 可见性 | ✅ | ✅ |
+| 阻塞 | 会 | 不 |
+| 修饰 | 方法/代码块 | 变量 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>sleep() 和 wait() 的区别？</strong>
+| 维度 | sleep | wait |
+|------|-------|------|
+| 释放锁 | ❌ | ✅ |
+| 调用 | Thread | Object |
+| 用途 | 暂停 | 线程通信 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>线程池参数？</strong>
+corePoolSize、maximumPoolSize、keepAliveTime、unit、workQueue、threadFactory、handler</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Java 内存模型 JMM？</strong></p>
+<ul>
+<li>主内存（共享）</li>
+<li>工作内存（线程私有）</li>
+<li>8 个原子操作（read、load、use、assign、store、write、lock、unlock）</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-33">十一、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>进程 vs 线程</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>3 种线程创建方式</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>6 种线程状态</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>synchronized</strong> 同步方法/代码块</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>volatile</strong> 可见性</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Lock 接口使用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>死锁产生与避免</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>wait / notify</strong> 线程通信</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>生产者-消费者模型</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>线程池创建与使用</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>start() 而非 run() 启动线程</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>wait/notify 必须在 synchronized 中</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>生产者-消费者必须用 while 判条件（防虚假唤醒）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Lock 必须手动 unlock（finally）</li>
+</ul>
+<p>下一章：<a href="./13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13-网络编程.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="11-IO%E6%B5%81.md.html"><small>← 上一篇</small><strong>11 · IO 流 ⭐⭐⭐</strong></a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html"><small>下一篇 →</small><strong>13 · 网络编程 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、进程 vs 线程 ⭐</a><a class="toc-h2" href="#section-2">三、线程创建（3 种方式）⭐⭐</a><a class="toc-h3" href="#section-3">3.1 继承 Thread</a><a class="toc-h3" href="#section-4">3.2 实现 Runnable（更灵活）⭐</a><a class="toc-h3" href="#section-5">3.3 实现 Callable（有返回值）⭐</a><a class="toc-h2" href="#section-6">四、线程状态 ⭐⭐⭐</a><a class="toc-h3" href="#section-7">4.1 六种状态</a><a class="toc-h2" href="#section-8">五、线程常用方法 ⭐</a><a class="toc-h3" href="#section-9">5.1 sleep / yield / join</a><a class="toc-h3" href="#section-10">5.2 优先级（1-10）</a><a class="toc-h3" href="#section-11">5.3 守护线程</a><a class="toc-h3" href="#section-12">5.4 中断</a><a class="toc-h2" href="#section-13">六、线程同步 ⭐⭐⭐</a><a class="toc-h3" href="#section-14">6.1 什么是线程安全</a><a class="toc-h3" href="#section-15">6.2 synchronized ⭐⭐⭐</a><a class="toc-h4" href="#section-16">6.2.1 同步方法</a><a class="toc-h4" href="#section-17">6.2.2 同步代码块</a><a class="toc-h4" href="#section-18">6.2.3 静态同步方法</a><a class="toc-h4" href="#section-19">6.2.4 synchronized 特性</a><a class="toc-h3" href="#section-20">6.3 volatile ⭐⭐</a><a class="toc-h3" href="#section-21">6.4 Lock 接口（JDK 5+）⭐⭐</a><a class="toc-h3" href="#section-22">6.5 synchronized vs Lock ⭐⭐</a><a class="toc-h2" href="#section-23">七、死锁 ⭐</a><a class="toc-h2" href="#section-24">八、线程通信 ⭐⭐</a><a class="toc-h3" href="#section-25">8.1 wait / notify / notifyAll</a><a class="toc-h3" href="#section-26">8.2 生产者-消费者模型 ⭐⭐⭐</a><a class="toc-h3" href="#section-27">8.3 Condition（Lock 的通信）</a><a class="toc-h2" href="#section-28">九、线程池 ⭐⭐</a><a class="toc-h3" href="#section-29">9.1 为什么用线程池</a><a class="toc-h3" href="#section-30">9.2 创建线程池</a><a class="toc-h3" href="#section-31">9.3 自定义线程池（推荐）⭐⭐</a><a class="toc-h2" href="#section-32">十、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-33">十一、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

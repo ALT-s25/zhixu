@@ -1,14 +1,11 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>15-异常与多线程</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 15 &#183; 异常与多线程 ⭐⭐⭐
-
-&gt; **难度**：中 | **学习建议**：2 天
-&gt; 二刷重点：**异常处理、thread、mutex、async/future、智能锁**
-
----
-
-## 一、知识框架
-
-```
-异常与多线程
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>15 · 异常与多线程 ⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/C++笔记/15-异常与多线程.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>C++笔记</h2><nav aria-label="同专题笔记"><a href="01-C%2B%2B%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · C++ 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E4%B8%8E%E5%87%BD%E6%95%B0.md.html">03 · 流程控制与函数 ⭐</a><a href="04-%E6%95%B0%E7%BB%84%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2.md.html">04 · 数组与字符串 ⭐⭐</a><a href="05-%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8.md.html">05 · 指针与引用 ⭐⭐⭐</a><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a href="07-%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">07 · 继承多态 ⭐⭐⭐⭐</a><a href="08-%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD%E4%B8%8E%E5%8F%8B%E5%85%83.md.html">08 · 运算符重载与友元 ⭐⭐⭐</a><a href="09-%E6%A8%A1%E6%9D%BF.md.html">09 · 模板 ⭐⭐⭐</a><a href="10-STL%E5%AE%B9%E5%99%A8.md.html">10 · STL 容器 ⭐⭐⭐⭐</a><a href="11-STL%E7%AE%97%E6%B3%95%E4%B8%8E%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1.md.html">11 · STL 算法与函数对象 ⭐⭐⭐</a><a href="12-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md.html">12 · 智能指针与内存管理 ⭐⭐⭐⭐</a><a href="13-%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E5%85%B3%E9%94%AE%E5%AD%97.md.html">13 · 类型转换与关键字 ⭐⭐</a><a href="14-%E7%8E%B0%E4%BB%A3C%2B%2B%E6%96%B0%E7%89%B9%E6%80%A7.md.html">14 · 现代 C++ 新特性 ⭐⭐⭐⭐</a><a aria-current="page" href="15-%E5%BC%82%E5%B8%B8%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">15 · 异常与多线程 ⭐⭐⭐</a><a href="README.md.html">C++笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>C++笔记</div><h1>15 · 异常与多线程 ⭐⭐⭐</h1><div class="article-meta"><span>约 15 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：2 天
+二刷重点：<strong>异常处理、thread、mutex、async/future、智能锁</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>异常与多线程
 ├── 15.1 异常处理 ⭐⭐
 │   ├── try / catch / throw
 │   ├── 标准异常类
@@ -24,40 +21,29 @@
 │   ├── std::unique_lock
 │   └── std::scoped_lock
 └── 15.4 条件变量与原子操作
-```
-
----
-
-## 二、异常处理 ⭐⭐
-
-### 2.1 基本语法
-
-```cpp
-try {
-    // 可能抛异常的代码
-    throw std::runtime_error(&quot;出错了&quot;);
-} catch (const std::runtime_error&amp; e) {
-    std::cerr &lt;&lt; &quot;运行时错误：&quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
-} catch (const std::exception&amp; e) {
-    std::cerr &lt;&lt; &quot;其他异常：&quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
-} catch (...) {
-    std::cerr &lt;&lt; &quot;未知异常\n&quot;;
-}
-```
-
-### 2.2 throw
-
-```cpp
-// 抛出异常
-throw std::runtime_error(&quot;something went wrong&quot;);
-throw 42;                           // 抛 int
-throw &quot;error&quot;;                      // 抛 const char*
-```
-
-### 2.3 标准异常类 ⭐
-
-```
-exception
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、异常处理 ⭐⭐</h2>
+<h3 id="section-2">2.1 基本语法</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 可能抛异常的代码</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">"出错了"</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="o">&amp;</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"运行时错误："</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">exception</span><span class="o">&amp;</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"其他异常："</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(...)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"未知异常</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-3">2.2 throw</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 抛出异常</span>
+<span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">"something went wrong"</span><span class="p">);</span>
+<span class="k">throw</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span><span class="w">                           </span><span class="c1">// 抛 int</span>
+<span class="k">throw</span><span class="w"> </span><span class="s">"error"</span><span class="p">;</span><span class="w">                      </span><span class="c1">// 抛 const char*</span>
+</pre></div>
+</div><h3 id="section-4">2.3 标准异常类 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>exception
 ├── logic_error
 │   ├── invalid_argument
 │   ├── out_of_range
@@ -65,423 +51,376 @@ exception
 └── runtime_error
     ├── overflow_error
     └── range_error
-```
-
-### 2.4 自定义异常
-
-```cpp
-class MyException : public std::exception {
-    std::string msg_;
-public:
-    MyException(const std::string&amp; msg) : msg_(msg) {}
-    const char* what() const noexcept override {
-        return msg_.c_str();
-    }
-};
-
-throw MyException(&quot;自定义错误&quot;);
-```
-
-### 2.5 noexcept ⭐
-
-**承诺函数不会抛出异常**，编译器可以优化。
-
-```cpp
-void func() noexcept {
-    // 不抛异常
-}
-
-void risky() noexcept(false) {     // 显式声明可能抛
-    throw std::runtime_error(&quot;&quot;);
-}
-
-// 条件 noexcept
-template &lt;typename T&gt;
-void swap(T&amp; a, T&amp; b) noexcept(std::is_nothrow_move_constructible_v&lt;T&gt;);
-```
-
-&gt; ⚠ **noexcept 函数抛异常 → std::terminate**
-
-### 2.6 异常最佳实践 ⭐
-
-```cpp
-// 1. 析构函数绝对不能抛异常
-~MyClass() noexcept { }
-
-// 2. RAII 配合异常处理
-{
-    std::unique_ptr&lt;int&gt; p(new int(10));    // 异常时也自动释放
-}
-
-// 3. 构造函数抛异常 → 对象未构造完成
-```
-
----
-
-## 三、多线程基础（C++11）⭐⭐⭐
-
-### 3.1 std::thread
-
-```cpp
-#include &lt;thread&gt;
-
-void task(int n) {
-    std::cout &lt;&lt; &quot;Task &quot; &lt;&lt; n &lt;&lt; &quot; running\n&quot;;
-}
-
-int main() {
-    // 1. 创建并启动线程
-    std::thread t1(task, 1);
-    std::thread t2(task, 2);
-
-    // 2. 等待线程结束
-    t1.join();           // 主线程阻塞等 t1
-    t2.join();
-
-    // 3. detach（分离，让线程后台运行）
-    // std::thread t3(task, 3);
-    // t3.detach();
-}
-```
-
-&gt; ⚠ **join 或 detach 必须调用一次**，否则析构会 std::terminate。
-
-### 3.2 Lambda 创建线程
-
-```cpp
-std::thread t([]() {
-    std::cout &lt;&lt; &quot;Hello from thread\n&quot;;
-});
-t.join();
-```
-
-### 3.3 std::async（C++11）⭐⭐⭐
-
-**异步任务**，获取执行结果。
-
-```cpp
-#include &lt;future&gt;
-
-std::future&lt;int&gt; fut = std::async([]() {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    return 42;
-});
-
-std::cout &lt;&lt; &quot;等待结果...\n&quot;;
-int result = fut.get();     // 阻塞等待
-std::cout &lt;&lt; &quot;结果：&quot; &lt;&lt; result;
-```
-
-**启动策略**：
-```cpp
-std::launch::async    // 立即在新线程中执行
-std::launch::deferred // 延迟到 get() 时才执行（同一线程）
-std::launch::async | std::launch::deferred   // 默认（让系统选）
-```
-
-### 3.4 std::this_thread
-
-```cpp
-std::this_thread::get_id();                       // 当前线程 id
-std::this_thread::sleep_for(std::chrono::ms(100));// 休眠
-std::this_thread::sleep_until(time_point);        // 休眠到指定时间
-std::this_thread::yield();                        // 让出 CPU
-```
-
-### 3.5 std::future / std::promise
-
-```cpp
-std::promise&lt;int&gt; prom;
-std::future&lt;int&gt; fut = prom.get_future();
-
-std::thread t([&amp;prom]() {
-    prom.set_value(42);   // 设置值
-});
-
-std::cout &lt;&lt; fut.get();   // 阻塞获取
-t.join();
-```
-
----
-
-## 四、互斥锁 ⭐⭐⭐
-
-### 4.1 std::mutex
-
-```cpp
-#include &lt;mutex&gt;
-
-std::mutex mtx;
-int counter = 0;
-
-void increment() {
-    mtx.lock();
-    counter++;
-    mtx.unlock();
-}
-
-// 推荐：使用 RAII 包装
-{
-    std::lock_guard&lt;std::mutex&gt; lock(mtx);
-    counter++;
-}   // 自动 unlock
-```
-
-### 4.2 std::lock_guard（RAII）⭐⭐
-
-```cpp
-{
-    std::lock_guard&lt;std::mutex&gt; lock(mtx);    // 加锁
-    counter++;
-}   // 析构自动解锁
-```
-
-&gt; &#128161; **永远不要忘记解锁**，用 `lock_guard` 避免忘记。
-
-### 4.3 std::unique_lock ⭐⭐
-
-比 lock_guard 更灵活，可延迟加锁、提前解锁。
-
-```cpp
-std::unique_lock&lt;std::mutex&gt; lock(mtx);   // 加锁
-// ... 中间可 lock.unlock() / lock.lock()
-```
-
-### 4.4 std::scoped_lock（C++17）⭐⭐
-
-**同时锁多个互斥量**，避免死锁。
-
-```cpp
-std::mutex mtx1, mtx2;
-
-{
-    std::scoped_lock lock(mtx1, mtx2);    // 同时锁多个
-    // ...
-}   // 自动按相反顺序解锁
-```
-
-### 4.5 try_lock / try_lock_for
-
-```cpp
-std::timed_mutex tmtx;
-
-if (tmtx.try_lock_for(std::chrono::ms(100))) {
-    // 拿到锁了
-    tmtx.unlock();
-} else {
-    // 超时了
-}
-```
-
----
-
-## 五、条件变量 ⭐⭐
-
-```cpp
-#include &lt;condition_variable&gt;
-
-std::mutex mtx;
-std::condition_variable cv;
-bool ready = false;
-
-void wait_for_ready() {
-    std::unique_lock&lt;std::mutex&gt; lock(mtx);
-    cv.wait(lock, []() { return ready; });   // 等待 ready 变 true
-    std::cout &lt;&lt; &quot;已就绪\n&quot;;
-}
-
-void set_ready() {
-    {
-        std::lock_guard&lt;std::mutex&gt; lock(mtx);
-        ready = true;
-    }
-    cv.notify_one();   // 通��一个等待者
-}
-
-std::thread t1(wait_for_ready);
-std::this_thread::sleep_for(std::chrono::seconds(1));
-std::thread t2(set_ready);
-```
-
-&gt; ⚠ `cv.wait` 会**自动释放锁并阻塞**，被唤醒后**重新加锁**。
-
----
-
-## 六、原子操作 ⭐
-
-```cpp
-#include &lt;atomic&gt;
-
-std::atomic&lt;int&gt; counter(0);
-
-void increment() {
-    counter.fetch_add(1);    // 原子加
-}
-
-// 整型、指针等都可 atomic
-std::atomic&lt;bool&gt; flag(false);
-flag.store(true);
-bool b = flag.load();
-```
-
-&gt; &#128161; **原子操作比互斥锁快**，但只适合简单的读写。
-
----
-
-## 七、call_once 与单例
-
-```cpp
-#include &lt;mutex&gt;
-
-std::once_flag flag;
-std::unique_ptr&lt;Config&gt; config;
-
-void init() {
-    config = std::make_unique&lt;Config&gt;();
-}
-
-// 多线程中只执行一次
-std::call_once(flag, init);
-```
-
----
-
-## 八、线程池（C++ 本身没有，但可自己实现）
-
-```cpp
-class ThreadPool {
-    std::vector&lt;std::thread&gt; workers_;
-    std::queue&lt;std::function&lt;void()&gt;&gt; tasks_;
-    std::mutex mtx_;
-    std::condition_variable cv_;
-    bool stop_ = false;
-
-public:
-    ThreadPool(size_t n) {
-        for (size_t i = 0; i &lt; n; i++) {
-            workers_.emplace_back([this] {
-                while (true) {
-                    std::function&lt;void()&gt; task;
-                    {
-                        std::unique_lock&lt;std::mutex&gt; lock(mtx_);
-                        cv_.wait(lock, [this] {
-                            return stop_ || !tasks_.empty();
-                        });
-                        if (stop_ &amp;&amp; tasks_.empty()) return;
-                        task = std::move(tasks_.front());
-                        tasks_.pop();
-                    }
-                    task();
-                }
-            });
-        }
-    }
-
-    template &lt;typename F, typename... Args&gt;
-    auto enqueue(F&amp;&amp; f, Args&amp;&amp;... args) {
-        using R = std::invoke_result_t&lt;F, Args...&gt;;
-        auto task = std::make_shared&lt;std::packaged_task&lt;R()&gt;&gt;(
-            std::bind(std::forward&lt;F&gt;(f), std::forward&lt;Args&gt;(args)...)
-        );
-        std::future&lt;R&gt; res = task-&gt;get_future();
-        {
-            std::lock_guard&lt;std::mutex&gt; lock(mtx_);
-            tasks_.emplace([task]() { (*task)(); });
-        }
-        cv_.notify_one();
-        return res;
-    }
-
-    ~ThreadPool() {
-        {
-            std::lock_guard&lt;std::mutex&gt; lock(mtx_);
-            stop_ = true;
-        }
-        cv_.notify_all();
-        for (auto&amp; w : workers_) w.join();
-    }
-};
-```
-
-&gt; &#128161; 现代项目推荐使用 **Asio、QtThreadPool、Boost.Asio** 等现成库。
-
----
-
-## 九、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **std::async vs std::thread？**
-&gt; | std::async | std::thread |
-&gt; |------------|-------------|
-&gt; | 自动管理线程 | 手动 join/detach |
-&gt; | 返回 future | 无返回值（用 promise） |
-&gt; | 可指定启动策略 | - |
-&gt; | **推荐** | - |
-
-&gt; &#128161; **std::lock_guard vs std::unique_lock？**
-&gt; | lock_guard | unique_lock |
-&gt; |------------|-------------|
-&gt; | 简单 | 灵活 |
-&gt; | 构造加锁、析构解锁 | 可延迟加锁、提前解锁 |
-&gt; | **首选** | 需要条件变量等场景 |
-
-&gt; &#128161; **如何避免死锁？**
-&gt; - 固定加锁顺序
-&gt; - 用 `std::lock()` 或 `std::scoped_lock`
-&gt; - 减少嵌套锁
-&gt; - 用 try_lock
-
-&gt; &#128161; **为什么析构函数要 noexcept？**
-&gt; 栈展开时若析构函数抛异常，会导致 std::terminate 程序崩溃。
-
-&gt; &#128161; **原子操作 vs 互斥锁？**
-&gt; - 原子操作：仅适合单变量读写（无锁，CAS）
-&gt; - 互斥锁：保护临界区（有锁，开销大）
-
-&gt; &#128161; **`std::future::get` 只能调一次？**
-&gt; 是的，`get()` 调用后 future 状态变为 ready。多次调用未定义。
-
----
-
-## 十、本章小结
-
-✅ 已掌握：
-- [ ] try / catch / throw
-- [ ] 标准异常类与自定义异常
-- [ ] **noexcept** 的作用
-- [ ] **std::thread** 创建与 join
-- [ ] **std::async** 与 future
-- [ ] **std::mutex + lock_guard**（互斥锁）
-- [ ] unique_lock / scoped_lock
-- [ ] 条件变量 cv
-- [ ] 原子操作 atomic
-- [ ] 线程池原理
-
-✅ 易错点：
-- [ ] thread 必须 join 或 detach
-- [ ] 析构函数不能抛异常（应 noexcept）
-- [ ] future.get() 只能调一次
-- [ ] cv.wait 会释放锁，被唤醒后重新加锁
-- [ ] 多线程注意数据竞争
-
----
-
-## 全部 C++ 章节完结 &#127881;
-
-到此 C++ 15 章全部学完，建议：
-
-1. **回到 README.md**，按复习路线查漏补缺
-2. **重点回顾**：
-   - 指针与引用（05）
-   - 面向对象（06、07）
-   - 智能指针（12）
-   - 现代 C++ 新特性（14）
-3. **动手项目**：
-   - 实现自己的智能指针（unique_ptr 简化版）
-   - 实现简易 STL 容器（vector、string）
-   - 多线程下载器（IO + 多线程 + 智能指针）
-4. **推荐阅读**：
-   - 《Effective Modern C++》（14、15 章）
-   - 《STL 源码剖析》（深入 STL）
-5. **下一步**：Qt 图形界面 / Unreal 游戏引擎 / 嵌入式开发
-
-C++ 学习曲线陡峭但一旦掌握就拥有巨大能力！&#128640;</pre>
+</pre></div>
+</div><h3 id="section-5">2.4 自定义异常</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyException</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">msg_</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">MyException</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">msg_</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">what</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">msg_</span><span class="p">.</span><span class="n">c_str</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">throw</span><span class="w"> </span><span class="n">MyException</span><span class="p">(</span><span class="s">"自定义错误"</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-6">2.5 noexcept ⭐</h3>
+<p><strong>承诺函数不会抛出异常</strong>，编译器可以优化。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">func</span><span class="p">()</span><span class="w"> </span><span class="k">noexcept</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 不抛异常</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">risky</span><span class="p">()</span><span class="w"> </span><span class="k">noexcept</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// 显式声明可能抛</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 条件 noexcept</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">swap</span><span class="p">(</span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_nothrow_move_constructible_v</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">);</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>noexcept 函数抛异常 → std::terminate</strong></p>
+</blockquote>
+<h3 id="section-7">2.6 异常最佳实践 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 析构函数绝对不能抛异常</span>
+<span class="o">~</span><span class="n">MyClass</span><span class="p">()</span><span class="w"> </span><span class="k">noexcept</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 2. RAII 配合异常处理</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">p</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="p">(</span><span class="mi">10</span><span class="p">));</span><span class="w">    </span><span class="c1">// 异常时也自动释放</span>
+<span class="p">}</span>
+
+<span class="c1">// 3. 构造函数抛异常 → 对象未构造完成</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-8">三、多线程基础（C++11）⭐⭐⭐</h2>
+<h3 id="section-9">3.1 std::thread</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;thread&gt;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Task "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" running</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 创建并启动线程</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="n">t1</span><span class="p">(</span><span class="n">task</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="n">t2</span><span class="p">(</span><span class="n">task</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 等待线程结束</span>
+<span class="w">    </span><span class="n">t1</span><span class="p">.</span><span class="n">join</span><span class="p">();</span><span class="w">           </span><span class="c1">// 主线程阻塞等 t1</span>
+<span class="w">    </span><span class="n">t2</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 3. detach（分离，让线程后台运行）</span>
+<span class="w">    </span><span class="c1">// std::thread t3(task, 3);</span>
+<span class="w">    </span><span class="c1">// t3.detach();</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>join 或 detach 必须调用一次</strong>，否则析构会 std::terminate。</p>
+</blockquote>
+<h3 id="section-10">3.2 Lambda 创建线程</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="nf">t</span><span class="p">([]()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Hello from thread</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">});</span>
+<span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-11">3.3 std::async（C++11）⭐⭐⭐</h3>
+<p><strong>异步任务</strong>，获取执行结果。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;future&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">fut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">async</span><span class="p">([]()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">sleep_for</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">seconds</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"等待结果...</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fut</span><span class="p">.</span><span class="n">get</span><span class="p">();</span><span class="w">     </span><span class="c1">// 阻塞等待</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"结果："</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>启动策略</strong>：</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">async</span><span class="w">    </span><span class="c1">// 立即在新线程中执行</span>
+<span class="n">std</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">deferred</span><span class="w"> </span><span class="c1">// 延迟到 get() 时才执行（同一线程）</span>
+<span class="n">std</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">async</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">deferred</span><span class="w">   </span><span class="c1">// 默认（让系统选）</span>
+</pre></div>
+</div><h3 id="section-12">3.4 std::this_thread</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">get_id</span><span class="p">();</span><span class="w">                       </span><span class="c1">// 当前线程 id</span>
+<span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">sleep_for</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">ms</span><span class="p">(</span><span class="mi">100</span><span class="p">));</span><span class="c1">// 休眠</span>
+<span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">sleep_until</span><span class="p">(</span><span class="n">time_point</span><span class="p">);</span><span class="w">        </span><span class="c1">// 休眠到指定时间</span>
+<span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">yield</span><span class="p">();</span><span class="w">                        </span><span class="c1">// 让出 CPU</span>
+</pre></div>
+</div><h3 id="section-13">3.5 std::future / std::promise</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">promise</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">prom</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">fut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prom</span><span class="p">.</span><span class="n">get_future</span><span class="p">();</span>
+
+<span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="nf">t</span><span class="p">([</span><span class="o">&amp;</span><span class="n">prom</span><span class="p">]()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">prom</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span><span class="w">   </span><span class="c1">// 设置值</span>
+<span class="p">});</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">fut</span><span class="p">.</span><span class="n">get</span><span class="p">();</span><span class="w">   </span><span class="c1">// 阻塞获取</span>
+<span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">四、互斥锁 ⭐⭐⭐</h2>
+<h3 id="section-15">4.1 std::mutex</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mutex&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="w"> </span><span class="n">mtx</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">mtx</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
+<span class="w">    </span><span class="n">counter</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="n">mtx</span><span class="p">.</span><span class="n">unlock</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// 推荐：使用 RAII 包装</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span>
+<span class="w">    </span><span class="n">counter</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span><span class="w">   </span><span class="c1">// 自动 unlock</span>
+</pre></div>
+</div><h3 id="section-16">4.2 std::lock_guard（RAII）⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span><span class="w">    </span><span class="c1">// 加锁</span>
+<span class="w">    </span><span class="n">counter</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span><span class="w">   </span><span class="c1">// 析构自动解锁</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>永远不要忘记解锁</strong>，用 <code>lock_guard</code> 避免忘记。</p>
+</blockquote>
+<h3 id="section-17">4.3 std::unique_lock ⭐⭐</h3>
+<p>比 lock_guard 更灵活，可延迟加锁、提前解锁。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_lock</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span><span class="w">   </span><span class="c1">// 加锁</span>
+<span class="c1">// ... 中间可 lock.unlock() / lock.lock()</span>
+</pre></div>
+</div><h3 id="section-18">4.4 std::scoped_lock（C++17）⭐⭐</h3>
+<p><strong>同时锁多个互斥量</strong>，避免死锁。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="w"> </span><span class="n">mtx1</span><span class="p">,</span><span class="w"> </span><span class="n">mtx2</span><span class="p">;</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">scoped_lock</span><span class="w"> </span><span class="nf">lock</span><span class="p">(</span><span class="n">mtx1</span><span class="p">,</span><span class="w"> </span><span class="n">mtx2</span><span class="p">);</span><span class="w">    </span><span class="c1">// 同时锁多个</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span><span class="w">   </span><span class="c1">// 自动按相反顺序解锁</span>
+</pre></div>
+</div><h3 id="section-19">4.5 try_lock / try_lock_for</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">timed_mutex</span><span class="w"> </span><span class="n">tmtx</span><span class="p">;</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tmtx</span><span class="p">.</span><span class="n">try_lock_for</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">ms</span><span class="p">(</span><span class="mi">100</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 拿到锁了</span>
+<span class="w">    </span><span class="n">tmtx</span><span class="p">.</span><span class="n">unlock</span><span class="p">();</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 超时了</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">五、条件变量 ⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;condition_variable&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="w"> </span><span class="n">mtx</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">condition_variable</span><span class="w"> </span><span class="n">cv</span><span class="p">;</span>
+<span class="kt">bool</span><span class="w"> </span><span class="n">ready</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">wait_for_ready</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">unique_lock</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span>
+<span class="w">    </span><span class="n">cv</span><span class="p">.</span><span class="n">wait</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span><span class="w"> </span><span class="p">[]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">ready</span><span class="p">;</span><span class="w"> </span><span class="p">});</span><span class="w">   </span><span class="c1">// 等待 ready 变 true</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"已就绪</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">set_ready</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ready</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">cv</span><span class="p">.</span><span class="n">notify_one</span><span class="p">();</span><span class="w">   </span><span class="c1">// 通��一个等待者</span>
+<span class="p">}</span>
+
+<span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="nf">t1</span><span class="p">(</span><span class="n">wait_for_ready</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">sleep_for</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">seconds</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="w"> </span><span class="nf">t2</span><span class="p">(</span><span class="n">set_ready</span><span class="p">);</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <code>cv.wait</code> 会<strong>自动释放锁并阻塞</strong>，被唤醒后<strong>重新加锁</strong>。</p>
+</blockquote>
+<hr/>
+<h2 id="section-21">六、原子操作 ⭐</h2>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;atomic&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">counter</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">counter</span><span class="p">.</span><span class="n">fetch_add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">    </span><span class="c1">// 原子加</span>
+<span class="p">}</span>
+
+<span class="c1">// 整型、指针等都可 atomic</span>
+<span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">flag</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+<span class="n">flag</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="kt">bool</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">flag</span><span class="p">.</span><span class="n">load</span><span class="p">();</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>原子操作比互斥锁快</strong>，但只适合简单的读写。</p>
+</blockquote>
+<hr/>
+<h2 id="section-22">七、call_once 与单例</h2>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mutex&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">once_flag</span><span class="w"> </span><span class="n">flag</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">Config</span><span class="o">&gt;</span><span class="w"> </span><span class="n">config</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">Config</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// 多线程中只执行一次</span>
+<span class="n">std</span><span class="o">::</span><span class="n">call_once</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">init</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-23">八、线程池（C++ 本身没有，但可自己实现）</h2>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ThreadPool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kr">thread</span><span class="o">&gt;</span><span class="w"> </span><span class="n">workers_</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">()</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">tasks_</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="w"> </span><span class="n">mtx_</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">condition_variable</span><span class="w"> </span><span class="n">cv_</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">stop_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">ThreadPool</span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">workers_</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">([</span><span class="k">this</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">()</span><span class="o">&gt;</span><span class="w"> </span><span class="n">task</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">std</span><span class="o">::</span><span class="n">unique_lock</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx_</span><span class="p">);</span>
+<span class="w">                        </span><span class="n">cv_</span><span class="p">.</span><span class="n">wait</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="k">this</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                            </span><span class="k">return</span><span class="w"> </span><span class="n">stop_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">tasks_</span><span class="p">.</span><span class="n">empty</span><span class="p">();</span>
+<span class="w">                        </span><span class="p">});</span>
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stop_</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">tasks_</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">                        </span><span class="n">task</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">tasks_</span><span class="p">.</span><span class="n">front</span><span class="p">());</span>
+<span class="w">                        </span><span class="n">tasks_</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                    </span><span class="n">task</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">});</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">F</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="p">...</span><span class="w"> </span><span class="n">Args</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">enqueue</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">using</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">Args</span><span class="p">...</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">packaged_task</span><span class="o">&lt;</span><span class="n">R</span><span class="p">()</span><span class="o">&gt;&gt;</span><span class="p">(</span>
+<span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="n">f</span><span class="p">),</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Args</span><span class="o">&gt;</span><span class="p">(</span><span class="n">args</span><span class="p">)...)</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">R</span><span class="o">&gt;</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">task</span><span class="o">-&gt;</span><span class="n">get_future</span><span class="p">();</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx_</span><span class="p">);</span>
+<span class="w">            </span><span class="n">tasks_</span><span class="p">.</span><span class="n">emplace</span><span class="p">([</span><span class="n">task</span><span class="p">]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">task</span><span class="p">)();</span><span class="w"> </span><span class="p">});</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">cv_</span><span class="p">.</span><span class="n">notify_one</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="o">~</span><span class="n">ThreadPool</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lock</span><span class="p">(</span><span class="n">mtx_</span><span class="p">);</span>
+<span class="w">            </span><span class="n">stop_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">cv_</span><span class="p">.</span><span class="n">notify_all</span><span class="p">();</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">workers_</span><span class="p">)</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><blockquote>
+<p>💡 现代项目推荐使用 <strong>Asio、QtThreadPool、Boost.Asio</strong> 等现成库。</p>
+</blockquote>
+<hr/>
+<h2 id="section-24">九、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>std::async vs std::thread？</strong>
+| std::async | std::thread |
+|------------|-------------|
+| 自动管理线程 | 手动 join/detach |
+| 返回 future | 无返回值（用 promise） |
+| 可指定启动策略 | - |
+| <strong>推荐</strong> | - |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>std::lock_guard vs std::unique_lock？</strong>
+| lock_guard | unique_lock |
+|------------|-------------|
+| 简单 | 灵活 |
+| 构造加锁、析构解锁 | 可延迟加锁、提前解锁 |
+| <strong>首选</strong> | 需要条件变量等场景 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>如何避免死锁？</strong></p>
+<ul>
+<li>固定加锁顺序</li>
+<li>用 <code>std::lock()</code> 或 <code>std::scoped_lock</code></li>
+<li>减少嵌套锁</li>
+<li>用 try_lock</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>为什么析构函数要 noexcept？</strong>
+栈展开时若析构函数抛异常，会导致 std::terminate 程序崩溃。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>原子操作 vs 互斥锁？</strong></p>
+<ul>
+<li>原子操作：仅适合单变量读写（无锁，CAS）</li>
+<li>互斥锁：保护临界区（有锁，开销大）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>std::future::get</code> 只能调一次？</strong>
+是的，<code>get()</code> 调用后 future 状态变为 ready。多次调用未定义。</p>
+</blockquote>
+<hr/>
+<h2 id="section-25">十、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>try / catch / throw</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>标准异常类与自定义异常</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>noexcept</strong> 的作用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>std::thread</strong> 创建与 join</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>std::async</strong> 与 future</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>std::mutex + lock_guard</strong>（互斥锁）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>unique_lock / scoped_lock</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>条件变量 cv</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>原子操作 atomic</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>线程池原理</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>thread 必须 join 或 detach</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>析构函数不能抛异常（应 noexcept）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>future.get() 只能调一次</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>cv.wait 会释放锁，被唤醒后重新加锁</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>多线程注意数据竞争</li>
+</ul>
+<hr/>
+<h2 id="section-26">全部 C++ 章节完结 🎉</h2>
+<p>到此 C++ 15 章全部学完，建议：</p>
+<ol>
+<li><strong>回到 README.md</strong>，按复习路线查漏补缺</li>
+<li><strong>重点回顾</strong>：<ul>
+<li>指针与引用（05）</li>
+<li>面向对象（06、07）</li>
+<li>智能指针（12）</li>
+<li>现代 C++ 新特性（14）</li>
+</ul>
+</li>
+<li><strong>动手项目</strong>：<ul>
+<li>实现自己的智能指针（unique_ptr 简化版）</li>
+<li>实现简易 STL 容器（vector、string）</li>
+<li>多线程下载器（IO + 多线程 + 智能指针）</li>
+</ul>
+</li>
+<li><strong>推荐阅读</strong>：<ul>
+<li>《Effective Modern C++》（14、15 章）</li>
+<li>《STL 源码剖析》（深入 STL）</li>
+</ul>
+</li>
+<li><strong>下一步</strong>：Qt 图形界面 / Unreal 游戏引擎 / 嵌入式开发</li>
+</ol>
+<p>C++ 学习曲线陡峭但一旦掌握就拥有巨大能力！🚀</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="14-%E7%8E%B0%E4%BB%A3C%2B%2B%E6%96%B0%E7%89%B9%E6%80%A7.md.html"><small>← 上一篇</small><strong>14 · 现代 C++ 新特性 ⭐⭐⭐⭐</strong></a><a href="README.md.html"><small>下一篇 →</small><strong>C++笔记 · 学习指南</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、异常处理 ⭐⭐</a><a class="toc-h3" href="#section-2">2.1 基本语法</a><a class="toc-h3" href="#section-3">2.2 throw</a><a class="toc-h3" href="#section-4">2.3 标准异常类 ⭐</a><a class="toc-h3" href="#section-5">2.4 自定义异常</a><a class="toc-h3" href="#section-6">2.5 noexcept ⭐</a><a class="toc-h3" href="#section-7">2.6 异常最佳实践 ⭐</a><a class="toc-h2" href="#section-8">三、多线程基础（C++11）⭐⭐⭐</a><a class="toc-h3" href="#section-9">3.1 std::thread</a><a class="toc-h3" href="#section-10">3.2 Lambda 创建线程</a><a class="toc-h3" href="#section-11">3.3 std::async（C++11）⭐⭐⭐</a><a class="toc-h3" href="#section-12">3.4 std::this_thread</a><a class="toc-h3" href="#section-13">3.5 std::future / std::promise</a><a class="toc-h2" href="#section-14">四、互斥锁 ⭐⭐⭐</a><a class="toc-h3" href="#section-15">4.1 std::mutex</a><a class="toc-h3" href="#section-16">4.2 std::lock_guard（RAII）⭐⭐</a><a class="toc-h3" href="#section-17">4.3 std::unique_lock ⭐⭐</a><a class="toc-h3" href="#section-18">4.4 std::scoped_lock（C++17）⭐⭐</a><a class="toc-h3" href="#section-19">4.5 try_lock / try_lock_for</a><a class="toc-h2" href="#section-20">五、条件变量 ⭐⭐</a><a class="toc-h2" href="#section-21">六、原子操作 ⭐</a><a class="toc-h2" href="#section-22">七、call_once 与单例</a><a class="toc-h2" href="#section-23">八、线程池（C++ 本身没有，但可自己实现）</a><a class="toc-h2" href="#section-24">九、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-25">十、本章小结</a><a class="toc-h2" href="#section-26">全部 C++ 章节完结 🎉</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

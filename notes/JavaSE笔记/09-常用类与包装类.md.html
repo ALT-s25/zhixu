@@ -1,355 +1,462 @@
-<meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>09-常用类与包装类</title><style>body{max-width:850px;margin:auto;padding:24px;background:#fff9ec;color:#304353}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.8 monospace}</style><pre># 09 &#183; 常用类与包装类 ⭐⭐
-
-&gt; **难度**：中 | **学习建议**：1 天
-&gt; 二刷重点：**String 不可变性、StringBuilder/StringBuffer 区别、自动装箱拆箱**
-
----
-
-## 一、知识框架
-
-```
-常用类与包装类
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>09 · 常用类与包装类 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css"></head><body data-note="notes/JavaSE笔记/09-常用类与包装类.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a aria-current="page" href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>09 · 常用类与包装类 ⭐⭐</h1><div class="article-meta"><span>约 12 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：1 天
+二刷重点：<strong>String 不可变性、StringBuilder/StringBuffer 区别、自动装箱拆箱</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>常用类与包装类
 ├── 9.1 Object 类
 ├── 9.2 String 类 ⭐⭐⭐
 ├── 9.3 StringBuilder / StringBuffer ⭐⭐
 ├── 9.4 其他常用类（Math、Date、Calendar）
 └── 9.5 包装类 ⭐⭐⭐
-```
-
----
-
-## 二、Object 类
-
-所有类的父类，常见方法：
-
-### 2.1 toString()
-
-```java
-// 默认返回 类名@哈希码
-System.out.println(obj.toString());   // com.kuangshen.Student@1540e19d
-
-// 重写后
-@Override
-public String toString() {
-    return &quot;Student{name=&quot; + name + &quot;, age=&quot; + age + &quot;}&quot;;
-}
-```
-
-### 2.2 equals()
-
-```java
-// 默认 == 比较（地址）
-// 必须重写才能比较内容
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Student s = (Student) o;
-    return age == s.age &amp;&amp; Objects.equals(name, s.name);
-}
-```
-
-### 2.3 hashCode()
-
-```java
-// 重写 equals 必须重写 hashCode
-// 原因：HashMap 等集合依赖 hashCode
-@Override
-public int hashCode() {
-    return Objects.hash(name, age);
-}
-```
-
-&gt; &#128161; **黄金法则**：
-&gt; - equals 相等 → hashCode 必须相等
-&gt; - hashCode 相等 → equals 不一定相等（哈希冲突）
-
----
-
-## 三、String 类 ⭐⭐⭐
-
-### 3.1 String 的本质
-
-```java
-public final class String
-    implements java.io.Serializable, Comparable&lt;String&gt;, CharSequence {
-    private final char value[];    // 内部是 final 字符数组
-}
-```
-
-&gt; &#128161; **关键**：`final class` + `final char[]` → **String 不可变**！
-
-### 3.2 String 不可变性（面试必问）
-
-```java
-String s = &quot;hello&quot;;
-s = s + &quot; world&quot;;   // 不是修改 s，而是创建新对象 &quot;hello world&quot;
-System.out.println(s);   // hello world
-```
-
-**内存示意**：
-```
-s 引用变化过程：
-s ──→ &quot;hello&quot;     // 旧对象（失去引用，会被 GC）
-s ──→ &quot;hello world&quot; // 新对象
-```
-
-**为什���设计成不可变？**
-1. **安全性**：作为 HashMap key、数据库连接参数等，值不能变
-2. **哈希缓存**：hashCode 可以缓存，不需要每次��算
-3. **线程安全**：多线程共享安全，无需同步
-4. **字符串常量池**：相同字符串可共享（节省内存）
-
-### 3.3 字符串常量池 ⭐⭐
-
-```java
-String s1 = &quot;hello&quot;;     // 走常量池
-String s2 = &quot;hello&quot;;     // 复用常量池的 &quot;hello&quot;
-String s3 = new String(&quot;hello&quot;);   // new 强制新建对象
-
-System.out.println(s1 == s2);   // true（同一对象）
-System.out.println(s1 == s3);   // false（不同对象）
-System.out.println(s1.equals(s3)); // true（内容相同）
-```
-
-&gt; &#128161; **intern()** 方法：将字符串放入常量池
-```java
-String s3 = new String(&quot;hello&quot;).intern();
-System.out.println(s1 == s3);   // true
-```
-
-### 3.4 String 常用方法 ⭐⭐
-
-| 方法 | 作用 | 示例 |
-|------|------|------|
-| `length()` | 长度 | `&quot;abc&quot;.length()` → 3 |
-| `charAt(int)` | 取字符 | `&quot;abc&quot;.charAt(1)` → &#39;b&#39; |
-| `indexOf(String)` | 子串位置 | `&quot;hello&quot;.indexOf(&quot;ll&quot;)` → 2 |
-| `substring(int, int)` | 截取 | `&quot;hello&quot;.substring(1, 3)` → &quot;el&quot; |
-| `split(String)` | 拆分 | `&quot;a,b,c&quot;.split(&quot;,&quot;)` → `[&quot;a&quot;,&quot;b&quot;,&quot;c&quot;]` |
-| `trim()` | 去两端空格 | `&quot; hi &quot;.trim()` → &quot;hi&quot; |
-| `toLowerCase()` / `toUpperCase()` | 大小写转换 | |
-| `replace(old, new)` | 替换 | `&quot;hi&quot;.replace(&quot;h&quot;,&quot;H&quot;)` → &quot;Hi&quot; |
-| `startsWith()` / `endsWith()` | 前缀/后缀判断 | |
-| `contains(String)` | 是否包含 | |
-| `compareTo(String)` | 字典序比较 | |
-| `equalsIgnoreCase()` | 忽略大小写比较 | |
-| `isEmpty()` | 是否为空 | `&quot;&quot;` → true |
-| `join(...)` | 拼接 | `String.join(&quot;,&quot;, &quot;a&quot;,&quot;b&quot;)` → &quot;a,b&quot; |
-
-### 3.5 String vs StringBuilder vs StringBuffer ⭐⭐⭐
-
-| 维度 | String | StringBuilder | StringBuffer |
-|------|--------|---------------|--------------|
-| 可变性 | ❌ 不可变 | ✅ 可变 | ✅ 可变 |
-| 线程安全 | ✅（因不可变） | ❌ 不安全 | ✅ synchronized |
-| 性能 | 拼接时差 | 最高 | 中等 |
-| 使用场景 | 少量拼接 | 单线程大量拼接 | 多线程大量拼接 |
-
-```java
-// ❌ String 拼接（创建大量临时对象）
-String s = &quot;&quot;;
-for (int i = 0; i &lt; 1000; i++) {
-    s += i;    // 每次循环创建新 String
-}
-
-// ✅ StringBuilder 拼接（推荐）
-StringBuilder sb = new StringBuilder();
-for (int i = 0; i &lt; 1000; i++) {
-    sb.append(i);
-}
-String s = sb.toString();
-
-// ✅ Java 8+：StringJoiner
-StringJoiner sj = new StringJoiner(&quot;,&quot;);
-for (int i = 0; i &lt; 1000; i++) sj.add(String.valueOf(i));
-String s = sj.toString();
-```
-
----
-
-## 四、其他常用类
-
-### 4.1 Math 类
-
-```java
-Math.abs(-1);         // 1
-Math.max(3, 5);       // 5
-Math.min(3, 5);       // 3
-Math.pow(2, 3);       // 8
-Math.sqrt(9);         // 3
-Math.random();        // [0, 1) 随机小数
-Math.round(3.5);      // 4（四舍五入）
-Math.floor(3.9);      // 3（向下取整）
-Math.ceil(3.1);       // 4（向上取整）
-```
-
-### 4.2 Random 类
-
-```java
-Random r = new Random();
-int n = r.nextInt(100);    // [0, 100) 整数
-double d = r.nextDouble(); // [0, 1) 小数
-```
-
-### 4.3 Date 类（旧）
-
-```java
-Date d = new Date();
-System.out.println(d);     // 当前时间
-
-// SimpleDateFormat 格式化
-SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
-String s = sdf.format(d);
-Date d2 = sdf.parse(&quot;2025-01-01 12:00:00&quot;);
-```
-
-### 4.4 Calendar 类（旧）
-
-```java
-Calendar c = Calendar.getInstance();
-c.set(2025, Calendar.JANUARY, 1);
-c.add(Calendar.DAY_OF_MONTH, 7);   // 加 7 天
-Date d = c.getTime();
-```
-
-&gt; ⚠ **Java 8 推荐 LocalDateTime**，更清晰。
-
-### 4.5 Java 8 时间 API（推荐）
-
-```java
-LocalDate today = LocalDate.now();
-LocalDate tomorrow = today.plusDays(1);
-LocalTime now = LocalTime.now();
-
-DateTimeFormatter fmt = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&quot;);
-String s = today.format(fmt);
-```
-
----
-
-## 五、包装类 ⭐⭐⭐
-
-### 5.1 8 种基本类型对应的包装类
-
-| 基本类型 | 包装类 |
-|---------|--------|
-| byte | Byte |
-| short | Short |
-| **int** | **Integer** |
-| long | Long |
-| float | Float |
-| double | Double |
-| char | Character |
-| boolean | Boolean |
-
-### 5.2 装箱与拆箱（自动）
-
-```java
-// 装箱：基本类型 → 包装类
-Integer i = 10;         // 自动装箱
-Integer j = Integer.valueOf(10);  // 手动装箱
-
-// 拆箱：包装类 → 基本类型
-int n = i;              // 自动拆箱
-int m = i.intValue();   // 手动拆箱
-```
-
-### 5.3 自动装箱的坑 ⭐⭐
-
-```java
-Integer a = 127;
-Integer b = 127;
-System.out.println(a == b);   // true（缓存池）
-
-Integer c = 128;
-Integer d = 128;
-System.out.println(c == d);   // false（超出缓存池）
-```
-
-&gt; &#128161; **缓存池**：Integer 默认缓存 **-128 ~ 127** 的值（可通过 JVM 参数调整）
-&gt; 包装类比较必须用 `.equals()`！
-
-### 5.4 包装类常用方法
-
-```java
-// 字符串转数字
-int n = Integer.parseInt(&quot;123&quot;);
-double d = Double.parseDouble(&quot;3.14&quot;);
-boolean b = Boolean.parseBoolean(&quot;true&quot;);
-
-// 数字转字符串
-String s = Integer.toString(123);   // &quot;123&quot;
-String s2 = String.valueOf(123);     // &quot;123&quot;
-
-// 最大值、最小值
-int max = Integer.MAX_VALUE;
-int min = Integer.MIN_VALUE;
-```
-
-### 5.5 int vs Integer ⭐⭐⭐
-
-| 维度 | int | Integer |
-|------|-----|---------|
-| 类型 | 基本类型 | 引用类型 |
-| 默认值 | 0 | null |
-| 内存 | 4 字节 | 对象（更大） |
-| 比较 | == | equals |
-| 集合 | 不能放 | 可以放 |
-| null | 不行 | 可以 |
-
-```java
-List&lt;Integer&gt; list = new ArrayList&lt;&gt;();    // 集合只能存对象
-list.add(1);    // 自动装箱为 Integer
-```
-
----
-
-## 六、面试常问 ⭐⭐⭐
-
-&gt; &#128161; **String 为什么是不可变的？**
-&gt; 1. 类被 `final` 修饰，不能被继承
-&gt; 2. 内部 `char[]` 被 `final` 修饰，不能修改
-&gt; 3. 没有提供修改内部数组的方法
-&gt;
-&gt; 设计原因：安全性（HashMap key）、线程安全、哈希缓存、字符串常量池。
-
-&gt; &#128161; **String、StringBuilder、StringBuffer 区别？**
-&gt; | 类型 | 可变 | 线程 | 性能 |
-&gt; |------|------|------|------|
-&gt; | String | ❌ | ✅ | 拼接差 |
-&gt; | StringBuilder | ✅ | ❌ | 最快 |
-&gt; | StringBuffer | ✅ | ✅ | 较慢 |
-
-&gt; &#128161; **`==` 和 `equals` 的区别？**
-&gt; - `==` 对基本类型比较值，对引用类型比较地址
-&gt; - `equals` 默认 ==，但 String、Integer 等类重写后比较内容
-&gt; - **包装类比较必须用 equals**
-
-&gt; &#128161; **自动装箱和拆箱？**
-&gt; - 装箱：基本类型 → 包装类（编译器自动调用 `valueOf`）
-&gt; - 拆箱：包装类 → 基本类型（编译器自动调用 `intValue` 等）
-
-&gt; &#128161; **Integer 缓存池范围？**
-&gt; -128 ~ 127，默认缓存，可通过 `-XX:AutoBoxCacheMax` 调整。
-
----
-
-## 七、本章小结
-
-✅ 已掌握：
-- [ ] Object 类的常用方法
-- [ ] **String 不可变性原理及原因**
-- [ ] 字符串常量池与 intern()
-- [ ] String 常用方法
-- [ ] **String / StringBuilder / StringBuffer 区别**
-- [ ] **基本类型与包装类的对应**
-- [ ] **自动装箱与拆箱**
-- [ ] Integer 缓存池陷阱
-
-✅ 易错点：
-- [ ] String 拼接性能差，循环中要用 StringBuilder
-- [ ] 包装类比较必须用 `.equals()`
-- [ ] Integer 缓存池范围 -128~127，超出后 == 比较会出错
-
-下一章：[10-集合框架.md](./10-集合框架.md) — JavaSE 核心！</pre>
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、Object 类</h2>
+<p>所有类的父类，常见方法：</p>
+<h3 id="section-2">2.1 toString()</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 默认返回 类名@哈希码</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span><span class="w">   </span><span class="c1">// com.kuangshen.Student@1540e19d</span>
+
+<span class="c1">// 重写后</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">"Student{name="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">", age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"}"</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-3">2.2 equals()</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 默认 == 比较（地址）</span>
+<span class="c1">// 必须重写才能比较内容</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">name</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-4">2.3 hashCode()</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 重写 equals 必须重写 hashCode</span>
+<span class="c1">// 原因：HashMap 等集合依赖 hashCode</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">hashCode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">hash</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>黄金法则</strong>：</p>
+<ul>
+<li>equals 相等 → hashCode 必须相等</li>
+<li>hashCode 相等 → equals 不一定相等（哈希冲突）</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-5">三、String 类 ⭐⭐⭐</h2>
+<h3 id="section-6">3.1 String 的本质</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">String</span>
+<span class="w">    </span><span class="kd">implements</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">Serializable</span><span class="p">,</span><span class="w"> </span><span class="n">Comparable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">CharSequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">value</span><span class="o">[]</span><span class="p">;</span><span class="w">    </span><span class="c1">// 内部是 final 字符数组</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>关键</strong>：<code>final class</code> + <code>final char[]</code> → <strong>String 不可变</strong>！</p>
+</blockquote>
+<h3 id="section-7">3.2 String 不可变性（面试必问）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hello"</span><span class="p">;</span>
+<span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" world"</span><span class="p">;</span><span class="w">   </span><span class="c1">// 不是修改 s，而是创建新对象 "hello world"</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w">   </span><span class="c1">// hello world</span>
+</pre></div>
+</div><p><strong>内存示意</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>s 引用变化过程：
+s ──→ "hello"     // 旧对象（失去引用，会被 GC）
+s ──→ "hello world" // 新对象
+</pre></div>
+</div><p><strong>为什���设计成不可变？</strong></p>
+<ol>
+<li><strong>安全性</strong>：作为 HashMap key、数据库连接参数等，值不能变</li>
+<li><strong>哈希缓存</strong>：hashCode 可以缓存，不需要每次��算</li>
+<li><strong>线程安全</strong>：多线程共享安全，无需同步</li>
+<li><strong>字符串常量池</strong>：相同字符串可共享（节省内存）</li>
+</ol>
+<h3 id="section-8">3.3 字符串常量池 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hello"</span><span class="p">;</span><span class="w">     </span><span class="c1">// 走常量池</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hello"</span><span class="p">;</span><span class="w">     </span><span class="c1">// 复用常量池的 "hello"</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span><span class="w">   </span><span class="c1">// new 强制新建对象</span>
+
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s2</span><span class="p">);</span><span class="w">   </span><span class="c1">// true（同一对象）</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s3</span><span class="p">);</span><span class="w">   </span><span class="c1">// false（不同对象）</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">s3</span><span class="p">));</span><span class="w"> </span><span class="c1">// true（内容相同）</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>intern()</strong> 方法：将字符串放入常量池</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">"hello"</span><span class="p">).</span><span class="na">intern</span><span class="p">();</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s3</span><span class="p">);</span><span class="w">   </span><span class="c1">// true</span>
+</pre></div>
+</div><h3 id="section-9">3.4 String 常用方法 ⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>length()</code></td>
+<td>长度</td>
+<td><code>"abc".length()</code> → 3</td>
+</tr>
+<tr>
+<td><code>charAt(int)</code></td>
+<td>取字符</td>
+<td><code>"abc".charAt(1)</code> → 'b'</td>
+</tr>
+<tr>
+<td><code>indexOf(String)</code></td>
+<td>子串位置</td>
+<td><code>"hello".indexOf("ll")</code> → 2</td>
+</tr>
+<tr>
+<td><code>substring(int, int)</code></td>
+<td>截取</td>
+<td><code>"hello".substring(1, 3)</code> → "el"</td>
+</tr>
+<tr>
+<td><code>split(String)</code></td>
+<td>拆分</td>
+<td><code>"a,b,c".split(",")</code> → <code>["a","b","c"]</code></td>
+</tr>
+<tr>
+<td><code>trim()</code></td>
+<td>去两端空格</td>
+<td><code>" hi ".trim()</code> → "hi"</td>
+</tr>
+<tr>
+<td><code>toLowerCase()</code> / <code>toUpperCase()</code></td>
+<td>大小写转换</td>
+<td></td>
+</tr>
+<tr>
+<td><code>replace(old, new)</code></td>
+<td>替换</td>
+<td><code>"hi".replace("h","H")</code> → "Hi"</td>
+</tr>
+<tr>
+<td><code>startsWith()</code> / <code>endsWith()</code></td>
+<td>前缀/后缀判断</td>
+<td></td>
+</tr>
+<tr>
+<td><code>contains(String)</code></td>
+<td>是否包含</td>
+<td></td>
+</tr>
+<tr>
+<td><code>compareTo(String)</code></td>
+<td>字典序比较</td>
+<td></td>
+</tr>
+<tr>
+<td><code>equalsIgnoreCase()</code></td>
+<td>忽略大小写比较</td>
+<td></td>
+</tr>
+<tr>
+<td><code>isEmpty()</code></td>
+<td>是否为空</td>
+<td><code>""</code> → true</td>
+</tr>
+<tr>
+<td><code>join(...)</code></td>
+<td>拼接</td>
+<td><code>String.join(",", "a","b")</code> → "a,b"</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-10">3.5 String vs StringBuilder vs StringBuffer ⭐⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>String</th>
+<th>StringBuilder</th>
+<th>StringBuffer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可变性</td>
+<td>❌ 不可变</td>
+<td>✅ 可变</td>
+<td>✅ 可变</td>
+</tr>
+<tr>
+<td>线程安全</td>
+<td>✅（因不可变）</td>
+<td>❌ 不安全</td>
+<td>✅ synchronized</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>拼接时差</td>
+<td>最高</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>少量拼接</td>
+<td>单线程大量拼接</td>
+<td>多线程大量拼接</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ❌ String 拼接（创建大量临时对象）</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">    </span><span class="c1">// 每次循环创建新 String</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ StringBuilder 拼接（推荐）</span>
+<span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+
+<span class="c1">// ✅ Java 8+：StringJoiner</span>
+<span class="n">StringJoiner</span><span class="w"> </span><span class="n">sj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringJoiner</span><span class="p">(</span><span class="s">","</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">sj</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sj</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-11">四、其他常用类</h2>
+<h3 id="section-12">4.1 Math 类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Math</span><span class="p">.</span><span class="na">abs</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="w">         </span><span class="c1">// 1</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">max</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">       </span><span class="c1">// 5</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">       </span><span class="c1">// 3</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">       </span><span class="c1">// 8</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">sqrt</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span><span class="w">         </span><span class="c1">// 3</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">random</span><span class="p">();</span><span class="w">        </span><span class="c1">// [0, 1) 随机小数</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">round</span><span class="p">(</span><span class="mf">3.5</span><span class="p">);</span><span class="w">      </span><span class="c1">// 4（四舍五入）</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">floor</span><span class="p">(</span><span class="mf">3.9</span><span class="p">);</span><span class="w">      </span><span class="c1">// 3（向下取整）</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">ceil</span><span class="p">(</span><span class="mf">3.1</span><span class="p">);</span><span class="w">       </span><span class="c1">// 4（向上取整）</span>
+</pre></div>
+</div><h3 id="section-13">4.2 Random 类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Random</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span><span class="w">    </span><span class="c1">// [0, 100) 整数</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">nextDouble</span><span class="p">();</span><span class="w"> </span><span class="c1">// [0, 1) 小数</span>
+</pre></div>
+</div><h3 id="section-14">4.3 Date 类（旧）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Date</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">();</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">d</span><span class="p">);</span><span class="w">     </span><span class="c1">// 当前时间</span>
+
+<span class="c1">// SimpleDateFormat 格式化</span>
+<span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">sdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+<span class="n">Date</span><span class="w"> </span><span class="n">d2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">"2025-01-01 12:00:00"</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-15">4.4 Calendar 类（旧）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Calendar</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Calendar</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="n">c</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span><span class="w"> </span><span class="n">Calendar</span><span class="p">.</span><span class="na">JANUARY</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="n">c</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">DAY_OF_MONTH</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span><span class="w">   </span><span class="c1">// 加 7 天</span>
+<span class="n">Date</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">getTime</span><span class="p">();</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>Java 8 推荐 LocalDateTime</strong>，更清晰。</p>
+</blockquote>
+<h3 id="section-16">4.5 Java 8 时间 API（推荐）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">LocalDate</span><span class="w"> </span><span class="n">today</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="n">LocalDate</span><span class="w"> </span><span class="n">tomorrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">today</span><span class="p">.</span><span class="na">plusDays</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">LocalTime</span><span class="w"> </span><span class="n">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalTime</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+
+<span class="n">DateTimeFormatter</span><span class="w"> </span><span class="n">fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">"yyyy-MM-dd"</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">today</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-17">五、包装类 ⭐⭐⭐</h2>
+<h3 id="section-18">5.1 8 种基本类型对应的包装类</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>基本类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td><strong>int</strong></td>
+<td><strong>Integer</strong></td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-19">5.2 装箱与拆箱（自动）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 装箱：基本类型 → 包装类</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">         </span><span class="c1">// 自动装箱</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// 手动装箱</span>
+
+<span class="c1">// 拆箱：包装类 → 基本类型</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">              </span><span class="c1">// 自动拆箱</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="na">intValue</span><span class="p">();</span><span class="w">   </span><span class="c1">// 手动拆箱</span>
+</pre></div>
+</div><h3 id="section-20">5.3 自动装箱的坑 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Integer</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">127</span><span class="p">;</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">127</span><span class="p">;</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w">   </span><span class="c1">// true（缓存池）</span>
+
+<span class="n">Integer</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">d</span><span class="p">);</span><span class="w">   </span><span class="c1">// false（超出缓存池）</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>缓存池</strong>：Integer 默认缓存 <strong>-128 ~ 127</strong> 的值（可通过 JVM 参数调整）
+包装类比较必须用 <code>.equals()</code>！</p>
+</blockquote>
+<h3 id="section-21">5.4 包装类常用方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 字符串转数字</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="s">"123"</span><span class="p">);</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Double</span><span class="p">.</span><span class="na">parseDouble</span><span class="p">(</span><span class="s">"3.14"</span><span class="p">);</span>
+<span class="kt">boolean</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Boolean</span><span class="p">.</span><span class="na">parseBoolean</span><span class="p">(</span><span class="s">"true"</span><span class="p">);</span>
+
+<span class="c1">// 数字转字符串</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span><span class="w">   </span><span class="c1">// "123"</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span><span class="w">     </span><span class="c1">// "123"</span>
+
+<span class="c1">// 最大值、最小值</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">MAX_VALUE</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">MIN_VALUE</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-22">5.5 int vs Integer ⭐⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>int</th>
+<th>Integer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>类型</td>
+<td>基本类型</td>
+<td>引用类型</td>
+</tr>
+<tr>
+<td>默认值</td>
+<td>0</td>
+<td>null</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>4 字节</td>
+<td>对象（更大）</td>
+</tr>
+<tr>
+<td>比较</td>
+<td>==</td>
+<td>equals</td>
+</tr>
+<tr>
+<td>集合</td>
+<td>不能放</td>
+<td>可以放</td>
+</tr>
+<tr>
+<td>null</td>
+<td>不行</td>
+<td>可以</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span><span class="w">    </span><span class="c1">// 集合只能存对象</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">    </span><span class="c1">// 自动装箱为 Integer</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-23">六、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>String 为什么是不可变的？</strong></p>
+<ol>
+<li>类被 <code>final</code> 修饰，不能被继承</li>
+<li>内部 <code>char[]</code> 被 <code>final</code> 修饰，不能修改</li>
+<li>没有提供修改内部数组的方法</li>
+</ol>
+<p>设计原因：安全性（HashMap key）、线程安全、哈希缓存、字符串常量池。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>String、StringBuilder、StringBuffer 区别？</strong>
+| 类型 | 可变 | 线程 | 性能 |
+|------|------|------|------|
+| String | ❌ | ✅ | 拼接差 |
+| StringBuilder | ✅ | ❌ | 最快 |
+| StringBuffer | ✅ | ✅ | 较慢 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>==</code> 和 <code>equals</code> 的区别？</strong></p>
+<ul>
+<li><code>==</code> 对基本类型比较值，对引用类型比较地址</li>
+<li><code>equals</code> 默认 ==，但 String、Integer 等类重写后比较内容</li>
+<li><strong>包装类比较必须用 equals</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>自动装箱和拆箱？</strong></p>
+<ul>
+<li>装箱：基本类型 → 包装类（编译器自动调用 <code>valueOf</code>）</li>
+<li>拆箱：包装类 → 基本类型（编译器自动调用 <code>intValue</code> 等）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Integer 缓存池范围？</strong>
+-128 ~ 127，默认缓存，可通过 <code>-XX:AutoBoxCacheMax</code> 调整。</p>
+</blockquote>
+<hr/>
+<h2 id="section-24">七、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Object 类的常用方法</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>String 不可变性原理及原因</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>字符串常量池与 intern()</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>String 常用方法</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>String / StringBuilder / StringBuffer 区别</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>基本类型与包装类的对应</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>自动装箱与拆箱</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Integer 缓存池陷阱</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>String 拼接性能差，循环中要用 StringBuilder</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>包装类比较必须用 <code>.equals()</code></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Integer 缓存池范围 -128~127，超出后 == 比较会出错</li>
+</ul>
+<p>下一章：<a href="./10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10-集合框架.md</a> — JavaSE 核心！</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html"><small>← 上一篇</small><strong>08 · 异常处理 ⭐⭐</strong></a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html"><small>下一篇 →</small><strong>10 · 集合框架 ⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、Object 类</a><a class="toc-h3" href="#section-2">2.1 toString()</a><a class="toc-h3" href="#section-3">2.2 equals()</a><a class="toc-h3" href="#section-4">2.3 hashCode()</a><a class="toc-h2" href="#section-5">三、String 类 ⭐⭐⭐</a><a class="toc-h3" href="#section-6">3.1 String 的本质</a><a class="toc-h3" href="#section-7">3.2 String 不可变性（面试必问）</a><a class="toc-h3" href="#section-8">3.3 字符串常量池 ⭐⭐</a><a class="toc-h3" href="#section-9">3.4 String 常用方法 ⭐⭐</a><a class="toc-h3" href="#section-10">3.5 String vs StringBuilder vs StringBuffer ⭐⭐⭐</a><a class="toc-h2" href="#section-11">四、其他常用类</a><a class="toc-h3" href="#section-12">4.1 Math 类</a><a class="toc-h3" href="#section-13">4.2 Random 类</a><a class="toc-h3" href="#section-14">4.3 Date 类（旧）</a><a class="toc-h3" href="#section-15">4.4 Calendar 类（旧）</a><a class="toc-h3" href="#section-16">4.5 Java 8 时间 API（推荐）</a><a class="toc-h2" href="#section-17">五、包装类 ⭐⭐⭐</a><a class="toc-h3" href="#section-18">5.1 8 种基本类型对应的包装类</a><a class="toc-h3" href="#section-19">5.2 装箱与拆箱（自动）</a><a class="toc-h3" href="#section-20">5.3 自动装箱的坑 ⭐⭐</a><a class="toc-h3" href="#section-21">5.4 包装类常用方法</a><a class="toc-h3" href="#section-22">5.5 int vs Integer ⭐⭐⭐</a><a class="toc-h2" href="#section-23">六、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-24">七、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
