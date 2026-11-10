@@ -4,7 +4,7 @@ let camp={goal:3,days:{}};
 try{const saved=JSON.parse(localStorage.getItem(CAMP_KEY)||'null');if(saved&&typeof saved==='object'){camp.goal=[1,3,5,10].includes(saved.goal)?saved.goal:3;camp.days=saved.days&&typeof saved.days==='object'&&!Array.isArray(saved.days)?saved.days:{}}}catch{}
 function campDate(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function campCount(){const ids=camp.days[campDate()];return Array.isArray(ids)?new Set(ids.filter(id=>state[id]?.done&&all.some(i=>i.id===id))).size:0}
-function saveCamp(){try{const dates=Object.keys(camp.days).sort();for(const date of dates.slice(0,-90))delete camp.days[date];localStorage.setItem(CAMP_KEY,JSON.stringify(camp))}catch{}}
+function saveCamp(){if(window.ZhixuAccount){window.ZhixuAccount.save();return}try{const dates=Object.keys(camp.days).sort();for(const date of dates.slice(0,-90))delete camp.days[date];localStorage.setItem(CAMP_KEY,JSON.stringify(camp))}catch{}}
 function renderCamp(){
  const today=campCount(),total=all.filter(i=>state[i.id]?.done).length,goal=camp.goal;
  $('#camp-goal').value=String(goal);$('#camp-today').textContent=today;
