@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>方法与重载 · 课程原文 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·原文查阅/06-方法与重载.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a aria-current="page" href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>方法与重载 · 课程原文</h1><div class="article-meta"><span>约 20 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<p>来源：用户提供的 <code>笔记(1).zip / 03_笔记/day06_方法/模块六_方法.md</code>。保留原课程内容，历史环境、示例错误和故意报错的教学代码应结合上下文阅读。</p>
+<p><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">返回本章速学总结</a></p>
+<h3 id="section-0">模块六_方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w"> </span><span class="n">模块五的重点回顾</span><span class="p">:</span>
+<span class="w">   </span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">容器</span><span class="p">,</span><span class="n">本身属于引用数据类型</span>
+<span class="w">   </span><span class="mf">2.</span><span class="n">特点</span><span class="p">:</span>
+<span class="w">     </span><span class="n">a</span><span class="p">.</span><span class="na">定长</span>
+<span class="w">     </span><span class="n">b</span><span class="p">.</span><span class="na">既可以存储基本数据类型的数据</span><span class="p">,</span><span class="n">还可以存储引用数据类型的数据</span>
+<span class="w">   </span><span class="mf">3.</span><span class="n">定义</span><span class="p">:</span>
+<span class="w">     </span><span class="n">动态初始化</span><span class="p">:</span><span class="w"> </span><span class="n">数据类型</span><span class="o">[]</span><span class="w"> </span><span class="n">数组名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">数据类型</span><span class="o">[</span><span class="n">长度</span><span class="o">]</span>
+<span class="w">     </span><span class="n">静态初始化</span><span class="p">:</span><span class="w"> </span><span class="n">数据类型</span><span class="o">[]</span><span class="w"> </span><span class="n">数组名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">元素1</span><span class="p">,</span><span class="n">元素2</span><span class="p">...}</span>
+<span class="w">   </span><span class="mf">4.</span><span class="n">数组操作</span><span class="p">:</span>
+<span class="w">     </span><span class="n">a</span><span class="p">.</span><span class="na">获取数组长度</span><span class="p">:</span><span class="w"> </span><span class="n">数组名</span><span class="p">.</span><span class="na">length</span>
+<span class="w">     </span><span class="n">b</span><span class="p">.</span><span class="na">存储数据</span><span class="p">:</span><span class="w"> </span><span class="n">数组名</span><span class="o">[</span><span class="n">索引值</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">元素</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将元素存储到数组指定的索引位置上</span>
+<span class="w">     </span><span class="n">c</span><span class="p">.</span><span class="na">获取元素</span><span class="p">:</span><span class="w"> </span><span class="n">数组名</span><span class="o">[</span><span class="n">索引值</span><span class="o">]</span>
+<span class="w">     </span><span class="n">d</span><span class="p">.</span><span class="na">遍历</span><span class="p">:</span><span class="w"> </span><span class="n">数组名</span><span class="p">.</span><span class="na">fori</span>
+<span class="w">     </span><span class="n">e</span><span class="p">.</span><span class="na">索引</span><span class="p">:</span><span class="n">指的是元素在数组中存储的位置</span>
+<span class="w">       </span><span class="n">从0开始</span><span class="p">,</span><span class="n">最大索引是数组</span><span class="p">.</span><span class="na">length</span><span class="o">-</span><span class="mi">1</span>
+<span class="w">       </span><span class="n">唯一</span><span class="p">,</span><span class="n">不能重复</span>
+<span class="w">   </span><span class="mf">5.</span><span class="n">操作数组时容易出现的异常</span>
+<span class="w">     </span><span class="n">a</span><span class="p">.</span><span class="na">数组索引越界异常</span><span class="p">:</span><span class="n">ArrayIndexOutOfBoundsException</span>
+<span class="w">       </span><span class="n">原因</span><span class="p">:</span><span class="n">操作的索引超出了数组索引范围</span>
+<span class="w">     </span><span class="n">b</span><span class="p">.</span><span class="na">空指针异常</span><span class="p">:</span><span class="n">NullPointerException</span>
+<span class="w">       </span><span class="n">原因</span><span class="p">:</span><span class="n">对象为null</span><span class="p">,</span><span class="n">然后再去操作此对象</span>
+<span class="w">           </span>
+<span class="w">  </span><span class="mf">6.</span><span class="n">内存</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">栈</span><span class="p">:</span><span class="n">方法的运行在栈</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">堆</span><span class="p">:</span><span class="n">数组</span><span class="p">,</span><span class="n">对象都在堆</span><span class="p">,</span><span class="n">而且每new一次都会在堆中开辟一个空间</span><span class="p">,</span><span class="n">堆内存会为此空间分配一个地址值</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">方法区</span><span class="p">:</span><span class="n">代码运行之前的预备区</span><span class="p">,</span><span class="n">存储class文件</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="na">本地方法栈</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">寄存器</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="mf">7.</span><span class="n">二维数组概述</span><span class="p">:</span><span class="n">数组中套了多个一维数组</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">动态初始化定义</span><span class="p">:</span><span class="n">数据类型</span><span class="o">[][]</span><span class="w"> </span><span class="n">数组名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">数据类型</span><span class="o">[</span><span class="n">m</span><span class="o">][</span><span class="n">n</span><span class="o">]</span>
+<span class="w">      </span><span class="n">m</span><span class="p">:</span><span class="n">代表的是二维数组长度</span>
+<span class="w">      </span><span class="n">n</span><span class="p">:</span><span class="n">代表的是每一个一维数组长度</span>
+<span class="w">          </span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">静态初始化定义</span><span class="p">(</span><span class="n">简化形式</span><span class="p">):</span>
+<span class="w">      </span><span class="n">数据类型</span><span class="o">[][]</span><span class="w"> </span><span class="n">数组名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="n">元素1</span><span class="p">,</span><span class="n">元素2</span><span class="p">...},{</span><span class="n">元素1</span><span class="p">,</span><span class="n">元素2</span><span class="p">...},{</span><span class="n">元素1</span><span class="p">,</span><span class="n">元素2</span><span class="p">...}...}</span>
+
+<span class="w"> </span><span class="mf">8.</span><span class="n">二维数组操作</span><span class="p">:</span>
+<span class="w">   </span><span class="n">a</span><span class="p">.</span><span class="na">获取长度</span><span class="p">:</span><span class="n">数组名</span><span class="p">.</span><span class="na">length</span>
+<span class="w">   </span><span class="n">b</span><span class="p">.</span><span class="na">存元素</span><span class="p">:</span><span class="w"> </span><span class="n">数组名</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">j</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">值</span>
+<span class="w">     </span><span class="n">i</span><span class="p">:</span><span class="n">代表的是一维数组在二维数组中的索引位置</span>
+<span class="w">     </span><span class="n">j</span><span class="p">:</span><span class="n">代表的是元素在一维数组中的索引位置</span>
+<span class="w">         </span>
+<span class="w">   </span><span class="n">c</span><span class="p">.</span><span class="na">获取元素</span><span class="p">:</span><span class="n">数组名</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">j</span><span class="o">]</span>
+<span class="w">   </span><span class="n">d</span><span class="p">.</span><span class="na">遍历</span><span class="p">:</span><span class="n">嵌套for</span><span class="w"> </span><span class="n">先将一维数组从二维数组中遍历出来</span><span class="p">,</span><span class="n">然后再遍历每一个一维数组</span>
+<span class="w">       </span>
+<span class="w">       </span>
+<span class="nl">模块六重点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">all</span>
+</pre></div>
+</div><h3 id="section-1">第一章.方法的使用</h3>
+<h4 id="section-2">1.方法介绍以及简单方法定义(无参无返回值)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">问题描述</span><span class="p">:</span>
+<span class="w">  </span><span class="n">之前所有的代码都在main方法中写</span><span class="p">,</span><span class="n">如果我们将来将所有功能的代码都放到main方法中</span><span class="p">,</span><span class="n">会显得main方法代码太多</span><span class="p">,</span><span class="n">太乱</span><span class="p">,</span><span class="n">太臃肿</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">不好维护</span>
+<span class="w">      </span>
+<span class="w">  </span><span class="n">解决</span><span class="p">:</span><span class="n">将不同功能的代码放到不同的方法中</span><span class="p">,</span><span class="n">想执行某个功能</span><span class="p">,</span><span class="n">直接调用方法名就行了</span><span class="p">,</span><span class="n">对应的代码就自动执行起来了</span>
+<span class="w">      </span><span class="n">将来维护的时候</span><span class="p">,</span><span class="n">直接找到对应的方法</span><span class="p">,</span><span class="n">就可以对其直接修改维护</span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="n">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="n">拥有功能性代码的代码块</span>
+<span class="w">  </span><span class="n">将不同的功能放在不同的方法中</span><span class="p">,</span><span class="n">给每个方法取个名字</span><span class="p">,</span><span class="n">直接调用方法名</span><span class="p">,</span><span class="n">对应的方法就执行起来了</span><span class="p">,</span><span class="n">好维护</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">通用定义格式</span><span class="p">:</span>
+<span class="w">  </span><span class="n">修饰符</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">参数</span><span class="p">){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">4.</span><span class="n">通过通用格式</span><span class="p">,</span><span class="n">分成四种方法来学习</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">无参无返回值方法</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">有参无返回值方法</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">无参有返回值方法</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">有参有返回值方法</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">无参无返回值方法定义</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(){</span>
+<span class="w">      </span><span class="n">方法体</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">实现此方法的具体代码</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">调用</span><span class="p">:</span><span class="n">直接调用</span>
+<span class="w">  </span><span class="n">在其他方法中</span><span class="p">:</span><span class="w"> </span><span class="n">方法名</span><span class="p">()</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">注意事项</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">void关键字代表无返回值</span><span class="p">,</span><span class="n">写了void</span><span class="p">,</span><span class="n">就不要在方法中写return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">方法不调用不执行</span><span class="p">,</span><span class="w"> </span><span class="n">main方法是jvm调用的</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">方法之间不能互相嵌套</span><span class="p">,</span><span class="n">方法之间是平级关系</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">方法的执行顺序只和调用顺序有关</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">farmer</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cook</span><span class="p">();</span>
+<span class="w">        </span><span class="n">me</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cook</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//农民伯伯</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">farmer</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"播种"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"施肥"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"拔草"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"浇水"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"除虫"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"收割"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//厨师</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">cook</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"洗菜"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"切菜"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"炒菜"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"装盘"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"上菜"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//我们自己</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">me</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"洗手"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"吃菜"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1699350498465" decoding="async" loading="lazy" src="../../course-assets/c3e4b3ac295a344b5c4a.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">定义一个方法</span><span class="p">,</span><span class="n">实现两个整数相加</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">sum</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"哈哈哈哈哈"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sum</span><span class="p">(){</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-3">2.无参数无返回值的方法执行流程</h4>
+<p><img alt="1699353749750" decoding="async" loading="lazy" src="../../course-assets/becca9b695fbee212ce8.png"/></p>
+<blockquote>
+<p><img alt="1699410063398" decoding="async" loading="lazy" src="../../course-assets/aae5f19e7a0e812110e6.png"/></p>
+</blockquote>
+<h4 id="section-4">3.方法定义各部分解释</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">通用格式</span><span class="p">:</span>
+<span class="w">  </span><span class="n">修饰符</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">参数</span><span class="p">){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">各部分解释</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">修饰符</span><span class="p">:</span><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">返回值类型</span><span class="p">:</span>
+<span class="w">    </span><span class="n">该方法最终返回的结果的数据类型</span>
+<span class="w">        </span><span class="n">比如</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">方法上的返回值类型写int</span>
+<span class="w">             </span><span class="k">return</span><span class="w"> </span><span class="mf">2.5</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">方法上的返回值类型写double</span>
+<span class="w">             </span><span class="k">return</span><span class="w"> </span><span class="s">""</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">方法上的返回值类型写String</span>
+<span class="w">    </span><span class="n">如果没有返回值</span><span class="p">,</span><span class="n">不要写具体的返回值类型了</span><span class="p">,</span><span class="n">要写void</span>
+<span class="w">            </span>
+<span class="w">            </span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">方法名</span><span class="p">:</span><span class="n">见名知意</span><span class="p">(</span><span class="n">小驼峰式</span><span class="p">)</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">参数</span><span class="p">:</span><span class="n">进入到方法内部参与执行的数据</span><span class="p">(</span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="p">,</span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="p">)</span>
+<span class="w">  </span><span class="n">e</span><span class="p">.</span><span class="na">方法体</span><span class="p">:</span><span class="n">实现该方法的具体代码</span><span class="w">    </span>
+<span class="w">  </span><span class="n">f</span><span class="p">.</span><span class="na">return</span><span class="w"> </span><span class="n">结果</span><span class="p">:</span><span class="w"> </span><span class="n">如果有返回值</span><span class="p">,</span><span class="n">可以利用return</span><span class="w"> </span><span class="n">将结果返回</span><span class="w">  </span>
+</pre></div>
+</div><p><img alt="1699410639842" decoding="async" loading="lazy" src="../../course-assets/c00fe11d67a1aba4d801.png"/></p>
+<h4 id="section-5">4.有参数无返回值的方法定义和执行流程</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">调用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">直接调用</span><span class="p">:</span><span class="n">方法名</span><span class="p">(</span><span class="n">具体的值</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">调用的时候要给参数赋值</span><span class="w"> </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">定义一个方法</span><span class="p">,</span><span class="n">实现两个整数相加</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="n">sum</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">){</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1699412622843" decoding="async" loading="lazy" src="../../course-assets/75e8bb2d240dbc29d876.png"/></p>
+<h4 id="section-6">5.无参数有返回值定义以及执行流程</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">调用</span><span class="p">:</span><span class="w"> </span><span class="n">返回值返回给了谁</span><span class="o">?</span><span class="w"> </span><span class="n">哪里调用返回给哪里</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">打印调用</span><span class="p">:</span><span class="n">sout</span><span class="p">(</span><span class="n">方法名</span><span class="p">())</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">不推荐使用</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">赋值调用</span><span class="p">:</span><span class="n">调用完之后用一个变量接收返回值结果</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">极力推荐</span>
+<span class="w">    </span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">方法名</span><span class="p">()</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">定义一个方法</span><span class="p">,</span><span class="n">实现两个整数相加</span><span class="p">,</span><span class="n">将结果返回</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//打印调用 -&gt; 涛哥不推荐</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">sum</span><span class="p">());</span>
+
+<span class="w">        </span><span class="c1">//赋值调用-&gt; 极力推荐</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">sum</span><span class="p">(){</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//return a+b;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1699413838812" decoding="async" loading="lazy" src="../../course-assets/0c6210ac1e5534ee27f2.png"/></p>
+<h4 id="section-7">6.有参数有返回值定义以及执行流程</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">参数</span><span class="p">){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">调用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">打印调用</span><span class="p">:</span>
+<span class="w">    </span><span class="n">sout</span><span class="p">(</span><span class="n">方法名</span><span class="p">(</span><span class="n">具体的值</span><span class="p">))</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">赋值调用</span><span class="p">(</span><span class="n">极力推荐</span><span class="p">)</span>
+<span class="w">    </span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">方法名</span><span class="p">(</span><span class="n">具体的值</span><span class="p">)</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">定义一个方法</span><span class="p">,</span><span class="n">实现两个整数相加</span><span class="p">,</span><span class="n">将结果返回</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">){</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1699414227291" decoding="async" loading="lazy" src="../../course-assets/25d2f5b029454de0892d.png"/></p>
+<h4 id="section-8">7.形式参数和实际参数区别</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">形式参数</span><span class="p">(</span><span class="n">形参</span><span class="p">):</span><span class="n">在定义方法的时候形式上定义的参数</span><span class="p">,</span><span class="n">此参数还没有值</span>
+<span class="mf">2.</span><span class="n">实际参数</span><span class="p">(</span><span class="n">实参</span><span class="p">):</span><span class="n">在调用方法的时候给形参赋予的具体的值</span>
+</pre></div>
+</div><p><img alt="1699414422241" decoding="async" loading="lazy" src="../../course-assets/d49c33b1ce293d8f9b7e.png"/></p>
+<h4 id="section-9">8.参数和返回值使用的时机</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">参数</span><span class="p">:</span>
+<span class="w">  </span><span class="n">当想将方法A的数据传递到方法B时</span><span class="p">,</span><span class="n">那么定义方法B时就需要带个参数</span><span class="p">,</span><span class="n">在方法A中调用方法B时</span><span class="p">,</span><span class="n">可以将方法A中的数据通过参数传递到方法B中</span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="n">返回值</span><span class="p">:</span>
+<span class="w">  </span><span class="n">调用方法A时</span><span class="p">,</span><span class="n">想要方法A的结果</span><span class="p">,</span><span class="n">去参与其他的操作</span><span class="p">,</span><span class="n">那么方法A就需要将自己的结果返回</span>
+</pre></div>
+</div><p><img alt="1699427230425" decoding="async" loading="lazy" src="../../course-assets/baf0dcdcad1b415547f9.png"/></p>
+<blockquote>
+<p>1.controller接收的请求参数需要一层一层传递到service层,service层需要将请求参数再传递到dao层</p>
+<p>此时service的方法以及dao的方法都需要参数,去接收</p>
+<p>2.dao层的结果需要传递给service,service再传递给controller层,此时dao层和service方法需要返回值</p>
+</blockquote>
+<h4 id="section-10">9.变量作为实参使用</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">定义一个方法</span><span class="p">,</span><span class="n">比较两个整数的大小</span><span class="p">,</span><span class="n">如果第一个比第二个大</span><span class="p">,</span><span class="n">返回true</span><span class="p">,</span><span class="n">否则返回false</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo07Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//传递的是i和j,但是我们真正传递的是i和j代表的数据,不是变量本身</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compare</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">){</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="p">){</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-11">第二章.方法注意事项终极版</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">方法不调用不执行</span>
+<span class="mf">2.</span><span class="n">方法的执行顺序只和调用顺序有关</span>
+<span class="mf">3.</span><span class="n">方法之间不能互相嵌套</span>
+<span class="w">    </span>
+<span class="mf">4.</span><span class="n">void不能和</span><span class="o">[</span><span class="k">return</span><span class="w"> </span><span class="n">结果</span><span class="o">]</span><span class="n">共存</span><span class="p">,</span><span class="n">但是void能和</span><span class="o">[</span><span class="k">return</span><span class="o">]</span><span class="n">共存</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">void</span><span class="p">:</span><span class="n">代表没有返回值</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">return</span><span class="w"> </span><span class="n">结果</span><span class="p">:</span><span class="n">就代表有返回值了</span>
+<span class="w">               </span><span class="n">先将结果返回</span><span class="p">,</span><span class="n">然后结束方法</span>
+<span class="w">      </span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">return</span><span class="p">:</span><span class="n">仅仅代表结束方法</span><span class="p">,</span><span class="n">不代表有返回值</span>
+<span class="w">  </span>
+<span class="mf">5.</span><span class="n">一个方法中不能连续写多个return</span><span class="p">(</span><span class="n">也就是说一个方法不能都多个返回值</span><span class="p">)</span>
+<span class="w">      </span>
+<span class="mf">6.</span><span class="n">调用方法的时候要看看下面有没有这个方法</span><span class="p">,</span><span class="n">没有的方法直接调用会报错</span><span class="w">      </span>
+<span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo08Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">method01</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//method04();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">method01</span><span class="p">(){</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">(){</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">method03</span><span class="p">(){</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//return 2;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">初学者怎么写</span><span class="p">:</span>
+<span class="w">     </span><span class="mf">1.</span><span class="n">先定义</span><span class="p">,</span><span class="n">再调用</span>
+<span class="w">     </span><span class="mf">2.</span><span class="n">如果是没有返回值的方法</span><span class="p">,</span><span class="n">直接在被调用的方法内部输出结果</span>
+<span class="w">     </span><span class="mf">3.</span><span class="n">如果是带返回值的方法</span><span class="p">,</span><span class="n">就调用完毕之后</span><span class="p">,</span><span class="n">用一个变量去接收结果</span><span class="p">,</span><span class="n">输出这个变量</span>
+<span class="w">     </span><span class="mf">4.</span><span class="n">调用方法</span><span class="p">:</span>
+<span class="w">        </span><span class="n">直接调用</span><span class="p">:</span><span class="n">方法名</span><span class="p">()</span><span class="w"> </span><span class="n">或者</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">实参</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">只针对于无返回值的方法</span>
+<span class="w">        </span><span class="n">打印调用</span><span class="p">:</span><span class="n">sout</span><span class="p">(</span><span class="n">方法名</span><span class="p">())</span><span class="w"> </span><span class="n">或者</span><span class="w"> </span><span class="nf">sout</span><span class="p">(</span><span class="n">方法名</span><span class="p">(</span><span class="n">实参</span><span class="p">))</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">针对有返回值的方法</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">不推荐使用</span>
+<span class="w">        </span><span class="n">赋值调用</span><span class="p">:</span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">方法名</span><span class="p">()</span><span class="w"> </span><span class="n">或者</span><span class="w"> </span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">方法名</span><span class="p">(</span><span class="n">实参</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">针对于有返回值的方法</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">推荐使用</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">怎么练习</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">如果定义的方法没有返回值</span><span class="p">,</span><span class="n">写个void</span><span class="w"> </span><span class="n">不要写return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">如果定义的方法有返回值</span><span class="p">,</span><span class="n">就将void改成具体的返回值类型</span><span class="p">,</span><span class="n">在</span><span class="w"> </span><span class="n">方法体中最后写一个return</span><span class="w"> </span><span class="n">结果</span><span class="p">,</span><span class="n">将结果返回</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">如果方法有返回值</span><span class="p">,</span><span class="n">调用的时候推荐使用赋值调用</span><span class="p">,</span><span class="n">如果没有返回值</span><span class="p">,</span><span class="n">使用直接调用</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">练习的时候</span><span class="p">,</span><span class="n">只需要完成一个简单的需求</span><span class="p">(</span><span class="n">比如两个整数相加</span><span class="p">),</span><span class="n">针对此需求</span><span class="p">,</span><span class="n">定义4种方法</span><span class="p">,</span><span class="n">并成功调用</span><span class="w">         </span>
+</pre></div>
+</div></blockquote>
+<h3 id="section-12">第三章.方法练习</h3>
+<h4 id="section-13">1.方法练习1(判断奇偶性)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span>
+<span class="w">   </span><span class="n">键盘录入一个整数</span><span class="p">,</span><span class="n">将整数传递到另外一个方法中</span><span class="p">,</span><span class="n">在此方法中判断这个整数的奇偶性</span>
+<span class="w">   </span><span class="n">如果是偶数</span><span class="p">,</span><span class="n">方法返回</span><span class="s">"偶数"</span><span class="w">  </span><span class="n">否则返回</span><span class="s">"奇数"</span>
+
+<span class="nl">方法三要素</span><span class="p">:</span>
+<span class="w">  </span><span class="n">方法名</span><span class="p">:</span><span class="n">要</span>
+<span class="w">  </span><span class="n">参数</span><span class="p">:</span><span class="n">要</span>
+<span class="w">  </span><span class="n">返回值</span><span class="p">:</span><span class="n">要</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">         键盘录入一个整数,将整数传递到另外一个方法中,在此方法中判断这个整数的奇偶性</span>
+<span class="cm">         如果是偶数,方法返回"偶数"  否则返回"奇数"</span>
+<span class="cm">     */</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="p">){</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span><span class="p">){</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">"偶数"</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">"奇数"</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-14">2.方法练习2(1-100的和)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">需求</span><span class="w"> </span><span class="p">:</span><span class="w">  </span><span class="n">求出1</span><span class="o">-</span><span class="mi">100</span><span class="n">的和</span><span class="p">,</span><span class="n">并将结果返回</span>
+
+<span class="nl">方法名</span><span class="p">:</span><span class="n">要</span>
+<span class="nl">参数</span><span class="p">:</span><span class="n">不要</span>
+<span class="nl">返回值</span><span class="p">:</span><span class="n">要</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">sum</span><span class="o">+=</span><span class="n">i</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-15">3.方法练习3(不定次数打印)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span>
+<span class="w">   </span><span class="n">定义一个方法</span><span class="p">,</span><span class="n">给这个方法传几</span><span class="p">,</span><span class="n">就让这个方法循环打印几次</span><span class="s">"我是一个有经验的JAVA开发工程师"</span>
+
+<span class="nl">方法名</span><span class="p">:</span><span class="n">要</span>
+<span class="nl">参数</span><span class="p">:</span><span class="n">要</span>
+<span class="nl">返回值</span><span class="p">:</span><span class="n">不要</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">){</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是一个有经验的java开发工程师"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-16">4.方法练习4(遍历数组)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span>
+<span class="w">  </span><span class="n">在main方法中定义一个数组</span><span class="p">,</span><span class="n">将数组传递到另外一个方法中</span><span class="p">,</span><span class="n">在此方法中遍历数组</span>
+<span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">};</span>
+<span class="w">       </span><span class="n">method</span><span class="p">(</span><span class="n">arr1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">       调用method方法,传递的实参时int[]数组</span>
+<span class="cm">       所以形参也应该用int型数组来接收</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="p">){</span><span class="c1">//int[] arr2 = arr1</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">arr2</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr2</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1699434078842" decoding="async" loading="lazy" src="../../course-assets/028991f7f4c3582a2d76.png"/></p>
+<blockquote>
+<p>数组本身是引用数据类型,引用数据类型做方法参数传递,传递的是地址值</p>
+</blockquote>
+<h4 id="section-17">5.练习7</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">数组作为返回值返回</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05Method</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span><span class="p">();</span><span class="c1">//int[] arr2 = arr1</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">arr2</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr2</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="nf">method</span><span class="p">(){</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">sum</span><span class="p">,</span><span class="n">sub</span><span class="p">};</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">arr1</span><span class="p">;</span><span class="c1">//返回的是一个int[],那么返回值类型也应该是int[]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1699434588013" decoding="async" loading="lazy" src="../../course-assets/a12949e441e9e748dc7f.png"/></p>
+<blockquote>
+<p>返回值为引用数据类型时,返回的是地址值</p>
+</blockquote>
+<h3 id="section-18">第四章.方法的重载(Overload)</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">定义三个方法</span><span class="p">,</span><span class="n">分别求2个整数相加</span><span class="p">,</span><span class="mi">3</span><span class="n">个整数相加</span><span class="p">,</span><span class="mi">4</span><span class="n">个整数相加</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo1OverLoad</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">sum</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span>
+<span class="w">        </span><span class="n">sum</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">);</span>
+<span class="w">        </span><span class="n">sum</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">40</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//两个整数相加</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//三个整数相加</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//四个整数相加</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="o">+</span><span class="n">d</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">方法名相同</span><span class="p">,</span><span class="n">参数列表不同的方法</span>
+<span class="mf">2.</span><span class="n">什么叫参数列表不同</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">参数个数不同</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">参数类型不同</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">参数类型顺序不同</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">判断两个方法是否为重载方法</span><span class="p">,</span><span class="n">和什么无关</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">和参数名无关</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">和返回值无关</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(){}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">){}</span>
+<span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">){}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">){}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="p">){}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="kt">double</span><span class="w"> </span><span class="n">d</span><span class="p">){}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">OPEN</span><span class="p">(){}</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">){}</span>
+</pre></div>
+</div><p><img alt="1699436053197" decoding="async" loading="lazy" src="../../course-assets/d850ff77094e50596581.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">如果定义方法功能一样</span><span class="p">,</span><span class="n">只不过实现细节不一样</span><span class="p">,</span><span class="n">就可以考虑定义成重载的方法</span>
+</pre></div>
+</div></article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html"><small>← 上一篇</small><strong>数组、索引与内存关系 · 课程原文</strong></a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html"><small>下一篇 →</small><strong>类、对象与成员变量 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块六_方法</a><a class="toc-h3" href="#section-1">第一章.方法的使用</a><a class="toc-h4" href="#section-2">1.方法介绍以及简单方法定义(无参无返回值)</a><a class="toc-h4" href="#section-3">2.无参数无返回值的方法执行流程</a><a class="toc-h4" href="#section-4">3.方法定义各部分解释</a><a class="toc-h4" href="#section-5">4.有参数无返回值的方法定义和执行流程</a><a class="toc-h4" href="#section-6">5.无参数有返回值定义以及执行流程</a><a class="toc-h4" href="#section-7">6.有参数有返回值定义以及执行流程</a><a class="toc-h4" href="#section-8">7.形式参数和实际参数区别</a><a class="toc-h4" href="#section-9">8.参数和返回值使用的时机</a><a class="toc-h4" href="#section-10">9.变量作为实参使用</a><a class="toc-h3" href="#section-11">第二章.方法注意事项终极版</a><a class="toc-h3" href="#section-12">第三章.方法练习</a><a class="toc-h4" href="#section-13">1.方法练习1(判断奇偶性)</a><a class="toc-h4" href="#section-14">2.方法练习2(1-100的和)</a><a class="toc-h4" href="#section-15">3.方法练习3(不定次数打印)</a><a class="toc-h4" href="#section-16">4.方法练习4(遍历数组)</a><a class="toc-h4" href="#section-17">5.练习7</a><a class="toc-h3" href="#section-18">第四章.方法的重载(Overload)</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

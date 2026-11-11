@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>接口、多态与类型转换 · 课程原文 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·原文查阅/11-接口、多态与类型转换.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a aria-current="page" href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>接口、多态与类型转换 · 课程原文</h1><div class="article-meta"><span>约 28 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<p>来源：用户提供的 <code>笔记(1).zip / 03_笔记/模块11_面向对象/模块11_面向对象.md</code>。保留原课程内容，历史环境、示例错误和故意报错的教学代码应结合上下文阅读。</p>
+<p><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">返回本章速学总结</a></p>
+<h3 id="section-0">模块11_面向对象</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">模块十回顾</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">继承</span><span class="p">:</span><span class="n">子类继承父类</span><span class="p">,</span><span class="n">可以直接使用父类中非私有成员</span><span class="p">,</span><span class="n">子类不用写重复性代码</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">关键字</span><span class="p">:</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">成员访问特点</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">成员变量</span><span class="p">:</span><span class="n">看等号左边是谁</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">成员方法</span><span class="p">:</span><span class="n">看new的是谁</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">方法的重写</span><span class="p">:</span><span class="n">子类中有一个和父类从方法名以及参数列表上一样的方法</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">检测</span><span class="p">:</span><span class="nd">@Override</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">使用场景</span><span class="p">:</span><span class="n">功能的升级</span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">继承中构造的特点</span><span class="p">:</span>
+<span class="w">    </span><span class="n">new子类对象先初始化父类</span>
+<span class="w">  </span><span class="mf">6.</span><span class="kd">super</span><span class="p">:</span><span class="n">代表的是父类引用</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">调用父类构造</span><span class="p">:</span><span class="kd">super</span><span class="p">()</span><span class="w">   </span><span class="kd">super</span><span class="p">(</span><span class="n">实参</span><span class="p">)</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">调用父类成员变量</span><span class="p">:</span><span class="w"> </span><span class="kd">super</span><span class="p">.</span><span class="na">成员变量名</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">调用父类成员方法</span><span class="p">:</span><span class="kd">super</span><span class="p">.</span><span class="na">成员方法名</span><span class="p">(</span><span class="n">实参</span><span class="p">)</span>
+<span class="w">  </span><span class="mf">7.</span><span class="k">this</span><span class="p">:</span><span class="n">代表的是当前对象</span><span class="p">(</span><span class="n">哪个对象调用的this所在的方法</span><span class="p">,</span><span class="n">this就代表哪个对象</span><span class="p">)</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">作用</span><span class="p">:</span><span class="n">区分重名的成员变量和局部变量</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">使用</span><span class="p">:</span>
+<span class="w">      </span><span class="n">调用当前对象构造</span><span class="p">:</span><span class="k">this</span><span class="p">()</span><span class="w">  </span><span class="k">this</span><span class="p">(</span><span class="n">实参</span><span class="p">)</span>
+<span class="w">      </span><span class="n">调用当前对象成员变量</span><span class="p">:</span><span class="k">this</span><span class="p">.</span><span class="na">成员变量名</span>
+<span class="w">      </span><span class="n">调用当前对象成员方法</span><span class="p">:</span><span class="k">this</span><span class="p">.</span><span class="na">成员方法名</span><span class="p">(</span><span class="n">实参</span><span class="p">)</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">注意</span><span class="p">:</span><span class="n">在构造中使用this和super</span><span class="p">,</span><span class="n">都必须要在第一行</span><span class="p">,</span><span class="n">所以两者不能同时出现</span>
+<span class="w">  </span><span class="mf">8.</span><span class="n">继承的特点</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">继承只支持单继承</span><span class="p">,</span><span class="n">不支持多继承</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">继承支持多层继承</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">一个父类可以拥有多个子类</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="mf">9.</span><span class="n">抽象</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">抽象方法</span><span class="p">:</span><span class="w"> </span><span class="n">修饰符</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">形参</span><span class="p">)</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">抽象类</span><span class="p">:</span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">类名</span><span class="p">{}</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">特点</span><span class="p">:</span>
+<span class="w">      </span><span class="n">抽象方法所在的类一定是抽象类</span>
+<span class="w">      </span><span class="n">抽象类中不一定非得有抽象方法</span>
+<span class="w">      </span><span class="n">子类继承抽象父类时</span><span class="p">,</span><span class="n">需要重写抽象方法</span>
+<span class="w">      </span><span class="n">抽象类不能new对象</span><span class="p">,</span><span class="n">只能new子类对象</span>
+<span class="w">      </span><span class="n">抽象类中啥都可以有</span><span class="p">,</span><span class="n">私有属性</span><span class="p">,</span><span class="n">构造</span><span class="p">,</span><span class="n">其他方法等</span>
+<span class="w">      </span><span class="n">抽象类中的构造是供创建子类对象时初始化父类属性使用的</span>
+<span class="w">          </span>
+<span class="nl">模块11重点</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">会定义接口</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">会在接口中定义抽象方法</span><span class="p">,</span><span class="n">默认方法</span><span class="p">,</span><span class="n">静态方法</span><span class="p">,</span><span class="n">成员变量</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">会调用接口中的成员</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">知道多态的前提</span><span class="w">    </span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">会利用多态的方式new对象</span>
+<span class="w">  </span><span class="mf">6.</span><span class="n">要知道使用多态的好处</span>
+<span class="w">  </span><span class="mf">7.</span><span class="n">会在多态的前提下</span><span class="p">,</span><span class="n">向下转型</span>
+<span class="w">  </span><span class="mf">8.</span><span class="n">会利用instanceof判断类型</span><span class="w">    </span>
+</pre></div>
+</div><h3 id="section-1">第一章.接口</h3>
+<h4 id="section-2">1.接口的介绍</h4>
+<p><img alt="1703138361150" decoding="async" loading="lazy" src="../../course-assets/fac299ff0a41d3c2e0a3.png"/></p>
+<h4 id="section-3">2.接口的定义以及使用</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">接口</span><span class="p">:</span><span class="n">是一个引用数据类型</span><span class="p">,</span><span class="n">是一种标准</span><span class="p">,</span><span class="n">规则</span>
+<span class="mf">2.</span><span class="n">关键字</span><span class="p">:</span>
+<span class="w">   </span><span class="n">a</span><span class="p">.</span><span class="na">interface</span><span class="w"> </span><span class="n">接口</span>
+<span class="w">      </span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">接口名</span><span class="p">{}</span>
+<span class="w">   </span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">implements</span><span class="w"> </span><span class="n">实现</span>
+<span class="w">      </span><span class="n">实现类</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">接口名</span><span class="p">{}</span>
+
+<span class="mf">3.</span><span class="n">接口中可以定义的成员</span><span class="p">:</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="n">a</span><span class="p">.</span><span class="na">jdk7以及之前</span><span class="p">:</span>
+<span class="w">     </span><span class="n">抽象方法</span><span class="p">:</span><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">即使不写public</span><span class="w"> </span><span class="kd">abstract</span><span class="p">,</span><span class="n">默认也有</span>
+<span class="w">     </span><span class="n">成员变量</span><span class="p">:</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">值</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">即使不写public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="p">,</span><span class="n">默认也有</span>
+<span class="w">                    </span><span class="n">final是最终的</span><span class="p">,</span><span class="n">被final修饰的变量不能二次赋值</span><span class="p">,</span><span class="n">所以我们一般将final修饰的变量视为常量</span>
+
+<span class="w">   </span><span class="n">b</span><span class="p">.</span><span class="na">jdk8</span><span class="p">:</span>
+<span class="w">      </span><span class="n">默认方法</span><span class="p">:</span><span class="kd">public</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">形参</span><span class="p">){}</span>
+<span class="w">      </span><span class="n">静态方法</span><span class="p">:</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">形参</span><span class="p">){}</span>
+
+<span class="w">   </span><span class="n">c</span><span class="p">.</span><span class="na">jdk9开始</span><span class="p">:</span>
+<span class="w">     </span><span class="n">私有方法</span><span class="p">:</span>
+<span class="w">        </span><span class="n">private的方法</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">定义接口</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">接口名</span><span class="p">{}</span>
+<span class="mf">2.</span><span class="n">实现</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">实现类类名</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">接口名</span><span class="p">{}</span>
+<span class="mf">3.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">实现类实现接口</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">重写接口中的抽象方法</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">创建实现类对象</span><span class="p">(</span><span class="n">接口不能直接new对象</span><span class="p">)</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">调用重写的方法</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Mouse</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">USB</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鼠标打开"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鼠标关闭"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Mouse</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Mouse</span><span class="p">();</span>
+<span class="w">        </span><span class="n">mouse</span><span class="p">.</span><span class="na">open</span><span class="p">();</span>
+<span class="w">        </span><span class="n">mouse</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-4">3.接口中的成员</h4>
+<h5>3.1抽象方法</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">定义格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">形参</span><span class="p">);</span>
+<span class="mf">2.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">不写public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="n">默认也有</span>
+<span class="mf">3.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">定义实现类</span><span class="p">,</span><span class="n">实现接口</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">重写抽象方法</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">创建实现类对象</span><span class="p">,</span><span class="n">调用重写的方法</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">();</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Mouse</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">USB</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鼠标打开"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"鼠标关闭"</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Mouse</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Mouse</span><span class="p">();</span>
+<span class="w">        </span><span class="n">mouse</span><span class="p">.</span><span class="na">open</span><span class="p">();</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mouse</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h5>3.2默认方法</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">形参</span><span class="p">){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="mf">2.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">定义实现类</span><span class="p">,</span><span class="n">实现接口</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">默认方法可重写</span><span class="p">,</span><span class="n">可不重写</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">创建实现类对象</span><span class="p">,</span><span class="n">调用默认方法</span><span class="w">     </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">//默认方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodDef</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是默认方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Mouse</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodDef</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是重写接口中的默认方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Mouse</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Mouse</span><span class="p">();</span>
+<span class="w">        </span><span class="n">mouse</span><span class="p">.</span><span class="na">methodDef</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h5>3.3静态方法</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">定义格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">返回值类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">形参</span><span class="p">){</span>
+<span class="w">      </span><span class="n">方法体</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">结果</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span>
+
+<span class="mf">2.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">接口名直接调用</span>
+<span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">//默认方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodDef</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是默认方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//静态方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodSta</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是接口中的静态方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Mouse</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Mouse</span><span class="p">();</span>
+<span class="w">        </span><span class="n">mouse</span><span class="p">.</span><span class="na">methodDef</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"============="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">USB</span><span class="p">.</span><span class="na">methodSta</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>默认方法和静态方法 -&gt; 可以作为临时加的一个小功能来使用</p>
+</blockquote>
+<h5>3.4成员变量</h5>
+<h5>3.4成员变量</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">数据类型</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">值</span>
+<span class="mf">2.</span><span class="n">相关知识点</span><span class="p">:</span><span class="kd">final</span>
+<span class="w">  </span><span class="n">final代表最终的</span><span class="p">,</span><span class="n">被它修饰的变量</span><span class="p">,</span><span class="n">不能二次赋值</span><span class="p">,</span><span class="n">可以视为常量</span>
+<span class="mf">3.</span><span class="n">特点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">不写public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">默认也有</span>
+<span class="mf">4.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">接口名直接调用</span>
+<span class="mf">5.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">被static</span><span class="w"> </span><span class="n">final修饰的成员变量需要手动赋值</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">习惯上我们会将static</span><span class="w"> </span><span class="n">final修饰的成员变量名大写</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">NUM1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">NUM2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">;</span><span class="c1">//不写public static final 默认也有</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">USB</span><span class="p">.</span><span class="na">NUM1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">USB</span><span class="p">.</span><span class="na">NUM2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-5">4.接口的特点</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">接口可以多继承</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">一个接口可以继承多个接口</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">InterfaceA</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">InterfaceB</span><span class="p">,</span><span class="n">InterfaceC</span><span class="p">{}</span>
+<span class="mf">2.</span><span class="n">接口可以多实现</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">一个实现类可以实现一个或者多个接口</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">InterfaceImpl</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">InterfaceA</span><span class="p">,</span><span class="n">InterfaceB</span><span class="p">{}</span>
+<span class="mf">3.</span><span class="n">一个子类可以继承一个父类的同时实现一个或者多个接口</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Zi</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Fu</span><span class="w"> </span><span class="kd">implements</span><span class="w">  </span><span class="n">InterfaceA</span><span class="p">,</span><span class="n">InterfaceB</span><span class="p">{}</span>
+
+<span class="mf">4.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">继承也好</span><span class="p">,</span><span class="n">实现接口也罢</span><span class="p">,</span><span class="n">只要是父类中或者接口的抽象方法</span><span class="p">,</span><span class="n">子类或者实现类都要重写</span>
+</pre></div>
+</div><blockquote>
+<p>当一个类实现多个接口时,如果接口中的抽象方法有重名且参数一样的,只需要重写一次</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">InterfaceA</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">InterfaceB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">InterfaceImpl</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">InterfaceA</span><span class="p">,</span><span class="n">InterfaceB</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"重写的method方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>当一个类实现多个接口时,如果多个接口中默认方法有重名的,且参数一样的,必须重写一次默认方法</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">InterfaceA</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodDef</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是接口A中的默认方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">InterfaceB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">();</span>
+
+<span class="w">    </span><span class="cm">/*    public default void methodDef(){</span>
+<span class="cm">            System.out.println("我是接口B中的默认方法");</span>
+<span class="cm">        }*/</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodDef</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是接口B中的默认方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">InterfaceImpl</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">InterfaceA</span><span class="p">,</span><span class="n">InterfaceB</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"重写的method方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="cm">/*    @Override</span>
+<span class="cm">    public void methodDef() {</span>
+<span class="cm">        System.out.println("重写后的默认方法");</span>
+<span class="cm">    }*/</span>
+<span class="p">}</span>
+
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">InterfaceImpl</span><span class="w"> </span><span class="n">anInterface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InterfaceImpl</span><span class="p">();</span>
+<span class="w">        </span><span class="n">anInterface</span><span class="p">.</span><span class="na">methodDef</span><span class="p">();</span>
+<span class="w">        </span><span class="n">anInterface</span><span class="p">.</span><span class="na">methodDef</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div></blockquote>
+<h4 id="section-6">5.接口和抽象类的区别</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">相同点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">都位于继承体系的顶端</span><span class="p">,</span><span class="n">用于被其他类实现或者继承</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">都不能new</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">都包含抽象方法</span><span class="p">,</span><span class="n">其子类或者实现类都必须重写这些抽象方法</span>
+<span class="w">      </span>
+<span class="nl">不同点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">抽象类</span><span class="p">:</span><span class="n">一般作为父类使用</span><span class="p">,</span><span class="n">可以有成员变量</span><span class="p">,</span><span class="n">构造</span><span class="p">,</span><span class="n">成员方法</span><span class="p">,</span><span class="n">抽象方法等</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">接口</span><span class="p">:</span><span class="n">成员单一</span><span class="p">,</span><span class="n">一般抽取接口</span><span class="p">,</span><span class="n">抽取的都是方法</span><span class="p">,</span><span class="n">视为功能的大集合</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">类不能多继承</span><span class="p">,</span><span class="n">但是接口可以</span>
+</pre></div>
+</div><p><img alt="1703144030947" decoding="async" loading="lazy" src="../../course-assets/2a7f5b6dc2b1241f167e.png"/></p>
+<h3 id="section-7">第二章.多态</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">面向对象三大特征</span><span class="p">:</span><span class="n">封装</span><span class="w">   </span><span class="n">继承</span><span class="w">   </span><span class="n">多态</span>
+<span class="mf">2.</span><span class="n">怎么学</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">不要从字面意思上理解多态这两个字</span><span class="p">,</span><span class="n">要从使用形式上掌握</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">要知道多态的好处</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">要知道多态的前提</span><span class="w">    </span>
+</pre></div>
+</div><h4 id="section-8">1.多态的介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">前提</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">必须有子父类继承或者接口实现关系</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">必须有方法的重写</span><span class="p">(</span><span class="n">没有重写</span><span class="p">,</span><span class="n">多态没有意义</span><span class="p">),</span><span class="n">多态主要玩儿的是重写方法</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">new对象</span><span class="p">:</span><span class="n">父类引用指向子类对象</span>
+<span class="w">    </span><span class="n">Fu</span><span class="w"> </span><span class="n">fu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Zi</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">理解为大类型接收了一个小类型的数据</span><span class="w"> </span><span class="o">-&gt;</span><span class="n">比如</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span>
+<span class="mf">2.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">多塔下不能直接调用子类特有功能</span>
+</pre></div>
+</div><h4 id="section-9">2.多态的基本使用</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗啃骨头"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">lookDoor</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗会看门"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Cat</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫吃鱼"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">catchMouse</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫会捉老鼠"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//原始方式</span>
+<span class="w">        </span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="c1">//重写的</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">lookDoor</span><span class="p">();</span><span class="c1">//特有的</span>
+
+<span class="w">        </span><span class="n">Cat</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cat</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="c1">//重写的</span>
+<span class="w">        </span><span class="n">cat</span><span class="p">.</span><span class="na">catchMouse</span><span class="p">();</span><span class="c1">//特有的</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=================="</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//多态形式new对象</span>
+<span class="w">        </span><span class="n">Animal</span><span class="w"> </span><span class="n">animal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span><span class="c1">//相当于double b = 10</span>
+<span class="w">        </span><span class="n">animal</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="c1">//重写的 animal接收的是dog对象,所以调用的是dog中的eat</span>
+<span class="c1">//      animal.lookDoor();   多态前提下,不能直接调用子类特有成员</span>
+
+<span class="w">        </span><span class="n">Animal</span><span class="w"> </span><span class="n">animal1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">animal1</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="c1">//cat重写的</span>
+
+
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-10">3.多态的条件下成员的访问特点</h4>
+<h5>3.1成员变量</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Fu</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Zi</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Fu</span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Fu</span><span class="w"> </span><span class="n">fu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Zi</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">fu</span><span class="p">.</span><span class="na">num</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">看等号左边是谁</span><span class="p">,</span><span class="n">先调用谁中的成员变量</span>
+</pre></div>
+</div><h5>3.2成员方法</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Fu</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是父类中的method方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Zi</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Fu</span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我是子类中的method方法"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Fu</span><span class="w"> </span><span class="n">fu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Zi</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">fu</span><span class="p">.</span><span class="na">num</span><span class="p">);</span><span class="c1">//父类中的num</span>
+<span class="w">        </span><span class="n">fu</span><span class="p">.</span><span class="na">method</span><span class="p">();</span><span class="c1">//子类中重写的method方法</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">看new的是谁</span><span class="p">,</span><span class="n">先调用谁中的成员方法</span><span class="p">,</span><span class="n">子类没有</span><span class="p">,</span><span class="n">找父类</span>
+</pre></div>
+</div><h4 id="section-11">4.多态的好处(为什么学多态)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">问题描述</span><span class="p">:</span>
+<span class="w">  </span><span class="n">如果使用原始方式new对象</span><span class="p">(</span><span class="n">等号左右两边一样</span><span class="p">),</span><span class="n">既能调用重写的</span><span class="p">,</span><span class="n">还能调用继承的</span><span class="p">,</span><span class="n">还能调用自己特有的成员</span>
+<span class="w">  </span><span class="n">但是多态方式new对象</span><span class="p">,</span><span class="n">只能调用重写的</span><span class="p">,</span><span class="n">不能直接调用子类特有的成员</span><span class="p">,</span><span class="n">那为啥还要用多态呢</span><span class="o">?</span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="n">多态方式和原始方式new对象的优缺点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">原始方式</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">优点</span><span class="p">:</span><span class="n">既能调用重写的</span><span class="p">,</span><span class="n">还能调用父类非私有的</span><span class="p">,</span><span class="n">还能调用自己特有的</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">缺点</span><span class="p">:</span><span class="n">扩展性差</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="n">多态方式</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">优点</span><span class="p">:</span><span class="n">扩展性强</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">缺点</span><span class="p">:</span><span class="n">不能直接调用子类特有功能</span>
+<span class="w">        </span>
+<span class="w">      </span><span class="n">Fu</span><span class="w"> </span><span class="n">fu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Zi</span><span class="p">()</span>
+<span class="w">      </span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">      </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100L</span><span class="p">;</span>
+<span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗啃骨头"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">lookDoor</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗会看门"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Cat</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫吃鱼"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">catchMouse</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫会捉老鼠"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="c1">//重写的</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">lookDoor</span><span class="p">();</span><span class="c1">//特有的</span>
+
+<span class="w">        </span><span class="c1">//dog = new Cat();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"============="</span><span class="p">);</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">dog</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Cat</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">cat</span><span class="p">);</span>
+
+<span class="w">       </span><span class="cm">/* houzi houzi = new houzi();</span>
+<span class="cm">        method(houzi);</span>
+
+<span class="cm">        bird bird = new bird();</span>
+<span class="cm">        method(bird);*/</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="p">){</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">lookDoor</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="n">Cat</span><span class="w"> </span><span class="n">cat</span><span class="p">){</span>
+<span class="w">        </span><span class="n">cat</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cat</span><span class="p">.</span><span class="na">catchMouse</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">   </span><span class="cm">/* public static void method(houzi houzi){</span>
+<span class="cm">        cat.eat();</span>
+<span class="cm">        cat.catchMouse();</span>
+<span class="cm">    }*/</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test02</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">           double b = 10;</span>
+<span class="cm">           b = 100L;</span>
+<span class="cm">         */</span>
+<span class="w">        </span><span class="n">Animal</span><span class="w"> </span><span class="n">animal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">animal</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">animal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">animal</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"================="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">dog</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Cat</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">cat</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">       形参传递父类类型,调用此方法父类类型可以接收任意它的子类对象</span>
+<span class="cm">       传递哪个子类对象,就指向哪个子类对象,就调用哪个子类对象重写的方法</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="n">Animal</span><span class="w"> </span><span class="n">animal</span><span class="p">){</span><span class="c1">//Animal animal = dog   Animal animal = cat</span>
+<span class="w">        </span><span class="n">animal</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>形参传递父类类型,调用此方法父类类型可以接收任意它的子类对象
+传递哪个子类对象,就指向哪个子类对象,就调用哪个子类对象重写的方法</p>
+</blockquote>
+<h4 id="section-12">5.多态中的转型</h4>
+<h5>5.1向上转型</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">父类引用指向子类对象</span>
+<span class="w">  </span><span class="n">好比是</span><span class="p">:</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div><h5>5.2向下转型</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">向下转型</span><span class="p">:</span><span class="n">好比强转</span><span class="p">,</span><span class="n">将大类型强制转成小类型</span>
+<span class="mf">2.</span><span class="n">表现方式</span><span class="p">:</span>
+<span class="w">  </span><span class="n">父类类型</span><span class="w"> </span><span class="n">对象名1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">子类对象</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">向上转型</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="n">子类类型</span><span class="w"> </span><span class="n">对象名2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">子类类型</span><span class="p">)</span><span class="n">对象名1</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">向下转型</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">b</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">想要调用子类特有功能</span><span class="p">,</span><span class="n">我们就需要向下转型</span><span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Cat</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫吃鱼"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">catchMouse</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫会捉老鼠"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗啃骨头"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">lookDoor</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗会看门"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//多态new对象  向上转型</span>
+<span class="w">        </span><span class="n">Animal</span><span class="w"> </span><span class="n">animal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">animal</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="c1">//dog重写的</span>
+<span class="w">        </span><span class="c1">//animal.lookDoor();//多态不能调用子类特有功能</span>
+
+<span class="w">        </span><span class="c1">//向下转型</span>
+<span class="w">        </span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Dog</span><span class="p">)</span><span class="w"> </span><span class="n">animal</span><span class="p">;</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">dog</span><span class="p">.</span><span class="na">lookDoor</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-13">6.转型可能会出现的问题</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">如果等号左右两边类型不一致</span><span class="p">,</span><span class="n">会出现类型转换异常</span><span class="p">(</span><span class="n">ClassCastException</span><span class="p">)</span>
+<span class="mf">2.</span><span class="n">解决</span><span class="p">:</span>
+<span class="w">  </span><span class="n">在向下转型之前</span><span class="p">,</span><span class="n">先判断类型</span>
+<span class="mf">3.</span><span class="n">怎么判断类型</span><span class="p">:</span><span class="w"> </span><span class="k">instanceof</span>
+<span class="w">  </span><span class="n">判断结果是boolean型</span>
+<span class="w">    </span>
+<span class="mf">4.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">对象名</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">类型</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">判断的是关键字前面的对象是否符合关键字后面的类型</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Dog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗啃骨头"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">lookDoor</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"狗会看门"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Cat</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Animal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫吃鱼"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">catchMouse</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"猫会捉老鼠"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Dog</span><span class="p">();</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">dog</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"==============="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Cat</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Cat</span><span class="p">();</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">cat</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="n">Animal</span><span class="w"> </span><span class="n">animal</span><span class="p">){</span><span class="c1">//animal = dog    animal = cat</span>
+<span class="w">      </span><span class="cm">/*  animal.eat();</span>
+<span class="cm">        *//*</span>
+<span class="cm">           这里会出现类型转换异常(ClassCastException)</span>
+<span class="cm">           原因:当调用method,传递Cat对象时,animal代表的就是cat对象</span>
+<span class="cm">               此时我们将代表cat对象的animal强转成了dog</span>
+<span class="cm">               此时等号左右两边类型不一致了,所以出现了类型转换异常</span>
+<span class="cm">         *//*</span>
+<span class="cm">        Dog dog = (Dog) animal;</span>
+<span class="cm">        dog.lookDoor();*/</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">animal</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">Dog</span><span class="p">){</span>
+<span class="w">            </span><span class="n">Dog</span><span class="w"> </span><span class="n">dog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Dog</span><span class="p">)</span><span class="w"> </span><span class="n">animal</span><span class="p">;</span>
+<span class="w">            </span><span class="n">dog</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">            </span><span class="n">dog</span><span class="p">.</span><span class="na">lookDoor</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">animal</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">Cat</span><span class="p">){</span>
+<span class="w">            </span><span class="n">Cat</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Cat</span><span class="p">)</span><span class="w"> </span><span class="n">animal</span><span class="p">;</span>
+<span class="w">            </span><span class="n">cat</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span>
+<span class="w">            </span><span class="n">cat</span><span class="p">.</span><span class="na">catchMouse</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-14">7.综合练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">定义笔记本类</span><span class="err">，</span><span class="n">具备开机</span><span class="err">，</span><span class="n">关机和使用USB设备的功能</span><span class="err">。</span><span class="n">具体是什么USB设备</span><span class="err">，</span><span class="n">笔记本并不关心</span><span class="err">，</span><span class="n">只要符合USB规格的设备都可以</span><span class="err">。</span><span class="n">鼠标和键盘要想能在电脑上使用</span><span class="err">，</span><span class="n">那么鼠标和键盘也必须遵守USB规范</span><span class="err">，</span><span class="n">不然鼠标和键盘的生产出来无法使用</span><span class="p">;</span>
+<span class="n">进行描述笔记本类</span><span class="err">，</span><span class="n">实现笔记本使用USB鼠标</span><span class="err">、</span><span class="n">USB键盘</span>
+
+<span class="o">-</span><span class="w"> </span><span class="n">USB接口</span><span class="err">，</span><span class="n">包含开启功能</span><span class="err">、</span><span class="n">关闭功能</span>
+<span class="o">-</span><span class="w"> </span><span class="n">笔记本类</span><span class="err">，</span><span class="n">包含运行功能</span><span class="err">、</span><span class="n">关机功能</span><span class="err">、</span><span class="n">使用USB设备功能</span>
+<span class="o">-</span><span class="w"> </span><span class="n">鼠标类</span><span class="err">，</span><span class="n">要符合USB接口</span>
+<span class="o">-</span><span class="w"> </span><span class="n">键盘类</span><span class="err">，</span><span class="n">要符合USB接口</span>
+</pre></div>
+</div><p><img alt="1703153078961" decoding="async" loading="lazy" src="../../course-assets/02af18b3d422029161af.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">USB</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Mouse</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">USB</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鼠标开启"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鼠标关闭"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">click</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"来呀,快点我"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">KeyBoard</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">USB</span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">open</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"键盘开启"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"键盘关闭"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//特有功能</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">input</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"来呀,敲我呀!"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">NoteBook</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">//开机</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">start</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"开机"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//使用USB</span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">       USB usb = mouse  多态</span>
+<span class="cm">       USB usb = keyBoard 多态</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">useUSB</span><span class="p">(</span><span class="n">USB</span><span class="w"> </span><span class="n">usb</span><span class="p">){</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">usb</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">Mouse</span><span class="p">){</span>
+<span class="w">            </span><span class="n">Mouse</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Mouse</span><span class="p">)</span><span class="w"> </span><span class="n">usb</span><span class="p">;</span>
+<span class="w">            </span><span class="n">mouse</span><span class="p">.</span><span class="na">open</span><span class="p">();</span>
+<span class="w">            </span><span class="n">mouse</span><span class="p">.</span><span class="na">click</span><span class="p">();</span>
+<span class="w">            </span><span class="n">mouse</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">KeyBoard</span><span class="w"> </span><span class="n">keyBoard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">KeyBoard</span><span class="p">)</span><span class="w"> </span><span class="n">usb</span><span class="p">;</span>
+<span class="w">            </span><span class="n">keyBoard</span><span class="p">.</span><span class="na">open</span><span class="p">();</span>
+<span class="w">            </span><span class="n">keyBoard</span><span class="p">.</span><span class="na">input</span><span class="p">();</span>
+<span class="w">            </span><span class="n">keyBoard</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">//usb.open();</span>
+<span class="w">        </span><span class="c1">//usb.close();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">//关机</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">stop</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"关机"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">NoteBook</span><span class="w"> </span><span class="n">noteBook</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">NoteBook</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Mouse</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Mouse</span><span class="p">();</span>
+<span class="w">        </span><span class="n">noteBook</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="w">        </span><span class="n">noteBook</span><span class="p">.</span><span class="na">useUSB</span><span class="p">(</span><span class="n">mouse</span><span class="p">);</span>
+<span class="w">        </span><span class="n">noteBook</span><span class="p">.</span><span class="na">stop</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"==========="</span><span class="p">);</span>
+<span class="w">        </span><span class="n">KeyBoard</span><span class="w"> </span><span class="n">keyBoard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">KeyBoard</span><span class="p">();</span>
+<span class="w">        </span><span class="n">noteBook</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="w">        </span><span class="n">noteBook</span><span class="p">.</span><span class="na">useUSB</span><span class="p">(</span><span class="n">keyBoard</span><span class="p">);</span>
+<span class="w">        </span><span class="n">noteBook</span><span class="p">.</span><span class="na">stop</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div></article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html"><small>← 上一篇</small><strong>继承、重写与抽象类 · 课程原文</strong></a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html"><small>下一篇 →</small><strong>权限、final、代码块与内部类 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块11_面向对象</a><a class="toc-h3" href="#section-1">第一章.接口</a><a class="toc-h4" href="#section-2">1.接口的介绍</a><a class="toc-h4" href="#section-3">2.接口的定义以及使用</a><a class="toc-h4" href="#section-4">3.接口中的成员</a><a class="toc-h4" href="#section-5">4.接口的特点</a><a class="toc-h4" href="#section-6">5.接口和抽象类的区别</a><a class="toc-h3" href="#section-7">第二章.多态</a><a class="toc-h4" href="#section-8">1.多态的介绍</a><a class="toc-h4" href="#section-9">2.多态的基本使用</a><a class="toc-h4" href="#section-10">3.多态的条件下成员的访问特点</a><a class="toc-h4" href="#section-11">4.多态的好处(为什么学多态)</a><a class="toc-h4" href="#section-12">5.多态中的转型</a><a class="toc-h4" href="#section-13">6.转型可能会出现的问题</a><a class="toc-h4" href="#section-14">7.综合练习</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

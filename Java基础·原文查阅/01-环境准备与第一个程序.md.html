@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>环境准备与第一个程序 · 课程原文 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·原文查阅/01-环境准备与第一个程序.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a aria-current="page" href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>环境准备与第一个程序 · 课程原文</h1><div class="article-meta"><span>约 24 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<p>来源：用户提供的 <code>笔记(1).zip / 03_笔记/day01_入门/day01_HelloWorld/day01.[环境变量,HelloWorld].md</code>。保留原课程内容，历史环境、示例错误和故意报错的教学代码应结合上下文阅读。</p>
+<p><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">返回本章速学总结</a></p>
+<h3 id="section-0">day01.[环境变量,HelloWorld]</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">会常用的dos命令</span>
+<span class="mf">2.</span><span class="n">会安装java所需要的环境</span><span class="p">(</span><span class="n">jdk</span><span class="p">)</span>
+<span class="mf">3.</span><span class="n">会配置java的环境变量</span>
+<span class="mf">4.</span><span class="n">知道java开发三步骤</span>
+<span class="mf">5.</span><span class="n">会java的入门程序</span><span class="p">(</span><span class="n">HelloWorld</span><span class="p">)</span>
+<span class="mf">6.</span><span class="n">会三种注释方式</span>
+<span class="mf">7.</span><span class="n">知道Java入门程序所需要注意的地方</span>
+<span class="mf">8.</span><span class="n">知道println和print的区别</span>
+</pre></div>
+</div><h3 id="section-1">第一章 Java概述</h3>
+<h4 id="section-2">1.1 JavaSE课程体系介绍</h4>
+<p>JavaSE知识图解</p>
+<p><img alt="1561379629326" decoding="async" loading="lazy" src="../../course-assets/6a07f71e39b33fe707d7.png"/></p>
+<p>JavaSE知识模块介绍</p>
+<ul>
+<li><p><strong>第一部分：计算机编程语言核心结构：</strong><code>数据类型</code>、<code>运算符</code>、<code>流程控制</code>、<code>数组</code>、…</p>
+<p>(没有为啥,按照格式定义)</p>
+</li>
+<li><p><strong>第二部分：Java面向对象核心逻辑：</strong><code>类和对象</code>、<code>封装</code>、<code>继承</code>、<code>多态</code>、<code>抽象</code>、<code>接口</code>、…</p>
+<p>JAVA核心编程思想(面向对象),很多功能别人已经给我们实现好了,我们直接调用这个对象的功能就可以了,</p>
+<p>让代码变得简单了,简洁了</p>
+</li>
+<li><p><strong>第三部分：JavaSE核心高级应用：</strong><code>集合</code>、<code>I/O</code>、<code>多线程</code>、<code>网络编程</code>、<code>反射机制</code>、…</p>
+</li>
+<li><p><strong>第四部分：Java新特性：</strong><code>Lambda表达式</code>、<code>函数式编程</code>、<code>新Date/Time API</code>、<code>接口的默认、静态和私有方法</code>、…</p>
+</li>
+<li><p><strong>第五部分：MySQL/JDBC核心技术：</strong><code>SQL语句</code>、<code>数据库连接池</code>、<code>DBUtils</code>、<code>事务管理</code>、<code>批处理</code>、…</p>
+</li>
+</ul>
+<h4 id="section-3">1.2 计算机语言介绍（了解）</h4>
+<h5>计算机编程语言是什么</h5>
+<p>所谓计算机编程语言，就是人们使用编程语言对计算机下达的命令，让计算机完成人们需要的功能。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">翻译</span><span class="p">:</span><span class="n">所谓的计算机编程语言</span><span class="p">,</span><span class="n">就是计算机能看懂的语言</span><span class="p">,</span><span class="n">我们需要学习这些计算机编程语言</span><span class="p">,</span><span class="n">给计算机下达指令</span><span class="p">,</span><span class="n">让计算机给我们完成一些功能</span>
+</pre></div>
+</div><h5>计算机语言发展</h5>
+<ul>
+<li><p>第一代：机器语言(计算机很庞大,都是0和1组成的指令,而且需要同时按下多个键才能完成一个指令,而且用0和1组成的一个一个指令,所以工程师们就要记住0和1的各种组合以及对应的指令)</p>
+</li>
+<li><p>第二代：汇编语言(面向机器的语言,因为直接面对机器需要记一些 0 和1 的指令,很痛苦,所以就出现了很多助记词,比如:add.汇编语言现在还在使用,接近于机器语言,越接近机器语言,速度越快,而且最终还是转成0和1存储)</p>
+</li>
+<li><p>第三代：高级语言(更接近我们人类语言,常见的有很多,比如C语言,java等)</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">不管是第几代语言</span><span class="p">,</span><span class="n">最终都会向0和1靠近</span><span class="p">,</span><span class="n">因为CPU只认识0和1</span>
+<span class="n">电脑上所有的内容</span><span class="p">,</span><span class="n">都是通过CPU将0和1转换而来的</span><span class="w">    </span>
+</pre></div>
+</div></li>
+</ul>
+<h5>计算机语言排行榜</h5>
+<p><img alt="image-20201109084739737" decoding="async" loading="lazy" src="../../course-assets/b93909119819d70e62f2.png"/></p>
+<h5>计算机语言走势</h5>
+<p><img alt="image-20200820180851296" decoding="async" loading="lazy" src="../../course-assets/3b58479d7f3df3f3f29a.png"/></p>
+<h4 id="section-4">1.3 Java语言概述（了解）</h4>
+<h5>Java生态圈</h5>
+<p><strong>Java是目前应用最为广泛的软件开发平台之一。</strong>随着Java以及Java社区的不断壮大，Java 也早已不再是简简单单的一门计算机语言了，它更是一个平台、一种文化、一个社区。</p>
+<p><strong>作为一个平台，</strong>Java虚拟机扮演着举足轻重的作用。除了 Java语言，任何一种能够被编译成字节码的计算机语言都属于Java这个平台。Groovy、Scala、 JRuby、Kotlin等都是Java平台的一部分，它们依赖于Java虚拟机，同时，Java平台也因为它们变得更加丰富多彩。而且Java还可以跨平台</p>
+<p><strong>作为一种文化，</strong>Java几乎成为了 “开源”的代名词。在Java程序中，有着数不清的开源软件和框架。如Tomcat、Struts, Hibernate, Spring,MyBatis等。就连JDK和JVM自身也有不少开源的实现，如OpenJDK、Apache Harmony。可以说，“共享”的精神在Java世界里体现得淋漓尽致。</p>
+<p><strong>作为一个社区，</strong>Java拥有全世界最多的技术拥护者和开源社区支持，有数不清的论坛和资料。从桌面应用软件、嵌入式开发到企业级应用、后台服务器、中间件，都可以看到Java的身影。其应用形式之复杂、参与人数之众多也令人咋舌。可以说，Java社区已经俨然成为了一个良好而庞大的生态系统。<strong>其实这才是Java最大的优势和财富。</strong></p>
+<h5>Java 是最好的语言吗？</h5>
+<p>不是，因为在每个领域都有更合适的编程语言。</p>
+<ul>
+<li><p>C 语言无疑是现代计算机软件编程语言的王者，几乎所有的操作系统都是 C 语言写成的。C里面有一个编译器,会将系统软件变成机器语言,让硬件识别,和硬件做交互.C++ 是面向对象的 C 语言，一直在不断的改进。</p>
+</li>
+<li><p>JavaScript 是能运行在浏览器中的语言，丰富的前端界面离不开 Javascript 的功劳。近年来的 Node.js 又在后端占有一席之地。</p>
+</li>
+<li><p>Python 用于系统管理，并通过高性能预编译的库，提供 API 来进行科学计算，文本处理等，是 Linux 必选的解释性语言。现在Python也被用于web开发、科学计算和统计、人工智能、网络爬虫等</p>
+</li>
+<li><p>Ruby 强于 DSL（领域特定语言），程序员可以定义丰富的语义来充分表达自己的思想。</p>
+</li>
+<li><p>Erlang 就是为分布式计算设计的，能保证在大规模并发访问的情况下，保持强壮和稳定性。</p>
+</li>
+<li><p>Go 语言内置了并发能力，可以编译成本地代码。当前新的网络相关项目，很大比例是由 Go 语言编写的，如 Docker、Kubernetes 等。</p>
+</li>
+<li><p>编写网页用 PHP，函数式编程有 Lisp，编写 iOS 程序有 Swift/Objective-C。</p>
+</li>
+<li><p>R的思想是：它可以提供一些集成的统计工具，但更大量的是它提供各种数学计算、统计计算的<a href="https://baike.baidu.com/item/%E5%87%BD%E6%95%B0/301912" rel="noopener noreferrer" target="_blank">函数</a>，从而使使用者能灵活机动的进行数据分析，甚至创造出符合需要的新的统计计算方法</p>
+</li>
+<li><p>SQL 是用于访问和处理数据库的标准的计算机语言， 这类数据库包括：MySQL，Oracle, Sybase, SQL Server, DB2, Access 等等</p>
+</li>
+</ul>
+<p>一句话概括，<strong>能留在排行榜之上的语言，都是好的语言，在其所在的领域能做到最好。</strong></p>
+<h5>Java语言发展历史</h5>
+<p>Java诞生于SUN（Stanford University Network），09年SUN被Oracle（甲骨文）收购。</p>
+<p>Java之父是詹姆斯.高斯林(James Gosling)。</p>
+<p><img alt="1615793633189" decoding="async" loading="lazy" src="../../course-assets/482af1c8824f36c4ef7f.png"/></p>
+<p><strong>詹姆斯·高斯林</strong>等人于1990年代初开发Java语言的雏形，最初被命名为<strong>Oak</strong>，目标设置在<strong>家用电器等小型系统的程序语言</strong>，应用在<strong>电视机、电话、闹钟、烤面包机</strong>等家用电器的<strong>控制和通信</strong>。由于这些智能化家电的市场需求没有预期的高，Sun公司放弃了该项计划。随着1990年代互联网的发展，Sun公司看见Oak在互联网上应用的前景，于是改造了Oak，于1995年5月以Java的名称正式发布。Java伴随着互联网的迅猛发展而发展，逐渐成为重要的网络编程语言。</p>
+<p>1996年发布JDK1.0版。</p>
+<p>目前最新的版本是Java17。我们学习的Java8以及jdk17。</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th style="text-align:center">发行版本</th>
+<th style="text-align:center">发行时间</th>
+<th style="text-align:center">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Java</td>
+<td style="text-align:center">1995.05.23</td>
+<td style="text-align:center">Sun公司在Sun world会议上正式发布Java和HotJava浏览器</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 1.0</td>
+<td style="text-align:center">1996.01.23</td>
+<td style="text-align:center">Sun公司发布了Java的第一个开发工具包</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 1.1</td>
+<td style="text-align:center">1997.02.19</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">Java 1.2</td>
+<td style="text-align:center">1998.12.08</td>
+<td style="text-align:center">拆分成：J2SE（标准版）、J2EE（企业版）、J2ME（小型版）</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 1.3</td>
+<td style="text-align:center">2000.05.08</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">Java1.4</td>
+<td style="text-align:center">2004.02.06</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>Java 5.0</strong></td>
+<td style="text-align:center">2004.09.30</td>
+<td style="text-align:center">①版本号从1.4直接更新至5.0；②平台更名为JavaSE、JavaEE、JavaME</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 6.0</td>
+<td style="text-align:center">2006.12.11</td>
+<td style="text-align:center">2009.04.20 Oracle宣布收购SUN公司</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 7.0</td>
+<td style="text-align:center">2011.07.02</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>Java 8.0</strong></td>
+<td style="text-align:center">2014.03.18</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">Java 9.0</td>
+<td style="text-align:center">2017.09.22</td>
+<td style="text-align:center">①每半年更新一次；②Java 9.0开始不再支持windows 32位系统</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 10.0</td>
+<td style="text-align:center">2018.03.21</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>Java 11.0</strong></td>
+<td style="text-align:center">2018.09.25</td>
+<td style="text-align:center">JDK安装包取消独立JRE安装包，长期支持版本</td>
+</tr>
+<tr>
+<td style="text-align:center">Java 12.0</td>
+<td style="text-align:center">2019.03.19</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">Java 13.0</td>
+<td style="text-align:center">2019.9.18</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">Java 14.0</td>
+<td style="text-align:center">2020.3.17</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">Google和Oracle的侵权事件</span><span class="p">:</span>
+
+<span class="n">Google</span><span class="w"> </span><span class="n">和</span><span class="w"> </span><span class="n">Oracle</span><span class="w"> </span><span class="n">纠缠多年的</span><span class="err">“</span><span class="n">Java</span><span class="w"> </span><span class="n">侵权案</span><span class="err">”</span><span class="n">又有了新的判决结果</span><span class="err">。</span><span class="n">Google</span><span class="w"> </span><span class="n">在此次对决中败诉</span><span class="err">，</span><span class="n">并可能需要支付高达88亿美元的赔偿金</span><span class="err">。</span><span class="n">这个案件还引发关于</span><span class="w"> </span><span class="n">API</span><span class="err">（</span><span class="n">应用程序编程接口</span><span class="err">）</span><span class="n">是否应该受版权保护的争议</span><span class="err">。</span>
+
+<span class="n">其实早在2010年8月</span><span class="err">，</span><span class="n">Oracle</span><span class="w"> </span><span class="n">就已经向法院起诉</span><span class="w"> </span><span class="n">Google</span><span class="w"> </span><span class="n">侵权</span><span class="err">，</span><span class="n">声称</span><span class="w"> </span><span class="n">Google</span><span class="w"> </span><span class="n">在开发</span><span class="w"> </span><span class="n">Android</span><span class="w"> </span><span class="n">平台时未经授权就使用了</span><span class="w"> </span><span class="n">Oracle</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">Java</span><span class="w"> </span><span class="n">应用编程接口数据包</span><span class="err">。</span>
+
+<span class="n">另外</span><span class="err">，</span><span class="n">虽然</span><span class="w"> </span><span class="n">Google</span><span class="w"> </span><span class="n">当年为避免版权问题而重写了</span><span class="w"> </span><span class="n">Java</span><span class="w"> </span><span class="n">API</span><span class="err">，</span><span class="n">却意外地使用了和</span><span class="w"> </span><span class="n">Oracle</span><span class="w"> </span><span class="n">JDK</span><span class="w"> </span><span class="n">相同的一小段代码</span><span class="err">，</span><span class="n">这使得</span><span class="w"> </span><span class="n">Google</span><span class="w"> </span><span class="n">陷入不利的局面</span><span class="err">。</span>
+
+<span class="n">正是由于</span><span class="w"> </span><span class="n">Google</span><span class="w"> </span><span class="n">在</span><span class="w"> </span><span class="n">Android</span><span class="w"> </span><span class="n">平台上使用</span><span class="w"> </span><span class="n">Java</span><span class="w"> </span><span class="n">时并未和</span><span class="w"> </span><span class="n">Sun</span><span class="w"> </span><span class="n">公司达成授权协议</span><span class="err">，</span><span class="n">造成了巨大的隐患</span><span class="err">，</span><span class="n">尤其是在</span><span class="w"> </span><span class="n">Oracle</span><span class="w"> </span><span class="n">收购</span><span class="w"> </span><span class="n">Sun</span><span class="w"> </span><span class="n">公司之后</span><span class="err">。</span>
+</pre></div>
+</div><p><img alt="1615793545482" decoding="async" loading="lazy" src="../../course-assets/841a1d9dbde1d944399f.png"/></p>
+<h5>Java技术体系平台</h5>
+<ul>
+<li>JavaSE（Java Platform, Standard Edition标准版）：允许您在桌面和服务器上开发和部署Java应用程序。Java提供了丰富的用户界面、性能、多功能性、可移植性和当今应用程序所需的安全性。</li>
+<li>JavaEE（Java Platform, Enterprise Edition企业版）：是为开发企业环境下的应用程序提供的一套解决方案，主要针对于Web应用程序开发。</li>
+<li>JavaME（Java Platform, Micro Edition 小型版）：为互联网上的嵌入式和移动设备上运行的应用提供了一个健壮、灵活的环境：微控制器、传感器、网关、移动电话、个人数字助理（PDA）、电视机顶盒、打印机等等。JavaME包括灵活的用户界面、健壮的安全性、内置的网络协议，以及支持动态下载的网络和离线应用程序。基于JavaME的应用程序在许多设备上都是可移植的，但是利用了每个设备的本机功能。<ul>
+<li>Java Embedded(Im'bedId): 用于解锁物联网的智能设备的价值：
+通过远程市场更新和刷新功能延长产品生命周期和价值；
+利用Java的可伸缩性、健壮性、可移植性和全套功能，提高生产效率，降低成本，缩短上市时间；
+在边缘启用快速数据功能；</li>
+<li>Java Card：使安全元件（如智能卡和其他防篡改安全芯片）能够承载采用Java技术的应用程序。Java card提供了一个安全的、可互操作的执行平台，它可以在一个资源受限的设备上存储和更新多个应用程序，同时保持最高的认证级别和与标准的兼容性。</li>
+<li>Java TV：是一种基于JavaME的技术，它为开发在tv和机顶盒设备上运行的java应用程序提供了一个性能良好、安全且易于实现的解决方案。使用Java TV运行时，开发人员可以轻松创建应用程序，例如电子节目指南（EPG）、视频点播（VOD）客户端、游戏和教育应用程序、用于访问Internet数据的应用程序（例如天气、新闻播报器、社交网络）以及大多数蓝光光盘标题上的用户界面和奖金内容。</li>
+</ul>
+</li>
+</ul>
+<h4 id="section-5">1.4 什么是软件开发</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span>
+<span class="w">  </span><span class="n">软件开发是根据用户要求建造出软件系统或者系统中的软件部分的过程</span>
+<span class="w">  </span><span class="n">软件开发是一项包括需求捕捉</span><span class="err">、</span><span class="n">需求分析</span><span class="err">、</span><span class="n">设计</span><span class="err">、</span><span class="n">实现和测试的系统工程</span>
+<span class="w">  </span><span class="n">软件一般是用某种程序设计语言来实现的</span><span class="err">。</span><span class="n">通常采用软件开发工具可以进行开发</span>
+<span class="w">  </span>
+<span class="mf">2.</span><span class="n">我们将来主要从事软件开发中各个环节的哪个环节呢</span><span class="o">?</span><span class="n">实现</span>
+<span class="w">  </span>
+<span class="mf">3.</span><span class="n">我们将来主要用什么程序设计语言来开发呢</span><span class="o">?</span><span class="w"> </span><span class="n">java语言</span><span class="w"> </span><span class="n">sql语言</span><span class="w">  </span><span class="n">js</span>
+</pre></div>
+</div><h3 id="section-6">第二章.Java语言前言</h3>
+<h4 id="section-7">1.字节</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">字节</span><span class="p">:</span><span class="n">计算机中存储数据的最小存储单元</span><span class="p">(</span><span class="n">计量单位</span><span class="p">),</span><span class="n">用byte或者B表示</span>
+<span class="w">  </span><span class="n">二进制位</span><span class="p">:</span><span class="n">用bit</span><span class="p">(</span><span class="n">比特</span><span class="p">)</span><span class="n">表示</span>
+<span class="w">  </span><span class="mi">8</span><span class="n">个二进制位代表一个字节</span><span class="w"> </span>
+<span class="w">      </span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="n">存储单元之间的转换</span><span class="p">:</span>
+<span class="w">  </span><span class="mi">8</span><span class="n">bit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="n">B</span>
+<span class="w">  </span><span class="mi">1024</span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="n">KB</span>
+<span class="w">  </span><span class="mi">1024</span><span class="n">KB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="n">MB</span>
+<span class="w">  </span><span class="mi">1024</span><span class="n">MB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="n">GB</span>
+<span class="w">  </span><span class="mi">1024</span><span class="n">GB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="n">TB</span>
+<span class="w">      </span>
+<span class="w">  </span><span class="n">PB</span><span class="w">   </span><span class="n">EB</span><span class="w">  </span><span class="n">ZB</span><span class="w"> </span><span class="p">...</span><span class="w">    </span>
+</pre></div>
+</div><p><img alt="1698284758661" decoding="async" loading="lazy" src="../../course-assets/a61bf9dbdb7081eecc59.png"/></p>
+<h4 id="section-8">2.常用的dos命令</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">打开dos命令窗口</span><span class="p">:</span>
+<span class="w">  </span><span class="n">win</span><span class="o">+</span><span class="n">r</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">输入cmd</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">回车</span>
+</pre></div>
+</div><p><img alt="1698285433042" decoding="async" loading="lazy" src="../../course-assets/bded42719c70038532e1.png"/></p>
+<p><img alt="1698285568344" decoding="async" loading="lazy" src="../../course-assets/c96bbe279043c34e0514.png"/></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>作用</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table></div>
+<p>| 切换盘符                       | 盘符名: -&gt; 回车
+盘符名不区分大小写,但是计算机上必须有指定的盘符 |
+| 查看当前路径下的文件或者文件夹 | dir                                                          |
+| 进入到指定文件夹下             | cd 文件夹名字                                                |
+| 进入到多级文件夹下             | cd 文件夹名字\文件夹名字                                     |
+| 退到上一级目录                 | cd..或者 cd ..                                               |
+| 直接退到磁盘位置(退到根目录)   | cd\或者cd \                                                  |
+| 清屏                           | cls                                                          |
+| 退出黑窗口                     | exit                                                         |
+| 创建文件夹                     | mkdir 文件夹名                                               |
+| 创建多级文件夹                 | mkdir 文件夹名\文件夹名                                      |
+| 删除文件夹                     | rd 文件夹名
+注意:删除的文件夹必须是空的
+不走回收站     |
+| 删除文件                       | del 文件名.后缀名
+不走回收站                              |
+| 批量删除文件                   | del *.后缀名                                                 |</p>
+<blockquote>
+<p>1.如何区分正斜杠和反斜杠:</p>
+<p>/:正斜杠</p>
+<p>:反斜杠</p>
+<p>2.快速打开该目录对应的dos命令窗口:</p>
+<p>a.选中路径</p>
+<p>b.输入cmd -&gt; 回车</p>
+<p>3.按上下箭头,切换之前输入过的命令</p>
+<p>4.在dos命令窗口中,可以输入文件夹名或者文件名的一部分,按 -&gt; tab键 -&gt; 自动补全文件夹名或者文件名</p>
+</blockquote>
+<h3 id="section-9">第三章.Java所需要的环境</h3>
+<h4 id="section-10">1.jvm和跨平台</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">jvm</span><span class="p">(</span><span class="n">java虚拟机</span><span class="p">):</span><span class="n">java运行程序的假想计算机</span><span class="p">,</span><span class="n">主要用来运行java程序的</span>
+<span class="mf">2.</span><span class="n">跨平台</span><span class="p">:</span><span class="n">java代码可以在不同的操作系统上运行</span><span class="p">(</span><span class="n">一次编写</span><span class="p">,</span><span class="n">到处运行</span><span class="p">)</span>
+<span class="w">  </span><span class="n">跨</span><span class="p">:</span><span class="n">跨越</span>
+<span class="w">  </span><span class="n">平台</span><span class="p">:</span><span class="n">操作系统</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">windows</span><span class="w"> </span><span class="n">linux</span><span class="w"> </span><span class="n">mac</span><span class="w"> </span><span class="n">os</span><span class="w">  </span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">关系</span><span class="p">:</span><span class="n">java程序想要在不同的操作系统上运行</span><span class="p">,</span><span class="n">实现跨平台</span><span class="p">,</span><span class="n">就需要安装不同版本的jvm</span><span class="w">      </span>
+</pre></div>
+</div><p><img alt="1698304141613" decoding="async" loading="lazy" src="../../course-assets/fd9dc8f47a27acdd81cf.png"/></p>
+<h4 id="section-11">2.JDK和JRE</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">jdk</span><span class="p">:(</span><span class="n">Java</span><span class="w"> </span><span class="n">Development</span><span class="w"> </span><span class="n">Kit</span><span class="p">):</span><span class="n">java开发工具包</span><span class="p">,</span><span class="n">包含了jre</span>
+<span class="w">  </span><span class="n">javac</span><span class="w"> </span><span class="n">编译工具</span>
+<span class="w">  </span><span class="n">java</span><span class="w"> </span><span class="n">运行工具</span>
+<span class="w">  </span><span class="n">jdb</span><span class="w">  </span><span class="n">调试工具</span>
+<span class="w">  </span><span class="n">jhat</span><span class="w"> </span><span class="n">内存分析工具</span>
+<span class="w">  </span><span class="p">...</span><span class="w">  </span>
+<span class="mf">2.</span><span class="n">jre</span><span class="p">:(</span><span class="n">Java</span><span class="w"> </span><span class="n">Runtime</span><span class="w"> </span><span class="n">Environment</span><span class="p">):</span><span class="n">java运行环境</span><span class="p">,</span><span class="n">包含了jvm以及后面开发用到的核心类库</span>
+<span class="w">    </span>
+<span class="mf">3.</span><span class="n">jdk和jre以及jvm的关系</span><span class="p">:</span>
+<span class="w">  </span><span class="n">jdk包含了jre</span><span class="p">,</span><span class="n">jre包含了jvm</span><span class="p">,</span><span class="n">所以我们只需要安装jdk即可</span>
+</pre></div>
+</div><blockquote>
+<p>但是从jdk9开始jdk目录中就没有单独的jre目录了,因为jre作为一个运行时,里面不需要包含太多的东西浪费空间,降低运行效率,在jdk9的时候引用模块化的技术,让开发者能按照自己的应用创建一个最小的运行时(比如一个微服务的部署应用仅仅需要一个非常小的runtime,而不是像以前一样不管应用复杂还是简单,都需要一个近百兆的jre运行)这样提高了运行效率</p>
+</blockquote>
+<h5>2.1.jdk安装</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">下载</span><span class="p">:</span><span class="n">www</span><span class="p">.</span><span class="na">oracle</span><span class="p">.</span><span class="na">com</span>
+</pre></div>
+</div><p><img alt="1698306463672" decoding="async" loading="lazy" src="../../course-assets/61043aab16a6c11dbb70.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w"> </span><span class="mf">1.</span><span class="n">安装</span><span class="p">:</span><span class="n">双击</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">选择安装路径</span><span class="p">(</span><span class="n">安装路径上不要有中文</span><span class="p">,</span><span class="n">不要有空格</span><span class="p">)</span>
+<span class="w"> </span><span class="mf">2.</span><span class="n">一定要记住</span><span class="p">:</span><span class="n">以后所有开发相关的安装路径上都不要有中文和空格</span><span class="w">    </span>
+</pre></div>
+</div><p><img alt="1698306706203" decoding="async" loading="lazy" src="../../course-assets/3eb6ff15ef77800d8315.png"/></p>
+<blockquote>
+<p>测试:进入到jdk的bin路径下,打开对应dos命令窗口</p>
+<p>输入javac(编译命令)和java(运行命令)</p>
+</blockquote>
+<h5>2.2.环境变量的配置</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">问题</span><span class="p">:</span><span class="n">将来我们需要创建一个java文件写代码</span><span class="p">,</span><span class="n">然后编译和运行的时候需要打开此java文件所在的目录</span><span class="p">,</span><span class="n">java文件的目录如果和javac以及java命令所在的bin目录不一致</span><span class="p">,</span><span class="n">那么javac和java命令就用不了了</span><span class="p">,</span><span class="n">毕竟javac和java命令在bin目录下</span><span class="p">,</span><span class="n">所以难道我们将来必须将所有的java文件都放到bin目录下吗</span><span class="o">?</span>
+<span class="w">  </span><span class="n">那么我们能不能在任意目录下都能使用javac和java命令呢</span><span class="o">?</span><span class="n">能</span><span class="p">,</span><span class="n">需要配置环境变量</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">配置环境变量的目的</span><span class="p">:</span><span class="n">在任意路径下都可以随意使用javac和java命令进行对java代码的编译和运行</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">方式1</span><span class="p">:</span><span class="n">直接将jdk的bin路径粘贴到path中</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">不推荐</span>
+</pre></div>
+</div><p><img alt="1698308025548" decoding="async" loading="lazy" src="../../course-assets/498b956b702178fa8afd.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">方式2</span><span class="p">:</span><span class="n">极力推荐</span>
+<span class="w">     </span><span class="n">配置JAVA_HOME</span>
+</pre></div>
+</div><p><img alt="1698308481783" decoding="async" loading="lazy" src="../../course-assets/754e11c089422c8b91eb.png"/></p>
+<blockquote>
+<p>jdk安装之后,自带环境变量配置-&gt;javapath(可以删除)-&gt;推荐使用JAVA_HOME</p>
+<p>可能出现的问题:电脑重启之后,环境变量失效了</p>
+<p>1.解决问题1:点到环境变量中,啥都不要做,直接点一下确定</p>
+<p>2.解决问题2:直接将bin路径粘进去</p>
+<p>当然,后面学了idea之后,不会出现这种问题了</p>
+</blockquote>
+<h3 id="section-12">第四章.Java第一个程序的开发</h3>
+<h4 id="section-13">1.开发三步骤</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">编写</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">创建一个文本文档</span><span class="p">,</span><span class="n">将后缀名改成</span><span class="p">.</span><span class="na">java</span><span class="p">,</span><span class="n">变成一个java文件</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">注意</span><span class="p">:</span><span class="n">我们需要将文件的后缀名显示出来</span><span class="w">  </span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="n">编译</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">命令</span><span class="p">:</span><span class="n">javac</span><span class="w"> </span><span class="n">java文件名</span><span class="p">.</span><span class="na">java</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">注意</span><span class="p">:</span><span class="n">javac会将java文件编译</span><span class="p">,</span><span class="n">生成一个</span><span class="p">.</span><span class="na">class文件</span><span class="p">(</span><span class="n">字节码文件</span><span class="p">),</span><span class="n">jvm运行只认class文件</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">运行</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">命令</span><span class="p">:</span><span class="n">java</span><span class="w"> </span><span class="nf">class文件名</span><span class="p">(</span><span class="n">不需要带后缀名了</span><span class="p">)</span>
+</pre></div>
+</div><p><img alt="1698310112286" decoding="async" loading="lazy" src="../../course-assets/5b634c0bcf50700ab4cd.png"/></p>
+<h4 id="section-14">2.编写HelloWorld</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01HelloWorld</span><span class="p">{</span>
+<span class="w">	</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">);</span>
+<span class="w">	</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">编译</span><span class="p">:</span>
+<span class="w">  </span><span class="n">javac</span><span class="w"> </span><span class="n">java文件名</span><span class="p">.</span><span class="na">java</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">运行</span><span class="p">:</span>
+<span class="w">  </span><span class="n">java</span><span class="w"> </span><span class="nf">class文件名</span><span class="p">(</span><span class="n">不要带后缀名了</span><span class="p">)</span>
+</pre></div>
+</div><p><img alt="1698310705311" decoding="async" loading="lazy" src="../../course-assets/97d268ff3fde31b367e5.png"/></p>
+<h4 id="section-15">3.注释</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">对代码的解释说明</span>
+<span class="mf">2.</span><span class="n">分类</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">单行注释</span><span class="p">:</span>
+<span class="w">    </span><span class="c1">//注释内容</span>
+
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">多行注释</span><span class="p">:</span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">      注释内容</span>
+<span class="cm">    */</span>
+
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">文档注释</span><span class="p">:</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">      注释内容</span>
+<span class="cm">    */</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">//单行注释 class后面的名字要和java文件名一致</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01HelloWorld</span><span class="p">{</span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">	  多行注释:</span>
+<span class="cm">	    main是一个方法,是程序的入口,jvm运行程序要找main当入口</span>
+<span class="cm">		执行程序</span>
+<span class="cm">	*/</span>
+<span class="w">	</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">	    </span><span class="cm">/**</span>
+<span class="cm">		  文档注释:</span>
+<span class="cm">		    下面的语句是输出语句</span>
+<span class="cm">		*/</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">);</span>
+<span class="w">	</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">文档注释作用</span><span class="p">:</span><span class="n">将来我们给别人一个开发好的类</span><span class="p">,</span><span class="n">如何让别人快速对我们写的代码了解呢</span><span class="o">?</span>
+<span class="w">  </span><span class="nf">我们的文档注释中的内容可以根据javadoc命令生成一个文档</span><span class="p">(</span><span class="n">API文档</span><span class="p">)</span>
+<span class="w">  </span><span class="n">别人拿到这个文档</span><span class="p">,</span><span class="n">就能快速对此类以及类中实现的功能</span><span class="p">,</span><span class="n">进行快速了解</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">命令</span><span class="p">:</span><span class="n">javadoc</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">要生成的文件夹名字</span><span class="w"> </span><span class="o">-</span><span class="n">author</span><span class="w"> </span><span class="o">-</span><span class="n">version</span><span class="w"> </span><span class="n">文件名</span><span class="p">.</span><span class="na">java</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">  此类是一个java的入门程序</span>
+<span class="cm">  @author 涛哥</span>
+<span class="cm">  @version v1.0</span>
+<span class="cm">*/</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02HelloWorld</span><span class="p">{</span>
+<span class="w">	</span><span class="cm">/**</span>
+<span class="cm">	  main是一个方法,是程序的入口</span>
+<span class="cm">	  jvm执行java代码,都是从main方法开始执行</span>
+<span class="cm">	*/</span>
+<span class="w">	</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"helloworld"</span><span class="p">);</span>
+<span class="w">	</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>1.右键中没有创建文件或者文件夹的选项 -&gt; 所在的磁盘有权限问题</p>
+<p>2.右键盘符 -&gt; 属性 -&gt; 安全 -&gt; 编辑 -&gt; 修改权限(完全控制)</p>
+</blockquote>
+<h4 id="section-16">4.第一个Java程序中每一句话的解释以及注意事项</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm">  1.public class Demo03HelloWorld:定义一个类</span>
+<span class="cm">  2.class:代表的就是类,类是java程序最基本的组成单元,所有代码都需要在类中写</span>
+<span class="cm">  3.class后面跟的名字叫做类名,类名要和java文件名保持一致</span>
+<span class="cm">*/</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03HelloWorld</span><span class="p">{</span>
+<span class="w">	</span><span class="cm">/*</span>
+<span class="cm">	  public static void main(String[] args)</span>
+<span class="cm">	  叫做main方法,是程序的入口</span>
+<span class="cm">	  jvm执行代码,会从main方法开始执行</span>
+<span class="cm">	*/</span>
+<span class="w">	</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">		</span><span class="c1">//打印语句(输出语句),会将我们想要输出的内容打印到控制台上</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"helloworld"</span><span class="p">);</span>
+<span class="w">	</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">注意事项</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">类名要和java文件名保持一致</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">程序中的标点符号必须是英文的</span><span class="w">  </span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">不要将main写成mian</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">System和String的首字母s要大写</span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">每个单词写完来个空格增强代码的可读性</span>
+<span class="w">  </span><span class="mf">6.</span><span class="n">括号要一对一对的写</span>
+<span class="w">  </span><span class="mf">7.</span><span class="n">代码写完语句用</span><span class="p">;</span><span class="n">代表结束了</span><span class="p">,</span><span class="n">一句话来个分号</span><span class="p">,</span><span class="n">证明这是一个单独的语句</span><span class="w">    </span>
+</pre></div>
+</div><p><img alt="1698316431980" decoding="async" loading="lazy" src="../../course-assets/4f81f3ab196f09cc61ae.png"/></p>
+<p><img alt="1698316471785" decoding="async" loading="lazy" src="../../course-assets/263806dc1d95aabc6da5.png"/></p>
+<h4 id="section-17">6.关键字</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">关键字</span><span class="p">:</span><span class="n">java提前定义好的</span><span class="p">,</span><span class="n">具有特殊含义的小写单词</span>
+<span class="mf">2.</span><span class="n">怎么记</span><span class="p">:</span><span class="n">不用提前都背下来</span><span class="p">,</span><span class="n">关键字在高级记事本中颜色特殊</span><span class="p">,</span><span class="n">学到哪里记到哪里</span><span class="w">    </span>
+</pre></div>
+</div><p><img alt="1698317329001" decoding="async" loading="lazy" src="../../course-assets/c49114b9c0caa919eea0.png"/></p>
+<h4 id="section-18">7.编写HelloWorld时要注意的问题</h4>
+<h5>7.1字符编码问题</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">编码</span><span class="p">:</span><span class="n">保存数据的过程就是编码的过程</span>
+<span class="mf">2.</span><span class="n">解码</span><span class="p">:</span><span class="n">读数据的过程就是解码的过程</span>
+<span class="mf">3.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">编码和解码遵守的编码规范必须是一样的</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">常见的两个编码规范</span><span class="p">:</span>
+<span class="w">    </span><span class="n">GBK</span><span class="p">:</span><span class="n">专门为我们中文所设计的编码</span>
+<span class="w">        </span><span class="n">ANSI代表的是GBK</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="n">一个中文汉字在GBK中占2个字节</span>
+<span class="w">        </span>
+<span class="w">    </span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span><span class="p">:</span><span class="n">一个中文汉字在UTF</span><span class="o">-</span><span class="mi">8</span><span class="n">中占3个字节</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">dos命令窗口默认编码</span><span class="p">:</span><span class="n">GBK</span><span class="w">       </span>
+</pre></div>
+</div><p><img alt="1698318579697" decoding="async" loading="lazy" src="../../course-assets/384c619d9cce7fcced71.png"/><img alt="1698318655020" decoding="async" loading="lazy" src="../../course-assets/9ff8843c210253059cd6.png"/></p>
+<h5>7.2源文件名(java文件名)与类名一致问题？</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">类名必须要和java文件名一致嘛</span><span class="o">?</span>
+<span class="w">  </span><span class="n">不是必须的</span>
+<span class="w">    </span>
+<span class="w">  </span><span class="n">如果类名和java文件名不一致</span><span class="p">,</span><span class="n">需要将class前面的public干掉</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">如果class前面带public</span><span class="p">,</span><span class="n">此时类名必须要和java文件名一致</span>
+<span class="w">    </span>
+<span class="mf">3.</span><span class="n">一个java文件中可以写多个class类</span><span class="p">,</span><span class="n">但是只能有一个类带public</span>
+<span class="w">    </span>
+<span class="w">  </span><span class="n">但是建议不要随意在一个java文件中写多个class</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">一个java文件中就写一个class</span><span class="p">,</span><span class="n">而且带public的</span>
+<span class="w">    </span>
+<span class="mf">4.</span><span class="n">main方法必须写在带public的类中</span><span class="w">    </span>
+</pre></div>
+</div><blockquote>
+<p>小结:</p>
+<p>1.一个java文件只写一个class,而且带public</p>
+<p>2.类名和java文件名保持一致</p>
+<p>3.main方法写在带public的类中</p>
+</blockquote>
+<h4 id="section-19">9.println和print区别</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">相同点</span><span class="p">:</span><span class="n">都是输出语句</span>
+<span class="nl">不同点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">println</span><span class="p">:</span><span class="n">输出之后自带换行效果</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">print</span><span class="p">:</span><span class="n">输出之后不带换行效果</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05HelloWorld</span><span class="p">{</span>
+<span class="w">	</span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">		</span><span class="c1">//System.out.println("床前明月光");</span>
+<span class="w">		</span><span class="c1">//System.out.println("疑是地上霜");</span>
+<span class="w">		</span><span class="c1">//System.out.println("举头望明月");</span>
+<span class="w">		</span><span class="c1">//System.out.println("低头思故乡");</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"床前明月光"</span><span class="p">);</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"疑是地上霜"</span><span class="p">);</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"举头望明月"</span><span class="p">);</span>
+<span class="w">		</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"低头思故乡"</span><span class="p">);</span>
+<span class="w">		</span>
+<span class="w">	</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>小技巧:</p>
+<p>1.复制当前行:ctrl+d</p>
+<p>2.一次操作多行:</p>
+<p>​     a.预留出足够的空间</p>
+<p>​     b.按住alt不放,鼠标往下拉,此时发现光标变长了</p>
+</blockquote>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html"><small>下一篇 →</small><strong>变量、类型转换与进制 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">day01.[环境变量,HelloWorld]</a><a class="toc-h3" href="#section-1">第一章 Java概述</a><a class="toc-h4" href="#section-2">1.1 JavaSE课程体系介绍</a><a class="toc-h4" href="#section-3">1.2 计算机语言介绍（了解）</a><a class="toc-h4" href="#section-4">1.3 Java语言概述（了解）</a><a class="toc-h4" href="#section-5">1.4 什么是软件开发</a><a class="toc-h3" href="#section-6">第二章.Java语言前言</a><a class="toc-h4" href="#section-7">1.字节</a><a class="toc-h4" href="#section-8">2.常用的dos命令</a><a class="toc-h3" href="#section-9">第三章.Java所需要的环境</a><a class="toc-h4" href="#section-10">1.jvm和跨平台</a><a class="toc-h4" href="#section-11">2.JDK和JRE</a><a class="toc-h3" href="#section-12">第四章.Java第一个程序的开发</a><a class="toc-h4" href="#section-13">1.开发三步骤</a><a class="toc-h4" href="#section-14">2.编写HelloWorld</a><a class="toc-h4" href="#section-15">3.注释</a><a class="toc-h4" href="#section-16">4.第一个Java程序中每一句话的解释以及注意事项</a><a class="toc-h4" href="#section-17">6.关键字</a><a class="toc-h4" href="#section-18">7.编写HelloWorld时要注意的问题</a><a class="toc-h4" href="#section-19">9.println和print区别</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>数值、日期与包装类 API · 课程原文 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·原文查阅/15-数值、日期与包装类 API.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a aria-current="page" href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>数值、日期与包装类 API · 课程原文</h1><div class="article-meta"><span>约 44 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<p>来源：用户提供的 <code>笔记(1).zip / 03_笔记/模块15_API/模块15.常用API.md</code>。保留原课程内容，历史环境、示例错误和故意报错的教学代码应结合上下文阅读。</p>
+<p><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">返回本章速学总结</a></p>
+<h3 id="section-0">模块15.常用API</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">模块14回顾</span><span class="p">:</span>
+<span class="w">  </span><span class="n">String</span><span class="p">:</span>
+<span class="w">    </span><span class="mf">1.</span><span class="n">构造</span><span class="p">:</span>
+<span class="w">      </span><span class="n">String</span><span class="p">()</span><span class="w">  </span><span class="n">String</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">chars</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="p">)</span>
+<span class="w">      </span><span class="n">String</span><span class="p">(</span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">chars</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">chars</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">)</span>
+<span class="w">   </span>
+<span class="w">    </span><span class="mf">2.</span><span class="n">判断方法</span><span class="p">:</span>
+<span class="w">      </span><span class="n">equals</span><span class="w">   </span><span class="n">equalsIgnoreCase</span>
+<span class="w">          </span>
+<span class="w">    </span><span class="mf">3.</span><span class="n">获取方法</span><span class="p">:</span>
+<span class="w">      </span><span class="n">length</span><span class="p">()</span><span class="w">  </span><span class="n">concat</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w">  </span><span class="n">charAt</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="n">indexOf</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">subString</span><span class="p">(</span><span class="n">开始索引</span><span class="p">)</span>
+<span class="w">      </span><span class="n">subString</span><span class="p">(</span><span class="n">开始索引</span><span class="p">,</span><span class="n">结束索引</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">含头不含尾</span>
+<span class="w">          </span>
+<span class="w">    </span><span class="mf">4.</span><span class="n">转换方法</span><span class="p">:</span>
+<span class="w">      </span><span class="n">toCharArray</span><span class="p">()</span><span class="w">  </span><span class="n">getBytes</span><span class="p">()</span><span class="w">   </span><span class="n">getBytes</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">charsetName</span><span class="p">)</span><span class="w"> </span><span class="n">replace</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">)</span>
+<span class="w">       </span>
+<span class="w">    </span><span class="mf">5.</span><span class="n">分割方法</span><span class="p">:</span>
+<span class="w">      </span><span class="n">split</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">regex</span><span class="p">)</span>
+<span class="w">          </span>
+<span class="w">    </span><span class="mf">6.</span><span class="n">其他方法</span><span class="p">:</span>
+<span class="w">      </span><span class="n">contains</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">endsWith</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">statsWith</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">toLowerCase</span><span class="p">()</span>
+<span class="w">      </span><span class="n">toUpperCase</span><span class="p">()</span><span class="w"> </span><span class="n">trim</span><span class="p">()</span>
+<span class="w">          </span>
+<span class="w">       </span>
+<span class="w">  </span><span class="n">StringBuilder</span><span class="p">:</span>
+<span class="w">    </span><span class="mf">1.</span><span class="n">append</span><span class="p">(</span><span class="n">任意类型数据</span><span class="p">)</span>
+<span class="w">    </span><span class="mf">2.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="w">    </span><span class="mf">3.</span><span class="n">toString</span><span class="p">()</span>
+<span class="w">        </span>
+<span class="nl">模块十五重点</span><span class="p">:</span>
+<span class="w">   </span><span class="mf">1.</span><span class="n">会BigInteger和BigDecimal操作</span>
+<span class="w">   </span><span class="mf">2.</span><span class="n">会Date和SimpleDateFormat的操作</span>
+<span class="w">   </span><span class="mf">3.</span><span class="n">会System中的常用方法</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">主要是数组复制</span>
+<span class="w">   </span><span class="mf">4.</span><span class="n">会Arrays中的常用方法</span>
+<span class="w">   </span><span class="mf">5.</span><span class="n">会利用包装类定义一个标准的javabean</span>
+<span class="w">   </span><span class="mf">6.</span><span class="n">会包装类和String之间的转换</span>
+</pre></div>
+</div><h3 id="section-1">第一章.Math类</h3>
+<h4 id="section-2">1.Math类介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">数学工具类</span>
+<span class="mf">2.</span><span class="n">作用</span><span class="p">:</span><span class="n">主要用于数学运算</span>
+<span class="mf">3.</span><span class="n">特点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">构造方法私有了</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">方法都是静态的</span>
+<span class="mf">4.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">类名直接调用</span>
+</pre></div>
+</div><h4 id="section-3">2.Math类方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">求参数的绝对值</span>
+<span class="kd">static</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="nf">ceil</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">向上取整</span>
+<span class="kd">static</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="nf">floor</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="n">向下取整</span>
+<span class="kd">static</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">round</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">四舍五入</span>
+<span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="n">求两个数之间的较大值</span><span class="w"> </span>
+<span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="n">求两个数之间的较小值</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Math</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//static int abs(int a) -&gt; 求参数的绝对值</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">abs</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//static double ceil(double a) -&gt; 向上取整</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">ceil</span><span class="p">(</span><span class="mf">3.6</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//static double floor(double a) -&gt;向下取整</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">floor</span><span class="p">(</span><span class="mf">3.6</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//static long round(double a)  -&gt; 四舍五入</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">round</span><span class="p">(</span><span class="mf">3.6</span><span class="p">));</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">round</span><span class="p">(</span><span class="o">-</span><span class="mf">2.8</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//static int max(int a, int b) -&gt;求两个数之间的较大值</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//static int min(int a, int b) -&gt;求两个数之间的较小值</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-4">第二章.BigInteger</h3>
+<h4 id="section-5">1.BigInteger介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">问题描述</span><span class="p">:</span><span class="n">我们操作数据</span><span class="p">,</span><span class="n">将来的数据有可能非常大</span><span class="p">,</span><span class="n">大到比long还要大</span><span class="p">,</span><span class="n">这种数据我们一般称之为</span><span class="s">"对象"</span>
+<span class="mf">2.</span><span class="n">作用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">处理超大整数</span>
+<span class="mf">3.</span><span class="n">构造</span><span class="p">:</span>
+<span class="w">  </span><span class="n">BigInteger</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">参数的格式必须是数字形式</span>
+<span class="mf">4.</span><span class="n">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="n">BigInteger</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">BigInteger</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">  </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigInteger</span>
+<span class="w">  </span><span class="n">BigInteger</span><span class="w"> </span><span class="nf">subtract</span><span class="p">(</span><span class="n">BigInteger</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigInteger</span>
+<span class="w">  </span><span class="n">BigInteger</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">BigInteger</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">  </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigInteger</span>
+<span class="w">  </span><span class="n">BigInteger</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">BigInteger</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">    </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigInteger</span><span class="w">   </span>
+</pre></div>
+</div><h4 id="section-6">2.BigInteger使用</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02BigInteger</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BigInteger</span><span class="w"> </span><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigInteger</span><span class="p">(</span><span class="s">"121212121212121212121212121212121212121"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BigInteger</span><span class="w"> </span><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigInteger</span><span class="p">(</span><span class="s">"121212121212121212121212121212121212121"</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//BigInteger add(BigInteger val)  返回其值为 (this + val) 的 BigInteger</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">b1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">b2</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//BigInteger subtract(BigInteger val) 返回其值为 (this - val) 的 BigInteger</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">b1</span><span class="p">.</span><span class="na">subtract</span><span class="p">(</span><span class="n">b2</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//BigInteger multiply(BigInteger val)  返回其值为 (this * val) 的 BigInteger</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">b1</span><span class="p">.</span><span class="na">multiply</span><span class="p">(</span><span class="n">b2</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//BigInteger divide(BigInteger val)    返回其值为 (this / val) 的 BigInteger</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">b1</span><span class="p">.</span><span class="na">divide</span><span class="p">(</span><span class="n">b2</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>int intValue() 将BigInteger转成int</p>
+<p>long longValue() 将BigInteger 转成 long</p>
+<p>BigInteger上限:42亿的21亿次方,内存根本扛不住,所以我们可以认为BigInteger无上限</p>
+</blockquote>
+<h3 id="section-7">第三章.BigDecimal类</h3>
+<h4 id="section-8">1.BigDecimal介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">问题描述</span><span class="p">:</span><span class="n">我们知道直接用float或者double做运算会出现精度损失的问题</span><span class="p">,</span><span class="n">所以将来设计到钱</span><span class="p">,</span><span class="n">我们就不能用float或者double直接做运算</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">作用</span><span class="p">:</span><span class="n">主要是解决float和double直接做运算出现的精度损失问题</span>
+<span class="w">    </span>
+<span class="mf">3.</span><span class="n">构造方法</span><span class="p">:</span>
+<span class="w">  </span><span class="n">BigDecimal</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">val必须要是数字形式</span>
+<span class="w">      </span>
+<span class="mf">4.</span><span class="n">常用方法</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">valueOf</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">此方法初始化小数时可以传入double型数据</span>
+<span class="w">  </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">  </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigDecimal</span>
+<span class="w">  </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">subtract</span><span class="p">(</span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigDecimal</span>
+<span class="w">  </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">  </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigDecimal</span>
+<span class="w">  </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w">    </span><span class="n">返回其值为</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">的</span><span class="w"> </span><span class="n">BigDecimal</span><span class="w"> </span>
+<span class="w">  </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">divisor</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">roundingMode</span><span class="p">)</span><span class="w">  </span>
+<span class="w">                    </span><span class="n">divisor</span><span class="p">:</span><span class="n">除号后面的那个数</span>
+<span class="w">                    </span><span class="n">scale</span><span class="p">:</span><span class="n">指定保留几位小数</span>
+<span class="w">                    </span><span class="n">roundingMode</span><span class="p">:</span><span class="n">取舍方式</span>
+<span class="w">                                 </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ROUND_UP</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">向上加1</span>
+<span class="w">                                 </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ROUND_DOWN</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">直接舍去</span>
+<span class="w">                                 </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ROUND_HALF_UP</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">四舍五入</span>
+<span class="w">      </span>
+<span class="mf">5.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">如果除不尽</span><span class="p">,</span><span class="n">会报错</span><span class="p">,</span><span class="n">出现运算异常</span>
+</pre></div>
+</div><h4 id="section-9">2.BigDecimal使用</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03BigDecimal</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//big01();</span>
+<span class="w">        </span><span class="c1">//big02();</span>
+<span class="w">        </span><span class="n">big03</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">big03</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">"3.55"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">"2.12"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">divide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b1</span><span class="p">.</span><span class="na">divide</span><span class="p">(</span><span class="n">b2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">.</span><span class="na">ROUND_UP</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"divide = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">divide</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">divide</span><span class="p">.</span><span class="na">doubleValue</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"v = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">big02</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">"3.55"</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//BigDecimal b2 = new BigDecimal("2.12");</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mf">2.12</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">//BigDecimal add(BigDecimal val)  返回其值为 (this + val) 的 BigDecimal</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b1</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">b2</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"add = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">add</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//BigDecimal subtract(BigDecimal val) 返回其值为 (this - val) 的 BigDecimal</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">subtract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b1</span><span class="p">.</span><span class="na">subtract</span><span class="p">(</span><span class="n">b2</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"subtract = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">subtract</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//BigDecimal multiply(BigDecimal val)  返回其值为 (this * val) 的 BigDecimal</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">multiply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b1</span><span class="p">.</span><span class="na">multiply</span><span class="p">(</span><span class="n">b2</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"multiply = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">multiply</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//BigDecimal divide(BigDecimal val)    返回其值为 (this / val) 的 BigDecimal</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">divide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b1</span><span class="p">.</span><span class="na">divide</span><span class="p">(</span><span class="n">b2</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"divide = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">divide</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">big01</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">float</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.55F</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">float</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.12F</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">float</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="c1">//1.4300001</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>double doubleValue()  将此BigDecimal转成double</p>
+</blockquote>
+<h4 id="section-10">3.BigDecimal除法过时方法解决</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">注意</span><span class="p">:</span><span class="n">如果调用的成员上面有一个横线</span><span class="p">,</span><span class="n">证明此成员过时了</span><span class="p">,</span><span class="n">底层会有一个注解</span><span class="nd">@Deprecated修饰</span><span class="p">,</span><span class="n">但是过时的成员还能使用</span><span class="p">,</span><span class="n">只不过被新的成员代替了</span><span class="p">,</span><span class="n">不推荐使用了</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="n">divide</span><span class="p">(</span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">divisor</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="n">RoundingMode</span><span class="w"> </span><span class="n">roundingMode</span><span class="p">)</span><span class="w"> </span>
+<span class="w">         </span><span class="n">divisor</span><span class="p">:</span><span class="n">代表除号后面的数据</span>
+<span class="w">         </span><span class="n">scale</span><span class="p">:</span><span class="n">保留几位小数</span>
+<span class="w">         </span><span class="n">roundingMode</span><span class="p">:</span><span class="n">取舍方式</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">RoundingMode是一个枚举</span><span class="p">,</span><span class="n">里面的成员可以类名直接调用</span>
+<span class="w">                                </span><span class="n">UP</span><span class="p">:</span><span class="n">向上加1</span><span class="w"> </span>
+<span class="w">                                </span><span class="n">DOWN</span><span class="p">:</span><span class="n">直接舍去</span><span class="w"> </span>
+<span class="w">                                </span><span class="n">HALF_UP</span><span class="p">:</span><span class="n">四舍五入</span><span class="w"> </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">big04</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">"3.55"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">"2.12"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">divide</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b1</span><span class="p">.</span><span class="na">divide</span><span class="p">(</span><span class="n">b2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">RoundingMode</span><span class="p">.</span><span class="na">HALF_UP</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"divide = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">divide</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h3 id="section-11">第四章.Date日期类</h3>
+<h4 id="section-12">1.Date类的介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w"> </span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">表示特定的瞬间</span><span class="p">,</span><span class="n">精确到毫秒</span>
+<span class="w"> </span><span class="mf">2.</span><span class="n">常识</span><span class="p">:</span>
+<span class="w">   </span><span class="n">a</span><span class="mf">.1000</span><span class="n">毫秒</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="n">秒</span>
+<span class="w">   </span><span class="n">b</span><span class="p">.</span><span class="na">时间原点</span><span class="p">:</span><span class="mi">1970</span><span class="n">年1月1日</span><span class="w"> </span><span class="mi">0</span><span class="n">时0分0秒</span><span class="p">(</span><span class="n">UNIX系统起始时间</span><span class="p">),</span><span class="n">叫做格林威治时间</span><span class="p">,</span><span class="n">在0时区上</span>
+<span class="w">   </span><span class="n">c</span><span class="p">.</span><span class="na">时区</span><span class="p">:</span><span class="n">北京位于东八区</span><span class="p">,</span><span class="n">一个时区经度差15度</span><span class="p">,</span><span class="n">时间相差一个小时</span><span class="p">,</span><span class="n">所以北京时间比时间原点所在时区时间差8个小时</span>
+<span class="w">   </span><span class="n">d</span><span class="p">.</span><span class="na">北京经纬度</span><span class="p">:</span><span class="n">东经116</span><span class="w"> </span><span class="n">北纬39</span><span class="mf">.56</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">温带大陆性季风气候</span>
+<span class="w">   </span><span class="n">e</span><span class="p">.</span><span class="na">赤道</span><span class="w">   </span><span class="nf">本初子午线</span><span class="p">(</span><span class="mi">0</span><span class="n">度经线</span><span class="p">)</span><span class="w">    </span>
+</pre></div>
+</div><h4 id="section-13">2.Date类的使用</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">构造</span><span class="p">:</span>
+<span class="w">  </span><span class="n">Date</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">获取当前系统时间</span>
+<span class="w">  </span><span class="nf">Date</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">time</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">获取指定时间</span><span class="p">,</span><span class="n">传递毫秒值</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">从时间原点开始算</span><span class="w">   </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">date01</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//Date() -&gt; 获取当前系统时间</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">date1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"date1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">date1</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//Date(long time) -&gt; 获取指定时间,传递毫秒值 -&gt; 从时间原点开始算</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">date2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">(</span><span class="mi">1000L</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"date2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">date2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h4 id="section-14">3.Date类的常用方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="kt">void</span><span class="w"> </span><span class="nf">setTime</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">time</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">设置时间</span><span class="p">,</span><span class="n">传递毫秒值</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">从时间原点开始算</span>
+<span class="mf">2.</span><span class="kt">long</span><span class="w"> </span><span class="nf">getTime</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取时间</span><span class="p">,</span><span class="n">返回毫秒值</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">        </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">date02</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Date</span><span class="w"> </span><span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">();</span>
+<span class="w">            </span><span class="c1">//1.void setTime(long time) -&gt; 设置时间,传递毫秒值-&gt; 从时间原点开始算</span>
+<span class="w">            </span><span class="n">date</span><span class="p">.</span><span class="na">setTime</span><span class="p">(</span><span class="mi">1000L</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">//2.long getTime()-&gt;获取时间,返回毫秒值</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">date</span><span class="p">.</span><span class="na">getTime</span><span class="p">());</span>
+<span class="w">        </span><span class="p">}</span>
+</pre></div>
+</div><h3 id="section-15">第五章.Calendar日历类</h3>
+<h4 id="section-16">1.Calendar介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">日历类</span><span class="p">,</span><span class="n">抽象类</span>
+<span class="mf">2.</span><span class="n">获取</span><span class="p">:</span><span class="n">Calendar中的方法</span><span class="p">:</span>
+<span class="w">      </span><span class="kd">static</span><span class="w"> </span><span class="n">Calendar</span><span class="w"> </span><span class="nf">getInstance</span><span class="p">()</span><span class="w"> </span>
+<span class="mf">3.</span><span class="n">月份对比</span><span class="p">:</span>
+<span class="w">  </span><span class="n">国外</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="mi">9</span><span class="w">  </span><span class="mi">10</span><span class="w"> </span><span class="mi">11</span>
+<span class="w">  </span><span class="n">国内</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="mi">11</span><span class="w"> </span><span class="mi">12</span><span class="w">    </span>
+</pre></div>
+</div><p><img alt="1704694983109" decoding="async" loading="lazy" src="../../course-assets/9d760c0118f84688cc45.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">常用方法</span><span class="p">:</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">field</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="n">返回给定日历字段的值</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">field</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w">  </span><span class="p">:</span><span class="n">将给定的日历字段设置为指定的值</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">field</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="n">根据日历的规则</span><span class="p">,</span><span class="n">为给定的日历字段添加或者减去指定的时间量</span>
+<span class="w">  </span><span class="n">Date</span><span class="w"> </span><span class="nf">getTime</span><span class="p">():</span><span class="n">将Calendar转成Date对象</span>
+<span class="w">      </span>
+<span class="nl">field</span><span class="p">:</span><span class="n">代表的是日历字段</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">年</span><span class="w"> </span><span class="n">月</span><span class="w"> </span><span class="n">日</span><span class="w"> </span><span class="n">星期等</span><span class="p">,</span><span class="n">都是静态的</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">calendar02</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Calendar</span><span class="w"> </span><span class="n">calendar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Calendar</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span><span class="c1">//多态</span>
+<span class="w">        </span><span class="c1">//int get(int field) -&gt;返回给定日历字段的值</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calendar</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">YEAR</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"year = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">year</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//void set(int field, int value)  :将给定的日历字段设置为指定的值</span>
+<span class="w">        </span><span class="c1">//calendar.set(Calendar.YEAR,2028);</span>
+<span class="w">        </span><span class="c1">//System.out.println(calendar.get(Calendar.YEAR));</span>
+<span class="w">        </span><span class="c1">//void add(int field, int amount) :根据日历的规则,为给定的日历字段添加或者减去指定的时间量</span>
+<span class="w">        </span><span class="n">calendar</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">YEAR</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">calendar</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">YEAR</span><span class="p">));</span>
+<span class="w">        </span><span class="c1">//Date getTime():将Calendar转成Date对象</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calendar</span><span class="p">.</span><span class="na">getTime</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"date = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">date</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>扩展方法:</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">date</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">直接设置年月日</span>
+
+<span class="nl">需求</span><span class="p">:</span><span class="n">键盘录入一个年份</span><span class="p">,</span><span class="n">判断这一年是闰年</span><span class="p">,</span><span class="n">还是平年</span>
+<span class="nl">步骤</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">创建Calendar对象</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">创建Scanner对象</span><span class="p">,</span><span class="n">键盘录入一个年份</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">调用set方法</span><span class="p">,</span><span class="n">传递年</span><span class="p">,</span><span class="n">月</span><span class="p">,</span><span class="n">日</span>
+<span class="w">    </span><span class="nf">set</span><span class="p">(</span><span class="n">年</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">国外是0</span><span class="o">-</span><span class="mi">11</span><span class="p">,</span><span class="n">所以设置成2月就是代表3月</span><span class="w">  </span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">将day减1天</span><span class="p">(</span><span class="mi">3</span><span class="n">月1日减1天</span><span class="p">,</span><span class="n">就是2月最后一天</span><span class="p">,</span><span class="n">知道2月最后一天了</span><span class="p">,</span><span class="n">就知道是平年还是闰年了</span><span class="p">)</span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">获取day判断平年还是闰年</span><span class="p">,</span><span class="n">输出结果</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">calendar03</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.创建Calendar对象</span>
+<span class="w">        </span><span class="n">Calendar</span><span class="w"> </span><span class="n">calendar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Calendar</span><span class="p">.</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//2.创建Scanner对象,键盘录入一个年份</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//3.调用set方法,传递年,月,日</span>
+<span class="w">        </span><span class="c1">//set(年,2,1) -&gt; 国外是0-11,所以设置成2月就是代表3月</span>
+<span class="w">        </span><span class="n">calendar</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//4.将day减1天(3月1日减1天,就是2月最后一天,知道2月最后一天了,就知道是平年还是闰年了)</span>
+<span class="w">        </span><span class="n">calendar</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">DATE</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">day</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calendar</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">Calendar</span><span class="p">.</span><span class="na">DATE</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//5.获取day判断平年还是闰年,输出结果</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">day</span><span class="o">==</span><span class="mi">29</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"闰年"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"平年"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div></blockquote>
+<h3 id="section-17">第六章.SimpleDateFormat日期格式化类</h3>
+<h4 id="section-18">1.SimpleDateFormat介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">日期格式化类</span>
+<span class="mf">2.</span><span class="n">构造</span><span class="p">:</span>
+<span class="w">  </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">pattern</span><span class="p">)</span>
+<span class="mf">3.</span><span class="n">pattern代表啥</span><span class="p">:</span><span class="n">代表的是我们自己指定的日期格式</span>
+<span class="w">  </span><span class="n">字母不能改变</span><span class="p">,</span><span class="n">但是中间的连接符我们可以改变</span><span class="w"> </span>
+<span class="w">  </span>
+<span class="w">  </span><span class="n">yyyy</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">dd</span><span class="w"> </span><span class="n">HH</span><span class="p">:</span><span class="n">mm</span><span class="p">:</span><span class="n">ss</span><span class="w">  </span>
+<span class="w">    </span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>时间字母表示</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>y</td>
+<td>年</td>
+</tr>
+<tr>
+<td>M</td>
+<td>月</td>
+</tr>
+<tr>
+<td>d</td>
+<td>日</td>
+</tr>
+<tr>
+<td>H</td>
+<td>时</td>
+</tr>
+<tr>
+<td>m</td>
+<td>分</td>
+</tr>
+<tr>
+<td>s</td>
+<td>秒</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="section-19">2.SimpleDateFormat常用方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">String</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="n">Date</span><span class="w"> </span><span class="n">date</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将Date对象按照指定的格式转成String</span><span class="w"> </span>
+<span class="mf">2.D</span><span class="n">ate</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">source</span><span class="p">)</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将符合日期格式的字符串转成Date对象</span><span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03SimpleDateFormat</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">ParseException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">sdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//1.String format(Date date) -&gt; 将Date对象按照指定的格式转成String</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">time1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Date</span><span class="p">());</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"time1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time1</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//2.Date parse(String source)-&gt; 将符合日期格式的字符串转成Date对象</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">time2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"2000-10-10 10:10:10"</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">time2</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"date = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">date</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-20">第七章.JDK8新日期类</h3>
+<h4 id="section-21">1. LocalDate 本地日期</h4>
+<h5>1.1.获取LocalDate对象</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">LocalDate是一个不可变的日期时间对象</span><span class="err">，</span><span class="n">表示日期</span><span class="err">，</span><span class="n">通常被视为年月日</span>
+<span class="mf">2.</span><span class="n">获取</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="nf">now</span><span class="p">()</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">创建LocalDate对象</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">LocalDate</span><span class="w"> </span><span class="nf">of</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dayOfMonth</span><span class="p">)</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">创建LocalDate对象</span><span class="p">,</span><span class="n">设置年月日</span><span class="w">   </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04LocalDate</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//static LocalDate now()  -&gt; 创建LocalDate对象</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDate = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDate</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//static LocalDate of(int year, int month, int dayOfMonth)  -&gt; 创建LocalDate对象,设置年月日</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDate1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDate1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h5>1.2.LocalDateTime对象</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">LocalDateTime概述</span><span class="p">:</span><span class="n">LocalDateTime是一个不可变的日期时间对象</span><span class="err">，</span><span class="n">代表日期时间</span><span class="err">，</span><span class="n">通常被视为年</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">月</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">日</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">时</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">分</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">秒</span><span class="err">。</span>
+<span class="w"> </span>
+<span class="mf">2.</span><span class="n">获取</span><span class="p">:</span>
+<span class="kd">static</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="nf">now</span><span class="p">()</span><span class="w">  </span><span class="n">创建LocalDateTime对象</span>
+<span class="kd">static</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="nf">of</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="p">,</span><span class="w"> </span><span class="n">Month</span><span class="w"> </span><span class="n">month</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dayOfMonth</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">hour</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">minute</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">second</span><span class="p">)</span><span class="w"> </span><span class="n">创建LocalDateTime对象</span><span class="p">,</span><span class="n">设置年月日时分秒</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05LocalDateTime</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//static LocalDateTime now()  创建LocalDateTime对象</span>
+<span class="w">        </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">localDateTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDateTime = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDateTime</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//static LocalDateTime of(int year, Month month, int dayOfMonth, int hour, int minute, int second) 创建LocalDateTime对象,设置年月日时分秒</span>
+<span class="w">        </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">localDateTime1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDateTime1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDateTime1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h5>1.3.获取日期字段的方法 : 名字是get开头</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">getYear</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取年份</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">getMonthValue</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取月份</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">getDayOfMonth</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取月中的第几天</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//int getYear()-&gt;获取年份</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">localDate</span><span class="p">.</span><span class="na">getYear</span><span class="p">());</span>
+<span class="w">        </span><span class="c1">//int getMonthValue()-&gt;获取月份</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">localDate</span><span class="p">.</span><span class="na">getMonthValue</span><span class="p">());</span>
+<span class="w">        </span><span class="c1">//int getDayOfMonth()-&gt;获取月中的第几天</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">localDate</span><span class="p">.</span><span class="na">getDayOfMonth</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h5>1.4.设置日期字段的方法 : 名字是with开头</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">LocalDate</span><span class="w"> </span><span class="nf">withYear</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="p">):</span><span class="n">设置年份</span>
+<span class="n">LocalDate</span><span class="w"> </span><span class="nf">withMonth</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="p">):</span><span class="n">设置月份</span>
+<span class="n">LocalDate</span><span class="w"> </span><span class="nf">withDayOfMonth</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">day</span><span class="p">):</span><span class="n">设置月中的天数</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">with</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//LocalDate withYear(int year):设置年份</span>
+<span class="w">        </span><span class="c1">//LocalDate localDate1 = localDate.withYear(2000);</span>
+<span class="w">        </span><span class="c1">//System.out.println(localDate1);</span>
+
+<span class="w">        </span><span class="c1">//LocalDate withMonth(int month):设置月份</span>
+<span class="w">        </span><span class="c1">//LocalDate localDate2 = localDate1.withMonth(10);</span>
+<span class="w">        </span><span class="c1">//System.out.println("localDate2 = " + localDate2);</span>
+<span class="w">        </span><span class="c1">//LocalDate withDayOfMonth(int day):设置月中的天数</span>
+
+<span class="w">        </span><span class="c1">//LocalDate localDate3 = localDate2.withDayOfMonth(10);</span>
+<span class="w">        </span><span class="c1">//System.out.println("localDate3 = " + localDate3);</span>
+
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">localDate</span><span class="p">.</span><span class="na">withYear</span><span class="p">(</span><span class="mi">2000</span><span class="p">).</span><span class="na">withMonth</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="na">withDayOfMonth</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDate1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDate1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h5>1.5.日期字段偏移</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">设置日期字段的偏移量</span><span class="p">,</span><span class="n">方法名plus开头</span><span class="p">,</span><span class="n">向后偏移</span>
+<span class="n">设置日期字段的偏移量</span><span class="p">,</span><span class="n">方法名minus开头</span><span class="p">,</span><span class="n">向前偏移</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="cm">/*</span>
+<span class="cm">      向后偏移 -&gt; plus开头方法</span>
+<span class="cm">      向前偏移 -&gt; minus开头方法</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">plusAndMinus</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="w">       </span><span class="c1">// LocalDate localDate1 = localDate.plusYears(1L);</span>
+<span class="w">       </span><span class="c1">// System.out.println("localDate1 = " + localDate1);</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">localDate1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">localDate</span><span class="p">.</span><span class="na">minusYears</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDate1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDate1</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h4 id="section-22">2.Period和Duration类</h4>
+<h5>2.1 Period 计算日期之间的偏差</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">Period</span><span class="w"> </span><span class="nf">between</span><span class="p">(</span><span class="n">LocalDate</span><span class="w"> </span><span class="n">d1</span><span class="p">,</span><span class="n">LocalDate</span><span class="w"> </span><span class="n">d2</span><span class="p">):</span><span class="n">计算两个日期之间的差值</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nf">getYears</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取相差的年</span>
+<span class="w">  </span><span class="nf">getMonths</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取相差的月</span>
+<span class="w">  </span><span class="nf">getDays</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取相差的天</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">period</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">local1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2022</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">);</span>
+<span class="w">        </span><span class="n">LocalDate</span><span class="w"> </span><span class="n">local2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDate</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Period</span><span class="w"> </span><span class="n">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Period</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">local2</span><span class="p">,</span><span class="w"> </span><span class="n">local1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">period</span><span class="p">.</span><span class="na">getYears</span><span class="p">());</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">period</span><span class="p">.</span><span class="na">getMonths</span><span class="p">());</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">period</span><span class="p">.</span><span class="na">getDays</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h5>2.2 Duration计算时间之间的偏差</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="kd">static</span><span class="w"> </span><span class="n">Duration</span><span class="w"> </span><span class="nf">between</span><span class="p">(</span><span class="n">Temporal</span><span class="w"> </span><span class="n">startInclusive</span><span class="p">,</span><span class="w"> </span><span class="n">Temporal</span><span class="w"> </span><span class="n">endExclusive</span><span class="p">)</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">计算时间差</span>
+<span class="mf">2.</span><span class="n">Temporal</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">是一个接口</span>
+<span class="w">  </span><span class="n">实现类</span><span class="p">:</span><span class="n">LocalDate</span><span class="w"> </span><span class="n">LocalDateTime</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">参数需要传递</span><span class="w"> </span><span class="n">Temporal</span><span class="w"> </span><span class="n">的实现类对象</span><span class="p">,</span><span class="w"> </span><span class="n">注意要传递LocalDateTime</span>
+<span class="w">  </span><span class="n">因为Duration计算精确时间偏差</span><span class="p">,</span><span class="n">所以需要传递能操作精确时间的</span><span class="w"> </span><span class="n">LocalDateTime</span>
+<span class="w">      </span>
+<span class="w">      </span>
+<span class="mf">4.</span><span class="n">利用Dutation获取相差的时分秒</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">to开头</span>
+<span class="w">  </span><span class="nf">toDays</span><span class="p">()</span><span class="w"> </span><span class="p">:</span><span class="n">获取相差天数</span>
+<span class="w">  </span><span class="nf">toHours</span><span class="p">():</span><span class="w"> </span><span class="n">获取相差小时</span>
+<span class="w">  </span><span class="nf">toMinutes</span><span class="p">():</span><span class="n">获取相差分钟</span>
+<span class="w">  </span><span class="nf">toMillis</span><span class="p">():</span><span class="n">获取相差秒</span><span class="p">(</span><span class="n">毫秒</span><span class="p">)</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">duration</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">local1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2022</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">);</span>
+<span class="w">        </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">local2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Duration</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Duration</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">local2</span><span class="p">,</span><span class="w"> </span><span class="n">local1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">duration</span><span class="p">.</span><span class="na">toDays</span><span class="p">());</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">duration</span><span class="p">.</span><span class="na">toHours</span><span class="p">());</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">duration</span><span class="p">.</span><span class="na">toMinutes</span><span class="p">());</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">duration</span><span class="p">.</span><span class="na">toMillis</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>如果计算年月日 ,就用Period</p>
+<p>如果计算时分秒,就用Duration</p>
+</blockquote>
+<h4 id="section-23">3.DateTimeFormatter日期格式化类</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">获取</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="w"> </span><span class="nf">ofPattern</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">pattern</span><span class="p">)</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">获取对象</span><span class="p">,</span><span class="n">指定格式</span>
+<span class="mf">2.</span><span class="n">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="n">String</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="n">TemporalAccessor</span><span class="w"> </span><span class="n">temporal</span><span class="p">)</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将日期对象按照指定的规则转成String</span><span class="w"> </span>
+<span class="w">                </span><span class="n">TemporalAccessor</span><span class="p">:</span><span class="n">接口</span><span class="p">,</span><span class="n">子接口有Temporal</span>
+<span class="w">                </span><span class="n">Temporal的实现类</span><span class="p">:</span><span class="n">LocalDate</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w">    </span>
+<span class="w">                    </span>
+<span class="w">  </span><span class="n">TemporalAccessor</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="n">CharSequence</span><span class="w"> </span><span class="n">text</span><span class="p">)</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将符合规则的字符串转成日期对象</span><span class="w"> </span>
+<span class="w">                   </span><span class="n">如果想将TemporalAccessor转成我们常见的LocalDateTime日期对象</span><span class="p">,</span><span class="n">就需要用到LocalDateTime中的静态方法</span><span class="p">:</span>
+<span class="w">                   </span><span class="kd">static</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="nf">from</span><span class="p">(</span><span class="n">TemporalAccessor</span><span class="w"> </span><span class="n">temporal</span><span class="p">)</span><span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">parse</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">DateTimeFormatter</span><span class="w"> </span><span class="n">dtf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"2000-10-10 10:10:10"</span><span class="p">;</span>
+<span class="w">        </span><span class="n">TemporalAccessor</span><span class="w"> </span><span class="n">temporalAccessor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dtf</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">time</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//System.out.println(temporalAccessor);</span>
+<span class="w">        </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">localDateTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">temporalAccessor</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"localDateTime = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">localDateTime</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h3 id="section-24">第八章.System类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">系统相关类</span><span class="p">,</span><span class="n">是一个工具类</span>
+<span class="mf">2.</span><span class="n">特点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">构造私有</span><span class="p">,</span><span class="n">不能利用构造方法new对象</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">方法都是静态的</span>
+<span class="mf">3.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w"> </span><span class="n">类名直接调用</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>static long currentTimeMillis()</td>
+<td>返回以毫秒为单位的当前时间,可以测效率</td>
+</tr>
+<tr>
+<td>static void exit(int status)</td>
+<td>终止当前正在运行的 Java 虚拟机</td>
+</tr>
+</tbody>
+</table></div>
+<p>| static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length | 数组复制
+src:源数组
+srcPos:从源数组的哪个索引开始复制
+dest:目标数组
+ldestPos:从目标数组哪个索引开始粘贴
+length:复制多少个元素 |</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01System</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//currentTimeMillis();</span>
+<span class="w">        </span><span class="c1">//exit();</span>
+<span class="w">        </span><span class="n">arraycopy</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">      static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)</span>
+<span class="cm">             src:源数组</span>
+<span class="cm">             srcPos:从源数组的哪个索引开始复制</span>
+<span class="cm">             dest:目标数组</span>
+<span class="cm">             destPos:从目标数组的哪个索引开始粘贴</span>
+<span class="cm">             length:复制多少个元素</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">arraycopy</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">10</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">arraycopy</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">arr2</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="n">arr2</span><span class="o">[</span><span class="n">i</span><span class="o">]+</span><span class="s">" "</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">exit</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">==</span><span class="mi">5</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"helloworld"</span><span class="o">+</span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"time = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-25">第九章.Arrays数组工具类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">数组工具类</span>
+<span class="mf">2.</span><span class="n">特点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">构造私有</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">方法静态</span>
+<span class="mf">3.</span><span class="n">使用</span><span class="p">:</span><span class="n">类名直接调用</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table></div>
+<p>| static String toString(int[] a)                    | 按照格式打印数组元素
+[元素1, 元素2, ...] |
+| static void sort(int[] a)                          | 升序排序                                    |
+| static int binarySearch(int[] a, int key)          | 二分查找(前提是升序)                        |
+| static int[] copyOf(int[] original, int newLength) | 数组扩容                                    |</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Arrays</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">};</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Arrays</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">};</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">binarySearch</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"index = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">index</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">newArr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">copyOf</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">newArr</span><span class="p">));</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newArr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr2</span><span class="p">));</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1704703505755" decoding="async" loading="lazy" src="../../course-assets/c91eda916e6fb376fd80.png"/></p>
+<h3 id="section-26">第十章.包装类</h3>
+<h4 id="section-27">1.基本数据类型对应的引用数据类型(包装类)</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">就是基本类型对应的类</span><span class="p">(</span><span class="n">包装类</span><span class="p">),</span><span class="n">我们需要将基本类型转成包装类</span><span class="p">,</span><span class="n">从而让基本类型拥有类的特性</span><span class="p">(</span><span class="n">说白了</span><span class="p">,</span><span class="n">将基本类型转成包装类之后</span><span class="p">,</span><span class="n">就可以使用包装类中的方法操作数据</span><span class="p">)</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">为啥要学包装类</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">将来有一些特定场景</span><span class="p">,</span><span class="n">特定操作</span><span class="p">,</span><span class="n">比如调用方法传递包装类</span>
+<span class="w">    </span><span class="n">比如</span><span class="p">:</span><span class="n">ArrayList集合</span><span class="p">,</span><span class="n">里面有一个方法add</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="n">此时我们不能调用add方法之后直接传递基本类型</span><span class="p">,</span><span class="n">因为引用类型不能直接接收基本类型的值</span><span class="p">,</span><span class="n">就需要先将基本类型转成包装类</span><span class="p">,</span><span class="n">传递到add方法中</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">将来我们还可以将包装类转成基本类型</span><span class="p">:</span>
+<span class="w">    </span><span class="n">包装类不能直接使用</span><span class="o">+</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">/</span><span class="p">,</span><span class="n">所以需要将包装类转成基本类型</span><span class="p">,</span><span class="n">才能使用</span><span class="o">+</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">/</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>基本类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Charactor</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="section-28">2.Integer的介绍以及使用</h4>
+<h5>2.1.Integer基本使用</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">Integer是int的包装类</span>
+<span class="mf">2.</span><span class="n">构造</span><span class="p">:</span><span class="w">  </span><span class="n">不推荐使用了</span><span class="p">,</span><span class="n">但是还能用</span>
+<span class="w">  </span><span class="nf">Integer</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Integer</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">s必须是数字形式</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Integer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">i1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Integer</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"i1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">i2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Integer</span><span class="p">(</span><span class="s">"10"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"i2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i2</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"================"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Boolean</span><span class="w"> </span><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Boolean</span><span class="p">(</span><span class="s">"true"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"b1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Boolean</span><span class="w"> </span><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Boolean</span><span class="p">(</span><span class="s">"false"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"b2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b2</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Boolean</span><span class="w"> </span><span class="n">b3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Boolean</span><span class="p">(</span><span class="s">"True"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"b3 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b3</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1704771866040" decoding="async" loading="lazy" src="../../course-assets/d71b6e6e40a866230f81.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">装箱</span><span class="p">:</span><span class="n">将基本类型转成对应的包装类</span>
+<span class="mf">2.</span><span class="n">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="nf">valueOf</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w">  </span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="nf">valueOf</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Integer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">i1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"i1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">i2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="s">"100"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"i2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">拆箱</span><span class="p">:</span><span class="n">将包装类转成基本类型</span>
+<span class="mf">2.</span><span class="n">方法</span><span class="p">:</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="nf">intValue</span><span class="p">();</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Integer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">i1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"i1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i1</span><span class="p">.</span><span class="na">intValue</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"(i+10) = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h5>2.2.自动拆箱装箱</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">拆箱和装箱很多时候都是自动完成的</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04Integer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="c1">//发生了自动装箱了</span>
+<span class="w">        </span><span class="n">Integer</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="mi">10</span><span class="p">;</span><span class="c1">//发生了自动拆箱装箱</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1704772451388" decoding="async" loading="lazy" src="../../course-assets/cdd5b6b4afcefaff1c75.png"/></p>
+<blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05Integer</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">Integer</span><span class="w"> </span><span class="n">i1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="w">  </span><span class="n">Integer</span><span class="w"> </span><span class="n">i2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="w">  </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i1</span><span class="o">==</span><span class="n">i2</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">Integer</span><span class="w"> </span><span class="n">i3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="w">  </span><span class="n">Integer</span><span class="w"> </span><span class="n">i4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">;</span>
+<span class="w">  </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i3</span><span class="o">==</span><span class="n">i4</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1704774738316" decoding="async" loading="lazy" src="../../course-assets/07b593fa346da6c8998a.png"/></p>
+<p><img alt="1704704132581" decoding="async" loading="lazy" src="../../course-assets/25eea1747d65717b5fd3.png"/></p>
+</blockquote>
+<h4 id="section-29">3.基本类型和String之间的转换</h4>
+<h5>3.1 基本类型往String转</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">方式1</span><span class="p">:</span>
+<span class="w">  </span><span class="o">+</span><span class="w"> </span><span class="n">拼接</span>
+<span class="mf">2.</span><span class="n">方式2</span><span class="p">:</span><span class="n">String中的静态方法</span>
+<span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">valueOf</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">  </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method01</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="s">""</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"============"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><h5>3.2 String转成基本数据类型</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">每个包装类中都有一个类似的方法</span><span class="p">:</span><span class="w">  </span><span class="n">parseXXX</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>位置</th>
+<th>方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Byte</td>
+<td>static byte parseByte(String s)</td>
+<td>将String转byte类型</td>
+</tr>
+<tr>
+<td>Short</td>
+<td>static short parseShort(String s)</td>
+<td>将String转成short类型</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>static int parseInt(String s)</td>
+<td>将String转成int类型</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>static long parseLong(String s)</td>
+<td>将String转成long类型</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>static float parseFloat(String s)</td>
+<td>将String转成float类型</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>static double parseDouble(String s)</td>
+<td>将String转成double类型</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>static boolean parseBoolean(String s)</td>
+<td>将String转成boolean类型</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="s">"1111"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">number</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">在实际开发过程中如何定义一个标准javabean</span>
+<span class="w">  </span><span class="n">定义javabean的时候一般会将基本类型的属性定义成包装类型的属性</span><span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">User</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">//private int uid;//用户id</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">uid</span><span class="p">;</span><span class="c1">//用户id</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">;</span><span class="c1">//用户名</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span><span class="c1">//密码</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">User</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">User</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">uid</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">uid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uid</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="nf">getUid</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">uid</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setUid</span><span class="p">(</span><span class="n">Integer</span><span class="w"> </span><span class="n">uid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">uid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uid</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getUsername</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">username</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setUsername</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getPassword</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setPassword</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">举例</span><span class="p">:</span><span class="n">如果uid为Integer型</span><span class="p">,</span><span class="n">默认值是null</span>
+<span class="mf">2.</span><span class="n">将来javabean中的数据都是和数据库表联系起来的</span><span class="p">,</span><span class="n">我们可以将javabean中的数据添加到表中</span>
+<span class="w">  </span><span class="n">如果表中的uid为主键自增的</span><span class="p">,</span><span class="n">此时添加语句时uid中的数据不用我们单独维护赋值了</span><span class="p">,</span><span class="n">添加语句的sql语句就可以这样写</span><span class="p">:</span>
+<span class="w">  </span><span class="n">insert</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span><span class="n">username</span><span class="p">,</span><span class="n">password</span><span class="p">)</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">(</span><span class="n">NULL</span><span class="p">,</span><span class="err">'</span><span class="n">金莲</span><span class="sc">','</span><span class="mi">36666</span><span class="err">'</span><span class="p">);</span>
+
+<span class="mf">3.</span><span class="n">到时候</span><span class="p">,</span><span class="n">我们需要将javabean中封装的数据获取出来放到sql语句中</span><span class="p">,</span><span class="n">如果uid为主键自增</span><span class="p">,</span><span class="n">而且javabean中的uid为包装类型</span><span class="p">,</span><span class="n">默认值为NULL</span><span class="p">,</span><span class="n">这样就不用单独维护uid的值了</span><span class="p">,</span><span class="n">也不用先给javabean中的uid赋值</span><span class="p">,</span><span class="n">然后在保存到数据库中了</span><span class="p">,</span><span class="n">咱们就可以直接使用uid的默认值</span><span class="p">,</span><span class="n">将默认值放到sql语句的uid列中</span>
+<span class="w">    </span>
+<span class="mf">4.</span><span class="n">而且将javabean中的属性变成包装类</span><span class="p">,</span><span class="n">还可以使用包装类中的方法去操作此属性值</span><span class="w">    </span>
+</pre></div>
+</div></blockquote>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html"><small>← 上一篇</small><strong>String 与 StringBuilder · 课程原文</strong></a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html"><small>下一篇 →</small><strong>线程创建、同步与状态 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块15.常用API</a><a class="toc-h3" href="#section-1">第一章.Math类</a><a class="toc-h4" href="#section-2">1.Math类介绍</a><a class="toc-h4" href="#section-3">2.Math类方法</a><a class="toc-h3" href="#section-4">第二章.BigInteger</a><a class="toc-h4" href="#section-5">1.BigInteger介绍</a><a class="toc-h4" href="#section-6">2.BigInteger使用</a><a class="toc-h3" href="#section-7">第三章.BigDecimal类</a><a class="toc-h4" href="#section-8">1.BigDecimal介绍</a><a class="toc-h4" href="#section-9">2.BigDecimal使用</a><a class="toc-h4" href="#section-10">3.BigDecimal除法过时方法解决</a><a class="toc-h3" href="#section-11">第四章.Date日期类</a><a class="toc-h4" href="#section-12">1.Date类的介绍</a><a class="toc-h4" href="#section-13">2.Date类的使用</a><a class="toc-h4" href="#section-14">3.Date类的常用方法</a><a class="toc-h3" href="#section-15">第五章.Calendar日历类</a><a class="toc-h4" href="#section-16">1.Calendar介绍</a><a class="toc-h3" href="#section-17">第六章.SimpleDateFormat日期格式化类</a><a class="toc-h4" href="#section-18">1.SimpleDateFormat介绍</a><a class="toc-h4" href="#section-19">2.SimpleDateFormat常用方法</a><a class="toc-h3" href="#section-20">第七章.JDK8新日期类</a><a class="toc-h4" href="#section-21">1. LocalDate 本地日期</a><a class="toc-h4" href="#section-22">2.Period和Duration类</a><a class="toc-h4" href="#section-23">3.DateTimeFormatter日期格式化类</a><a class="toc-h3" href="#section-24">第八章.System类</a><a class="toc-h3" href="#section-25">第九章.Arrays数组工具类</a><a class="toc-h3" href="#section-26">第十章.包装类</a><a class="toc-h4" href="#section-27">1.基本数据类型对应的引用数据类型(包装类)</a><a class="toc-h4" href="#section-28">2.Integer的介绍以及使用</a><a class="toc-h4" href="#section-29">3.基本类型和String之间的转换</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
