@@ -1,0 +1,97 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>七阶段复习：用证据证明自己会了 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/Java后端学习路径/15-复习排错与最终验收.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java后端学习路径</h2><nav aria-label="同专题笔记"><a href="00-%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.md.html">Java 后端学习路径：先做出来，再解释清楚</a><a href="01-Java%E8%AF%AD%E6%B3%95%E4%B8%8E%E5%AF%B9%E8%B1%A1.md.html">Java：从变量到可维护的对象</a><a href="02-%E9%9B%86%E5%90%88%E5%BC%82%E5%B8%B8%E4%B8%8E%E6%96%87%E4%BB%B6.md.html">Java：集合、泛型、异常与文件读写</a><a href="03-Java%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE.md.html">Java阶段项目：能重启恢复数据的学生管理器</a><a href="04-MySQL%E4%BA%94%E8%A1%A8%E5%BB%BA%E6%A8%A1.md.html">MySQL：用五张表建一个电商练习库</a><a href="05-SQL%E6%9F%A5%E8%AF%A2%E4%B8%8E%E4%BA%8B%E5%8A%A1.md.html">SQL：JOIN、分组、分页与事务的实际写法</a><a href="06-SpringBoot%E6%8E%A5%E5%8F%A3%E4%B8%8E%E6%A0%A1%E9%AA%8C.md.html">Spring Boot：把一次HTTP请求走明白</a><a href="07-MyBatis%E7%99%BB%E5%BD%95%E4%B8%8E%E4%BA%8B%E5%8A%A1.md.html">接口落地：MyBatis、登录与事务边界</a><a href="08-Redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E%E7%BC%93%E5%AD%98.md.html">Redis：先选结构，再设计键与过期</a><a href="09-Redis%E7%A7%92%E6%9D%80%E4%B8%8E%E9%94%81.md.html">Redis实战：库存预扣、Lua与分布式锁</a><a href="10-RabbitMQ%E6%B6%88%E6%81%AF%E6%A8%A1%E5%9E%8B.md.html">RabbitMQ：交换机、队列与一次消息旅行</a><a href="11-%E6%B6%88%E6%81%AF%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%B8%8E%E5%BC%82%E6%AD%A5%E8%AE%A2%E5%8D%95.md.html">异步订单：重复、丢失、重试与补偿</a><a href="12-Cloud%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%E4%B8%8E%E8%B0%83%E7%94%A8.md.html">Spring Cloud：先让两个服务可靠地互相找到</a><a href="13-%E9%99%90%E6%B5%81%E7%86%94%E6%96%AD%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1.md.html">Cloud进阶：限流、熔断与事务的选择</a><a href="14-%E5%AD%A6%E6%88%90%E5%9C%A8%E7%BA%BF%E9%A1%B9%E7%9B%AE%E8%90%BD%E5%9C%B0.md.html">学成在线：把课程项目变成自己的工程作品</a><a aria-current="page" href="15-%E5%A4%8D%E4%B9%A0%E6%8E%92%E9%94%99%E4%B8%8E%E6%9C%80%E7%BB%88%E9%AA%8C%E6%94%B6.md.html">七阶段复习：用证据证明自己会了</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java后端学习路径</div><h1>七阶段复习：用证据证明自己会了</h1><div class="article-meta"><span>约 4 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<p>这份清单用于结束每个阶段，而不是用来催进度。不会的部分回到对应笔记和原视频，补一个失败样例，比从头重看整套课程更有效。</p>
+<h2 id="section-0">闭卷自测与答案要点</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>合格答案至少包含</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java对象参数到底传了什么</td>
+<td>引用值的副本；修改对象与重绑形参不同</td>
+</tr>
+<tr>
+<td>Map中学号重复会怎样</td>
+<td>普通put会覆盖；根据业务拒绝或更新</td>
+</tr>
+<tr>
+<td>LEFT JOIN后没订单的用户为何消失</td>
+<td>WHERE筛掉右表NULL行；条件位置影响结果</td>
+</tr>
+<tr>
+<td>多表JOIN后订单数为何变大</td>
+<td>一对多展开；先聚合或按订单ID去重</td>
+</tr>
+<tr>
+<td>注册前查用户名为什么仍会重复</td>
+<td>并发竞争；数据库唯一约束作为最终防线</td>
+</tr>
+<tr>
+<td>登录成功是否等于有权改任意资源</td>
+<td>认证与授权不同；按身份检查资源归属</td>
+</tr>
+<tr>
+<td>缓存更新为什么仍可能读到旧值</td>
+<td>读写交错与跨系统非原子；设计一致性窗口</td>
+</tr>
+<tr>
+<td>Redis Lua是否出错自动回滚</td>
+<td>不保证回滚已执行写命令，应校验前提</td>
+</tr>
+<tr>
+<td>消费消息提交后ACK丢失怎么办</td>
+<td>可能重投；幂等记录与业务同事务</td>
+</tr>
+<tr>
+<td>接口超时是否一定没执行</td>
+<td>可能已提交，只是响应未到达</td>
+</tr>
+<tr>
+<td>远程调用何时能自动重试</td>
+<td>先明确幂等身份、上限、退避与总超时</td>
+</tr>
+<tr>
+<td>项目性能指标如何证明</td>
+<td>环境、数据、负载模型、分位延迟与错误率</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-1">分层排错顺序</h2>
+<ol>
+<li>先记录一个可复现输入、时间和traceId。</li>
+<li>HTTP层：路径、方法、Content-Type、认证、状态码。</li>
+<li>应用层：校验、业务分支、事务是否真的生效。</li>
+<li>存储层：连接、SQL参数、约束、受影响行数、事务提交。</li>
+<li>中间件：Redis key类型/TTL；消息绑定、确认、重试与积压。</li>
+<li>分布式链路：实例地址、配置环境、超时与版本适配。</li>
+</ol>
+<p>不要看到500就重装框架，也不要只提高超时掩盖慢查询。先判断错误发生在哪一跳，再修复最小问题。</p>
+<h2 id="section-2">七阶段交付目录</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>learning-evidence/
+  java/           StudentApp.java、操作记录、损坏文件用例
+  mysql/          schema.sql、seed.sql、queries.sql、预期结果
+  boot/           依赖版本、请求集合、鉴权与回滚测试
+  redis/          key设计表、并发库存结果、缓存命中实验
+  rabbitmq/       拓扑图、重复消息实验、崩溃恢复记录
+  cloud/          版本矩阵、两服务调用、故障实验
+  capstone/       架构图、README、独立修改、压测说明
+</pre></div>
+</div><h2 id="section-3">复习节奏</h2>
+<p>第一次学习后立刻闭卷重写核心代码；次日做一个变式；一周后用失败场景自测。这里的时间只是建议，不是视频课时安排。每次复习只记录仍然解释不清的点，并给它配一个具体实验。</p>
+<h2 id="section-4">学习完成度与本站实现状态</h2>
+<p>本文档提供路径化知识笔记与示例，不等于七个完整后端项目已经交付。学生管理器是可独立编译的完整示例；Spring、Redis、消息与微服务部分包含集成片段、设计步骤与验收实验，需要读者在对应环境实现运行。</p>
+<p>原PDF是8页，目录中的部分页码与实际PDF页面不一致；本书架按七阶段主题组织，避免依赖原目录页码。六个课程BV号保留原文，Java课程未给出唯一链接，因此不自行挑一个版本冒充原课。</p>
+<h2 id="section-5">补充官方资料</h2>
+<ul>
+<li><a href="https://dev.java/learn/" rel="noopener noreferrer" target="_blank">Java学习入口</a></li>
+<li><a href="https://dev.mysql.com/doc/refman/8.4/en/" rel="noopener noreferrer" target="_blank">MySQL8.4手册</a></li>
+<li><a href="https://docs.spring.io/spring-boot/reference/" rel="noopener noreferrer" target="_blank">Spring Boot参考</a></li>
+<li><a href="https://redis.io/docs/latest/commands/" rel="noopener noreferrer" target="_blank">Redis命令</a></li>
+<li><a href="https://www.rabbitmq.com/docs/reliability" rel="noopener noreferrer" target="_blank">RabbitMQ可靠性</a></li>
+<li><a href="https://spring.io/projects/spring-cloud/" rel="noopener noreferrer" target="_blank">Spring Cloud</a></li>
+</ul>
+<p>阅读时切换到工程所用版本。本文核对日期为2026-11-11；版本支持状态以后可能变化。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="14-%E5%AD%A6%E6%88%90%E5%9C%A8%E7%BA%BF%E9%A1%B9%E7%9B%AE%E8%90%BD%E5%9C%B0.md.html"><small>← 上一篇</small><strong>学成在线：把课程项目变成自己的工程作品</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">闭卷自测与答案要点</a><a class="toc-h2" href="#section-1">分层排错顺序</a><a class="toc-h2" href="#section-2">七阶段交付目录</a><a class="toc-h2" href="#section-3">复习节奏</a><a class="toc-h2" href="#section-4">学习完成度与本站实现状态</a><a class="toc-h2" href="#section-5">补充官方资料</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
