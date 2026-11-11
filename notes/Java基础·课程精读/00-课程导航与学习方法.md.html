@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Java 基础：按课程一步步学懂 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·课程精读/00-课程导航与学习方法.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·课程精读</h2><nav aria-label="同专题笔记"><a aria-current="page" href="00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%88%AA%E4%B8%8E%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95.md.html">Java 基础：按课程一步步学懂</a><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制</a><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·课程精读</div><h1>Java 基础：按课程一步步学懂</h1><div class="article-meta"><span>约 7 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<p>这是基于你提供的 26 份课程笔记制作的精读版，保留完整正文，而非把课程压缩成知识点清单。默认打开的是速学总结，包含导读、类比、示例和自测；每篇末尾链接到完整原文。</p>
+<h2 id="section-0">推荐使用顺序</h2>
+<p>从01开始，学完09先做学生管理系统，再进入10。原路线暂缓的多线程深入、反射等内容仍保留在书架，首次可按需要后学；它们不是已经删去的章节。</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>顺序</th>
+<th>课程模块</th>
+<th>本章阅读入口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td>环境准备与第一个程序</td>
+<td><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>02</td>
+<td>变量、类型转换与进制</td>
+<td><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>03</td>
+<td>IDEA 与运算符</td>
+<td><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>04</td>
+<td>输入、分支与循环</td>
+<td><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>05</td>
+<td>数组、索引与内存关系</td>
+<td><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>06</td>
+<td>方法与重载</td>
+<td><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>07</td>
+<td>类、对象与成员变量</td>
+<td><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>08</td>
+<td>封装、this 与构造方法</td>
+<td><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>09</td>
+<td>static、递归、数组算法与调试</td>
+<td><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>09a</td>
+<td>阶段项目：学生管理系统</td>
+<td><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>10</td>
+<td>继承、重写与抽象类</td>
+<td><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>11</td>
+<td>接口、多态与类型转换</td>
+<td><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>12</td>
+<td>权限、final、代码块与内部类</td>
+<td><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>13</td>
+<td>异常、Object 与比较规则</td>
+<td><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>14</td>
+<td>String 与 StringBuilder</td>
+<td><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>15</td>
+<td>数值、日期与包装类 API</td>
+<td><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>16</td>
+<td>线程创建、同步与状态</td>
+<td><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>17</td>
+<td>等待唤醒、Lock 与线程池</td>
+<td><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>18</td>
+<td>Collection、List 与迭代</td>
+<td><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>19</td>
+<td>泛型、Set 与去重</td>
+<td><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>20</td>
+<td>Map、哈希表与统计案例</td>
+<td><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>21</td>
+<td>File 与字节、字符 IO</td>
+<td><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>22</td>
+<td>缓冲流、序列化与工具流</td>
+<td><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>23</td>
+<td>网络编程、正则与设计模式</td>
+<td><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>24</td>
+<td>Lambda、Stream 与 JDK 新特性</td>
+<td><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">打开笔记</a></td>
+</tr>
+<tr>
+<td>25</td>
+<td>单元测试、反射与注解</td>
+<td><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">打开笔记</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-1">资料与版本说明</h2>
+<p>课程源文件来自用户提供的 D:/za。完整笔记包包含25个知识模块和1个学生管理系统；上部笔记包是其中的重复子集，已去重。本文保留原作者课程内容，本站新增部分单独标明。未将网上同名但不同版本课程混入，也未声称已经逐集观看视频。</p>
+<h2 id="section-2">三轮学习法</h2>
+<p>第一轮跟着示例跑通，把不认识的词与报错记下来。第二轮关掉代码，靠需求重新写；卡住时只回查一个小节。第三轮改变输入与边界条件，尝试让程序失败，再解释为什么失败。记住一段代码不等于掌握它适用的条件。</p>
+<p>每次练习保存“输入 / 预期 / 实际 / 修改原因”。练习的依据是能否独立解决问题，标记已读只是个人阅读记录。</p>
+<h2 id="section-3">与先前16篇提纲的关系</h2>
+<p>此前“Java后端学习路径”是独立编写的路线提纲，可用于总体复习；本书架才是针对本次提供课程资料的详细阅读版。两者来源不同，不用提纲替代课程正文。</p>
+<h2 id="section-4">其他阶段的资料状态</h2>
+<p>已收到MySQL课件、SQL示例及安装说明，另有262页Spring Boot 3与响应式编程PDF。Redis、RabbitMQ、Spring Cloud和学成在线的配套讲义尚未在本次目录中找到，不能标成已完成逐课总结。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html"><small>下一篇 →</small><strong>环境准备与第一个程序</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">推荐使用顺序</a><a class="toc-h2" href="#section-1">资料与版本说明</a><a class="toc-h2" href="#section-2">三轮学习法</a><a class="toc-h2" href="#section-3">与先前16篇提纲的关系</a><a class="toc-h2" href="#section-4">其他阶段的资料状态</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

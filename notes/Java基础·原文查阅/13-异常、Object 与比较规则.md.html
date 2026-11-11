@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>异常、Object 与比较规则 · 课程原文 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·原文查阅/13-异常、Object 与比较规则.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a aria-current="page" href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>异常、Object 与比较规则 · 课程原文</h1><div class="article-meta"><span>约 41 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<p>来源：用户提供的 <code>笔记(1).zip / 03_笔记/模块13_异常_Object/模块13.异常_Object.md</code>。保留原课程内容，历史环境、示例错误和故意报错的教学代码应结合上下文阅读。</p>
+<p><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">返回本章速学总结</a></p>
+<h3 id="section-0">模块13.异常_Object</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">模块十二回顾</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">权限修饰符</span><span class="p">:</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kd">protected</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">默认</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kd">private</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">构造一般用public</span><span class="w"> </span><span class="p">:</span><span class="n">便于new对象</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">成员方法一般用public</span><span class="p">:</span><span class="n">便于调用</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">属性一般用private</span><span class="p">:</span><span class="n">封装思想</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="mf">2.f</span><span class="n">inal</span><span class="p">:</span><span class="n">最终的</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">修饰类</span><span class="p">:</span><span class="n">不能被继承的</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">修饰方法</span><span class="p">:</span><span class="n">不能被重写</span>
+<span class="w">    </span><span class="n">c</span><span class="p">.</span><span class="na">修饰局部变量</span><span class="p">:</span><span class="n">不能被二次赋值</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="na">修饰对象</span><span class="p">:</span><span class="n">地址值不能改变</span><span class="p">,</span><span class="n">但是对象中的属性值可以改变</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">修饰成员变量</span><span class="p">:</span><span class="n">需要手动赋值</span><span class="p">,</span><span class="n">不能二次赋值</span>
+<span class="w">        </span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">代码块</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">构造代码块</span><span class="p">:</span>
+<span class="w">      </span><span class="p">{}</span>
+<span class="w">      </span><span class="n">优先于构造方法执行</span><span class="p">,</span><span class="n">每new一次</span><span class="p">,</span><span class="n">构造代码块就执行一次</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">静态代码块</span><span class="p">:</span>
+<span class="w">      </span><span class="kd">static</span><span class="p">{</span>
+<span class="w">          </span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="n">优先于构造代码块和构造方法执行的</span><span class="p">,</span><span class="n">只执行一次</span>
+<span class="w">          </span>
+<span class="w">   </span><span class="n">静态代码块</span><span class="o">&gt;</span><span class="n">构造代码块</span><span class="o">&gt;</span><span class="n">构造方法</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">从执行顺序上来看</span>
+<span class="w">          </span>
+<span class="w">    </span>
+<span class="w"> </span><span class="mf">4.</span><span class="n">匿名内部类</span><span class="p">:</span>
+<span class="w">   </span><span class="n">a</span><span class="p">.</span><span class="na">格式1</span><span class="p">:</span>
+<span class="w">     </span><span class="k">new</span><span class="w"> </span><span class="n">接口</span><span class="o">/</span><span class="n">抽象类</span><span class="p">(){</span>
+<span class="w">         </span><span class="n">重写方法</span>
+<span class="w">     </span><span class="p">}.</span><span class="na">重写的方法</span><span class="p">();</span>
+
+<span class="w">   </span><span class="n">b</span><span class="p">.</span><span class="na">格式2</span><span class="p">:</span>
+<span class="w">     </span><span class="n">接口</span><span class="o">/</span><span class="n">抽象类</span><span class="w"> </span><span class="n">对象名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">接口</span><span class="o">/</span><span class="n">抽象类</span><span class="p">(){</span>
+<span class="w">         </span>
+<span class="w">         </span><span class="n">重写的方法</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">     </span><span class="n">对象名</span><span class="p">.</span><span class="na">重写的方法</span><span class="p">();</span>
+
+<span class="nl">模块13重点</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">分清楚什么是编译时期异常</span><span class="p">,</span><span class="n">什么是运行时期异常</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">知道处理异常的2种方式</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">知道finally关键字的使用场景</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">知道Object是啥</span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">知道Object中toString以及equals方法的作用</span>
+<span class="w">  </span><span class="mf">6.</span><span class="n">知道重写完Object中的toString以及equals方法的作用</span>
+</pre></div>
+</div><h3 id="section-1">第一章.API文档</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">什么叫做API</span><span class="p">:</span><span class="n">Application</span><span class="w"> </span><span class="n">Programming</span><span class="w"> </span><span class="n">Interface</span><span class="p">,</span><span class="n">简称API</span><span class="p">,</span><span class="n">又称之为应用编程接口</span>
+<span class="w">             </span><span class="n">说白了</span><span class="p">:</span><span class="n">定义出来的类以及接口</span><span class="p">,</span><span class="n">以及其中的方法等</span>
+<span class="mf">2.</span><span class="n">为了方便我们去查询开发好的接口以及类</span><span class="p">,</span><span class="n">以及其中的方法</span><span class="p">,</span><span class="n">会对应提供一个文档</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">API文档</span>
+<span class="w">                 </span>
+<span class="mf">3.</span><span class="n">API文档作用</span><span class="p">:</span><span class="n">查询我们要使用的对象</span><span class="p">,</span><span class="n">以及方法</span><span class="p">,</span><span class="n">是我们程序员的</span><span class="s">"字典"</span><span class="w">  </span>
+</pre></div>
+</div><p><img alt="1704185036101" decoding="async" loading="lazy" src="../../course-assets/ad109eaf3ac1737f8545.png"/></p>
+<p><img alt="1704185224910" decoding="async" loading="lazy" src="../../course-assets/dd319d381b98289525a8.png"/></p>
+<p><img alt="1704185319987" decoding="async" loading="lazy" src="../../course-assets/bb7842150e5e6cf300c3.png"/></p>
+<p><img alt="1704185443350" decoding="async" loading="lazy" src="../../course-assets/d328a1b7b2dbc4709568.png"/></p>
+<h3 id="section-2">第二章.异常</h3>
+<h4 id="section-3">1.异常介绍</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">代码出现了不正常的现象</span><span class="p">;</span><span class="n">在java中</span><span class="p">,</span><span class="n">异常都是一个一个的类</span><span class="w">                </span>
+</pre></div>
+</div><p><img alt="1704188467029" decoding="async" loading="lazy" src="../../course-assets/0e272d39e50566f961ab.png"/></p>
+<p><img alt="1704188437280" decoding="async" loading="lazy" src="../../course-assets/373f1fd321c12ca739ec.png"/></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">ParseException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//错误Error -&gt; StackOverflowError</span>
+<span class="w">        </span><span class="c1">//method();</span>
+
+<span class="w">        </span><span class="c1">//运行时期异常 -&gt; ArrayIndexOutOfBoundsException</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//System.out.println(arr1[4]);</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">          编译时期异常:</span>
+<span class="cm">           注意看:编译时期异常是我们代码写错了嘛?不是,当我们调用方法的时候</span>
+<span class="cm">           该方法底层给我们抛了一个编译时期异常,所以导致我们一调用此方法</span>
+<span class="cm">           一编译,就爆红了</span>
+<span class="cm">           当我们一旦触发了这个异常,jvm就会将异常信息打印到控制台上,给程序员们看</span>
+<span class="cm">         */</span>
+<span class="w">        </span><span class="n">SimpleDateFormat</span><span class="w"> </span><span class="n">sdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"2000-10-10 10:10:10"</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Date</span><span class="w"> </span><span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sdf</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">time</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">date</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(){</span>
+<span class="w">        </span><span class="n">method</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-4">2.异常出现的过程</h4>
+<p><img alt="1704189581288" decoding="async" loading="lazy" src="../../course-assets/dfdb306a75776cc2e5f8.png"/></p>
+<h4 id="section-5">3.创建异常对象(了解)</h4>
+<blockquote>
+<p>创建异常对象,只是为了后面学习如何处理异常,其他的暂时没有啥意义</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">关键字</span><span class="p">:</span><span class="k">throw</span>
+<span class="mf">2.</span><span class="n">格式</span><span class="p">:</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">异常</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"a.tx1t"</span><span class="p">;</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">){</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".txt"</span><span class="p">)){</span>
+<span class="w">            </span><span class="c1">//故意创建异常对象,用throw说明此处有异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">NullPointerException</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我要执行了"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-6">4.异常处理方式(重点)</h4>
+<h5>4.1 异常处理方式一_throws</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span><span class="n">在方法参数和方法体之间位置上写</span>
+<span class="w">  </span><span class="kd">throws</span><span class="w"> </span><span class="n">异常</span>
+<span class="mf">2.</span><span class="n">意义</span><span class="p">:</span><span class="n">处理异常</span>
+<span class="w">  </span><span class="n">将异常往上抛</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"a.txt1"</span><span class="p">;</span>
+<span class="w">        </span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="c1">//添加功能</span>
+<span class="w">        </span><span class="n">delete</span><span class="p">();</span><span class="c1">//删除功能</span>
+<span class="w">        </span><span class="n">update</span><span class="p">();</span><span class="c1">//修改功能</span>
+<span class="w">        </span><span class="n">find</span><span class="p">();</span><span class="c1">//查询功能</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".txt"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//故意创建异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="p">(</span><span class="s">"文件找不到"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我要执行了"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">find</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"查询功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"修改功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"删除功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1704192622348" decoding="async" loading="lazy" src="../../course-assets/7c7db45204cf54289aeb.png"/></p>
+<h5>4.2 异常处理方式一_throws多个异常</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span><span class="kd">throws</span><span class="w"> </span><span class="n">异常1</span><span class="p">,</span><span class="n">异常2</span>
+<span class="w">    </span>
+<span class="mf">2.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">如果throws的多个异常之间有子父类继承关系</span><span class="p">,</span><span class="n">我们可以直接throws父类异常</span>
+<span class="w">  </span><span class="n">如果不知道多个异常之间是否有子父类继承关系</span><span class="p">,</span><span class="n">我们可以直接throws</span><span class="w"> </span><span class="n">Exception</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="cm">/*FileNotFoundException,*//*IOException*/</span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="c1">//添加功能</span>
+<span class="w">        </span><span class="n">delete</span><span class="p">();</span><span class="c1">//删除功能</span>
+<span class="w">        </span><span class="n">update</span><span class="p">();</span><span class="c1">//修改功能</span>
+<span class="w">        </span><span class="n">find</span><span class="p">();</span><span class="c1">//查询功能</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="cm">/*FileNotFoundException,*//*IOException*/</span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="o">==</span><span class="kc">null</span><span class="p">){</span>
+<span class="w">            </span><span class="c1">//故意造异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IOException</span><span class="p">(</span><span class="s">"IO异常"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".txt"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//故意创建异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="p">(</span><span class="s">"文件找不到"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我要执行了"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">find</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"查询功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"修改功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"删除功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div><h5>4.3 异常处理方式二_try...catch</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">try</span><span class="p">{</span>
+<span class="w">      </span><span class="n">可能出现异常的代码</span>
+<span class="w">  </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">异常</span><span class="w"> </span><span class="n">对象名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">处理异常的代码</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将来开发会将异常信息保存到日志文件中</span>
+<span class="w">  </span><span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo06Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"a.txt1"</span><span class="p">;</span>
+<span class="w">        </span><span class="k">try</span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//int[] arr = null;</span>
+<span class="w">            </span><span class="c1">//System.out.println(arr.length);//NullPointerException</span>
+<span class="w">            </span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="c1">//添加功能</span>
+<span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">delete</span><span class="p">();</span><span class="c1">//删除功能</span>
+<span class="w">        </span><span class="n">update</span><span class="p">();</span><span class="c1">//修改功能</span>
+<span class="w">        </span><span class="n">find</span><span class="p">();</span><span class="c1">//查询功能</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".txt"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//故意创建异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="p">(</span><span class="s">"文件找不到"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我要执行了"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">find</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"查询功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"修改功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"删除功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div><h5>4.4.异常处理方式二_多个catch</h5>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">try</span><span class="p">{</span>
+<span class="w">      </span><span class="n">可能出现异常的代码</span>
+<span class="w">  </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">异常</span><span class="w"> </span><span class="n">对象名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">处理异常的代码</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将来开发会将异常信息保存到日志文件中</span>
+<span class="w">  </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">异常</span><span class="w"> </span><span class="n">对象名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">处理异常的代码</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将来开发会将异常信息保存到日志文件中</span>
+<span class="w">  </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">异常</span><span class="w"> </span><span class="n">对象名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">处理异常的代码</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将来开发会将异常信息保存到日志文件中</span>
+<span class="w">  </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">异常</span><span class="w"> </span><span class="n">对象名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">处理异常的代码</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将来开发会将异常信息保存到日志文件中</span>
+<span class="w">  </span><span class="p">}...</span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">如果catch的多个异常之间有子父类继承关系</span><span class="p">,</span><span class="n">我们可以直接catch父类异常</span>
+<span class="w">  </span><span class="n">如果不知道多个异常之间是否有子父类继承关系</span><span class="p">,</span><span class="n">我们也可以直接catch</span><span class="w"> </span><span class="n">Exception</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo07Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">       </span><span class="cm">/* try {</span>
+<span class="cm">            add(s);//添加功能</span>
+<span class="cm">        }catch (FileNotFoundException e){</span>
+<span class="cm">            System.out.println(e);</span>
+<span class="cm">        }catch (IOException e){</span>
+<span class="cm">            System.out.println(e);</span>
+<span class="cm">        }*/</span>
+
+<span class="w">        </span><span class="cm">/*try {</span>
+<span class="cm">            add(s);//添加功能</span>
+<span class="cm">        }catch (IOException e){</span>
+<span class="cm">            System.out.println(e);</span>
+<span class="cm">        }*/</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="c1">//添加功能</span>
+<span class="w">        </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">){</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="c1">//将详细的异常信息打印到控制台上</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">delete</span><span class="p">();</span><span class="c1">//删除功能</span>
+<span class="w">        </span><span class="n">update</span><span class="p">();</span><span class="c1">//修改功能</span>
+<span class="w">        </span><span class="n">find</span><span class="p">();</span><span class="c1">//查询功能</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//故意造异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IOException</span><span class="p">(</span><span class="s">"IO异常"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".txt"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//故意创建异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="p">(</span><span class="s">"文件找不到"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我要执行了"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">find</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"查询功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">update</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"修改功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">delete</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"删除功能"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-7">5.finally关键字</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">代表的是不管是否触发了异常</span><span class="p">,</span><span class="n">都会执行的代码块</span>
+<span class="w">  </span><span class="n">特殊情况</span><span class="p">:</span><span class="n">如果之前执行了System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="n">终止当前正在执行的java虚拟机</span>
+<span class="mf">2.</span><span class="n">使用</span><span class="p">:</span><span class="n">都是配合try</span><span class="p">...</span><span class="na">catch使用</span>
+<span class="w">  </span><span class="k">try</span><span class="p">{</span>
+<span class="w">      </span><span class="n">可能出现异常的代码</span>
+<span class="w">  </span><span class="p">}</span><span class="k">catch</span><span class="p">(</span><span class="n">异常</span><span class="w"> </span><span class="n">对象名</span><span class="p">){</span>
+<span class="w">      </span><span class="n">处理异常的代码</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">将来开发会将异常信息保存到日志文件中</span>
+<span class="w">  </span><span class="p">}</span><span class="k">finally</span><span class="p">{</span>
+<span class="w">      </span><span class="n">不管是否有异常</span><span class="p">,</span><span class="n">都会执行的代码</span>
+<span class="w">  </span><span class="p">}</span><span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo08Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">){</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"a.txt"</span><span class="p">;</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="c1">//添加功能</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我必须滴执行"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".txt"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//故意创建异常</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileNotFoundException</span><span class="p">(</span><span class="s">"文件找不到"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我要执行了"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo09Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">());</span><span class="c1">//空指针异常</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我一定要执行"</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">//return 3;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>finally的使用场景:</p>
+<p>1.关闭资源</p>
+<p>2.原因:对象如果没有用了,GC(垃圾回收器)回收,用来回收堆内存中的垃圾,释放内存,但是有一些对象GC回收不了,比如:连接对象(Connection),IO流对象,Socket对象,这些对象GC回收不了,就需要我们自己手动回收,手动关闭</p>
+<p>​      将来不能回收的对象new完之后,后续操作不管是否操作成功,是否有异常,我们都需要手动关闭,此时我们就可以将关闭资源的代码放到finally中</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test</span><span class="w"> </span><span class="p">{</span>
+<span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="n">FileWriter</span><span class="w"> </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">     </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">"day13_exception_object\\1.txt"</span><span class="p">);</span>
+<span class="w">         </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"哈哈哈"</span><span class="p">);</span><span class="c1">//假如这里写失败或者写成功了</span>
+<span class="w">     </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">     </span><span class="p">}</span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fw</span><span class="o">!=</span><span class="kc">null</span><span class="p">){</span>
+<span class="w">             </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                 </span><span class="n">fw</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">             </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                 </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">             </span><span class="p">}</span>
+<span class="w">         </span><span class="p">}</span>
+
+<span class="w">     </span><span class="p">}</span>
+<span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div></blockquote>
+<h4 id="section-8">6.抛异常时注意的事项</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">如果父类中的方法抛了异常</span><span class="p">,</span><span class="n">那么子类重写之后要不要抛</span><span class="o">?</span>
+<span class="w">  </span><span class="n">可抛可不抛</span><span class="w">  </span>
+<span class="mf">2.</span><span class="n">如果父类中的方法没有抛异常</span><span class="p">,</span><span class="n">那么子类重写之后要不要抛</span><span class="o">?</span><span class="w">  </span>
+<span class="w">  </span><span class="n">不要抛</span><span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo10Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">class</span> <span class="nc">A</span><span class="p">{</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="cm">/*throws Exception*/</span><span class="p">{</span>
+
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">class</span> <span class="nc">B</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">A</span><span class="p">{</span>
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">()</span><span class="cm">/*throws Exception*/</span><span class="p">{</span>
+
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-9">7.try_catch和throws的使用时机</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">如果处理异常之后</span><span class="p">,</span><span class="n">还想让后续的代码正常执行</span><span class="p">,</span><span class="n">我们使用try</span><span class="p">...</span><span class="na">catch</span>
+<span class="mf">2.</span><span class="n">如果方法之间是递进关系</span><span class="p">(</span><span class="n">调用</span><span class="p">),</span><span class="n">我们可以先throws</span><span class="p">,</span><span class="n">但是到了最后需要用try</span><span class="p">...</span><span class="na">catch做一个统一的异常处理</span>
+</pre></div>
+</div><p><img alt="1704269702465" decoding="async" loading="lazy" src="../../course-assets/ca7feaf3ebae4d9ac5ad.png"/></p>
+<blockquote>
+<p>1.编译时期异常是必须要处理的,不处理爆红,没法往下写</p>
+<p>a.throws</p>
+<p>b.try...catch</p>
+<p>2.运行时期异常我们一般不处理,一旦出现运行时期异常,肯定是代码写的有问题,我们直接修改代码细节就行啦</p>
+</blockquote>
+<h4 id="section-10">8.自定义异常</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">需求</span><span class="p">:</span><span class="n">键盘录入一个用户名</span><span class="p">,</span><span class="n">实现登录功能</span><span class="p">,</span><span class="n">如果登录失败</span><span class="p">,</span><span class="n">抛出LoginUserException</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LoginUserException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Exception</span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginUserException</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginUserException</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo11Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">LoginUserException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.定义一个用户名,代表已经注册的用户</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"root"</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//2.创建Scanner对象,录入用户名</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"请您输入要登录的用户名:"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//3.判断用户名是否和已经存在的用户名一致</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">username</span><span class="p">)){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"登录成功了"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoginUserException</span><span class="p">(</span><span class="s">"登录失败了,用户名或者密码有问题"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>1.定义一个类</p>
+<p>2.如果继承Exception 就是编译时期异常</p>
+<p>3.如果继承RuntimeException,就是运行时期异常</p>
+</blockquote>
+<h4 id="section-11">9.打印异常信息的三个方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">Throwable类中的方法</span><span class="p">:</span>
+<span class="w">  </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w">  </span><span class="p">:</span><span class="n">输出异常类型和设置的异常信息</span>
+<span class="w">  </span><span class="n">String</span><span class="w"> </span><span class="nf">getMessage</span><span class="p">():</span><span class="w"> </span><span class="n">输出设置的异常信息</span><span class="w">  </span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">printStackTrace</span><span class="p">():</span><span class="n">打印异常信息是最全的</span><span class="p">:</span><span class="n">包括异常类型</span><span class="p">,</span><span class="n">信息</span><span class="p">,</span><span class="n">以及出现的行数等</span><span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo11Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.定义一个用户名,代表已经注册的用户</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"root"</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//2.创建Scanner对象,录入用户名</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"请您输入要登录的用户名:"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//3.判断用户名是否和已经存在的用户名一致</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">username</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"登录成功了"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LoginUserException</span><span class="p">(</span><span class="s">"登录失败了,用户名或者密码有问题"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">){</span>
+<span class="w">                </span><span class="c1">//System.out.println(e.toString());</span>
+<span class="w">                </span><span class="c1">//System.out.println(e.getMessage());</span>
+<span class="w">                </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-12">第三章.Object类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">所有类的根类</span><span class="p">(</span><span class="n">父类</span><span class="p">),</span><span class="n">所有的类都会直接或者间接继承Object类</span>
+</pre></div>
+</div><h4 id="section-13">1.Object中的toString</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">Object中的toString方法</span><span class="p">:</span><span class="n">返回该对象的字符串表示形式</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">getClass</span><span class="p">().</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"@"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">toHexString</span><span class="p">(</span><span class="n">hashCode</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">如果没有重写Object中的toString方法</span><span class="p">,</span><span class="n">直接输出对象名会默认调用Object中的toString方法</span><span class="p">,</span><span class="n">直接输出地址值</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">如果重写了Object中的toString方法</span><span class="p">,</span><span class="n">再输出地址值</span><span class="p">,</span><span class="n">重写没有意义</span><span class="p">,</span><span class="n">所以重写完toString之后</span><span class="p">,</span><span class="n">应该返回对象的内容</span><span class="w">  </span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">总结</span><span class="p">:</span>
+<span class="w">  </span><span class="n">如果直接输出对象名不想输出地址值</span><span class="p">,</span><span class="n">就重写Object中的toString方法</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getAge</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setAge</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Person{"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">"name='"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="sc">'\''</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">", age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="sc">'}'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"金莲"</span><span class="p">,</span><span class="w"> </span><span class="mi">26</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">);</span><span class="c1">//com.atguigu.b_object.Person@4eec7777</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span><span class="c1">//com.atguigu.b_object.Person@4eec7777</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"张三"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"李四"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"王五"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">list</span><span class="p">);</span><span class="c1">//[张三, 李四, 王五]</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">list</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span><span class="c1">//[张三, 李四, 王五]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>快速生成toString</p>
+<p>alt+insert -&gt; 选择toString -&gt; 直接下一步</p>
+</blockquote>
+<h4 id="section-14">2.Object中的equals</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">比较两个对象的地址值是否相等</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">obj</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="o">==</span><span class="w"> </span><span class="n">针对于基本数据类型来说</span><span class="p">,</span><span class="n">比较的是值</span><span class="w"> </span>
+<span class="w">    </span><span class="o">==</span><span class="w"> </span><span class="n">针对于引用数据类型来说</span><span class="p">,</span><span class="n">比较的是地址值</span>
+<span class="w">        </span>
+<span class="mf">2.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">如果没有重写Object中的equals方法</span><span class="p">,</span><span class="n">那么就会调用Object中的equals方法</span><span class="p">,</span><span class="n">比较对象的地址值</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">如果重写了Object中的equals方法</span><span class="p">,</span><span class="n">那么就会调用重写后的equals方法</span><span class="p">,</span><span class="n">应该比较对象的内容</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getAge</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setAge</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Person{"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">"name='"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="sc">'\''</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">", age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="sc">'}'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">       问题1:obj直接调用name和age调用不了,因为Object接收了Person类型的对象</span>
+<span class="cm">            属于多态,多态前提下不能直接调用子类特有内容</span>
+<span class="cm">       解决问题1:向下转型</span>
+
+<span class="cm">       问题2:如果传递的不是Person类型,就会出现类型转换异常</span>
+<span class="cm">       解决问题2:先判断类型,如果是Person类型,再强转成Person</span>
+
+<span class="cm">       问题3:如果传递null呢?,就不用判断类型了,直接给false</span>
+
+<span class="cm">       问题4:如果传递自己呢?就不用判断非空了,也不同判断类型了,直接给true</span>
+<span class="cm">     */</span>
+<span class="w">   </span><span class="cm">/* public boolean equals(Object obj){</span>
+<span class="cm">        if (this==obj){</span>
+<span class="cm">            return true;</span>
+<span class="cm">        }</span>
+
+<span class="cm">        if (obj==null){</span>
+<span class="cm">            return false;</span>
+<span class="cm">        }</span>
+
+<span class="cm">        if (obj instanceof Person){</span>
+<span class="cm">            Person p = (Person) obj;</span>
+<span class="cm">            return this.name.equals(p.name)&amp;&amp;this.age==p.age;</span>
+<span class="cm">        }</span>
+<span class="cm">        return false;</span>
+
+<span class="cm">    }*/</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Person</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">person</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">person</span><span class="p">.</span><span class="na">name</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test02</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"金莲"</span><span class="p">,</span><span class="w"> </span><span class="mi">26</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"金莲"</span><span class="p">,</span><span class="w"> </span><span class="mi">26</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="o">==</span><span class="n">p2</span><span class="p">);</span><span class="c1">//false</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">p2</span><span class="p">));</span><span class="c1">//false &amp; true</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+
+
+<span class="w">        </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">list</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="kc">null</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">p1</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"===================="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">"abc"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">"abc"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">s2</span><span class="p">));</span><span class="c1">//true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><img alt="1704276772548" decoding="async" loading="lazy" src="../../course-assets/38bf55856d5f7bbf21d4.png"/></p>
+<blockquote>
+<p>小结:</p>
+<p>1.如果直接输出对象名不想输出地址值,重写toString方法</p>
+<p>2.如果想比较两个对象的内容,就重写一下equals方法</p>
+<p>3.怎么重写:alt+insert -&gt; 选toString 或者equals and hashcode -&gt; 啥也不要管 -&gt; 一路下一步即可</p>
+</blockquote>
+<h4 id="section-15">3.Object中的clone方法</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">作用</span><span class="p">:</span><span class="n">复制一个属性值一样的新对象</span>
+<span class="mf">2.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">需要被克隆的对象实现Cloneable</span>
+<span class="w">  </span><span class="n">重写clone方法</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Cloneable</span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getAge</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setAge</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Person{"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">"name='"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="sc">'\''</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">", age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="sc">'}'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">       问题1:obj直接调用name和age调用不了,因为Object接收了Person类型的对象</span>
+<span class="cm">            属于多态,多态前提下不能直接调用子类特有内容</span>
+<span class="cm">       解决问题1:向下转型</span>
+
+<span class="cm">       问题2:如果传递的不是Person类型,就会出现类型转换异常</span>
+<span class="cm">       解决问题2:先判断类型,如果是Person类型,再强转成Person</span>
+
+<span class="cm">       问题3:如果传递null呢?,就不用判断类型了,直接给false</span>
+
+<span class="cm">       问题4:如果传递自己呢?就不用判断非空了,也不同判断类型了,直接给true</span>
+<span class="cm">     */</span>
+<span class="w">   </span><span class="cm">/* public boolean equals(Object obj){</span>
+<span class="cm">        if (this==obj){</span>
+<span class="cm">            return true;</span>
+<span class="cm">        }</span>
+
+<span class="cm">        if (obj==null){</span>
+<span class="cm">            return false;</span>
+<span class="cm">        }</span>
+
+<span class="cm">        if (obj instanceof Person){</span>
+<span class="cm">            Person p = (Person) obj;</span>
+<span class="cm">            return this.name.equals(p.name)&amp;&amp;this.age==p.age;</span>
+<span class="cm">        }</span>
+<span class="cm">        return false;</span>
+
+<span class="cm">    }*/</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Person</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">person</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">person</span><span class="p">.</span><span class="na">name</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="nf">clone</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">CloneNotSupportedException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kd">super</span><span class="p">.</span><span class="na">clone</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test03</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">CloneNotSupportedException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"涛哥"</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p2</span><span class="p">.</span><span class="na">clone</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">p3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Person</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span><span class="c1">//克隆了一个新对象</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p2</span><span class="o">==</span><span class="n">p3</span><span class="p">);</span><span class="c1">//比较地址值  false</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p2</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">p3</span><span class="p">));</span><span class="c1">//true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-16">第四章.经典接口</h3>
+<h4 id="section-17">1.java.lang.Comparable</h4>
+<p>我们知道基本数据类型的数据（除boolean类型外）需要比较大小的话，之间使用比较运算符即可，但是引用数据类型是不能直接使用比较运算符来比较大小的。那么，如何解决这个问题呢？</p>
+<p>Java给所有引用数据类型的大小比较，指定了一个标准接口，就是java.lang.Comparable接口：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">java.lang</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Comparable</span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">compareTo</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">obj</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>那么我们想要使得我们某个类的对象可以比较大小，怎么做呢？步骤：</p>
+<p>第一步：哪个类的对象要比较大小，哪个类就实现java.lang.Comparable接口，并重写方法</p>
+<ul>
+<li>方法体就是你要如何比较当前对象和指定的另一个对象的大小</li>
+</ul>
+<p>第二步：对象比较大小时，通过对象调用compareTo方法，根据方法的返回值决定谁大谁小。</p>
+<ul>
+<li>this对象（调用compareTo方法的对象）减 指定对象（传入compareTo()的参数对象）大于0,返回正整数</li>
+<li>this对象（调用compareTo方法的对象）减 指定对象（传入compareTo()的参数对象）小于0 返回负整数</li>
+<li>this对象（调用compareTo方法的对象）减 指定对象（传入compareTo()的参数对象）等于0 返回零</li>
+</ul>
+<p>代码示例：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Student</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Comparable</span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Student</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Student</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getScore</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setScore</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Student{"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">"name='"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="sc">'\''</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">", score="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="sc">'}'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">      this:代表students[i]</span>
+<span class="cm">      o:代表students[i+1]</span>
+
+<span class="cm">      如果students[i].getScore()-students[i+1].getScore()&gt;0</span>
+<span class="cm">         证明数组中的前面一个对象比后面一个对象的分数高</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">compareTo</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">getScore</span><span class="p">()</span><span class="o">-</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">getScore</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>测试类</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//创建一个数组</span>
+<span class="w">        </span><span class="n">Student</span><span class="o">[]</span><span class="w"> </span><span class="n">students</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"李四"</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"王五"</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">);</span>
+<span class="w">        </span><span class="n">students</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">students</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s2</span><span class="p">;</span>
+<span class="w">        </span><span class="n">students</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s3</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">&lt;</span><span class="n">students</span><span class="p">.</span><span class="na">length</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">){</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">students</span><span class="p">.</span><span class="na">length</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">j</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+<span class="w">                </span><span class="c1">//如果students[i]比students[i+1]大,就排序换位置</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">.</span><span class="na">compareTo</span><span class="p">(</span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">){</span>
+<span class="w">                    </span><span class="n">Student</span><span class="w"> </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">//遍历</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-18">2.java.util.Comparator</h4>
+<p>思考：</p>
+<p>（1）如果一个类，没有实现Comparable接口，而这个类你又不方便修改（例如：一些第三方的类，你只有.class文件，没有源文件），那么这样类的对象也要比较大小怎么办？</p>
+<p>（2）如果一个类，实现了Comparable接口，也指定了两个对象的比较大小的规则，但是此时此刻我不想按照它预定义的方法比较大小，但是我又不能随意修改，因为会影响其他地方的使用，怎么办？</p>
+<p>JDK在设计类库之初，也考虑到这种情况了，所以又增加了一个java.util.Comparator接口。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">java.util</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Comparator</span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o1</span><span class="p">,</span><span class="n">Object</span><span class="w"> </span><span class="n">o2</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>那么我们想要比较某个类的两个对象的大小，怎么做呢？步骤：</p>
+<p>第一步：编写一个类，我们称之为比较器类型，实现java.util.Comparator接口，并重写方法</p>
+<ul>
+<li>方法体就是你要如何指定的两个对象的大小</li>
+</ul>
+<p>第二步：比较大小时，通过比较器类型的对象调用compare()方法，将要比较大小的两个对象作为compare方法的实参传入，根据方法的返回值决定谁大谁小。</p>
+<ul>
+<li>o1对象减o2大于0返回正整数</li>
+<li>o1对象减o2小于0返回负整数</li>
+<li>o1对象减o2等于0返回零</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Student</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Comparator</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Student</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Student</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getScore</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setScore</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">score</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Student{"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">"name='"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="sc">'\''</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="s">", score="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="sc">'}'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">       o1代表students[i]</span>
+<span class="cm">       o2代表students[i+1]</span>
+
+<span class="cm">       如果o1的分数大于o2的分数-&gt; compare方法返回正整数</span>
+<span class="cm">       如果o1的分数小于o2的分数-&gt; compare方法返回负整数</span>
+<span class="cm">       如果o1的分数等于o2的分数-&gt; compare方法返回0</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o1</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">o2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o2</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">s1</span><span class="p">.</span><span class="na">getScore</span><span class="p">()</span><span class="o">-</span><span class="n">s2</span><span class="p">.</span><span class="na">getScore</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Test01</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//创建一个数组</span>
+<span class="w">        </span><span class="n">Student</span><span class="o">[]</span><span class="w"> </span><span class="n">students</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"李四"</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"王五"</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">);</span>
+<span class="w">        </span><span class="n">students</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">students</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s2</span><span class="p">;</span>
+<span class="w">        </span><span class="n">students</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s3</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">Student</span><span class="w"> </span><span class="n">student</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">();</span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">&lt;</span><span class="n">students</span><span class="p">.</span><span class="na">length</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">){</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">students</span><span class="p">.</span><span class="na">length</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">j</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+<span class="w">                </span><span class="c1">//如果students[i]比students[i+1]大,就排序换位置</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">student</span><span class="p">.</span><span class="na">compare</span><span class="p">(</span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">,</span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">){</span>
+<span class="w">                    </span><span class="n">Student</span><span class="w"> </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">//遍历</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">students</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div></article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html"><small>← 上一篇</small><strong>权限、final、代码块与内部类 · 课程原文</strong></a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html"><small>下一篇 →</small><strong>String 与 StringBuilder · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块13.异常_Object</a><a class="toc-h3" href="#section-1">第一章.API文档</a><a class="toc-h3" href="#section-2">第二章.异常</a><a class="toc-h4" href="#section-3">1.异常介绍</a><a class="toc-h4" href="#section-4">2.异常出现的过程</a><a class="toc-h4" href="#section-5">3.创建异常对象(了解)</a><a class="toc-h4" href="#section-6">4.异常处理方式(重点)</a><a class="toc-h4" href="#section-7">5.finally关键字</a><a class="toc-h4" href="#section-8">6.抛异常时注意的事项</a><a class="toc-h4" href="#section-9">7.try_catch和throws的使用时机</a><a class="toc-h4" href="#section-10">8.自定义异常</a><a class="toc-h4" href="#section-11">9.打印异常信息的三个方法</a><a class="toc-h3" href="#section-12">第三章.Object类</a><a class="toc-h4" href="#section-13">1.Object中的toString</a><a class="toc-h4" href="#section-14">2.Object中的equals</a><a class="toc-h4" href="#section-15">3.Object中的clone方法</a><a class="toc-h3" href="#section-16">第四章.经典接口</a><a class="toc-h4" href="#section-17">1.java.lang.Comparable</a><a class="toc-h4" href="#section-18">2.java.util.Comparator</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

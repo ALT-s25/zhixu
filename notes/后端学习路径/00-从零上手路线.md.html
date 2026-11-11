@@ -1,0 +1,79 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>后端学习路径：每一段都做出一个可验证的小成果 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/后端学习路径/00-从零上手路线.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>后端学习路径</h2><nav aria-label="同专题笔记"><a aria-current="page" href="00-%E4%BB%8E%E9%9B%B6%E4%B8%8A%E6%89%8B%E8%B7%AF%E7%BA%BF.md.html">后端学习路径：每一段都做出一个可验证的小成果</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>后端学习路径</div><h1>后端学习路径：每一段都做出一个可验证的小成果</h1><div class="article-meta"><span>约 5 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<p>这条路径根据你提供的课程资料安排。目标是用尽量少的重复学习打通 Java → SQL → HTTP接口 → 数据持久化；学时取决于练习反馈，不承诺几天“精通”。默认先读速学总结，再运行例子，卡住时查原课件。</p>
+<h2 id="section-0">从这里打开分类笔记</h2>
+<ul>
+<li><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%88%AA%E4%B8%8E%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95.md.html">Java基础：26章速学总结</a></li>
+<li><a href="../MySQL%C2%B7%E9%80%9F%E5%AD%A6%E6%80%BB%E7%BB%93/00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">MySQL：9章SQL学习总结</a></li>
+<li><a href="../SpringBoot%C2%B7%E9%80%9F%E5%AD%A6%E6%80%BB%E7%BB%93/00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">Spring Boot：12章学习总结</a></li>
+</ul>
+<h2 id="section-1">先认清四种材料</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>材料</th>
+<th>用来做什么</th>
+<th>不用怎么做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>速学总结</td>
+<td>建立概念、类比、操作顺序、排错与自测</td>
+<td>不把“看完”当成掌握</td>
+</tr>
+<tr>
+<td>Java课程原文</td>
+<td>查完整API、图示、课程练习与案例</td>
+<td>不要求每次从头通读</td>
+</tr>
+<tr>
+<td>原SQL与Spring PDF</td>
+<td>核对真实课程示例、版本与页码</td>
+<td>不整包复制后宣称会做</td>
+</tr>
+<tr>
+<td>旧版16篇实战提纲</td>
+<td>总览和后续扩展</td>
+<td>不当作视频逐集总结</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-2">第一段：让代码按你的想法运行</h2>
+<p>读Java速学01—06：环境、变量、IDEA、流程控制、数组、方法。每天选一小节，用30—60分钟完成一个“预测→运行→改写→解释”的循环；时间仅是安排建议，卡住就拆小任务。</p>
+<p><strong>成果：</strong>命令行成绩统计器，输入一组成绩，输出人数、平均分、最高分；对空输入与非法输入给出明确反馈。</p>
+<p><strong>过关：</strong>不用复制能写循环与方法；知道数组越界、空指针和编译错误分别是什么。进制细节与工具快捷键先按需查。</p>
+<h2 id="section-3">第二段：用对象组织小项目</h2>
+<p>读Java07—09，接学生管理系统09a；再读10—15理解继承、接口、多态、异常和常用API。类像模板、对象像实例；业务规则由代码维护，不是把所有字段公开就叫面向对象。</p>
+<p><strong>成果：</strong>学生管理系统：添加、查询、修改、删除，编号不重复、找不到时明确提示。</p>
+<p><strong>过关：</strong>能画出菜单→业务方法→数据的调用关系；新增一个字段时知道哪些地方需要改。此阶段暂不要求保存到磁盘。</p>
+<h2 id="section-4">第三段：从内存记录走向文件保存</h2>
+<p>读Java18—22（集合、泛型、Map、IO），再读24中的Lambda与Stream。16—17多线程、23网络、25反射可放到后面按需补；基础内容仍完整保留，没有删掉。</p>
+<p><strong>成果：</strong>把第二段系统升级为集合存储和文件持久化，退出再启动仍能读到数据。</p>
+<p><strong>过关：</strong>能区分内存对象与文件内容；测试重复编号、空文件、坏数据、中文编码，不让失败保存破坏原数据。原提纲的StudentApp可作对照，但先自己写。</p>
+<h2 id="section-5">第四段：让数据库管理结构化数据</h2>
+<p>读MySQL01—07，再做09综合练习；08先关注事务，其他高级机制可以后学。SQL不是Java方法名的另一种写法，要先说清“输出一行代表什么”。</p>
+<p><strong>成果：</strong>学生、课程、选课三表；查询学生所选课程、没有选课的学生、每门课人数。然后回到原路径要求的五表电商练习扩展。</p>
+<p><strong>过关：</strong>能说明主键、外键、INNER/LEFT JOIN和COUNT(*)/COUNT(列)差异；用有匹配、无匹配、一对多三类数据验证。</p>
+<h2 id="section-6">第五段：补上框架前置概念，再做接口</h2>
+<p>进入Spring Boot前需要知道：Maven的pom.xml管理项目与依赖；依赖不是复制代码，而是让编译和运行能找到库。HTTP由方法、路径、请求头、请求体和响应组成；JSON是一种数据格式，不是Java对象本身。注解是元数据，框架读取它后才能产生行为。</p>
+<p>Spring容器可类比登记并组装组件的管理者，依赖注入把需要的组件交给使用者；边界是容器不会自动发现任意类，扫描与注册规则仍要满足。先理解“谁创建对象、谁把对象交给谁”，再背注解名。</p>
+<p>读Spring Boot01—04：Hello接口→参数与错误响应→MyBatis→环境与测试；接口文档可在06补上，05原理放到跑通项目之后。</p>
+<p><strong>成果：</strong>学生管理HTTP接口，支持CRUD、分页、校验、统一异常、MySQL持久化。前端不是必要前提，先用浏览器与接口工具验证。</p>
+<p><strong>过关：</strong>能按HTTP状态与异常链排查问题；重启后数据保留；测试不修改自己的重要数据库。</p>
+<h2 id="section-7">第六段：完善权限、缓存和运行观察</h2>
+<p>读Spring Boot06、08、09中的缓存入门、权限和监控。先做小范围，再深入专项课程。把身份认证与授权分开，区分缓存不存在、数据库不存在、远程调用失败。</p>
+<p><strong>成果：</strong>普通用户只能操作自己的记录；管理员能管理授权范围内数据；查询缓存可失效；能够从日志定位一次失败请求。</p>
+<p><strong>过关：</strong>用户A不能借改URL访问用户B的数据；缓存丢失不导致业务记录永久丢失。课堂演示的全端点暴露、固定密码不可直接用于公开部署。</p>
+<h2 id="section-8">第七段：两条进阶支线，不同时硬学</h2>
+<p><strong>原路线主线：</strong>Redis专项→RabbitMQ→Spring Cloud→学成在线。当前目录未找到这四套对应完整讲义，所以保留为待补充，不以通用介绍冒充课程总结。Spring Boot PDF中的消息部分是Kafka，不能拿来替代RabbitMQ。</p>
+<p><strong>本次已有扩展：</strong>Spring Boot10—12的Reactor、WebFlux、R2DBC、响应式权限。完成MVC项目后另开练习工程，使用提供的reactor代码核对。它不是学会普通后端开发的前提。</p>
+<h2 id="section-9">每次学习都填写这张小卡</h2>
+<ol>
+<li>今天解决什么问题？用一句自己的话说明。</li>
+<li>输入与预期输出是什么？先写预期，再运行。</li>
+<li>哪种边界输入会失败？至少试一种。</li>
+<li>这段类比哪里不适用？把它对应回真实代码。</li>
+<li>明天不看笔记，能否重写核心部分？不能就回查小节。</li>
+</ol>
+<p>不用用连续看视频时长衡量努力。真正的进度是：你独立完成了哪个功能、解释了哪个错误、验证了哪个边界。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">从这里打开分类笔记</a><a class="toc-h2" href="#section-1">先认清四种材料</a><a class="toc-h2" href="#section-2">第一段：让代码按你的想法运行</a><a class="toc-h2" href="#section-3">第二段：用对象组织小项目</a><a class="toc-h2" href="#section-4">第三段：从内存记录走向文件保存</a><a class="toc-h2" href="#section-5">第四段：让数据库管理结构化数据</a><a class="toc-h2" href="#section-6">第五段：补上框架前置概念，再做接口</a><a class="toc-h2" href="#section-7">第六段：完善权限、缓存和运行观察</a><a class="toc-h2" href="#section-8">第七段：两条进阶支线，不同时硬学</a><a class="toc-h2" href="#section-9">每次学习都填写这张小卡</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
