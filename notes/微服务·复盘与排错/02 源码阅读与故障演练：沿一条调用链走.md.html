@@ -1,0 +1,62 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02 源码阅读与故障演练：沿一条调用链走 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/微服务·复盘与排错/02 源码阅读与故障演练：沿一条调用链走.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>微服务·复盘与排错</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">微服务复盘：把会背变成能解释和排错</a><a href="01%20%E7%94%A8%E6%A1%88%E4%BE%8B%E5%9B%9E%E7%AD%94%E9%9D%A2%E8%AF%95%E9%A2%98%EF%BC%9A%E9%97%AE%E9%A2%98%E3%80%81%E6%9C%BA%E5%88%B6%E3%80%81%E8%BE%B9%E7%95%8C%E3%80%81%E8%AF%81%E6%8D%AE.md.html">01 用案例回答面试题：问题、机制、边界、证据</a><a aria-current="page" href="02%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E6%95%85%E9%9A%9C%E6%BC%94%E7%BB%83%EF%BC%9A%E6%B2%BF%E4%B8%80%E6%9D%A1%E8%B0%83%E7%94%A8%E9%93%BE%E8%B5%B0.md.html">02 源码阅读与故障演练：沿一条调用链走</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>微服务·复盘与排错</div><h1>02 源码阅读与故障演练：沿一条调用链走</h1><div class="article-meta"><span>约 2 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">为什么不要一上来通读仓库</h3>
+<p>源码像一座城市地图，先确定从哪到哪，再找沿途路口。课程Nacos源码按注册、心跳、服务发现组织；Sentinel源码按Entry和ProcessorSlotChain展开。这比按文件夹挨个读有效。</p>
+<h3 id="section-1">Nacos的阅读任务</h3>
+<ol>
+<li>明确课程源码版本，找到客户端发起注册的位置。</li>
+<li>跟到请求如何到达服务端，实例信息存到哪里。</li>
+<li>继续看实例变化如何让客户端知道，而非只记一个容器类名。</li>
+<li>回到服务发现调用，验证本地缓存与网络请求分别何时发生。</li>
+</ol>
+<p>课程旧版本心跳和注册实现不代表所有版本完全一致；不能把类名背下来当作跨版本结论。</p>
+<h3 id="section-2">Sentinel的阅读任务</h3>
+<p>从资源Entry进入，沿SlotChain看统计、规则检查、放行或抛出BlockException，再看退出如何清理统计上下文。把它与实战中的“触发限流后返回什么”连起来。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>定义资源 → 进入Entry → 经过规则与统计链
+                       ├─ 通过 → 执行业务 → 退出
+                       └─ 拦截 → 明确的阻断处理
+</pre></div>
+</div><p>不是每个Slot都在所有调用中承担相同作用，也不能把任何业务异常都当成限流异常。</p>
+<h3 id="section-3">五项毕业演练</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>演练</th>
+<th>观察证据</th>
+<th>通过条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>商户缓存失效</td>
+<td>SQL次数、返回值与耗时</td>
+<td>不因一次失效无限回源</td>
+</tr>
+<tr>
+<td>重复支付事件</td>
+<td>事件ID与订单状态</td>
+<td>业务影响一次</td>
+</tr>
+<tr>
+<td>商品服务超时</td>
+<td>调用次数、总耗时</td>
+<td>有界等待，不伪造成功</td>
+</tr>
+<tr>
+<td>搜索同步暂停后恢复</td>
+<td>事件积压、ES文档</td>
+<td>恢复后可对账</td>
+</tr>
+<tr>
+<td>容器重建</td>
+<td>数据实际位置与恢复记录</td>
+<td>重要数据不依赖临时可写层</td>
+</tr>
+</tbody>
+</table></div>
+<p>每次演练只在自己的练习环境进行，记录改动、预期、实际、恢复方式。一次只注入一个故障，才能知道哪项机制起了作用。</p>
+<h3 id="section-4">自测与答案</h3>
+<p>题目：断点没走到课程指定类，是否一定是自己启动错了？答案：不一定，先核对依赖版本、调用分支、自动配置与实际实现类，再判断；源码学习最怕跳过版本信息。</p>
+<p>完成标准：写出一页可重现报告，让另一个人照做得到同样现象。</p>
+<h3 id="section-5">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="01%20%E7%94%A8%E6%A1%88%E4%BE%8B%E5%9B%9E%E7%AD%94%E9%9D%A2%E8%AF%95%E9%A2%98%EF%BC%9A%E9%97%AE%E9%A2%98%E3%80%81%E6%9C%BA%E5%88%B6%E3%80%81%E8%BE%B9%E7%95%8C%E3%80%81%E8%AF%81%E6%8D%AE.md.html"><small>← 上一篇</small><strong>01 用案例回答面试题：问题、机制、边界、证据</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">为什么不要一上来通读仓库</a><a class="toc-h3" href="#section-1">Nacos的阅读任务</a><a class="toc-h3" href="#section-2">Sentinel的阅读任务</a><a class="toc-h3" href="#section-3">五项毕业演练</a><a class="toc-h3" href="#section-4">自测与答案</a><a class="toc-h3" href="#section-5">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

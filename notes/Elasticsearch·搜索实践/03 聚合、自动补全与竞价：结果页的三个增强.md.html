@@ -1,0 +1,37 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03 聚合、自动补全与竞价：结果页的三个增强 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/Elasticsearch·搜索实践/03 聚合、自动补全与竞价：结果页的三个增强.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Elasticsearch·搜索实践</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">Elasticsearch：沿着黑马旅游完成酒店搜索</a><a href="01%20%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E3%80%81Mapping%E4%B8%8E%E6%96%87%E6%A1%A3%EF%BC%9A%E4%BB%8E%E6%89%BE%E4%B8%80%E6%9C%AC%E4%B9%A6%E5%BC%80%E5%A7%8B.md.html">01 倒排索引、Mapping与文档：从找一本书开始</a><a href="02%20%E6%90%9C%E7%B4%A2%E3%80%81%E8%BF%87%E6%BB%A4%E3%80%81%E6%8E%92%E5%BA%8F%E4%B8%8E%E9%AB%98%E4%BA%AE%EF%BC%9A%E6%8A%8A%E4%B8%80%E5%8F%A5%E9%9C%80%E6%B1%82%E6%8B%86%E6%88%90DSL.md.html">02 搜索、过滤、排序与高亮：把一句需求拆成DSL</a><a aria-current="page" href="03%20%E8%81%9A%E5%90%88%E3%80%81%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8%E4%B8%8E%E7%AB%9E%E4%BB%B7%EF%BC%9A%E7%BB%93%E6%9E%9C%E9%A1%B5%E7%9A%84%E4%B8%89%E4%B8%AA%E5%A2%9E%E5%BC%BA.md.html">03 聚合、自动补全与竞价：结果页的三个增强</a><a href="04%20%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E4%B8%8E%E9%9B%86%E7%BE%A4%EF%BC%9A%E6%90%9C%E7%B4%A2%E5%89%AF%E6%9C%AC%E4%B9%9F%E4%BC%9A%E8%90%BD%E5%90%8E.md.html">04 数据同步与集群：搜索副本也会落后</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Elasticsearch·搜索实践</div><h1>03 聚合、自动补全与竞价：结果页的三个增强</h1><div class="article-meta"><span>约 2 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">聚合像现场分组统计</h3>
+<p>课程不把城市、品牌选项写死，而是从符合查询条件的酒店数据中聚合。桶聚合负责分组，指标聚合负责每组的平均价等统计。</p>
+<div class="code-block"><div class="code-top"><span>http</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET learn_hotels/_search</span>
+<span class="err">{</span>
+<span class="err">  "size": 0,</span>
+<span class="err">  "query": {"term": {"city": "上海"}},</span>
+<span class="err">  "aggs": {</span>
+<span class="err">    "brands": {</span>
+<span class="err">      "terms": {"field": "brand", "size": 20},</span>
+<span class="err">      "aggs": {"avg_price": {"avg": {"field": "price"}}}</span>
+<span class="err">    }</span>
+<span class="err">  }</span>
+<span class="err">}</span>
+</pre></div>
+</div><p>size=0表示不需要普通搜索文档，不是没有聚合结果。外层query限制聚合范围；结果应从aggregations读取。terms默认是取部分桶，不保证任意数量品牌都完整列出，需按需求设计分页聚合等方案。</p>
+<h3 id="section-1">自动补全不是全文搜索</h3>
+<p>课程添加completion字段，并引入拼音分词器，使用户输入前缀获得建议。类比是输入时给出候选菜单，不是提交关键词后的完整搜索排名。</p>
+<div class="code-block"><div class="code-top"><span>http</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET learn_hotels/_search</span>
+<span class="err">{</span>
+<span class="err">  "suggest": {</span>
+<span class="err">    "hotel_suggest": {</span>
+<span class="err">      "prefix": "xiao",</span>
+<span class="err">      "completion": {"field": "suggestion", "size": 5, "skip_duplicates": true}</span>
+<span class="err">    }</span>
+<span class="err">  }</span>
+<span class="err">}</span>
+</pre></div>
+</div><p>本例在前章手动写入xiaoya，所以不依赖拼音插件也能理解前缀匹配；要按课程让中文自动生成拼音，需安装匹配ES版本的插件，配置analyzer并重建相应数据。不要把手工测试成功描述成拼音功能已自动实现。</p>
+<h3 id="section-2">竞价排名与用户理解</h3>
+<p>课程用function_score影响部分酒店得分，同时界面显示广告标记。加分不等于在所有排序条件下一定第一：若用户明确按价格升序，就要决定是否尊重价格排序。技术规则应与页面承诺一致。</p>
+<h3 id="section-3">自测与答案</h3>
+<p>题目：筛选上海之后，品牌聚合仍包含其他城市品牌一定是ES错了吗？答案：先看query是否应用到聚合范围，或你是否故意采用全局聚合。结果取决于DSL层级。</p>
+<p>完成标准：讲清普通hits、聚合桶、suggest候选是三套不同的响应结构。</p>
+<h3 id="section-4">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="02%20%E6%90%9C%E7%B4%A2%E3%80%81%E8%BF%87%E6%BB%A4%E3%80%81%E6%8E%92%E5%BA%8F%E4%B8%8E%E9%AB%98%E4%BA%AE%EF%BC%9A%E6%8A%8A%E4%B8%80%E5%8F%A5%E9%9C%80%E6%B1%82%E6%8B%86%E6%88%90DSL.md.html"><small>← 上一篇</small><strong>02 搜索、过滤、排序与高亮：把一句需求拆成DSL</strong></a><a href="04%20%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E4%B8%8E%E9%9B%86%E7%BE%A4%EF%BC%9A%E6%90%9C%E7%B4%A2%E5%89%AF%E6%9C%AC%E4%B9%9F%E4%BC%9A%E8%90%BD%E5%90%8E.md.html"><small>下一篇 →</small><strong>04 数据同步与集群：搜索副本也会落后</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">聚合像现场分组统计</a><a class="toc-h3" href="#section-1">自动补全不是全文搜索</a><a class="toc-h3" href="#section-2">竞价排名与用户理解</a><a class="toc-h3" href="#section-3">自测与答案</a><a class="toc-h3" href="#section-4">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

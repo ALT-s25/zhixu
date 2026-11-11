@@ -1,0 +1,34 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02 搜索、过滤、排序与高亮：把一句需求拆成DSL · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/Elasticsearch·搜索实践/02 搜索、过滤、排序与高亮：把一句需求拆成DSL.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Elasticsearch·搜索实践</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">Elasticsearch：沿着黑马旅游完成酒店搜索</a><a href="01%20%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E3%80%81Mapping%E4%B8%8E%E6%96%87%E6%A1%A3%EF%BC%9A%E4%BB%8E%E6%89%BE%E4%B8%80%E6%9C%AC%E4%B9%A6%E5%BC%80%E5%A7%8B.md.html">01 倒排索引、Mapping与文档：从找一本书开始</a><a aria-current="page" href="02%20%E6%90%9C%E7%B4%A2%E3%80%81%E8%BF%87%E6%BB%A4%E3%80%81%E6%8E%92%E5%BA%8F%E4%B8%8E%E9%AB%98%E4%BA%AE%EF%BC%9A%E6%8A%8A%E4%B8%80%E5%8F%A5%E9%9C%80%E6%B1%82%E6%8B%86%E6%88%90DSL.md.html">02 搜索、过滤、排序与高亮：把一句需求拆成DSL</a><a href="03%20%E8%81%9A%E5%90%88%E3%80%81%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8%E4%B8%8E%E7%AB%9E%E4%BB%B7%EF%BC%9A%E7%BB%93%E6%9E%9C%E9%A1%B5%E7%9A%84%E4%B8%89%E4%B8%AA%E5%A2%9E%E5%BC%BA.md.html">03 聚合、自动补全与竞价：结果页的三个增强</a><a href="04%20%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E4%B8%8E%E9%9B%86%E7%BE%A4%EF%BC%9A%E6%90%9C%E7%B4%A2%E5%89%AF%E6%9C%AC%E4%B9%9F%E4%BC%9A%E8%90%BD%E5%90%8E.md.html">04 数据同步与集群：搜索副本也会落后</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Elasticsearch·搜索实践</div><h1>02 搜索、过滤、排序与高亮：把一句需求拆成DSL</h1><div class="article-meta"><span>约 3 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">课程需求拆解</h3>
+<p>用户想找“上海、价格不超过500、与酒店关键词相关”的结果。关键词影响相关性得分，城市与价格通常只是资格条件。像先按要求筛出候选，再按贴合程度排序，两个步骤不要混在一起。</p>
+<div class="code-block"><div class="code-top"><span>http</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET learn_hotels/_search</span>
+<span class="err">{</span>
+<span class="err">  "query": {</span>
+<span class="err">    "bool": {</span>
+<span class="err">      "must": [{"match": {"name": "酒店"}}],</span>
+<span class="err">      "filter": [</span>
+<span class="err">        {"term": {"city": "上海"}},</span>
+<span class="err">        {"range": {"price": {"lte": 500}}}</span>
+<span class="err">      ]</span>
+<span class="err">    }</span>
+<span class="err">  },</span>
+<span class="err">  "from": 0, "size": 5,</span>
+<span class="err">  "sort": [{"price": "asc"}],</span>
+<span class="err">  "highlight": {"fields": {"name": {}}}</span>
+<span class="err">}</span>
+</pre></div>
+</div><p>这例明确按价格排序，所以不要再期待一定按相关性得分排列。name的中文匹配效果依赖分词；先用<code>_analyze</code>理解分词结果，再判断查询是否写错。</p>
+<h3 id="section-1">课程Java实现的固定骨架</h3>
+<p>RequestParams接收key/page/size/city/brand/minPrice/maxPrice等→组装query→添加分页排序→发请求→解析hits与total→解析高亮和距离→组装返回值。先在DSL验证，再翻译成客户端API，能少掉一半排错变量。</p>
+<p>空关键词应使用match_all或等价无关键词查询；价格下界高于上界、page小于1、size过大应在接口层验证。高亮缺失时使用原name，不要让显示名称变null。</p>
+<h3 id="section-2">分页与附近酒店</h3>
+<p>from/size适合浅分页，页数很深会增加处理成本。需要稳定连续遍历时学习search_after配合一致的排序与PIT等机制，不能无限加大窗口。</p>
+<p>课程附近酒店按geo距离排序，坐标必须分清经度与纬度；显示的距离来自排序/计算结果，而不是名称里含“附近”。相同距离时还需稳定的辅助排序字段。</p>
+<h3 id="section-3">高亮的显示边界</h3>
+<p>高亮返回片段含标记标签，不要把不可信完整字符串直接作为任意HTML执行。显示层仅允许预期高亮标签或用安全的文本分段渲染。</p>
+<h3 id="section-4">自测与答案</h3>
+<p>题目：term查询“酒店”为什么可能搜不到text字段中你以为应存在的结果？答案：term按词条精确匹配，不先像match那样分析查询文本；应核对实际分词词条与字段类型。</p>
+<p>完成标准：把一句搜索需求标成关键词、过滤、排序、分页四类，并写出对应DSL位置。</p>
+<h3 id="section-5">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="01%20%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E3%80%81Mapping%E4%B8%8E%E6%96%87%E6%A1%A3%EF%BC%9A%E4%BB%8E%E6%89%BE%E4%B8%80%E6%9C%AC%E4%B9%A6%E5%BC%80%E5%A7%8B.md.html"><small>← 上一篇</small><strong>01 倒排索引、Mapping与文档：从找一本书开始</strong></a><a href="03%20%E8%81%9A%E5%90%88%E3%80%81%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8%E4%B8%8E%E7%AB%9E%E4%BB%B7%EF%BC%9A%E7%BB%93%E6%9E%9C%E9%A1%B5%E7%9A%84%E4%B8%89%E4%B8%AA%E5%A2%9E%E5%BC%BA.md.html"><small>下一篇 →</small><strong>03 聚合、自动补全与竞价：结果页的三个增强</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">课程需求拆解</a><a class="toc-h3" href="#section-1">课程Java实现的固定骨架</a><a class="toc-h3" href="#section-2">分页与附近酒店</a><a class="toc-h3" href="#section-3">高亮的显示边界</a><a class="toc-h3" href="#section-4">自测与答案</a><a class="toc-h3" href="#section-5">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

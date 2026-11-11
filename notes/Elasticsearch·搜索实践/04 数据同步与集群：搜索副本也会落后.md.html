@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>04 数据同步与集群：搜索副本也会落后 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/Elasticsearch·搜索实践/04 数据同步与集群：搜索副本也会落后.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Elasticsearch·搜索实践</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">Elasticsearch：沿着黑马旅游完成酒店搜索</a><a href="01%20%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E3%80%81Mapping%E4%B8%8E%E6%96%87%E6%A1%A3%EF%BC%9A%E4%BB%8E%E6%89%BE%E4%B8%80%E6%9C%AC%E4%B9%A6%E5%BC%80%E5%A7%8B.md.html">01 倒排索引、Mapping与文档：从找一本书开始</a><a href="02%20%E6%90%9C%E7%B4%A2%E3%80%81%E8%BF%87%E6%BB%A4%E3%80%81%E6%8E%92%E5%BA%8F%E4%B8%8E%E9%AB%98%E4%BA%AE%EF%BC%9A%E6%8A%8A%E4%B8%80%E5%8F%A5%E9%9C%80%E6%B1%82%E6%8B%86%E6%88%90DSL.md.html">02 搜索、过滤、排序与高亮：把一句需求拆成DSL</a><a href="03%20%E8%81%9A%E5%90%88%E3%80%81%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8%E4%B8%8E%E7%AB%9E%E4%BB%B7%EF%BC%9A%E7%BB%93%E6%9E%9C%E9%A1%B5%E7%9A%84%E4%B8%89%E4%B8%AA%E5%A2%9E%E5%BC%BA.md.html">03 聚合、自动补全与竞价：结果页的三个增强</a><a aria-current="page" href="04%20%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E4%B8%8E%E9%9B%86%E7%BE%A4%EF%BC%9A%E6%90%9C%E7%B4%A2%E5%89%AF%E6%9C%AC%E4%B9%9F%E4%BC%9A%E8%90%BD%E5%90%8E.md.html">04 数据同步与集群：搜索副本也会落后</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Elasticsearch·搜索实践</div><h1>04 数据同步与集群：搜索副本也会落后</h1><div class="article-meta"><span>约 2 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">沿着hotel-admin到hotel-demo看数据</h3>
+<p>课程比较直接同步调用、MQ通知和binlog监听，实战采用酒店管理修改MySQL后发送事件，由搜索服务更新ES。类比是总账更新后通知检索目录，目录不是总账本人。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>hotel-admin修改MySQL
+        ↓ 可靠事件
+       MQ
+        ↓
+hotel-demo按ID读取当前数据 → 更新/删除ES文档
+</pre></div>
+</div><p>事务提交与发消息之间仍有漏发窗口；可结合消息表、重试和定期对账。消息重复、乱序、删除后旧更新迟到都要处理，不是“加MQ”就自动同步正确。</p>
+<h3 id="section-1">用三个实验验证同步</h3>
+<p>新增酒店后等搜索出现；更新价格后搜索反映新值；删除后不再显示。再停止搜索消费者，修改数据库并恢复消费者，确认积压处理和最终结果。记录允许的同步延迟，而不是只说“最终一致”。</p>
+<p>更新时按ID读取数据库当前状态可减轻旧事件覆盖，但删除与重建仍需要清晰策略；若携带完整旧快照，通常还要版本判断。</p>
+<h3 id="section-2">分片与副本分工</h3>
+<p>主分片用于切分数据，副本提高容错和读取能力；主节点负责集群协调，不等于“所有写入都放在这台主机”。协调节点把请求分发到分片，再汇总结果。</p>
+<p>单节点配置副本时，副本不能与同分片主副本落在同一节点，可能显示yellow；这与red缺失主分片不是同一故障。副本也不替代快照备份，误删可能同步到副本。</p>
+<h3 id="section-3">版本与课程代码</h3>
+<p>课程围绕旧RestClient API讲解；新建其他版本工程应使用匹配的客户端，先保留已验证DSL，再按该版本API重写。参见<a href="https://www.elastic.co/docs/reference/elasticsearch/clients/java" rel="noopener noreferrer" target="_blank">Elastic官方Java客户端说明</a>。不要把不同大版本依赖同时塞进同一项目试运气。</p>
+<h3 id="section-4">自测与答案</h3>
+<p>题目：ES暂时搜不到刚新增的酒店，一定是数据没写入吗？答案：可能是事件尚未消费、索引刷新尚未可见、映射或查询不匹配；按MySQL→事件→消费者→GET文档→搜索逐层定位。</p>
+<p>完成标准：能区分数据同步延迟与搜索刷新延迟，并给出排查证据。</p>
+<h3 id="section-5">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="03%20%E8%81%9A%E5%90%88%E3%80%81%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8%E4%B8%8E%E7%AB%9E%E4%BB%B7%EF%BC%9A%E7%BB%93%E6%9E%9C%E9%A1%B5%E7%9A%84%E4%B8%89%E4%B8%AA%E5%A2%9E%E5%BC%BA.md.html"><small>← 上一篇</small><strong>03 聚合、自动补全与竞价：结果页的三个增强</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">沿着hotel-admin到hotel-demo看数据</a><a class="toc-h3" href="#section-1">用三个实验验证同步</a><a class="toc-h3" href="#section-2">分片与副本分工</a><a class="toc-h3" href="#section-3">版本与课程代码</a><a class="toc-h3" href="#section-4">自测与答案</a><a class="toc-h3" href="#section-5">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
