@@ -1,0 +1,405 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>13 · 类型转换与关键字 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/C++笔记/13-类型转换与关键字.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>C++笔记</h2><nav aria-label="同专题笔记"><a href="01-C%2B%2B%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · C++ 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E4%B8%8E%E5%87%BD%E6%95%B0.md.html">03 · 流程控制与函数 ⭐</a><a href="04-%E6%95%B0%E7%BB%84%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2.md.html">04 · 数组与字符串 ⭐⭐</a><a href="05-%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8.md.html">05 · 指针与引用 ⭐⭐⭐</a><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a href="07-%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">07 · 继承多态 ⭐⭐⭐⭐</a><a href="08-%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD%E4%B8%8E%E5%8F%8B%E5%85%83.md.html">08 · 运算符重载与友元 ⭐⭐⭐</a><a href="09-%E6%A8%A1%E6%9D%BF.md.html">09 · 模板 ⭐⭐⭐</a><a href="10-STL%E5%AE%B9%E5%99%A8.md.html">10 · STL 容器 ⭐⭐⭐⭐</a><a href="11-STL%E7%AE%97%E6%B3%95%E4%B8%8E%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1.md.html">11 · STL 算法与函数对象 ⭐⭐⭐</a><a href="12-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md.html">12 · 智能指针与内存管理 ⭐⭐⭐⭐</a><a aria-current="page" href="13-%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E5%85%B3%E9%94%AE%E5%AD%97.md.html">13 · 类型转换与关键字 ⭐⭐</a><a href="14-%E7%8E%B0%E4%BB%A3C%2B%2B%E6%96%B0%E7%89%B9%E6%80%A7.md.html">14 · 现代 C++ 新特性 ⭐⭐⭐⭐</a><a href="15-%E5%BC%82%E5%B8%B8%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">15 · 异常与多线程 ⭐⭐⭐</a><a href="README.md.html">C++笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>C++笔记</div><h1>13 · 类型转换与关键字 ⭐⭐</h1><div class="article-meta"><span>约 12 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：1 天
+二刷重点：<strong>const 修饰、static 用法、explicit、enum class、C++ 类型转换</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>类型转换与关键字
+├── 13.1 C++ 4 种类型转换 ⭐⭐
+├── 13.2 const 关键字深入 ⭐⭐
+├── 13.3 static 关键字深入 ⭐⭐
+├── 13.4 explicit 关键字 ⭐⭐
+├── 13.5 enum class（强类型枚举）⭐⭐
+├── 13.6 sizeof / decltype / typeid
+├── 13.7 inline / volatile / extern
+└── 13.8 using 关键字
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、C++ 4 种类型转换 ⭐⭐</h2>
+<p>详见 <a href="./02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02-基础语法.md</a>，这里复习巩固。</p>
+<h3 id="section-2">2.1 static_cast</h3>
+<p><strong>常规转换</strong>（编译期）。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 基础类型转换</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mf">3.14</span><span class="p">);</span>
+
+<span class="c1">// 2. 父子类指针转换（不走虚函数表）</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Base</span><span class="w"> </span><span class="p">{};</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Derived</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">Base</span><span class="w"> </span><span class="p">{};</span>
+<span class="n">Base</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Derived</span><span class="p">();</span>
+<span class="n">Derived</span><span class="o">*</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">Derived</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">);</span><span class="w">    </span><span class="c1">// ⚠ 不安全（编译期）</span>
+
+<span class="c1">// 3. void* 转其他指针</span>
+<span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-3">2.2 const_cast</h3>
+<p><strong>去 const / volatile</strong>。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">*&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span>
+<span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span><span class="w">        </span><span class="c1">// ⚠ 未定义行为！</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>慎用</strong>：修改 const 对象是未定义行为。</p>
+</blockquote>
+<h3 id="section-4">2.3 dynamic_cast ⭐⭐</h3>
+<p><strong>运行时类型转换</strong>，需要多态（有虚函数）。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Base</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="o">~</span><span class="n">Base</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span><span class="w">     </span><span class="c1">// 必须有虚函数</span>
+<span class="p">};</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Derived</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">Base</span><span class="w"> </span><span class="p">{};</span>
+
+<span class="n">Base</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Derived</span><span class="p">();</span>
+
+<span class="c1">// 安全向下转型：失败返回 nullptr</span>
+<span class="n">Derived</span><span class="o">*</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">dynamic_cast</span><span class="o">&lt;</span><span class="n">Derived</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 转换成功</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 不是 Derived</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-5">2.4 reinterpret_cast ⭐</h3>
+<p><strong>底层重新解释</strong>（危险）。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x12345678</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">*&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w">   </span><span class="c1">// 把 int* 当 char*</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>尽量避免</strong>：依赖具体实现，不可移植。</p>
+</blockquote>
+<h3 id="section-6">2.5 对比 ⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>转换</th>
+<th>时机</th>
+<th>安全性</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>static_cast</code></td>
+<td>编译期</td>
+<td>⚠</td>
+<td>常规转换</td>
+</tr>
+<tr>
+<td><code>const_cast</code></td>
+<td>编译期</td>
+<td>⚠</td>
+<td>去 const</td>
+</tr>
+<tr>
+<td><code>dynamic_cast</code></td>
+<td>运行时</td>
+<td>✅</td>
+<td>多态类型转换</td>
+</tr>
+<tr>
+<td><code>reinterpret_cast</code></td>
+<td>编译期</td>
+<td>❌</td>
+<td>底层 reinterpret</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-7">三、const 关键字深入 ⭐⭐</h2>
+<h3 id="section-8">3.1 const 修饰位置 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">              </span><span class="c1">// 顶层 const</span>
+<span class="kt">int</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">              </span><span class="c1">// 同上（等价）</span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">p1</span><span class="p">;</span><span class="w">                 </span><span class="c1">// 指向常量的指针（底层 const）</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">p2</span><span class="p">;</span><span class="w">                 </span><span class="c1">// 指针本身是常量（顶层 const）</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">p3</span><span class="p">;</span><span class="w">           </span><span class="c1">// 两者都是</span>
+</pre></div>
+</div><p><strong>记忆口诀</strong>：</p>
+<ul>
+<li><code>const</code> 在 <code>*</code> <strong>左边</strong>：所指对象是 const</li>
+<li><code>const</code> 在 <code>*</code> <strong>右边</strong>：指针本身是 const</li>
+</ul>
+<h3 id="section-9">3.2 const 成员函数 ⭐</h3>
+<p>详见 <a href="./06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06-面向对象基础.md</a>。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name_</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// 不修改成员</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">name_</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><h3 id="section-10">3.3 const 与函数重载</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w">        </span><span class="c1">// const 版本</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w">              </span><span class="c1">// 非 const 版本</span>
+<span class="p">};</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">MyClass</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get</span><span class="p">();</span><span class="w">     </span><span class="c1">// 1</span>
+
+<span class="n">MyClass</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">get</span><span class="p">();</span><span class="w">     </span><span class="c1">// 2</span>
+</pre></div>
+</div><h3 id="section-11">3.4 constexpr（C++11）⭐⭐</h3>
+<p><strong>编译期常量</strong>。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">SIZE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">PI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14159</span><span class="p">;</span>
+
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">arr</span><span class="p">[</span><span class="n">square</span><span class="p">(</span><span class="mi">3</span><span class="p">)];</span><span class="w">   </span><span class="c1">// 编译期数组大小：int arr[9]</span>
+</pre></div>
+</div><h3 id="section-12">3.5 const 与 constexpr 的区别</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>const</th>
+<th>constexpr</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>求值时机</td>
+<td>运行期（也可编译期）</td>
+<td><strong>强制编译期</strong></td>
+</tr>
+<tr>
+<td>修饰函数</td>
+<td>❌</td>
+<td>✅（C++11）</td>
+</tr>
+<tr>
+<td>修饰变量</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-13">四、static 关键字深入 ⭐⭐</h2>
+<h3 id="section-14">4.1 static 修饰局部变量</h3>
+<p><strong>生命周期延长</strong>，作用域不变。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">counter</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">      </span><span class="c1">// 只初始化一次，函数多次调用共享</span>
+<span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">counter</span><span class="p">();</span><span class="w"> </span><span class="n">counter</span><span class="p">();</span><span class="w"> </span><span class="n">counter</span><span class="p">();</span><span class="w">    </span><span class="c1">// 1 2 3</span>
+</pre></div>
+</div><h3 id="section-15">4.2 static 修饰全局变量</h3>
+<p><strong>限制作用域为当前文件</strong>。</p>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// file1.cpp</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">       </span><span class="c1">// 只在本文件可见</span>
+
+<span class="c1">// file2.cpp</span>
+<span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w">            </span><span class="c1">// ❌ 链接错误！</span>
+</pre></div>
+</div><h3 id="section-16">4.3 static 修饰成员变量</h3>
+<p>详见 <a href="./06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06-面向对象基础.md</a>。所有对象共享。</p>
+<h3 id="section-17">4.4 static 修饰成员函数</h3>
+<p>无 this 指针，只能访问 static 成员。</p>
+<h3 id="section-18">4.5 static 在 C++ 中的总结</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>用法</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>静态局部变量</td>
+<td>生命周期延长，作用域不变</td>
+</tr>
+<tr>
+<td>静态全局变量</td>
+<td>文件作用域</td>
+</tr>
+<tr>
+<td>静态成员变量</td>
+<td>类共享</td>
+</tr>
+<tr>
+<td>静态成员函数</td>
+<td>不依赖对象</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-19">五、explicit 关键字 ⭐⭐</h2>
+<p><strong>禁止隐式转换</strong>。</p>
+<h3 id="section-20">5.1 不使用 explicit</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyString</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">MyString</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">size_</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">       </span><span class="c1">// 不加 explicit</span>
+<span class="p">};</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MyString</span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+
+<span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">       </span><span class="c1">// ✅ 隐式转换：int → MyString（可能不期望）</span>
+<span class="n">MyString</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">  </span><span class="c1">// ✅ 同样隐式转换</span>
+</pre></div>
+</div><h3 id="section-21">5.2 使用 explicit</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyString</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">explicit</span><span class="w"> </span><span class="n">MyString</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">size_</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">print</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">       </span><span class="c1">// ❌ 不允许隐式转换</span>
+<span class="n">MyString</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">   </span><span class="c1">// ✅ 显式构造</span>
+<span class="n">MyString</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">  </span><span class="c1">// ❌ 同样不允许</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>现代 C++ 建议</strong>：单参数构造函数都加 <code>explicit</code>，避免意外的隐式转换。</p>
+</blockquote>
+<hr/>
+<h2 id="section-22">六、enum class（强类型枚举）⭐⭐</h2>
+<p>C++11 引入，<strong>强类型</strong>，不会隐式转 int。</p>
+<h3 id="section-23">6.1 传统 enum 的问题</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">enum</span><span class="w"> </span><span class="nc">Color</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">RED</span><span class="p">,</span><span class="w"> </span><span class="n">GREEN</span><span class="p">,</span><span class="w"> </span><span class="n">BLUE</span><span class="w"> </span><span class="p">};</span>
+<span class="k">enum</span><span class="w"> </span><span class="nc">Feeling</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">HAPPY</span><span class="p">,</span><span class="w"> </span><span class="n">SAD</span><span class="w"> </span><span class="p">};</span><span class="w">     </span><span class="c1">// ❌ 命名冲突！</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RED</span><span class="p">;</span><span class="w">                      </span><span class="c1">// 隐式转 int</span>
+</pre></div>
+</div><h3 id="section-24">6.2 enum class</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">enum</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">Color</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Red</span><span class="p">,</span><span class="w"> </span><span class="n">Green</span><span class="p">,</span><span class="w"> </span><span class="n">Blue</span><span class="w"> </span><span class="p">};</span>
+<span class="k">enum</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">Feeling</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Happy</span><span class="p">,</span><span class="w"> </span><span class="n">Sad</span><span class="w"> </span><span class="p">};</span><span class="w">    </span><span class="c1">// ✅ 不会冲突</span>
+
+<span class="n">Color</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Color</span><span class="o">::</span><span class="n">Red</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w">                            </span><span class="c1">// ❌ 不隐式转 int</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">c</span><span class="p">);</span><span class="w">          </span><span class="c1">// ✅ 显式转换</span>
+
+<span class="c1">// 指定底层类型</span>
+<span class="k">enum</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">Small</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="p">};</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-25">七、其他关键字</h2>
+<h3 id="section-26">7.1 sizeof</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span><span class="w">             </span><span class="c1">// 4</span>
+<span class="k">sizeof</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">);</span><span class="w">     </span><span class="c1">// 通常 32（SSO）</span>
+<span class="k">sizeof</span><span class="p">(</span><span class="n">p</span><span class="p">);</span><span class="w">               </span><span class="c1">// 指针大小（8/4）</span>
+<span class="k">sizeof</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span><span class="w">             </span><span class="c1">// 数组总大小</span>
+<span class="k">sizeof</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span><span class="w">  </span><span class="c1">// 元素个数</span>
+</pre></div>
+</div><h3 id="section-27">7.2 decltype（C++11）</h3>
+<p>详见 <a href="./02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02-基础语法.md</a>。推导表达式类型，不使用。</p>
+<h3 id="section-28">7.3 typeid</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;typeinfo&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="k">typeid</span><span class="p">(</span><span class="n">x</span><span class="p">).</span><span class="n">name</span><span class="p">();</span><span class="w">       </span><span class="c1">// "int"</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="k">typeid</span><span class="p">(</span><span class="n">x</span><span class="p">).</span><span class="n">hash_code</span><span class="p">();</span>
+
+<span class="c1">// 用于多态类型</span>
+<span class="n">Base</span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Derived</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="k">typeid</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">).</span><span class="n">name</span><span class="p">();</span><span class="w">      </span><span class="c1">// "Derived"（运行时类型）</span>
+</pre></div>
+</div><h3 id="section-29">7.4 inline</h3>
+<p>详见 <a href="./03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E4%B8%8E%E5%87%BD%E6%95%B0.md.html">03-流程控制与函数.md</a>。建议编译器内联展开。</p>
+<h3 id="section-30">7.5 volatile</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">       </span><span class="c1">// 告诉编译器不要优化，每次都从内存读取</span>
+</pre></div>
+</div><blockquote>
+<p>💡 用于硬件寄存器、多线程共享变量（但 volatile 不解决并发问题）。</p>
+</blockquote>
+<h3 id="section-31">7.6 extern</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 声明（不定义）</span>
+<span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">global_var</span><span class="p">;</span>
+
+<span class="c1">// "C" 链接（避免 C++ 名字修饰）</span>
+<span class="k">extern</span><span class="w"> </span><span class="s">"C"</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">c_function</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-32">7.7 using</h3>
+<div class="code-block"><div class="code-top"><span>cpp</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 命名空间</span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
+
+<span class="c1">// 类型别名</span>
+<span class="k">using</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">;</span>
+
+<span class="c1">// 模板别名</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="c1">// 继承中隐藏基类成员</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Derived</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">Base</span><span class="w"> </span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">Base</span><span class="o">::</span><span class="n">func</span><span class="p">;</span><span class="w">        </span><span class="c1">// 引入基类所有 func 重载</span>
+<span class="p">};</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-33">八、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>C++ 4 种类型转换的区别？</strong>
+| 转换 | 时机 | 安全性 |
+|------|------|--------|
+| static_cast | 编译期 | ⚠ |
+| const_cast | 编译期 | ⚠ |
+| dynamic_cast | 运行时 | ✅ |
+| reinterpret_cast | 编译期 | ❌ |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>const</code> 在 <code>*</code> 左右两侧的区别？</strong></p>
+<ul>
+<li>左边：所指对象是 const</li>
+<li>右边：指针本身是 const</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>static_cast vs dynamic_cast？</strong></p>
+<ul>
+<li>static_cast：编译期，不检查</li>
+<li>dynamic_cast：运行时，安全检查（需要虚函数）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>enum class vs enum？</strong></p>
+<ul>
+<li>enum class 强类型，不会隐式转 int</li>
+<li>作用域限定，不会命名冲突</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>explicit 的作用？</strong>
+禁止单参数构造函数的隐式转换。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>const</code> vs <code>constexpr</code>？</strong></p>
+<ul>
+<li>const：运行期不变（也可编译期）</li>
+<li>constexpr：强制编译期</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>using namespace std;</code> 有什么问题？</strong>
+把 std 全部引入全局，可能命名冲突，<strong>头文件不要用</strong>。</p>
+</blockquote>
+<hr/>
+<h2 id="section-34">九、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>C++ 4 种类型转换</strong>（static_cast 等）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>const 修饰位置</strong>（左 vs 右）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>static 修饰</strong> 各种用法</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>explicit</strong> 禁止隐式转换</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>enum class</strong> 强类型枚举</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>sizeof / decltype / typeid</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>volatile / extern / using</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>const_cast 修改 const 是未定义行为</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>dynamic_cast 需要基类有虚函数</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>reinterpret_cast 不可移植</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>单参数构造建议加 explicit</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>enum class 不隐式转 int</li>
+</ul>
+<p>下一章：<a href="./14-%E7%8E%B0%E4%BB%A3C++%E6%96%B0%E7%89%B9%E6%80%A7.md.html">14-现代C++新特性.md</a> — 现代 C++ 核心！</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="12-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md.html"><small>← 上一篇</small><strong>12 · 智能指针与内存管理 ⭐⭐⭐⭐</strong></a><a href="14-%E7%8E%B0%E4%BB%A3C%2B%2B%E6%96%B0%E7%89%B9%E6%80%A7.md.html"><small>下一篇 →</small><strong>14 · 现代 C++ 新特性 ⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、C++ 4 种类型转换 ⭐⭐</a><a class="toc-h3" href="#section-2">2.1 static_cast</a><a class="toc-h3" href="#section-3">2.2 const_cast</a><a class="toc-h3" href="#section-4">2.3 dynamic_cast ⭐⭐</a><a class="toc-h3" href="#section-5">2.4 reinterpret_cast ⭐</a><a class="toc-h3" href="#section-6">2.5 对比 ⭐⭐</a><a class="toc-h2" href="#section-7">三、const 关键字深入 ⭐⭐</a><a class="toc-h3" href="#section-8">3.1 const 修饰位置 ⭐⭐⭐</a><a class="toc-h3" href="#section-9">3.2 const 成员函数 ⭐</a><a class="toc-h3" href="#section-10">3.3 const 与函数重载</a><a class="toc-h3" href="#section-11">3.4 constexpr（C++11）⭐⭐</a><a class="toc-h3" href="#section-12">3.5 const 与 constexpr 的区别</a><a class="toc-h2" href="#section-13">四、static 关键字深入 ⭐⭐</a><a class="toc-h3" href="#section-14">4.1 static 修饰局部变量</a><a class="toc-h3" href="#section-15">4.2 static 修饰全局变量</a><a class="toc-h3" href="#section-16">4.3 static 修饰成员变量</a><a class="toc-h3" href="#section-17">4.4 static 修饰成员函数</a><a class="toc-h3" href="#section-18">4.5 static 在 C++ 中的总结</a><a class="toc-h2" href="#section-19">五、explicit 关键字 ⭐⭐</a><a class="toc-h3" href="#section-20">5.1 不使用 explicit</a><a class="toc-h3" href="#section-21">5.2 使用 explicit</a><a class="toc-h2" href="#section-22">六、enum class（强类型枚举）⭐⭐</a><a class="toc-h3" href="#section-23">6.1 传统 enum 的问题</a><a class="toc-h3" href="#section-24">6.2 enum class</a><a class="toc-h2" href="#section-25">七、其他关键字</a><a class="toc-h3" href="#section-26">7.1 sizeof</a><a class="toc-h3" href="#section-27">7.2 decltype（C++11）</a><a class="toc-h3" href="#section-28">7.3 typeid</a><a class="toc-h3" href="#section-29">7.4 inline</a><a class="toc-h3" href="#section-30">7.5 volatile</a><a class="toc-h3" href="#section-31">7.6 extern</a><a class="toc-h3" href="#section-32">7.7 using</a><a class="toc-h2" href="#section-33">八、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-34">九、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

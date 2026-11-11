@@ -1,0 +1,321 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>04 · 方法与数组 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/JavaSE笔记/04-方法与数组.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a aria-current="page" href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>04 · 方法与数组 ⭐⭐</h1><div class="article-meta"><span>约 10 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：1 天
+二刷重点：<strong>数组内存分析、方法重载、值传递 vs 引用传递</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>方法与数组
+├── 4.1 方法
+│   ├── 方法定义
+│   ├── 方法调用
+│   ├── 方法重载 ⭐
+│   ├── 可变参数 ⭐
+│   └── 递归 ⭐
+└── 4.2 数组 ⭐⭐
+    ├── 声明与初始化
+    ├── 内存分析（栈、堆）⭐⭐⭐
+    ├── 数组操作（遍历、查找、排序）
+    ├── 多维数组
+    └── Arrays 工具类
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、方法</h2>
+<h3 id="section-2">2.1 方法定义</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">修饰符</span><span class="w"> </span><span class="n">返回类型</span><span class="w"> </span><span class="nf">方法名</span><span class="p">(</span><span class="n">参数列表</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 方法体</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">返回值</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-3">2.2 方法调用</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 静态方法：类名.方法名() 或直接方法名()</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Math</span><span class="p">.</span><span class="na">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span><span class="w">   </span><span class="c1">// 调用静态方法</span>
+
+<span class="c1">// 实例方法：对象.方法名()</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hello"</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w">            </span><span class="c1">// 调用实例方法</span>
+</pre></div>
+</div><h3 id="section-4">2.3 方法重载 ⭐⭐</h3>
+<p><strong>定义</strong>：同一个类中，<strong>方法名相同，参数列表不同</strong>（参数类型、个数、顺序），与返回值无关。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Calculator</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 参数类型不同</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// 参数个数不同</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>常见坑</strong>：</p>
+<ol>
+<li><strong>返回值不同不构成重载</strong>（会报错"已定义方法"）</li>
+<li>仅参数名称不同<strong>不构成重载</strong></li>
+<li>重载方法在<strong>编译时</strong>根据参数类型决定调用哪个</li>
+</ol>
+</blockquote>
+<h3 id="section-5">2.4 可变参数 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="kt">int</span><span class="p">...</span><span class="w"> </span><span class="n">nums</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// 可传 0 个或多个 int</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">nums</span><span class="p">)</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">total</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">     </span><span class="c1">// OK</span>
+<span class="n">sum</span><span class="p">();</span><span class="w">            </span><span class="c1">// OK（不传参）</span>
+<span class="n">sum</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">});</span><span class="w"> </span><span class="c1">// OK（数组）</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>底层</strong>：可变参数本质是数组。</p>
+</blockquote>
+<h3 id="section-6">2.5 递归 ⭐⭐</h3>
+<p><strong>定义</strong>：方法自己调用自己。</p>
+<p><strong>三要素</strong>：</p>
+<ol>
+<li><strong>递归出口</strong>：何时停止递归</li>
+<li><strong>递归式子</strong>：如何分解问题</li>
+<li><strong>递归方向</strong>：向出口推进</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 阶乘</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">factorial</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">          </span><span class="c1">// 递归出口</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">    </span><span class="c1">// 递归式</span>
+<span class="p">}</span>
+
+<span class="c1">// 斐波那契</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">fib</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>常见坑</strong>：</p>
+<ol>
+<li><strong>没有递归出口 → 栈溢出（StackOverflowError）</strong></li>
+<li>递归层数太深效率低（可改为循环）</li>
+<li>不要在递归里修改静态变量（线程不安全）</li>
+</ol>
+</blockquote>
+<hr/>
+<h2 id="section-7">三、数组 ⭐⭐⭐</h2>
+<h3 id="section-8">3.1 数组定义与初始化</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 静态初始化：直接赋值</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">};</span>
+<span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="s">"b"</span><span class="p">,</span><span class="w"> </span><span class="s">"c"</span><span class="p">};</span>
+
+<span class="c1">// 2. 动态初始化：指定长度</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">5</span><span class="o">]</span><span class="p">;</span><span class="w">          </span><span class="c1">// 默认值全 0</span>
+<span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">arr4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span><span class="w">    </span><span class="c1">// 默认值全 null</span>
+
+<span class="c1">// 3. 混合（先指定长度再赋值）</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">};</span><span class="w">  </span><span class="c1">// 注意：不能再写长度</span>
+</pre></div>
+</div><h3 id="section-9">3.2 数组内存分析 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>栈（Stack）            堆（Heap）
+┌────────────┐        ┌──────────────┐
+│  arr1 ─────────────→│ 0x1000: [1][2][3][4][5] │
+│  (引用)   │        │              │
+└────────────┘        └──────────────┘
+                                  ↑
+                           数组对象
+</pre></div>
+</div><p><strong>关键点</strong>：</p>
+<ul>
+<li>数组是<strong>引用类型</strong>，变量存的是内存地址</li>
+<li>数组对象存在<strong>堆</strong>中，变量在<strong>栈</strong>中</li>
+<li>一旦创建，<strong>长度不可变</strong></li>
+</ul>
+<h3 id="section-10">3.3 数组遍历</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">};</span>
+
+<span class="c1">// 1. 普通 for</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">arr</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 2. 增强 for</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">arr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 3. Arrays.toString</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr</span><span class="p">));</span><span class="w">  </span><span class="c1">// [1, 2, 3, 4, 5]</span>
+</pre></div>
+</div><h3 id="section-11">3.4 值传递 vs 引用传递 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 基本类型：值传递（形参改变不影响实参）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">change1</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="n">change1</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">  </span><span class="c1">// 1（x 没变）</span>
+
+<span class="c1">// 引用类型：传递的是地址（形参可改变对象内容）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">change2</span><span class="p">(</span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">arr</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">};</span>
+<span class="n">change2</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// 100（被修改了）</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>面试常问</strong>：</p>
+<ul>
+<li>Java <strong>只有值传递</strong></li>
+<li>引用类型的"值"就是地址，所以传递的是地址的副本</li>
+<li>形参改对象内容会影响实参，但形参指向新对象不影响实参</li>
+</ul>
+</blockquote>
+<h3 id="section-12">3.5 多维数组 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 二维数组</span>
+<span class="kt">int</span><span class="o">[][]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="mi">2</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// 6</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">deepToString</span><span class="p">(</span><span class="n">arr</span><span class="p">));</span><span class="w">  </span><span class="c1">// [[1,2,3],[4,5,6],[7,8,9]]</span>
+
+<span class="c1">// 不规则的二维数组（每行长度可以不同）</span>
+<span class="kt">int</span><span class="o">[][]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">3</span><span class="o">][]</span><span class="p">;</span>
+<span class="n">arr2</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span>
+<span class="n">arr2</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">};</span>
+<span class="n">arr2</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">6</span><span class="p">};</span>
+</pre></div>
+</div><h3 id="section-13">3.6 Arrays 工具类 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span>
+
+<span class="c1">// 打印</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr</span><span class="p">));</span><span class="w">  </span><span class="c1">// [5, 3, 1, 4, 2]</span>
+
+<span class="c1">// 排序（升序）</span>
+<span class="n">Arrays</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr</span><span class="p">));</span><span class="w">  </span><span class="c1">// [1, 2, 3, 4, 5]</span>
+
+<span class="c1">// 二分查找（要求数组已排序）</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">binarySearch</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">    </span><span class="c1">// 2</span>
+
+<span class="c1">// 填充</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">5</span><span class="o">]</span><span class="p">;</span>
+<span class="n">Arrays</span><span class="p">.</span><span class="na">fill</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">    </span><span class="c1">// [10, 10, 10, 10, 10]</span>
+
+<span class="c1">// 比较</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">};</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">));</span><span class="w">   </span><span class="c1">// true</span>
+
+<span class="c1">// 拷贝</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">copyOf</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span><span class="w"> </span><span class="n">arr</span><span class="p">.</span><span class="na">length</span><span class="p">);</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">copyOfRange</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">   </span><span class="c1">// [2, 3]</span>
+</pre></div>
+</div><h3 id="section-14">3.7 稀疏数组 ⭐（了解）</h3>
+<p>当数组中大部分元素为同一个值（如 0）时，可以用稀疏数组压缩存储：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 普通棋盘 11x11 = 121 个位置，但只���几个棋子</span>
+<span class="c1">// 稀疏数组：行、列、值 → 只存非零元素</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-15">四、内存图详解 ⭐⭐⭐</h2>
+<h3 id="section-16">4.1 Java 内存划分</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>区域</th>
+<th>存放内容</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>栈（Stack）</strong></td>
+<td>基本类型变量、对象引用、方法调用</td>
+<td>自动分配释放，速度快</td>
+</tr>
+<tr>
+<td><strong>堆���Heap）</strong></td>
+<td>对象实例、数组</td>
+<td>GC 管理，垃圾回收</td>
+</tr>
+<tr>
+<td><strong>方法区</strong></td>
+<td>类信息、常量、静态变量</td>
+<td>共享</td>
+</tr>
+<tr>
+<td><strong>本地方法栈</strong></td>
+<td>Native 方法</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>PC 寄存器</strong></td>
+<td>线程执行位置</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-17">4.2 一个数组的内存图</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">};</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">arr</span><span class="p">;</span><span class="w">     </span><span class="c1">// 传引用</span>
+<span class="w">    </span><span class="n">arr2</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">arr</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span><span class="w">  </span><span class="c1">// 100（共享同一对象）</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>内存示意：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>栈                          堆
+┌─────────┐               ┌──────────────┐
+│ arr  ────────────────→ │ 0x1000: [100,2,3] │
+│ arr2 ──────┐            └──────────────┘
+└─────────┘  │            ↑
+         └────┴────────────┘
+         (两个引用指向同一对象)
+</pre></div>
+</div><hr/>
+<h2 id="section-18">���、面试常问</h2>
+<blockquote>
+<p>💡 <strong>Java 是值传递还是引用传递？</strong>
+Java <strong>只有值传递</strong>。引用类型传递的是地址的副本，方法内改对象内容会影响实参，但形参指向新对象不影响实参。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>数组是基本类型还是引用类型？</strong>
+引用类型。变量存的是堆中数组对象的地址。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>方法重载和方法重写的区别？</strong></p>
+<ul>
+<li><strong>重载</strong>：同类中，方法名相同，参数列表不同（<strong>编译时</strong>）</li>
+<li><strong>重写</strong>：子类继承父类，方法签名相同，重新实现（<strong>运行时</strong>）</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-19">六、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>方法定义、调用、重载</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>可变参数（int...）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>递归三要素</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>数组三种初始化方式</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>数组内存分析</strong>（栈 vs 堆）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>值传递 vs 引用传递</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Arrays 工具类常用方法</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>二维数组、稀疏数组</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>数组一旦创建长度不可变</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>数组引用赋值后修改会互相影响</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>可变参数只能放最后一个参数位置</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>递归必须有出口，否则栈溢出</li>
+</ul>
+<p>下一章：<a href="./05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05-面向对象基础.md</a> — 整个 Java 的核心！</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html"><small>← 上一篇</small><strong>03 · 流程控制 ⭐</strong></a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html"><small>下一篇 →</small><strong>05 · 面向对象基础 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、方法</a><a class="toc-h3" href="#section-2">2.1 方法定义</a><a class="toc-h3" href="#section-3">2.2 方法调用</a><a class="toc-h3" href="#section-4">2.3 方法重载 ⭐⭐</a><a class="toc-h3" href="#section-5">2.4 可变参数 ⭐</a><a class="toc-h3" href="#section-6">2.5 递归 ⭐⭐</a><a class="toc-h2" href="#section-7">三、数组 ⭐⭐⭐</a><a class="toc-h3" href="#section-8">3.1 数组定义与初始化</a><a class="toc-h3" href="#section-9">3.2 数组内存分析 ⭐⭐⭐</a><a class="toc-h3" href="#section-10">3.3 数组遍历</a><a class="toc-h3" href="#section-11">3.4 值传递 vs 引用传递 ⭐⭐⭐</a><a class="toc-h3" href="#section-12">3.5 多维数组 ⭐</a><a class="toc-h3" href="#section-13">3.6 Arrays 工具类 ⭐</a><a class="toc-h3" href="#section-14">3.7 稀疏数组 ⭐（了解）</a><a class="toc-h2" href="#section-15">四、内存图详解 ⭐⭐⭐</a><a class="toc-h3" href="#section-16">4.1 Java 内存划分</a><a class="toc-h3" href="#section-17">4.2 一个数组的内存图</a><a class="toc-h2" href="#section-18">���、面试常问</a><a class="toc-h2" href="#section-19">六、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

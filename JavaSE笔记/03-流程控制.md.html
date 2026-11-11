@@ -1,0 +1,258 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03 · 流程控制 ⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/JavaSE笔记/03-流程控制.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>JavaSE笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8%E4%B8%8E%E7%8E%AF%E5%A2%83.md.html">01 · Java 入门与环境 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a aria-current="page" href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04 · 方法与数组 ⭐⭐</a><a href="05-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">05 · 面向对象基础 ⭐⭐⭐</a><a href="06-%E5%B0%81%E8%A3%85%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81.md.html">06 · 封装继承多态 ⭐⭐⭐</a><a href="07-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E6%8E%A5%E5%8F%A3%E5%86%85%E9%83%A8%E7%B1%BB.md.html">07 · 抽象类、接口、内部类 ⭐⭐⭐</a><a href="08-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">08 · 异常处理 ⭐⭐</a><a href="09-%E5%B8%B8%E7%94%A8%E7%B1%BB%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB.md.html">09 · 常用类与包装类 ⭐⭐</a><a href="10-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">10 · 集合框架 ⭐⭐⭐⭐</a><a href="11-IO%E6%B5%81.md.html">11 · IO 流 ⭐⭐⭐</a><a href="12-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">12 · 多线程 ⭐⭐⭐⭐</a><a href="13-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">13 · 网络编程 ⭐⭐⭐</a><a href="14-%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84.md.html">14 · 注解与反射 ⭐⭐⭐</a><a href="README.md.html">JavaSE笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>JavaSE笔记</div><h1>03 · 流程控制 ⭐</h1><div class="article-meta"><span>约 7 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：低 | <strong>学习建议</strong>：1 天
+二刷重点：<strong>switch 穿透、循环的 break/continue、增强 for</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>流程控制
+├── 3.1 顺序结构
+├── 3.2 选择结构
+│   ├── if 单分支、双分支、多分支
+│   ├── if 嵌套
+│   └── switch 多分支 ⭐
+├── 3.3 循环结构
+│   ├── while
+│   ├── do-while
+│   ├── for
+│   └── 增强 for（for-each）⭐
+├── 3.4 跳转语句
+│   ├── break
+│   ├── continue
+│   └── return
+└── 3.5 经典练习（九九乘法表、打印三角形）
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、顺序结构</h2>
+<p>代码从上到下逐行执行，是默认结构。</p>
+<hr/>
+<h2 id="section-2">三、选择结构</h2>
+<h3 id="section-3">3.1 if 语句</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 单分支</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">条件</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 条件为 true 时执行</span>
+<span class="p">}</span>
+
+<span class="c1">// 双分支</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">条件</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// true</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// false</span>
+<span class="p">}</span>
+
+<span class="c1">// 多分支</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">条件1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">条件2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 都不满足</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-4">3.2 switch 多分支 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">表达式</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">值1</span><span class="p">:</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w">          </span><span class="c1">// 必须 break，否则穿透</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">值2</span><span class="p">:</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="k">default</span><span class="p">:</span>
+<span class="w">        </span><span class="c1">// 都不匹配时执行</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-5">3.3 switch 新特性（Java 14+）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 箭头语法（不再需要 break）</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">day</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">day</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">"工作日"</span><span class="p">;</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">"周末"</span><span class="p">;</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">"非法"</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div><h3 id="section-6">3.4 switch 表达式支持的数据类型</h3>
+<ul>
+<li><code>byte</code>, <code>short</code>, <code>int</code>, <code>char</code>, <strong><code>String</code></strong>, <strong>枚举</strong></li>
+<li>不支持 <code>long</code>, <code>float</code>, <code>double</code>, <code>boolean</code></li>
+</ul>
+<blockquote>
+<p>⚠ <strong>常见坑</strong>：</p>
+<ol>
+<li><strong>case 穿透</strong> —— 每个 case 末尾如果不写 break，会继续执行下一个 case</li>
+<li><strong>default 不是必须的</strong> —— 但建议加上，处理非法输入</li>
+<li><strong>case 标签</strong>必须是常量，不能是变量</li>
+</ol>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 故意利用穿透的写法</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">season</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">month</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">       </span><span class="c1">// 春</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">       </span><span class="c1">// 夏</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">     </span><span class="c1">// 秋</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">      </span><span class="c1">// 冬</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">            </span><span class="c1">// 非法</span>
+<span class="p">};</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-7">四、循环结构</h2>
+<h3 id="section-8">4.1 while 循环</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">条件</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 循环体</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>特点</strong>：先判断后执行，<strong>条件不满足则一次都不执行</strong>。</p>
+<h3 id="section-9">4.2 do-while 循环</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">do</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 循环体</span>
+<span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">条件</span><span class="p">);</span>
+</pre></div>
+</div><p><strong>特点</strong>：先执行后判断，<strong>至少执行一次</strong>。</p>
+<h3 id="section-10">4.3 for 循环 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">初始化</span><span class="p">;</span><span class="w"> </span><span class="n">条件</span><span class="p">;</span><span class="w"> </span><span class="n">迭代表达式</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 循环体</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>执行流程</strong>：</p>
+<ol>
+<li>初始化（仅一次）</li>
+<li>判断条件 → false 则退出</li>
+<li>执行循环体</li>
+<li>执行迭代表达式</li>
+<li>回到步骤 2</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-11">4.4 增强 for 循环（for-each）⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 遍历数组</span>
+<span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">};</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">arr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 遍历集合</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="s">"b"</span><span class="p">,</span><span class="w"> </span><span class="s">"c"</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>优点</strong>：简洁
+<strong>缺点</strong>：不能访问下标，无法修改原数组</p>
+<hr/>
+<h2 id="section-12">五、跳转语句 ⭐⭐</h2>
+<h3 id="section-13">5.1 break</h3>
+<ul>
+<li>用于<strong>终止当前循环</strong>或 switch</li>
+<li><strong>不会跳过 finally</strong>（如有）</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">   </span><span class="c1">// i=5 时跳出循环</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// 输出：0 1 2 3 4</span>
+</pre></div>
+</div><h3 id="section-14">5.2 continue</h3>
+<ul>
+<li>用于<strong>跳过本次循环</strong>，继续下一次</li>
+<li>不会终止循环</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span><span class="w">   </span><span class="c1">// 跳过偶数</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// 输出：1 3 5 7 9</span>
+</pre></div>
+</div><h3 id="section-15">5.3 return</h3>
+<ul>
+<li><strong>结束整个方法</strong>，并返回值</li>
+<li>跳出多层循环可用：给外层加标签（不推荐）</li>
+</ul>
+<hr/>
+<h2 id="section-16">六、循环练习 ⭐</h2>
+<h3 id="section-17">6.1 累加 1~100</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">sum</span><span class="p">);</span><span class="w">  </span><span class="c1">// 5050</span>
+</pre></div>
+</div><h3 id="section-18">6.2 打印九九乘法表 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">9</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"*"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"\t"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>输出：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>1*1=1
+1*2=2	2*2=4
+1*3=3	2*3=6	3*3=9
+...
+</pre></div>
+</div><h3 id="section-19">6.3 打印三角形</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">" "</span><span class="p">);</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"*"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>输出：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>    *
+   ***
+  *****
+ *******
+*********
+</pre></div>
+</div><h3 id="section-20">6.4 break + 标签跳出多层循环</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">outer</span><span class="p">:</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="w"> </span><span class="n">outer</span><span class="p">;</span><span class="w">   </span><span class="c1">// 直接跳出外层</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">","</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">七、面试常问</h2>
+<blockquote>
+<p>💡 <strong>while 和 do-while 的区别？</strong></p>
+<ul>
+<li>while 先判断后执行，可能一次都不执行</li>
+<li>do-while 先执行后判断，至少执行一次</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>break 和 continue 的区别？</strong></p>
+<ul>
+<li>break 终止整个循环</li>
+<li>continue 跳过本次循环，继续下一次</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>for 和 while 的选择？</strong></p>
+<ul>
+<li>循环次数已知 → for</li>
+<li>循环次数未知 → while</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-22">八、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>if、switch 选择结构</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>while、do-while、for 循环</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>增强 for 遍历数组/集合</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>break、continue、return 跳转</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>常见循环练习（九九乘法表、三角形）</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>switch 不写 break 会穿透</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>for 循环的初始化、条件、迭代 三部分都可省略（但分号不能省）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>死循环：<code>while (true) {}</code> 和 <code>for (;;) {}</code></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>增强 for 不能修改元素</li>
+</ul>
+<p>下一章：<a href="./04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html">04-方法与数组.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html"><small>← 上一篇</small><strong>02 · 基础语法 ⭐</strong></a><a href="04-%E6%96%B9%E6%B3%95%E4%B8%8E%E6%95%B0%E7%BB%84.md.html"><small>下一篇 →</small><strong>04 · 方法与数组 ⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、顺序结构</a><a class="toc-h2" href="#section-2">三、选择结构</a><a class="toc-h3" href="#section-3">3.1 if 语句</a><a class="toc-h3" href="#section-4">3.2 switch 多分支 ⭐⭐</a><a class="toc-h3" href="#section-5">3.3 switch 新特性（Java 14+）</a><a class="toc-h3" href="#section-6">3.4 switch 表达式支持的数据类型</a><a class="toc-h2" href="#section-7">四、循环结构</a><a class="toc-h3" href="#section-8">4.1 while 循环</a><a class="toc-h3" href="#section-9">4.2 do-while 循环</a><a class="toc-h3" href="#section-10">4.3 for 循环 ⭐⭐</a><a class="toc-h3" href="#section-11">4.4 增强 for 循环（for-each）⭐</a><a class="toc-h2" href="#section-12">五、跳转语句 ⭐⭐</a><a class="toc-h3" href="#section-13">5.1 break</a><a class="toc-h3" href="#section-14">5.2 continue</a><a class="toc-h3" href="#section-15">5.3 return</a><a class="toc-h2" href="#section-16">六、循环练习 ⭐</a><a class="toc-h3" href="#section-17">6.1 累加 1~100</a><a class="toc-h3" href="#section-18">6.2 打印九九乘法表 ⭐⭐</a><a class="toc-h3" href="#section-19">6.3 打印三角形</a><a class="toc-h3" href="#section-20">6.4 break + 标签跳出多层循环</a><a class="toc-h2" href="#section-21">七、面试常问</a><a class="toc-h2" href="#section-22">八、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
