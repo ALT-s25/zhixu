@@ -1,0 +1,75 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02 路由、声明与序列化：先把消息送到正确的人 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/RabbitMQ·案例精讲/02 路由、声明与序列化：先把消息送到正确的人.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>RabbitMQ·案例精讲</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">RabbitMQ：围绕支付与订单学可靠消息</a><a href="01%20%E5%90%8C%E6%AD%A5%E4%B8%8E%E5%BC%82%E6%AD%A5%EF%BC%9A%E6%8A%8A%E6%94%AF%E4%BB%98%E5%90%8E%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%8B%86%E5%BC%80.md.html">01 同步与异步：把支付后的工作拆开</a><a aria-current="page" href="02%20%E8%B7%AF%E7%94%B1%E3%80%81%E5%A3%B0%E6%98%8E%E4%B8%8E%E5%BA%8F%E5%88%97%E5%8C%96%EF%BC%9A%E5%85%88%E6%8A%8A%E6%B6%88%E6%81%AF%E9%80%81%E5%88%B0%E6%AD%A3%E7%A1%AE%E7%9A%84%E4%BA%BA.md.html">02 路由、声明与序列化：先把消息送到正确的人</a><a href="03%20%E7%94%9F%E4%BA%A7%E8%80%85%E7%A1%AE%E8%AE%A4%E4%B8%8E%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%9A%E6%8A%8A%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8B%86%E6%88%90%E4%B8%89%E6%AE%B5.md.html">03 生产者确认与持久化：把可靠性拆成三段</a><a href="04%20%E6%B6%88%E8%B4%B9%E7%A1%AE%E8%AE%A4%E3%80%81%E9%87%8D%E8%AF%95%E4%B8%8E%E5%B9%82%E7%AD%89%EF%BC%9A%E9%87%8D%E5%A4%8D%E5%A4%84%E7%90%86%E4%B9%9F%E4%B8%8D%E5%A4%9A%E6%89%A3%E4%B8%80%E6%AC%A1.md.html">04 消费确认、重试与幂等：重复处理也不多扣一次</a><a href="05%20%E5%BB%B6%E8%BF%9F%E6%B6%88%E6%81%AF%E4%B8%8E%E5%85%B3%E5%8D%95%EF%BC%9A%E5%88%B0%E7%82%B9%E5%86%8D%E6%A0%B8%E5%AE%9E%EF%BC%8C%E8%80%8C%E9%9D%9E%E5%88%B0%E7%82%B9%E5%B0%B1%E5%88%A0%E9%99%A4.md.html">05 延迟消息与关单：到点再核实，而非到点就删除</a><a href="06%20%E7%A7%AF%E5%8E%8B%E3%80%81%E9%A1%BA%E5%BA%8F%E4%B8%8E%E9%9B%86%E7%BE%A4%EF%BC%9A%E5%85%88%E5%AE%9A%E4%BD%8D%E7%93%B6%E9%A2%88%EF%BC%8C%E5%86%8D%E8%B0%88%E6%89%A9%E5%AE%B9.md.html">06 积压、顺序与集群：先定位瓶颈，再谈扩容</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>RabbitMQ·案例精讲</div><h1>02 路由、声明与序列化：先把消息送到正确的人</h1><div class="article-meta"><span>约 3 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">把交换机当作分拣规则</h3>
+<p>Fanout像群发公告，忽略routing key；Direct按精确标签分拣；Topic按点分隔的主题词匹配。边界：规则匹配成功不保证消费者已完成工作，甚至不保证当前有消费者在线。</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>绑定规则</th>
+<th>测试routing key</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direct</td>
+<td>order.paid</td>
+<td>order.paid</td>
+<td>匹配</td>
+</tr>
+<tr>
+<td>Direct</td>
+<td>order.paid</td>
+<td>order.closed</td>
+<td>不匹配</td>
+</tr>
+<tr>
+<td>Topic</td>
+<td>order.*</td>
+<td>order.paid</td>
+<td>匹配</td>
+</tr>
+<tr>
+<td>Topic</td>
+<td>order.*</td>
+<td>order.vip.paid</td>
+<td>不匹配</td>
+</tr>
+<tr>
+<td>Topic</td>
+<td>order.#</td>
+<td>order.vip.paid</td>
+<td>匹配</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>*</code>匹配一个词，<code>#</code>匹配零个或多个词；点分词规则不是任意字符正则表达式。</p>
+<h3 id="section-1">声明顺序与消息结构</h3>
+<p>先声明交换机、队列和绑定，再发送。课程既展示Bean声明也展示注解绑定；选一种一致组织方式，避免多个地方声明同名队列却使用不同参数。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 片段：放在课程使用的@Configuration类中</span>
+<span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">DirectExchange</span><span class="w"> </span><span class="nf">learnExchange</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DirectExchange</span><span class="p">(</span><span class="s">"learn.pay"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Queue</span><span class="w"> </span><span class="nf">learnQueue</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Queue</span><span class="p">(</span><span class="s">"learn.order.paid"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Binding</span><span class="w"> </span><span class="nf">learnBinding</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">BindingBuilder</span><span class="p">.</span><span class="na">bind</span><span class="p">(</span><span class="n">learnQueue</span><span class="p">()).</span><span class="na">to</span><span class="p">(</span><span class="n">learnExchange</span><span class="p">()).</span><span class="na">with</span><span class="p">(</span><span class="s">"order.paid"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>代码中Queue指Spring AMQP的Queue，不是java.util.Queue。同名已存在但参数不同，Broker可能拒绝声明；不能靠不停重启解决。</p>
+<h3 id="section-2">JSON转换器解决什么</h3>
+<p>课程用JSON替代Java默认对象序列化，便于观察和跨服务协作。生产者与消费者要约定字段、类型、事件版本；不要直接把整个数据库实体发送过去。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">"eventId"</span><span class="p">:</span><span class="s2">"pay-1001-v1"</span><span class="p">,</span><span class="nt">"orderId"</span><span class="p">:</span><span class="mi">1001</span><span class="p">,</span><span class="nt">"type"</span><span class="p">:</span><span class="s2">"ORDER_PAID"</span><span class="p">,</span><span class="nt">"version"</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
+</pre></div>
+</div><p>eventId识别同一个事件，orderId识别业务对象；重发同一个事件应保留可去重标识。消费者只需要订单ID时，不必附带密码、完整用户档案等无关字段。</p>
+<h3 id="section-3">自测与答案</h3>
+<p>题目：一个队列绑定两个能匹配同一消息的规则，就应靠收到两次来做两种业务吗？</p>
+<p>答案：不应依赖这种设计。按业务划分队列，各自幂等处理；路由规则只是把事件送到目标队列。</p>
+<p>完成标准：做出一条匹配和一条不匹配消息，能解释它们在管理界面中的去向。</p>
+<h3 id="section-4">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="01%20%E5%90%8C%E6%AD%A5%E4%B8%8E%E5%BC%82%E6%AD%A5%EF%BC%9A%E6%8A%8A%E6%94%AF%E4%BB%98%E5%90%8E%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%8B%86%E5%BC%80.md.html"><small>← 上一篇</small><strong>01 同步与异步：把支付后的工作拆开</strong></a><a href="03%20%E7%94%9F%E4%BA%A7%E8%80%85%E7%A1%AE%E8%AE%A4%E4%B8%8E%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%9A%E6%8A%8A%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%8B%86%E6%88%90%E4%B8%89%E6%AE%B5.md.html"><small>下一篇 →</small><strong>03 生产者确认与持久化：把可靠性拆成三段</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">把交换机当作分拣规则</a><a class="toc-h3" href="#section-1">声明顺序与消息结构</a><a class="toc-h3" href="#section-2">JSON转换器解决什么</a><a class="toc-h3" href="#section-3">自测与答案</a><a class="toc-h3" href="#section-4">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
