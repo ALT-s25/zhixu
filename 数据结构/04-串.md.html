@@ -1,0 +1,311 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第 4 章 · 串 ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/数据结构/04-串.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>数据结构</h2><nav aria-label="同专题笔记"><a href="01-%E7%BB%AA%E8%AE%BA.md.html">第 1 章 · 绪论 ⭐</a><a href="02-%E7%BA%BF%E6%80%A7%E8%A1%A8.md.html">第 2 章 · 线性表 ⭐⭐⭐</a><a href="03-%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97.md.html">第 3 章 · 栈和队列 ⭐⭐⭐</a><a aria-current="page" href="04-%E4%B8%B2.md.html">第 4 章 · 串 ⭐⭐</a><a href="05-%E6%A0%91%E4%B8%8E%E4%BA%8C%E5%8F%89%E6%A0%91.md.html">第 5 章 · 树与二叉树 ⭐⭐⭐⭐⭐</a><a href="06-%E5%9B%BE.md.html">第 6 章 · 图 ⭐⭐⭐⭐⭐</a><a href="07-%E6%9F%A5%E6%89%BE.md.html">第 7 章 · 查找 ⭐⭐⭐⭐⭐</a><a href="08-%E6%8E%92%E5%BA%8F.md.html">第 8 章 · 排序 ⭐⭐⭐⭐⭐</a><a href="README.md.html">数据结构 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>数据结构</div><h1>第 4 章 · 串 ⭐⭐</h1><div class="article-meta"><span>约 7 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>考频</strong>：选+码 | <strong>难度</strong>：中 | <strong>分值占比</strong>：~5%
+整章就一个真神：<strong>KMP 算法</strong>。next 数组手算是必考点。</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>串
+├── 4.1 串的基本概念
+│   ├── 串、空串、空格串、子串、主串
+│   └── 串相等定义
+├── 4.2 串的存储结构
+│   ├── 定长顺序存储
+│   ├── 堆分配存储
+│   └── 链式存储（块链）
+├── 4.3 朴素模式匹配 O(nm)
+└── 4.4 KMP 算法 ★★★★★
+    ├── next 数组
+    ├── nextval 数组（优化）
+    └── 代码模板
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、核心概念</h2>
+<h3 id="section-2">2.1 串的基本概念</h3>
+<ul>
+<li><strong>串</strong>：零个或多个字符组成的有限序列</li>
+<li><strong>空串 <code>""</code></strong>、<strong>空格串 <code>"   "</code></strong>、<strong>子串</strong>、<strong>主串</strong></li>
+<li><strong>串相等</strong>：长度相同且对应位置字符相同</li>
+</ul>
+<h3 id="section-3">2.2 串的��储结构</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>存储方式</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定长顺序存储</td>
+<td>类似静态数组，下标 0 弃用或存长度</td>
+</tr>
+<tr>
+<td>堆分配存储</td>
+<td>动态分配，类似动态数组</td>
+</tr>
+<tr>
+<td>链式存储</td>
+<td>每个结点存 1 个或多个字符（块链）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4">2.3 基本操作时间复杂度</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>时间复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>求子串</td>
+<td>O(m)（m 为子串长度）</td>
+</tr>
+<tr>
+<td>比较</td>
+<td>O(min(n,m))</td>
+</tr>
+<tr>
+<td>定位（朴素模式匹配）</td>
+<td><strong>O(nm)</strong></td>
+</tr>
+<tr>
+<td>定位（KMP）</td>
+<td><strong>O(n+m)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-5">三、朴素模式匹配</h2>
+<p>主串指针 i、子串指针 j 同步推进，失配时 i 回退到 <code>i-j+2</code>，j 重置为 1。最坏情况 <code>O(nm)</code>。</p>
+<hr/>
+<h2 id="section-6">四、KMP 算法 ★★★★★</h2>
+<h3 id="section-7">4.1 核心思想</h3>
+<p><strong>主串指针 i 永不回退</strong>，子串指针 j 根据 next 数组动态调整。</p>
+<h3 id="section-8">4.2 next 数组含义 ★★★★</h3>
+<p><code>next[j]</code> = 当子串第 j 个字符失配时，j 应回退到的<strong>下一比较位置</strong>。</p>
+<p>等价于：<code>P[1..next[j]] = P[j-next[j]+1 .. j-1]</code>，即 j 之前的最长相等前后缀长度 + 1。</p>
+<h3 id="section-9">4.3 手算 next 数组（王道版）★</h3>
+<p>约定 <code>next[1] = 0</code>，然后对 j ≥ 2：</p>
+<ol>
+<li>看子串第 j 个字符之前的串 <code>P[1..j-1]</code></li>
+<li>求这个串的<strong>最长相等前后缀</strong>长度 L</li>
+<li><code>next[j] = L + 1</code></li>
+</ol>
+<p><strong>例子</strong>：<code>T = "abaababa"</code></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>j</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T[j]</td>
+<td>a</td>
+<td>b</td>
+<td>a</td>
+<td>a</td>
+<td>b</td>
+<td>a</td>
+<td>b</td>
+<td>a</td>
+</tr>
+<tr>
+<td>最长相等前后缀</td>
+<td>-</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>next[j]</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>3</td>
+<td>3</td>
+</tr>
+</tbody>
+</table></div>
+<p>j=8 时，前面 "ababab" 最长相等前后缀 = "ab"，长度 2，所以 next[8] = 3。</p>
+<h3 id="section-10">4.4 nextval 数组（优化版）★</h3>
+<p>若 <code>P[j] == P[next[j]]</code>，则失配时 next[j] 仍可能再失配，<strong>递归地</strong>把 next[j] 替换为 next[next[j]]。</p>
+<p><strong>计算步骤</strong>：</p>
+<ol>
+<li><code>nextval[1] = 0</code></li>
+<li>对 j ≥ 2：若 <code>P[j] ≠ P[next[j]]</code>，则 <code>nextval[j] = next[j]</code>；否则 <code>nextval[j] = nextval[next[j]]</code></li>
+</ol>
+<p><strong>接上例求 nextval</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>j</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P[j]</td>
+<td>a</td>
+<td>b</td>
+<td>a</td>
+<td>a</td>
+<td>b</td>
+<td>a</td>
+<td>b</td>
+<td>a</td>
+</tr>
+<tr>
+<td>next</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>nextval</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>3</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p>说明：j=3 时 <code>P[3]=a = P[next[3]]=P[2]=b</code> 的 nextval，递归取 nextval[1]=0。</p>
+<hr/>
+<h2 id="section-11">五、关键代码 ★★★★★</h2>
+<h3 id="section-12">5.1 求 next 数组</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 约定 T[1..T[0]] 存串，T[0] 存长度</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">GetNext</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">T</span><span class="p">[],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">next</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w">                </span><span class="c1">// 还没到串尾</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">j</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="n">next</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next</span><span class="p">[</span><span class="n">k</span><span class="p">];</span><span class="w">              </span><span class="c1">// k 回退</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-13">5.2 KMP 匹配</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">KMP</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">S</span><span class="p">[],</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">T</span><span class="p">[],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">next</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">;</span><span class="w">                 </span><span class="c1">// 继续匹配</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next</span><span class="p">[</span><span class="n">j</span><span class="p">];</span><span class="w">              </span><span class="c1">// j 回退，i 不变</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w">    </span><span class="c1">// 匹配成功，返回起始位置</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">                          </span><span class="c1">// 匹配失败</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-14">5.3 求 nextval 数组</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">GetNextval</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">T</span><span class="p">[],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">nextval</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">nextval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">j</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="w"> </span><span class="n">nextval</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextval</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="n">nextval</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextval</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-15">六、真题套路</h2>
+<h3 id="section-16">套路 A：手算 next 数组</h3>
+<ul>
+<li>先把 next[1] = 0 写上</li>
+<li>然后<strong>看当前位置的前面串</strong>，用最长的"前缀=后缀"长度+1 填入</li>
+</ul>
+<h3 id="section-17">套路 B：手算 nextval 数组</h3>
+<ul>
+<li>关键：当前位置字符 == next 位置的字符 → 递归跳 nextval</li>
+</ul>
+<h3 id="section-18">套路 C：KMP 匹配过程</h3>
+<ul>
+<li>主串不回退是核心</li>
+<li>失配时 j ���退到 next[j]，i 保持</li>
+<li>当 j 回退到 0 时，i++、j++ 继续</li>
+</ul>
+<h3 id="section-19">套路 D：KMP 时间复杂度证明</h3>
+<ul>
+<li>get_next O(m)</li>
+<li>kmp_match O(n)</li>
+<li>总 O(n+m)</li>
+</ul>
+<hr/>
+<h2 id="section-20">七、概念清单（必背）</h2>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>串的定义、空串/空格串/子串/主串</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>串的 3 种存储结构</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>朴素模式匹配 O(nm)</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>KMP 思想：主串不回退</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>next 数组：最长相等前后缀 + 1</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>nextval 数组：消除重复比较</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>KMP 时间复杂度 O(n+m)，空间 O(m)</li>
+</ul>
+<hr/>
+<h2 id="section-21">八、自测题</h2>
+<ol>
+<li><p><strong>手算</strong>：求 <code>T = "abcababc"</code> 的 next 数组。</p>
+<ul>
+<li><strong>答案</strong>：<code>0 1 1 1 2 3 2 3</code></li>
+</ul>
+</li>
+<li><p><strong>手算</strong>：在第 1 题基础上求 nextval。</p>
+<ul>
+<li><strong>答案</strong>：<code>0 1 1 1 2 1 2 3</code></li>
+</ul>
+</li>
+<li><p><strong>选择</strong>：KMP 算法的核心思想是？</p>
+<ul>
+<li>A. 模式串不回退</li>
+<li>B. 主串指针不回退</li>
+<li>C. 主串模式串都不回退</li>
+<li>D. 以上都不对</li>
+<li><strong>答案</strong>：B</li>
+</ul>
+</li>
+</ol>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="03-%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97.md.html"><small>← 上一篇</small><strong>第 3 章 · 栈和队列 ⭐⭐⭐</strong></a><a href="05-%E6%A0%91%E4%B8%8E%E4%BA%8C%E5%8F%89%E6%A0%91.md.html"><small>下一篇 →</small><strong>第 5 章 · 树与二叉树 ⭐⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、核心概念</a><a class="toc-h3" href="#section-2">2.1 串的基本概念</a><a class="toc-h3" href="#section-3">2.2 串的��储结构</a><a class="toc-h3" href="#section-4">2.3 基本操作时间复杂度</a><a class="toc-h2" href="#section-5">三、朴素模式匹配</a><a class="toc-h2" href="#section-6">四、KMP 算法 ★★★★★</a><a class="toc-h3" href="#section-7">4.1 核心思想</a><a class="toc-h3" href="#section-8">4.2 next 数组含义 ★★★★</a><a class="toc-h3" href="#section-9">4.3 手算 next 数组（王道版）★</a><a class="toc-h3" href="#section-10">4.4 nextval 数组（优化版）★</a><a class="toc-h2" href="#section-11">五、关键代码 ★★★★★</a><a class="toc-h3" href="#section-12">5.1 求 next 数组</a><a class="toc-h3" href="#section-13">5.2 KMP 匹配</a><a class="toc-h3" href="#section-14">5.3 求 nextval 数组</a><a class="toc-h2" href="#section-15">六、真题套路</a><a class="toc-h3" href="#section-16">套路 A：手算 next 数组</a><a class="toc-h3" href="#section-17">套路 B：手算 nextval 数组</a><a class="toc-h3" href="#section-18">套路 C：KMP 匹配过程</a><a class="toc-h3" href="#section-19">套路 D：KMP 时间复杂度证明</a><a class="toc-h2" href="#section-20">七、概念清单（必背）</a><a class="toc-h2" href="#section-21">八、自测题</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

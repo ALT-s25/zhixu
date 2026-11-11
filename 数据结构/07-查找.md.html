@@ -1,0 +1,442 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第 7 章 · 查找 ⭐⭐⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/数据结构/07-查找.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>数据结构</h2><nav aria-label="同专题笔记"><a href="01-%E7%BB%AA%E8%AE%BA.md.html">第 1 章 · 绪论 ⭐</a><a href="02-%E7%BA%BF%E6%80%A7%E8%A1%A8.md.html">第 2 章 · 线性表 ⭐⭐⭐</a><a href="03-%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97.md.html">第 3 章 · 栈和队列 ⭐⭐⭐</a><a href="04-%E4%B8%B2.md.html">第 4 章 · 串 ⭐⭐</a><a href="05-%E6%A0%91%E4%B8%8E%E4%BA%8C%E5%8F%89%E6%A0%91.md.html">第 5 章 · 树与二叉树 ⭐⭐⭐⭐⭐</a><a href="06-%E5%9B%BE.md.html">第 6 章 · 图 ⭐⭐⭐⭐⭐</a><a aria-current="page" href="07-%E6%9F%A5%E6%89%BE.md.html">第 7 章 · 查找 ⭐⭐⭐⭐⭐</a><a href="08-%E6%8E%92%E5%BA%8F.md.html">第 8 章 · 排序 ⭐⭐⭐⭐⭐</a><a href="README.md.html">数据结构 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>数据结构</div><h1>第 7 章 · 查找 ⭐⭐⭐⭐⭐</h1><div class="article-meta"><span>约 13 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>考频</strong>：选+码+用 | <strong>难度</strong>：高 | <strong>分值占比</strong>：~16%
+本章分值高、难度大。<strong>折半查找 + B 树 + 哈希</strong>每年必考，AVL 调整是重难点。</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>查找
+├── 7.1 基本概念
+│   ├── ASL（平均查找长度）
+│   └── 静态 vs 动态查找
+├── 7.2 顺序查找
+├── 7.3 折半查找 ★★★★
+├── 7.4 分块查找
+├── 7.5 二叉排序树 BST ★★★★
+├── 7.6 平衡二叉树 AVL ★★★★★
+│   ├── 平衡因子
+│   └── 4 种调整：LL/RR/LR/RL
+├── 7.7 B 树 ★★★★
+│   ├── m 阶 B 树的定义
+│   └── 插入、删除
+├── 7.8 B+ 树 ★★★
+└── 7.9 散列表（哈希表）★★★★★
+    ├── 散列函数构造
+    ├── 冲突处理（线性/平方/双散列/链地址）
+    └── 装填因子 + ASL 公式
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、核心概念</h2>
+<h3 id="section-2">2.1 基本概念</h3>
+<ul>
+<li><strong>查找长度 ASL</strong>：查找过程中比较关键字次数的平均值</li>
+<li><strong>静态查找</strong>：不插入/删除（顺序、折半、分块）</li>
+<li><strong>动态查找</strong>：支持插入/删除（BST、AVL、B 树、哈希）</li>
+</ul>
+<h3 id="section-3">2.2 顺序查找</h3>
+<ul>
+<li>ASL = (n+1)/2（成功），n+1（失败，带哨兵）</li>
+<li>适用<strong>顺序存储或链式存储</strong>，对数据无要求</li>
+<li>优化："哨兵"放在 a[0]，少一次边界判断</li>
+</ul>
+<h3 id="section-4">2.3 折半查找 ★★★★</h3>
+<p><strong>仅适用有序顺序表</strong>，ASL = <code>⌊log₂(n+1)⌋</code>。</p>
+<p><strong>过程</strong>：low、high、mid = <code>⌊(low+high)/2⌋</code>。比较 key 与 a[mid]，缩小区间。
+<strong>判定树</strong>：折半查找的判定树是<strong>平衡二叉树</strong>（但不一定完全）。</p>
+<h3 id="section-5">2.4 分块查找</h3>
+<ul>
+<li>分块有序（块内无序，块间有序）</li>
+<li>先索引表折半/顺序 → 再块内顺序</li>
+<li>ASL ≈ 折半块间 + 顺序块内</li>
+</ul>
+<h3 id="section-6">2.5 二叉排序树 BST ★★★★</h3>
+<p><strong>定义</strong>：<strong>左子树 &lt; 根 &lt; 右子树</strong>。中序遍历得到有序序列。</p>
+<p><strong>操作</strong>：</p>
+<ul>
+<li><strong>查找</strong>：类似折半，沿子树方向递归</li>
+<li><strong>插入</strong>：从根开始，遇到更大就往左、否则往右，直到空位</li>
+<li><strong>删除</strong>：三种情况<ol>
+<li>叶子 → 直接删</li>
+<li>仅一棵子树 → 子树顶替</li>
+<li>两棵子树都有 → 用<strong>直接后继（或前驱）</strong>填补，再删后继/前驱</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>⚠ ASL 取决于树高：平均 O(log n)，最坏 O(n)（退化为链表）。</p>
+</blockquote>
+<h3 id="section-7">2.6 平衡二叉树 AVL ★★★★★</h3>
+<p><strong>定义</strong>：BST + <strong>任一结点左右子树高度差 ≤ 1</strong>（平衡因子 = 左高 - 右高，取值 -1/0/1）。</p>
+<h4 id="section-8">插入失衡 → 4 种调整 ★★★★★</h4>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>失衡类型</th>
+<th>症状</th>
+<th>调整方法</th>
+<th>口诀</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LL（左左）</td>
+<td>失衡结点左孩子的左子树插入</td>
+<td>右单旋</td>
+<td>失衡点右旋</td>
+</tr>
+<tr>
+<td>RR（右右）</td>
+<td>失衡结点右孩子的右子树插入</td>
+<td>左单旋</td>
+<td>失衡点左旋</td>
+</tr>
+<tr>
+<td>LR（左右）</td>
+<td>失衡结点左孩子的右子树插入</td>
+<td>先左后右双旋</td>
+<td>先对失衡点的左孩子左旋，再对失衡点右旋</td>
+</tr>
+<tr>
+<td>RL（右左）</td>
+<td>失衡结点右孩子的左子树插入</td>
+<td>先右后左双旋</td>
+<td>先对失衡点的右孩子右旋，再对失衡点左旋</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>最少结点数</strong>：高度 h 的 AVL 树最少 F(h) 个结点，F(0)=1, F(1)=2, F(h)=F(h-1)+F(h-2)+1。</p>
+<p><strong>最大树高</strong>：含 n 结点的 AVL 树，最大深度 <code>h &lt; 1.44 log₂(n+2)</code>，ASL 接近 O(log n)。</p>
+<blockquote>
+<p>💡 <strong>调整画图套路</strong>：画树 → 找到失衡点（离插入点最近、bf ∈ {-2, 2} 的祖先）→ 看失衡点 + 孩子 + 孙子的方位 → 套 4 种调整。</p>
+</blockquote>
+<h3 id="section-9">2.7 B 树 ★★★★</h3>
+<h4 id="section-10">为何需要 B 树</h4>
+<p>降低磁盘 I/O（每个结点可放多个关键字）。</p>
+<h4 id="section-11">m 阶 B 树的定义</h4>
+<ol>
+<li>每个结点最多 m 棵子树，<strong>最多 m-1 个关键字</strong></li>
+<li>除根外，每个分支结点至少 <code>⌈m/2⌉</code> 棵子树，至少 <code>⌈m/2⌉-1</code> 个关键字</li>
+<li>所有叶子结点都在同一层（带空指针/失败指针）</li>
+<li>结点内关键字有序，kᵢ 左侧子树关键字都 &lt; kᵢ，右侧都 &gt; kᵢ</li>
+</ol>
+<h4 id="section-12">关键公式</h4>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>结点</th>
+<th>子树数</th>
+<th>关键字数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>根</td>
+<td>[2, m]</td>
+<td>[1, m-1]</td>
+</tr>
+<tr>
+<td>其他分支结点</td>
+<td>[⌈m/2⌉, m]</td>
+<td>[⌈m/2⌉-1, m-1]</td>
+</tr>
+<tr>
+<td>叶子</td>
+<td>0</td>
+<td>[⌈m/2⌉-1, m-1]</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="section-13">插入 ★★★★★</h4>
+<p><strong>查找 → 定位 → 插入</strong>。插入后若该结点关键字数 = m，则<strong>分裂</strong>：中间关键字上提到父结点，左右各分一半。
+若父结点也溢出，递归上提直到根（根溢出则树增高一层）。</p>
+<h4 id="section-14">删除</h4>
+<p>复杂情况：删除后关键字数低于下限 → <strong>借兄弟</strong>（父结点补下来，兄弟上来）或 <strong>合并</strong>。考试一般不要求实现，但要会分析。</p>
+<h3 id="section-15">2.8 B+ 树 ★★★</h3>
+<h4 id="section-16">B 树 vs B+ 树</h4>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>B 树</th>
+<th>B+ 树</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关键字数 vs 子树数</td>
+<td>n 个关键字 → n+1 个子树</td>
+<td>n 个关键字 → n 个子树</td>
+</tr>
+<tr>
+<td>数据存储</td>
+<td>每个结点都存数据</td>
+<td><strong>只有叶子结点存数据</strong>，分支结点仅索引</td>
+</tr>
+<tr>
+<td>叶子结点</td>
+<td>独立</td>
+<td>用<strong>链表</strong>串起来 → 范围查找快</td>
+</tr>
+<tr>
+<td>查找方式</td>
+<td>可能在分支结点结束</td>
+<td>必须走到叶子</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-17">2.9 散列表（哈希表）★★★★★</h3>
+<h4 id="section-18">基本思想</h4>
+<p>关键字 → 散列函数 → 存储位置。最理想 O(1) 查找。</p>
+<h4 id="section-19">冲突</h4>
+<p><strong>不同关键字映射到同一地址</strong>，不可避免。</p>
+<h4 id="section-20">散列函数构造 ★★</h4>
+<ul>
+<li><strong>直接定址法</strong>：<code>H(key) = a·key + b</code>，简单不冲突</li>
+<li><strong>除留余数法</strong>：<code>H(key) = key % p</code>，<strong>p 取不大于表长的最大素数</strong></li>
+<li><strong>数字分析法、平方取中法、折叠法</strong></li>
+</ul>
+<hr/>
+<h2 id="section-21">三、关键代码</h2>
+<h3 id="section-22">3.1 顺序查找（带哨兵）</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">length</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">SSTable</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">SeqSearch</span><span class="p">(</span><span class="n">SSTable</span><span class="w"> </span><span class="n">ST</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ST</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 哨兵</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ST</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w"> </span><span class="n">ST</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">--</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">                           </span><span class="c1">// 0 表示失败</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-23">3.2 折半查找 ⭐⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">BinSearch</span><span class="p">(</span><span class="n">SqList</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">low</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">L</span><span class="p">.</span><span class="n">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">low</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">high</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">low</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">high</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">L</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">mid</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">L</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="n">low</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-24">3.3 BST 插入 ⭐⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="nf">BSTInsert</span><span class="p">(</span><span class="n">BiTree</span><span class="w"> </span><span class="o">&amp;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">BiTree</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">BiNode</span><span class="p">));</span>
+<span class="w">        </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">        </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">     </span><span class="c1">// 不插重复</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">BSTInsert</span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">BSTInsert</span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-25">3.4 BST 删除（递归）</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="nf">BSTDelete</span><span class="p">(</span><span class="n">BiTree</span><span class="w"> </span><span class="o">&amp;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">DeleteNode</span><span class="p">(</span><span class="n">T</span><span class="p">);</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">BSTDelete</span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">BSTDelete</span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">bool</span><span class="w"> </span><span class="nf">DeleteNode</span><span class="p">(</span><span class="n">BiTree</span><span class="w"> </span><span class="o">&amp;</span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">        </span><span class="c1">// 只有右子树或叶子</span>
+<span class="w">        </span><span class="n">BiTree</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="p">;</span>
+<span class="w">        </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="p">;</span>
+<span class="w">        </span><span class="n">free</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 只有左子树</span>
+<span class="w">        </span><span class="n">BiTree</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="p">;</span>
+<span class="w">        </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="p">;</span>
+<span class="w">        </span><span class="n">free</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">                        </span><span class="c1">// 两子树都有：找直接后继</span>
+<span class="w">        </span><span class="n">BiTree</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="p">)</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="o">-&gt;</span><span class="n">lchild</span><span class="p">;</span><span class="w">     </span><span class="c1">// 一直向左</span>
+<span class="w">        </span><span class="n">T</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span><span class="w">                    </span><span class="c1">// 后继值补上</span>
+<span class="w">        </span><span class="n">BSTDelete</span><span class="p">(</span><span class="n">T</span><span class="o">-&gt;</span><span class="n">rchild</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span><span class="w">       </span><span class="c1">// 删除后继</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-26">3.5 哈希表（线性探测法）</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cp">#define HASHSIZE 12</span>
+<span class="cp">#define NULLKEY -1</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">HashTable</span><span class="p">[</span><span class="n">HASHSIZE</span><span class="p">];</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">InitHash</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">HASHSIZE</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">HashTable</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NULLKEY</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">H</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">HASHSIZE</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// 除留余数法</span>
+
+<span class="c1">// 插入（探测序列）</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">InsertHash</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NULLKEY</span><span class="p">)</span><span class="w">       </span><span class="c1">// 冲突，线性探测</span>
+<span class="w">        </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">HASHSIZE</span><span class="p">;</span>
+<span class="w">    </span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 查找</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">SearchHash</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">NULLKEY</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w">   </span><span class="c1">// 失败</span>
+<span class="w">        </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">HASHSIZE</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">addr</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-27">3.6 哈希表（链地址法）</h3>
+<div class="code-block"><div class="code-top"><span>c</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">LNode</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">LNode</span><span class="w"> </span><span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">LNode</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">LinkList</span><span class="p">;</span>
+
+<span class="n">LinkList</span><span class="w"> </span><span class="n">HashTable</span><span class="p">[</span><span class="n">HASHSIZE</span><span class="p">];</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">H</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">HASHSIZE</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">InsertHash</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LinkList</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">LinkList</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">LNode</span><span class="p">));</span>
+<span class="w">    </span><span class="n">s</span><span class="o">-&gt;</span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">];</span><span class="w">     </span><span class="c1">// 头插</span>
+<span class="w">    </span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">LinkList</span><span class="w"> </span><span class="nf">SearchHash</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LinkList</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HashTable</span><span class="p">[</span><span class="n">addr</span><span class="p">];</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">key</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">p</span><span class="p">;</span><span class="w">       </span><span class="c1">// NULL 表示失败</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-28">四、冲突处理 ★★★★</h2>
+<h3 id="section-29">4.1 开放定址法（闭散列��</h3>
+<p><code>Hᵢ(key) = (H(key) + dᵢ) % m</code></p>
+<ul>
+<li><strong>线性探测</strong>：<code>dᵢ = 0, 1, 2, ..., m-1</code>。易<strong>堆积</strong></li>
+<li><strong>平方探测</strong>：<code>dᵢ = 0², 1², -1², 2², -2², ...</code>。可缓解堆积，但<strong>不能探测到所有单元</strong></li>
+<li><strong>双散列</strong>：<code>dᵢ = i × H₂(key)</code>，探测序列分布更均匀</li>
+<li><strong>伪随机探测</strong>：<code>dᵢ = 伪随机序列</code></li>
+</ul>
+<h3 id="section-30">4.2 链地址法（开散列）★★★</h3>
+<p>同地址的冲突元素拉成<strong>链表</strong>挂在该槽位。<strong>考研最常考</strong>。</p>
+<ul>
+<li>装填因子 <code>α = n/m</code>（n 关键字数，m 槽数）</li>
+<li>ASL 成功 ≈ 1 + α/2，ASL 失败 ≈ α + e^(-α)（王道默认）</li>
+</ul>
+<h3 id="section-31">4.3 再散列法</h3>
+<p>构造多个散列函数，第一个冲突用第二个，以此类推。</p>
+<h3 id="section-32">4.4 装填因子 α ★★★</h3>
+<p><code>α = 表中记录数 / 散列表长度</code>。<strong>α 越大，冲突越多</strong>。</p>
+<h3 id="section-33">4.5 各种探测法 ASL 公式</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>成功 ASL</th>
+<th>失败 ASL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>线性探测</td>
+<td><code>(1+1/(1-α))/2</code></td>
+<td><code>(1+α²)/(1+α)/2 + 1/2</code></td>
+</tr>
+<tr>
+<td>平方探测</td>
+<td><code>-(1/α)·ln(1-α)</code></td>
+<td><code>1/(1-α) - α + ln(1-α)</code></td>
+</tr>
+<tr>
+<td>链地址法</td>
+<td><code>1 + α/2</code></td>
+<td><code>α + e^(-α)</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠ <strong>ASL 计算常错</strong>：成功是"找到关键字的查找次数期望"，失败是"判定不存在的查找次数期望"。</p>
+</blockquote>
+<hr/>
+<h2 id="section-34">五、真题套路</h2>
+<h3 id="section-35">套路 A：折半查找判定树</h3>
+<ul>
+<li>给有序表，画判定树</li>
+<li>求 ASL</li>
+</ul>
+<h3 id="section-36">套路 B：BST 构造 + 删除</h3>
+<ul>
+<li>给一组关键字，画 BST</li>
+<li>删除结点：分类讨论三种情况</li>
+</ul>
+<h3 id="section-37">套路 C：AVL 调整</h3>
+<ul>
+<li>插入后画图找失衡点</li>
+<li>套 4 种调整</li>
+</ul>
+<h3 id="section-38">套路 D：B 树插入分裂</h3>
+<ul>
+<li>关键字逐个插入</li>
+<li>结点满时分裂</li>
+</ul>
+<h3 id="section-39">套路 E：哈希表构造 + ASL</h3>
+<ul>
+<li>给定哈希函数和冲突处理方法</li>
+<li>构造哈希表（手写）</li>
+<li>计算 ASL</li>
+</ul>
+<hr/>
+<h2 id="section-40">六、概念清单（必背）</h2>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>ASL 定义 + 静态/动态查找</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>折半查找：判定树 = 平衡二叉树</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>BST：插入/删除（特别是删除两子树都有时）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>AVL 4 种调整：LL/RR/LR/RL 的判定和调整</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>m 阶 B 树：关键字范围 + 插入分裂</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>B+ 树 vs B 树：叶子链表 + 范围查找</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>哈希表冲突处理 4 种 + 装填因子 + ASL 公式</li>
+</ul>
+<hr/>
+<h2 id="section-41">七、自测题</h2>
+<ol>
+<li><p><strong>折半查找</strong>：有序表 (1, 3, 5, 7, 9, 11, 13, 15)，查找 11 的比较次数？</p>
+<ul>
+<li>mid=7 (1次)，右侧 mid=11 (2次)，命中</li>
+<li><strong>答案</strong>：2</li>
+</ul>
+</li>
+<li><p><strong>AVL</strong>：依次插入 50, 30, 70, 20, 40，画出每次调整结果</p>
+<ul>
+<li>50 插入 → 50</li>
+<li>30 插入 → 30 左</li>
+<li>70 插入 → 70 右</li>
+<li>20 插入 → 30 左左</li>
+<li>40 插入 → 30 的右孩子 → LR 调整</li>
+</ul>
+</li>
+<li><p><strong>哈希</strong>：表长 11，散列函��� H(key) = key % 11，依次插入 26, 41, 25, 60, 39, 31, 线性探测</p>
+<ul>
+<li>26 → 4</li>
+<li>41 → 8</li>
+<li>25 → 3</li>
+<li>60 → 5（原本 5，空）</li>
+<li>39 → 6</li>
+<li>31 → 9</li>
+</ul>
+</li>
+<li><p><strong>链地址法 ASL</strong>：表长 7，存 8 个关键字</p>
+<ul>
+<li>α = 8/7 ≈ 1.14</li>
+<li>ASL 成功 ≈ 1 + α/2 ≈ 1.57</li>
+</ul>
+</li>
+</ol>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="06-%E5%9B%BE.md.html"><small>← 上一篇</small><strong>第 6 章 · 图 ⭐⭐⭐⭐⭐</strong></a><a href="08-%E6%8E%92%E5%BA%8F.md.html"><small>下一篇 →</small><strong>第 8 章 · 排序 ⭐⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、核心概念</a><a class="toc-h3" href="#section-2">2.1 基本概念</a><a class="toc-h3" href="#section-3">2.2 顺序查找</a><a class="toc-h3" href="#section-4">2.3 折半查找 ★★★★</a><a class="toc-h3" href="#section-5">2.4 分块查找</a><a class="toc-h3" href="#section-6">2.5 二叉排序树 BST ★★★★</a><a class="toc-h3" href="#section-7">2.6 平衡二叉树 AVL ★★★★★</a><a class="toc-h4" href="#section-8">插入失衡 → 4 种调整 ★★★★★</a><a class="toc-h3" href="#section-9">2.7 B 树 ★★★★</a><a class="toc-h4" href="#section-10">为何需要 B 树</a><a class="toc-h4" href="#section-11">m 阶 B 树的定义</a><a class="toc-h4" href="#section-12">关键公式</a><a class="toc-h4" href="#section-13">插入 ★★★★★</a><a class="toc-h4" href="#section-14">删除</a><a class="toc-h3" href="#section-15">2.8 B+ 树 ★★★</a><a class="toc-h4" href="#section-16">B 树 vs B+ 树</a><a class="toc-h3" href="#section-17">2.9 散列表（哈希表）★★★★★</a><a class="toc-h4" href="#section-18">基本思想</a><a class="toc-h4" href="#section-19">冲突</a><a class="toc-h4" href="#section-20">散列函数构造 ★★</a><a class="toc-h2" href="#section-21">三、关键代码</a><a class="toc-h3" href="#section-22">3.1 顺序查找（带哨兵）</a><a class="toc-h3" href="#section-23">3.2 折半查找 ⭐⭐⭐⭐</a><a class="toc-h3" href="#section-24">3.3 BST 插入 ⭐⭐⭐⭐</a><a class="toc-h3" href="#section-25">3.4 BST 删除（递归）</a><a class="toc-h3" href="#section-26">3.5 哈希表（线性探测法）</a><a class="toc-h3" href="#section-27">3.6 哈希表（链地址法）</a><a class="toc-h2" href="#section-28">四、冲突处理 ★★★★</a><a class="toc-h3" href="#section-29">4.1 开放定址法（闭散列��</a><a class="toc-h3" href="#section-30">4.2 链地址法（开散列）★★★</a><a class="toc-h3" href="#section-31">4.3 再散列法</a><a class="toc-h3" href="#section-32">4.4 装填因子 α ★★★</a><a class="toc-h3" href="#section-33">4.5 各种探测法 ASL 公式</a><a class="toc-h2" href="#section-34">五、真题套路</a><a class="toc-h3" href="#section-35">套路 A：折半查找判定树</a><a class="toc-h3" href="#section-36">套路 B：BST 构造 + 删除</a><a class="toc-h3" href="#section-37">套路 C：AVL 调整</a><a class="toc-h3" href="#section-38">套路 D：B 树插入分裂</a><a class="toc-h3" href="#section-39">套路 E：哈希表构造 + ASL</a><a class="toc-h2" href="#section-40">六、概念清单（必背）</a><a class="toc-h2" href="#section-41">七、自测题</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

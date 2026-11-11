@@ -1,0 +1,409 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>07 · 常用 API ⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/黑马Java笔记/07-常用API.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>黑马Java笔记</h2><nav aria-label="同专题笔记"><a href="01-Java%E5%85%A5%E9%97%A8.md.html">01 · Java 入门 ⭐</a><a href="02-%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.md.html">02 · 基础语法 ⭐</a><a href="03-%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6.md.html">03 · 流程控制 ⭐</a><a href="04-%E6%95%B0%E7%BB%84.md.html">04 · 数组 ⭐⭐</a><a href="05-%E6%96%B9%E6%B3%95.md.html">05 · 方法 ⭐⭐</a><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html">06 · 面向对象基础 ⭐⭐⭐</a><a aria-current="page" href="07-%E5%B8%B8%E7%94%A8API.md.html">07 · 常用 API ⭐⭐</a><a href="08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html">08 · 面向对象进阶 ⭐⭐⭐</a><a href="09-%E5%86%85%E9%83%A8%E7%B1%BB%E4%B8%8E%E5%B8%B8%E7%94%A8%E7%B1%BB.md.html">09 · 内部类与常用类 ⭐⭐</a><a href="10-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86.md.html">10 · 异常处理 ⭐⭐</a><a href="11-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6.md.html">11 · 集合框架 ⭐⭐⭐⭐</a><a href="12-IO%E6%B5%81.md.html">12 · IO 流 ⭐⭐⭐</a><a href="13-%E5%A4%9A%E7%BA%BF%E7%A8%8B.md.html">13 · 多线程 ⭐⭐⭐⭐</a><a href="14-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.md.html">14 · 网络编程 ⭐⭐⭐</a><a href="15-%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">15 · 反射与注解 ⭐⭐⭐</a><a href="16-Lambda%E4%B8%8EStream.md.html">16 · Lambda 与 Stream ⭐⭐⭐</a><a href="17-%E6%9E%9A%E4%B8%BE%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">17 · 枚举与设计模式 ⭐⭐⭐</a><a href="18-%E5%AE%9E%E6%88%98%E9%A1%B9%E7%9B%AE.md.html">18 · 实战项目 ⭐⭐⭐⭐</a><a href="README.md.html">黑马Java笔记 · 学习指南</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>黑马Java笔记</div><h1>07 · 常用 API ⭐⭐</h1><div class="article-meta"><span>约 14 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：入门 | <strong>学习建议</strong>：2 天
+对应黑马视频：第 66 ~ 95 集
+项目导向：<strong>字符串处理是最频繁的操作</strong>（用户输入、日志、JSON 处理）</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>常用 API
+├── 7.1 API 文档使用
+├── 7.2 String 类 ⭐⭐⭐
+├── 7.3 StringBuilder / StringBuffer ⭐⭐
+├── 7.4 ArrayList 集合 ⭐⭐⭐
+├── 7.5 Math 类
+├── 7.6 System 类
+└── 7.7 Object 类 ⭐
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、API 文档使用</h2>
+<p><strong>API（Application Programming Interface）</strong>：程序员的"字典"。</p>
+<ul>
+<li>类名、构造方法、普通方法</li>
+<li>看包路径（<code>java.lang</code> 不需要导包）</li>
+</ul>
+<hr/>
+<h2 id="section-2">三、String 类 ⭐⭐⭐（黑马重点）</h2>
+<h3 id="section-3">3.1 String 本质</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">String</span>
+<span class="w">    </span><span class="kd">implements</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">Serializable</span><span class="p">,</span><span class="w"> </span><span class="n">Comparable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">CharSequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">value</span><span class="o">[]</span><span class="p">;</span><span class="w">   </span><span class="c1">// 内部是 final char[]</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>String 不可变</strong>！</p>
+</blockquote>
+<h3 id="section-4">3.2 字符串常量池 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hello"</span><span class="p">;</span><span class="w">     </span><span class="c1">// 走常量池</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hello"</span><span class="p">;</span><span class="w">     </span><span class="c1">// 复用</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span><span class="w">   </span><span class="c1">// new 强制新建</span>
+
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s2</span><span class="p">);</span><span class="w">     </span><span class="c1">// true</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s3</span><span class="p">);</span><span class="w">     </span><span class="c1">// false</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">s3</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>黑马常考</strong>：String 直接赋值（走常量池）和 new 的区别。</p>
+</blockquote>
+<h3 id="section-5">3.3 String 常用方法 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"HelloWorld"</span><span class="p">;</span>
+
+<span class="c1">// 长度</span>
+<span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w">                          </span><span class="c1">// 10</span>
+
+<span class="c1">// 字符访问</span>
+<span class="n">s</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">                          </span><span class="c1">// 'H'</span>
+
+<span class="c1">// 拼接</span>
+<span class="n">s</span><span class="p">.</span><span class="na">concat</span><span class="p">(</span><span class="s">"!"</span><span class="p">);</span><span class="w">                        </span><span class="c1">// "HelloWorld!"</span>
+<span class="n">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"!"</span><span class="p">;</span><span class="w">                              </span><span class="c1">// 同上（编译器优化）</span>
+
+<span class="c1">// 子串</span>
+<span class="n">s</span><span class="p">.</span><span class="na">substring</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">                       </span><span class="c1">// "World"</span>
+<span class="n">s</span><span class="p">.</span><span class="na">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">                    </span><span class="c1">// "Hello"</span>
+
+<span class="c1">// 判断</span>
+<span class="n">s</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">"World"</span><span class="p">);</span><span class="w">                  </span><span class="c1">// true</span>
+<span class="n">s</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">);</span><span class="w">                </span><span class="c1">// true</span>
+<span class="n">s</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">"World"</span><span class="p">);</span><span class="w">                  </span><span class="c1">// true</span>
+<span class="n">s</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">();</span><span class="w">                          </span><span class="c1">// false</span>
+
+<span class="c1">// 查找</span>
+<span class="n">s</span><span class="p">.</span><span class="na">indexOf</span><span class="p">(</span><span class="s">"o"</span><span class="p">);</span><span class="w">                       </span><span class="c1">// 4</span>
+<span class="n">s</span><span class="p">.</span><span class="na">lastIndexOf</span><span class="p">(</span><span class="s">"o"</span><span class="p">);</span><span class="w">                   </span><span class="c1">// 6</span>
+
+<span class="c1">// 替换</span>
+<span class="n">s</span><span class="p">.</span><span class="na">replace</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span><span class="w"> </span><span class="s">"Java"</span><span class="p">);</span><span class="w">           </span><span class="c1">// "HelloJava"</span>
+
+<span class="c1">// 切割</span>
+<span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"a,b,c"</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">","</span><span class="p">);</span><span class="w">    </span><span class="c1">// [a, b, c]</span>
+
+<span class="c1">// 大小写</span>
+<span class="s">"HELLO"</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">();</span><span class="w">                </span><span class="c1">// "hello"</span>
+<span class="s">"hello"</span><span class="p">.</span><span class="na">toUpperCase</span><span class="p">();</span><span class="w">                </span><span class="c1">// "HELLO"</span>
+
+<span class="c1">// 去除空格</span>
+<span class="s">"  hi  "</span><span class="p">.</span><span class="na">trim</span><span class="p">();</span><span class="w">                      </span><span class="c1">// "hi"</span>
+</pre></div>
+</div><h3 id="section-6">3.4 黑马经典案例 ⭐⭐</h3>
+<p><strong>案例 1：用户名校验</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">checkUsername</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">username</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">username</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Character</span><span class="p">.</span><span class="na">isLetter</span><span class="p">(</span><span class="n">username</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">username</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Character</span><span class="p">.</span><span class="na">isLetterOrDigit</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">'_'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>案例 2：字符串反转</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">reverse</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">(</span><span class="n">s</span><span class="p">).</span><span class="na">reverse</span><span class="p">().</span><span class="na">toString</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>案例 3：统计字符出现次数</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">countChar</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="w"> </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-7">四、StringBuilder / StringBuffer ⭐⭐</h2>
+<h3 id="section-8">4.1 String 拼接的问题</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">     </span><span class="c1">// 每次循环创建新 String（性能差）</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-9">4.2 StringBuilder 用法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w">   </span><span class="c1">// 直接拼接，性能好</span>
+<span class="p">}</span>
+<span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-10">4.3 常用方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span>
+<span class="n">sb</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">"Hi"</span><span class="p">);</span><span class="w">           </span><span class="c1">// 指定位置插入</span>
+<span class="n">sb</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w">               </span><span class="c1">// 删除区间</span>
+<span class="n">sb</span><span class="p">.</span><span class="na">reverse</span><span class="p">();</span><span class="w">                  </span><span class="c1">// 反转</span>
+<span class="n">sb</span><span class="p">.</span><span class="na">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="s">"Hi"</span><span class="p">);</span><span class="w">        </span><span class="c1">// 替换</span>
+<span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w">                 </span><span class="c1">// 转 String</span>
+<span class="n">sb</span><span class="p">.</span><span class="na">length</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-11">4.4 对比</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>String</th>
+<th>StringBuilder</th>
+<th>StringBuffer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可变</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>线程安全</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>差</td>
+<td>高</td>
+<td>中</td>
+</tr>
+<tr>
+<td>场景</td>
+<td>字符串常量</td>
+<td>单线程拼接</td>
+<td>多线程拼接</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-12">五、ArrayList 集合 ⭐⭐⭐</h2>
+<p>黑马视频<strong>单独</strong>：数组、ArrayList 是 Java 中最常用的容器。</p>
+<h3 id="section-13">5.1 为什么用 ArrayList</h3>
+<p>数组长度固定，ArrayList 可变。</p>
+<h3 id="section-14">5.2 基本使用</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.ArrayList</span><span class="p">;</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="c1">// 添加</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"张三"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">"李四"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">"王五"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 指定位置插入</span>
+
+<span class="c1">// 获取</span>
+<span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">              </span><span class="c1">// "王五"</span>
+<span class="n">list</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
+
+<span class="c1">// 删除</span>
+<span class="n">list</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">            </span><span class="c1">// 按下标</span>
+<span class="n">list</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="s">"张三"</span><span class="p">);</span><span class="w">       </span><span class="c1">// 按值（首次出现的）</span>
+
+<span class="c1">// 修改</span>
+<span class="n">list</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">"赵六"</span><span class="p">);</span>
+
+<span class="c1">// 判断</span>
+<span class="n">list</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">"张三"</span><span class="p">);</span>
+<span class="n">list</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">();</span>
+
+<span class="c1">// 遍历</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">list</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-15">5.3 黑马经典案例 ⭐⭐</h3>
+<p><strong>学生成绩管理系统（升级版）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="n">students</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">students</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">95</span><span class="p">));</span>
+<span class="n">students</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">"李四"</span><span class="p">,</span><span class="w"> </span><span class="mi">82</span><span class="p">));</span>
+
+<span class="c1">// 查找最高分</span>
+<span class="n">Student</span><span class="w"> </span><span class="n">maxStu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">students</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="na">getScore</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">maxStu</span><span class="p">.</span><span class="na">getScore</span><span class="p">())</span><span class="w"> </span><span class="n">maxStu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"最高分："</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">maxStu</span><span class="p">.</span><span class="na">getName</span><span class="p">());</span>
+</pre></div>
+</div><h3 id="section-16">5.4 ArrayList 底层 ⭐</h3>
+<ul>
+<li>基于<strong>动态数组</strong>实现</li>
+<li>初始容量 10</li>
+<li>扩容机制：约 1.5 倍（具体看 JDK 版本）</li>
+</ul>
+<hr/>
+<h2 id="section-17">六、Math 类</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Math</span><span class="p">.</span><span class="na">abs</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">);</span><span class="w">          </span><span class="c1">// 10</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">max</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">          </span><span class="c1">// 5</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w">          </span><span class="c1">// 3</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">          </span><span class="c1">// 8</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">sqrt</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span><span class="w">            </span><span class="c1">// 3.0</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">random</span><span class="p">();</span><span class="w">            </span><span class="c1">// [0, 1) 随机小数</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">round</span><span class="p">(</span><span class="mf">3.5</span><span class="p">);</span><span class="w">          </span><span class="c1">// 4</span>
+<span class="n">Math</span><span class="p">.</span><span class="na">PI</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 3.14159...</span>
+</pre></div>
+</div><h3 id="section-18">黑马案例：随机数</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1~100 随机整数</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-19">七、System 类</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"hi"</span><span class="p">);</span><span class="w">       </span><span class="c1">// 标准输出</span>
+<span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"err"</span><span class="p">);</span><span class="w">       </span><span class="c1">// 错误输出</span>
+<span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">;</span><span class="w">                       </span><span class="c1">// 标准输入</span>
+
+<span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span><span class="w">      </span><span class="c1">// 当前毫秒</span>
+<span class="n">System</span><span class="p">.</span><span class="na">arraycopy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="n">srcPos</span><span class="p">,</span><span class="w"> </span><span class="n">dest</span><span class="p">,</span><span class="w"> </span><span class="n">destPos</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">);</span><span class="w">   </span><span class="c1">// 数组拷贝</span>
+<span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 退出程序</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">八、Object 类 ⭐</h2>
+<p><strong>所有类的父类</strong>。</p>
+<h3 id="section-21">8.1 常用方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. toString：返回对象的字符串表示</span>
+<span class="c1">// 默认：类名@哈希码</span>
+<span class="c1">// 重写后：属性信息</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">"Student{name="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">", score="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"}"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 2. equals：比较两个对象是否相等</span>
+<span class="c1">// 默认 ==，重写后比较内容</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">getClass</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getClass</span><span class="p">())</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Student</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Student</span><span class="p">)</span><span class="w"> </span><span class="n">o</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">score</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">name</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 3. hashCode：返回哈希码</span>
+<span class="c1">// 重写 equals 必重写 hashCode</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">hashCode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Objects</span><span class="p">.</span><span class="na">hash</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">score</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-22">8.2 黑马案例：���户比较</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">User</span><span class="w"> </span><span class="n">u1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">(</span><span class="s">"admin"</span><span class="p">,</span><span class="w"> </span><span class="s">"123"</span><span class="p">);</span>
+<span class="n">User</span><span class="w"> </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">(</span><span class="s">"admin"</span><span class="p">,</span><span class="w"> </span><span class="s">"123"</span><span class="p">);</span>
+
+<span class="c1">// 不重写 equals 时</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">u1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">u2</span><span class="p">));</span><span class="w">   </span><span class="c1">// false（默认 ==）</span>
+
+<span class="c1">// 重写后</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">u1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">u2</span><span class="p">));</span><span class="w">   </span><span class="c1">// true（比较内容）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-23">九、项目场景（实战导向）⭐</h2>
+<h3 id="section-24">🎯 场景 1：日志系统</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+<span class="n">log</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"["</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Date</span><span class="p">()).</span><span class="na">append</span><span class="p">(</span><span class="s">"] "</span><span class="p">);</span>
+<span class="n">log</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"用户登录："</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"admin"</span><span class="p">);</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">log</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
+</pre></div>
+</div><h3 id="section-25">🎯 场景 2：订单列表</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Order</span><span class="o">&gt;</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="n">orders</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Order</span><span class="p">(</span><span class="s">"A001"</span><span class="p">,</span><span class="w"> </span><span class="mf">100.0</span><span class="p">));</span>
+<span class="n">orders</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Order</span><span class="p">(</span><span class="s">"A002"</span><span class="p">,</span><span class="w"> </span><span class="mf">200.0</span><span class="p">));</span>
+
+<span class="c1">// 计算总金额</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Order</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">orders</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="na">getAmount</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-26">🎯 场景 3：字符串模板（简单实现）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">template</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="p">...</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">(</span><span class="n">template</span><span class="p">);</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">arg</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">indexOf</span><span class="p">(</span><span class="s">"{}"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">sb</span><span class="p">.</span><span class="na">replace</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">arg</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="n">format</span><span class="p">(</span><span class="s">"你好，{}，今年 {} 岁"</span><span class="p">,</span><span class="w"> </span><span class="s">"张三"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+<span class="c1">// "你好，张三，今年 18 岁"</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-27">十、力扣实战 ⭐⭐</h2>
+<h3 id="section-28">LeetCode 344. 反转字符串</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Solution</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">reverseString</span><span class="p">(</span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">left</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">right</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="o">[</span><span class="n">left</span><span class="o">]</span><span class="p">;</span>
+<span class="w">            </span><span class="n">s</span><span class="o">[</span><span class="n">left</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="o">[</span><span class="n">right</span><span class="o">]</span><span class="p">;</span>
+<span class="w">            </span><span class="n">s</span><span class="o">[</span><span class="n">right</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="p">;</span>
+<span class="w">            </span><span class="n">left</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">right</span><span class="o">--</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-29">LeetCode 387. 字符串中的第一个唯一字符</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Solution</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">firstUniqChar</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">26</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">())</span><span class="w"> </span><span class="n">count</span><span class="o">[</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="sc">'a'</span><span class="o">]++</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">count</span><span class="o">[</span><span class="n">s</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="sc">'a'</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-30">十一、面试常问 ⭐</h2>
+<blockquote>
+<p>💡 <strong>String 不可变的原因？</strong></p>
+<ol>
+<li><code>final class</code> 不能继承</li>
+<li><code>final char[]</code> 内部数组不能修改</li>
+<li>没有暴露修改方法</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>==</code> 和 <code>equals</code> 的区别？</strong></p>
+<ul>
+<li><code>==</code> 基本类型比值，引用类型比地址</li>
+<li><code>equals</code> 默认 ==，但 String 等类重写后比内容</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>String / StringBuilder / StringBuffer？</strong></p>
+<ul>
+<li>String 不可变（拼接差）</li>
+<li>StringBuilder 可变（最快）</li>
+<li>StringBuffer 可变（线程安全）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong><code>new String("abc")</code> 创建几个对象？</strong>
+1 或 2 个。字面量在常量池 + 堆对象（如果常量池不存在）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-31">十二、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>String 不可变性</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>字符串常量池</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>String 常用方法</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>StringBuilder 拼接</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>ArrayList 集合</strong>（黑马重点）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Math / System / Object 类</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>String 拼接性能差（循环中用 StringBuilder）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>equals 默认是 ==（要重写）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>ArrayList 中 add/remove 等返回 boolean 还是 void</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>重写 equals 必重写 hashCode</li>
+</ul>
+<p>下一章：<a href="./08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html">08-面向对象进阶.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="06-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80.md.html"><small>← 上一篇</small><strong>06 · 面向对象基础 ⭐⭐⭐</strong></a><a href="08-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BF%9B%E9%98%B6.md.html"><small>下一篇 →</small><strong>08 · 面向对象进阶 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、API 文档使用</a><a class="toc-h2" href="#section-2">三、String 类 ⭐⭐⭐（黑马重点）</a><a class="toc-h3" href="#section-3">3.1 String 本质</a><a class="toc-h3" href="#section-4">3.2 字符串常量池 ⭐⭐</a><a class="toc-h3" href="#section-5">3.3 String 常用方法 ⭐⭐⭐</a><a class="toc-h3" href="#section-6">3.4 黑马经典案例 ⭐⭐</a><a class="toc-h2" href="#section-7">四、StringBuilder / StringBuffer ⭐⭐</a><a class="toc-h3" href="#section-8">4.1 String 拼接的问题</a><a class="toc-h3" href="#section-9">4.2 StringBuilder 用法</a><a class="toc-h3" href="#section-10">4.3 常用方法</a><a class="toc-h3" href="#section-11">4.4 对比</a><a class="toc-h2" href="#section-12">五、ArrayList 集合 ⭐⭐⭐</a><a class="toc-h3" href="#section-13">5.1 为什么用 ArrayList</a><a class="toc-h3" href="#section-14">5.2 基本使用</a><a class="toc-h3" href="#section-15">5.3 黑马经典案例 ⭐⭐</a><a class="toc-h3" href="#section-16">5.4 ArrayList 底层 ⭐</a><a class="toc-h2" href="#section-17">六、Math 类</a><a class="toc-h3" href="#section-18">黑马案例：随机数</a><a class="toc-h2" href="#section-19">七、System 类</a><a class="toc-h2" href="#section-20">八、Object 类 ⭐</a><a class="toc-h3" href="#section-21">8.1 常用方法</a><a class="toc-h3" href="#section-22">8.2 黑马案例：���户比较</a><a class="toc-h2" href="#section-23">九、项目场景（实战导向）⭐</a><a class="toc-h3" href="#section-24">🎯 场景 1：日志系统</a><a class="toc-h3" href="#section-25">🎯 场景 2：订单列表</a><a class="toc-h3" href="#section-26">🎯 场景 3：字符串模板（简单实现）</a><a class="toc-h2" href="#section-27">十、力扣实战 ⭐⭐</a><a class="toc-h3" href="#section-28">LeetCode 344. 反转字符串</a><a class="toc-h3" href="#section-29">LeetCode 387. 字符串中的第一个唯一字符</a><a class="toc-h2" href="#section-30">十一、面试常问 ⭐</a><a class="toc-h2" href="#section-31">十二、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
