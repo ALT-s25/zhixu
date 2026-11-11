@@ -1,0 +1,41 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03 Dockerfile、Compose与仓库：让别人能重现你的环境 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/Docker·部署实践/03 Dockerfile、Compose与仓库：让别人能重现你的环境.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Docker·部署实践</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">Docker：把课程工程变成可重复的运行环境</a><a href="01%20%E9%95%9C%E5%83%8F%E3%80%81%E5%AE%B9%E5%99%A8%E5%92%8C%E7%AB%AF%E5%8F%A3%EF%BC%9A%E8%8F%9C%E8%B0%B1%E4%B8%8E%E6%AD%A3%E5%9C%A8%E5%81%9A%E7%9A%84%E8%8F%9C.md.html">01 镜像、容器和端口：菜谱与正在做的菜</a><a href="02%20%E6%95%B0%E6%8D%AE%E5%8D%B7%E4%B8%8E%E7%BD%91%E7%BB%9C%EF%BC%9A%E6%95%B0%E6%8D%AE%E4%BD%8F%E5%93%AA%EF%BC%8C%E6%9C%8D%E5%8A%A1%E6%89%BE%E8%B0%81.md.html">02 数据卷与网络：数据住哪，服务找谁</a><a aria-current="page" href="03%20Dockerfile%E3%80%81Compose%E4%B8%8E%E4%BB%93%E5%BA%93%EF%BC%9A%E8%AE%A9%E5%88%AB%E4%BA%BA%E8%83%BD%E9%87%8D%E7%8E%B0%E4%BD%A0%E7%9A%84%E7%8E%AF%E5%A2%83.md.html">03 Dockerfile、Compose与仓库：让别人能重现你的环境</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Docker·部署实践</div><h1>03 Dockerfile、Compose与仓库：让别人能重现你的环境</h1><div class="article-meta"><span>约 3 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">课程从单容器走向多服务</h3>
+<p>Dockerfile描述如何构建镜像，Compose描述哪些服务一起运行。像制作说明书与活动排班表，职责不同。构建成功不证明程序运行成功，容器启动也不证明依赖服务已经就绪。</p>
+<h3 id="section-1">一个Java17镜像骨架</h3>
+<div class="code-block"><div class="code-top"><span>dockerfile</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c"># 示意：先准备已构建好的app.jar，运行时版本应匹配项目</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">eclipse-temurin:17-jre</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">COPY</span><span class="w"> </span>app.jar<span class="w"> </span>/app/app.jar
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8080</span>
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">"java"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-jar"</span><span class="p">,</span><span class="w"> </span><span class="s2">"/app/app.jar"</span><span class="p">]</span>
+</pre></div>
+</div><p>EXPOSE只是描述端口，不自动发布宿主端口。不要把本地凭据、数据库备份和整个下载目录COPY到镜像里；用.dockerignore缩小构建上下文。这个骨架用于理解，正式部署还要确定非root用户、资源限制和运行配置。</p>
+<h3 id="section-2">最小Compose骨架</h3>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">web</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx:stable</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"127.0.0.1:8090:80"</span>
+<span class="w">  </span><span class="nt">redis</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis:7</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">learn-redis:/data</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"redis-server"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"--appendonly"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"yes"</span><span class="p p-Indicator">]</span>
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">learn-redis</span><span class="p">:</span>
+</pre></div>
+</div><p>两服务只是用于观察网络与卷，没有假装Nginx会自动使用Redis。应用服务加入同网络后才可按redis:6379连接。课程旧式<code>docker-compose</code>与新式<code>docker compose</code>命令应按所装工具确认。</p>
+<div class="code-block"><div class="code-top"><span>sh</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>config
+docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+docker<span class="w"> </span>compose<span class="w"> </span>ps
+docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>--tail<span class="w"> </span><span class="m">30</span>
+</pre></div>
+</div><p><code>depends_on</code>默认主要控制启动顺序；需配合healthcheck与service_healthy等条件表达健康就绪。应用仍应能处理依赖运行中断连。参见<a href="https://docs.docker.com/compose/how-tos/startup-order/" rel="noopener noreferrer" target="_blank">Docker启动顺序说明</a>。</p>
+<h3 id="section-3">镜像仓库不是代码仓库</h3>
+<p>课程私有仓库流程是构建→打标签→推送→其他主机拉取。标签如latest或stable是可变名字，不是永远固定的内容；可复现部署应记录实际版本或摘要。推送镜像前检查是否误带凭据。</p>
+<h3 id="section-4">自测与答案</h3>
+<p>题目：换一台机器能启动但数据为空，优先怀疑什么？答案：镜像通常不包含原数据卷；要独立迁移或恢复数据，不能把推送镜像等同于迁移数据库。</p>
+<p>完成标准：别人仅凭你的构建说明、配置样例和数据初始化步骤，能重建一个练习环境。</p>
+<h3 id="section-5">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="02%20%E6%95%B0%E6%8D%AE%E5%8D%B7%E4%B8%8E%E7%BD%91%E7%BB%9C%EF%BC%9A%E6%95%B0%E6%8D%AE%E4%BD%8F%E5%93%AA%EF%BC%8C%E6%9C%8D%E5%8A%A1%E6%89%BE%E8%B0%81.md.html"><small>← 上一篇</small><strong>02 数据卷与网络：数据住哪，服务找谁</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">课程从单容器走向多服务</a><a class="toc-h3" href="#section-1">一个Java17镜像骨架</a><a class="toc-h3" href="#section-2">最小Compose骨架</a><a class="toc-h3" href="#section-3">镜像仓库不是代码仓库</a><a class="toc-h3" href="#section-4">自测与答案</a><a class="toc-h3" href="#section-5">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

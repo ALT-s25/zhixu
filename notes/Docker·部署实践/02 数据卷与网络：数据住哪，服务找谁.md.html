@@ -1,0 +1,47 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>02 数据卷与网络：数据住哪，服务找谁 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/Docker·部署实践/02 数据卷与网络：数据住哪，服务找谁.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Docker·部署实践</h2><nav aria-label="同专题笔记"><a href="00-%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.md.html">Docker：把课程工程变成可重复的运行环境</a><a href="01%20%E9%95%9C%E5%83%8F%E3%80%81%E5%AE%B9%E5%99%A8%E5%92%8C%E7%AB%AF%E5%8F%A3%EF%BC%9A%E8%8F%9C%E8%B0%B1%E4%B8%8E%E6%AD%A3%E5%9C%A8%E5%81%9A%E7%9A%84%E8%8F%9C.md.html">01 镜像、容器和端口：菜谱与正在做的菜</a><a aria-current="page" href="02%20%E6%95%B0%E6%8D%AE%E5%8D%B7%E4%B8%8E%E7%BD%91%E7%BB%9C%EF%BC%9A%E6%95%B0%E6%8D%AE%E4%BD%8F%E5%93%AA%EF%BC%8C%E6%9C%8D%E5%8A%A1%E6%89%BE%E8%B0%81.md.html">02 数据卷与网络：数据住哪，服务找谁</a><a href="03%20Dockerfile%E3%80%81Compose%E4%B8%8E%E4%BB%93%E5%BA%93%EF%BC%9A%E8%AE%A9%E5%88%AB%E4%BA%BA%E8%83%BD%E9%87%8D%E7%8E%B0%E4%BD%A0%E7%9A%84%E7%8E%AF%E5%A2%83.md.html">03 Dockerfile、Compose与仓库：让别人能重现你的环境</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Docker·部署实践</div><h1>02 数据卷与网络：数据住哪，服务找谁</h1><div class="article-meta"><span>约 2 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<h3 id="section-0">别把容器当永久硬盘</h3>
+<p>课程用Nginx页面演示卷挂载。容器可写层像临时工位，重建工位不该带走重要档案；volume或bind mount把需要保留的数据放到独立位置。挂载覆盖容器路径后看到的是挂载内容，不是自动合并两边文件。</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>管理者</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>named volume</td>
+<td>Docker管理存储位置</td>
+<td>数据库数据等持久化</td>
+</tr>
+<tr>
+<td>bind mount</td>
+<td>你指定宿主路径</td>
+<td>本地静态页面与配置文件</td>
+</tr>
+<tr>
+<td>容器可写层</td>
+<td>当前容器</td>
+<td>临时文件，不作为唯一重要数据</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-1">Windows本地页面实验</h3>
+<p>先在自己的练习目录建立site/index.html，再在该目录的PowerShell运行：</p>
+<div class="code-block"><div class="code-top"><span>powershell</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nv">$sitePath</span> <span class="p">=</span> <span class="p">(</span><span class="nb">Resolve-Path</span> <span class="p">.\</span><span class="n">site</span><span class="p">).</span><span class="n">Path</span>
+<span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-name</span> <span class="n">learn-page</span> <span class="n">-d</span> <span class="n">-p</span> <span class="n">127</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">1</span><span class="p">:</span><span class="n">8089</span><span class="p">:</span><span class="n">80</span> <span class="p">-</span><span class="n">-mount</span> <span class="s2">"type=bind,source=$sitePath,target=/usr/share/nginx/html,readonly"</span> <span class="n">nginx</span><span class="p">:</span><span class="n">stable</span>
+</pre></div>
+</div><p>浏览器打开8089，修改本地index.html后刷新应能看到变化。这里只读是对容器而言，宿主编辑仍可进行。命令不含删除操作；练习结束自行停止对应容器即可。</p>
+<h3 id="section-2">localhost到底是谁</h3>
+<p>应用在容器内访问localhost，指向该容器自己，不是宿主机，也不是隔壁数据库容器。课程Compose用服务名建立连接：同一Compose网络中，应用访问数据库服务名和容器内部端口。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>宿主浏览器 → localhost:8089 → Nginx容器:80
+应用容器 → redis:6379 → 名为redis的服务容器
+</pre></div>
+</div><p>端口映射主要解决从宿主或外部访问的问题；同网络容器间通常不需要为每个内部组件都开放宿主端口。</p>
+<h3 id="section-3">自测与答案</h3>
+<p>题目：数据库容器删了，数据一定还在吗？答案：取决于数据是否写入正确持久卷，以及卷是否也被删除。仅创建一个卷但没挂到真实数据目录，没有保护作用；卷也不是备份。</p>
+<p>完成标准：指出项目每类数据实际保存路径，并解释重启与重建的区别。</p>
+<h3 id="section-4">资料依据</h3>
+<p>本页根据用户提供的 D:/za 课程讲义重组，类比、练习与边界解释由本站补充；不冒称视频逐字稿。</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="01%20%E9%95%9C%E5%83%8F%E3%80%81%E5%AE%B9%E5%99%A8%E5%92%8C%E7%AB%AF%E5%8F%A3%EF%BC%9A%E8%8F%9C%E8%B0%B1%E4%B8%8E%E6%AD%A3%E5%9C%A8%E5%81%9A%E7%9A%84%E8%8F%9C.md.html"><small>← 上一篇</small><strong>01 镜像、容器和端口：菜谱与正在做的菜</strong></a><a href="03%20Dockerfile%E3%80%81Compose%E4%B8%8E%E4%BB%93%E5%BA%93%EF%BC%9A%E8%AE%A9%E5%88%AB%E4%BA%BA%E8%83%BD%E9%87%8D%E7%8E%B0%E4%BD%A0%E7%9A%84%E7%8E%AF%E5%A2%83.md.html"><small>下一篇 →</small><strong>03 Dockerfile、Compose与仓库：让别人能重现你的环境</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">别把容器当永久硬盘</a><a class="toc-h3" href="#section-1">Windows本地页面实验</a><a class="toc-h3" href="#section-2">localhost到底是谁</a><a class="toc-h3" href="#section-3">自测与答案</a><a class="toc-h3" href="#section-4">资料依据</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
