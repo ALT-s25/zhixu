@@ -1,0 +1,972 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Redis 实战 · 保姆级详解 ⭐⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/详细课程/Redis实战-保姆级详解.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>详细课程</h2><nav aria-label="同专题笔记"><a href="Docker%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Docker 入门 · 保姆级详解 ⭐⭐⭐</a><a href="Elasticsearch%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Elasticsearch 搜索引擎 · 保姆级详解 ⭐⭐⭐</a><a href="RabbitMQ%E5%9F%BA%E7%A1%80-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">RabbitMQ 基础 · 保姆级详解 ⭐⭐⭐</a><a href="RabbitMQ%E9%AB%98%E7%BA%A7-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">RabbitMQ 高级 · 保姆级详解 ⭐⭐⭐</a><a href="Redis%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 入门 · 保姆级详解 ⭐⭐⭐</a><a aria-current="page" href="Redis%E5%AE%9E%E6%88%98-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 实战 · 保姆级详解 ⭐⭐⭐⭐</a><a href="Redis%E9%AB%98%E7%BA%A7%E4%B8%8E%E5%8E%9F%E7%90%86-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 高级与原理 · 保姆级详解 ⭐⭐⭐⭐</a><a href="SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">SpringCloud 微服务 · 保姆级详解 ⭐⭐⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>详细课程</div><h1>Redis 实战 · 保姆级详解 ⭐⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>黑马点评项目核心 · 缓存三大问题 + 分布式锁 + 秒杀
+零基础友好 · 每个概念都配类比 · 每行代码都注释 · 每个坑都标注</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">写在前面</h2>
+<p>这一章是 Redis <strong>最核心</strong>的部分，所有"Redis 面试题"基本都在这里。</p>
+<p><strong>学习目标</strong>：学完这份笔记，你能：</p>
+<ul>
+<li>理解缓存的三大问题（穿透、雪崩、击穿）及解决方案</li>
+<li>实现分布式锁（自实现 + Redisson）</li>
+<li>实现秒杀功能（全局唯一 ID、超卖问题、一人一单）</li>
+<li>用 Redis 优化秒杀（异步下单）</li>
+</ul>
+<hr/>
+<h2 id="section-1">第一章：短信登录（热身）</h2>
+<h3 id="section-2">1.1 先讲问题：Session 不共享</h3>
+<p><strong>故事</strong>：你做了个网站，用户登录后信息存在 Session 里。一台服务器扛不住，加了第二台。但用户登录时打到服务器 A，第二次请求打到服务器 B，B 没有这个用户的 Session，用户就被踢出去了。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>用户登录 → 服务器 A（存 Session）
+用户请求 → 服务器 B（没有 Session！）❌ 被踢出
+</pre></div>
+</div><p><strong>解决</strong>：用 Redis 代替 Session，所有服务器共享。</p>
+<h3 id="section-3">1.2 Redis 代替 Session 的设计</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>发送验证码：
+  手机号 → 生成 4~6 位验证码 → 存 Redis
+  key = "login:code:13800138000"
+  value = "123456"
+  TTL = 2 分钟
+
+登录验证：
+  手机号 + 验证码 → 校验 Redis 里的验证码
+  → 查询/创建用户 → 生成 token（UUID）
+  → 存 Redis
+  key = "login:token:abc123"
+  value = 用户信息（JSON）
+  TTL = 30 分钟
+  → 返回 token 给前端
+
+每次请求：
+  前端带 token → 拦截器查 Redis → 刷新 TTL → 放行
+</pre></div>
+</div><h3 id="section-4">1.3 完整代码（每行注释）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ================== 发送验证码 ==================</span>
+<span class="nd">@PostMapping</span><span class="p">(</span><span class="s">"/code"</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">sendCode</span><span class="p">(</span><span class="nd">@RequestParam</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">phone</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 生成验证码（6 位数字）</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RandomUtil</span><span class="p">.</span><span class="na">randomNumbers</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 存入 Redis（key = login:code:手机号，2 分钟过期）</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span>
+<span class="w">        </span><span class="s">"login:code:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">phone</span><span class="p">,</span><span class="w">   </span><span class="c1">// key</span>
+<span class="w">        </span><span class="n">code</span><span class="p">,</span><span class="w">                      </span><span class="c1">// value</span>
+<span class="w">        </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="w">        </span><span class="c1">// 过期时间</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 3. 发送短信（这里模拟）</span>
+<span class="w">    </span><span class="n">log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"发送验证码成功：{}"</span><span class="p">,</span><span class="w"> </span><span class="n">code</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">ok</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// ================== 登录 ==================</span>
+<span class="nd">@PostMapping</span><span class="p">(</span><span class="s">"/login"</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="nd">@RequestBody</span><span class="w"> </span><span class="n">LoginFormDTO</span><span class="w"> </span><span class="n">form</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">form</span><span class="p">.</span><span class="na">getPhone</span><span class="p">();</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">form</span><span class="p">.</span><span class="na">getCode</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 1. 从 Redis 取验证码</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">redisCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="s">"login:code:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">phone</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 校验验证码</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">redisCode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">redisCode</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">code</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">fail</span><span class="p">(</span><span class="s">"验证码错误"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 3. 查询用户（不存在则创建）</span>
+<span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">queryByPhone</span><span class="p">(</span><span class="n">phone</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createUserWithPhone</span><span class="p">(</span><span class="n">phone</span><span class="p">);</span><span class="w">   </span><span class="c1">// 新用户自动注册</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 4. 生成 token（UUID，不包含敏感信息）</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UUID</span><span class="p">.</span><span class="na">randomUUID</span><span class="p">().</span><span class="na">toString</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 5. 把用户信息存入 Redis（用 Hash 存）</span>
+<span class="w">    </span><span class="c1">//    key = login:token:token</span>
+<span class="w">    </span><span class="c1">//    TTL = 30 分钟</span>
+<span class="w">    </span><span class="n">UserDTO</span><span class="w"> </span><span class="n">userDTO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserDTO</span><span class="p">();</span>
+<span class="w">    </span><span class="n">userDTO</span><span class="p">.</span><span class="na">setId</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">    </span><span class="n">userDTO</span><span class="p">.</span><span class="na">setNickName</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">getNickName</span><span class="p">());</span>
+<span class="w">    </span><span class="n">userDTO</span><span class="p">.</span><span class="na">setIcon</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">getIcon</span><span class="p">());</span>
+
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForHash</span><span class="p">().</span><span class="na">putAll</span><span class="p">(</span>
+<span class="w">        </span><span class="s">"login:token:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">token</span><span class="p">,</span>
+<span class="w">        </span><span class="n">BeanUtil</span><span class="p">.</span><span class="na">beanToMap</span><span class="p">(</span><span class="n">userDTO</span><span class="p">)</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">expire</span><span class="p">(</span><span class="s">"login:token:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">token</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 6. 返回 token 给前端</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-5">1.4 登录拦截器（每次请求都拦截）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LoginInterceptor</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">HandlerInterceptor</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">StringRedisTemplate</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 构造器注入（拦截器不被 Spring 管理，要手动传）</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">LoginInterceptor</span><span class="p">(</span><span class="n">StringRedisTemplate</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">stringRedisTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">preHandle</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">Object</span><span class="w"> </span><span class="n">handler</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 1. 从请求头获取 token</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getHeader</span><span class="p">(</span><span class="s">"authorization"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isBlank</span><span class="p">(</span><span class="n">token</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">response</span><span class="p">.</span><span class="na">setStatus</span><span class="p">(</span><span class="mi">401</span><span class="p">);</span><span class="w">   </span><span class="c1">// 401 = 未授权</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 2. 从 Redis 查用户信息</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"login:token:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">token</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Object</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">userMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForHash</span><span class="p">().</span><span class="na">entries</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 3. 用户不存在（token 无效或过期）</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">userMap</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">response</span><span class="p">.</span><span class="na">setStatus</span><span class="p">(</span><span class="mi">401</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 4. 刷新 token 的 TTL（每次请求都续期，活跃用户不掉线）</span>
+<span class="w">        </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">expire</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 5. 用户信息存入 ThreadLocal（后续业务可以拿到）</span>
+<span class="w">        </span><span class="n">UserDTO</span><span class="w"> </span><span class="n">userDTO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BeanUtil</span><span class="p">.</span><span class="na">fillBeanWithMap</span><span class="p">(</span><span class="n">userMap</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserDTO</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+<span class="w">        </span><span class="n">UserHolder</span><span class="p">.</span><span class="na">saveUser</span><span class="p">(</span><span class="n">userDTO</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">   </span><span class="c1">// 放行</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">afterCompletion</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span>
+<span class="w">                                  </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">,</span>
+<span class="w">                                  </span><span class="n">Object</span><span class="w"> </span><span class="n">handler</span><span class="p">,</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="n">ex</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 请求结束，清理 ThreadLocal（防止内存泄漏）</span>
+<span class="w">        </span><span class="n">UserHolder</span><span class="p">.</span><span class="na">removeUser</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-6">1.5 常见报错 ⚠</h3>
+<p><strong>问题：拦截器里注入的 stringRedisTemplate 是 null</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：拦截器是 new 出来的，不被 Spring 管理，无法注入
+解决：在配置类里把 stringRedisTemplate 传进去
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Configuration</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">WebConfig</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">WebMvcConfigurer</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">StringRedisTemplate</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addInterceptors</span><span class="p">(</span><span class="n">InterceptorRegistry</span><span class="w"> </span><span class="n">registry</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">registry</span><span class="p">.</span><span class="na">addInterceptor</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">LoginInterceptor</span><span class="p">(</span><span class="n">stringRedisTemplate</span><span class="p">))</span>
+<span class="w">                </span><span class="p">.</span><span class="na">excludePathPatterns</span><span class="p">(</span><span class="s">"/user/login"</span><span class="p">,</span><span class="w"> </span><span class="s">"/user/code"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-7">第二章：商户查询缓存（核心中的核心）</h2>
+<h3 id="section-8">2.1 什么是缓存</h3>
+<p><strong>缓存</strong>就是把经常要查的数据，从数据库复制一份到 Redis，下次直接从 Redis 取，不用每次都查数据库。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>第一次请求：
+  客户端 → 服务端 → 查 MySQL → 返回数据
+                          ↓
+                     同时存一份到 Redis
+
+第二次请求：
+  客户端 → 服务端 → 查 Redis（命中）→ 返回数据
+                  （不查 MySQL 了！）
+</pre></div>
+</div><h3 id="section-9">2.2 基础缓存代码</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="n">Shop</span><span class="w"> </span><span class="nf">queryShopById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 拼 key（规范：业务:类型:ID）</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 2. 从 Redis 查</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 3. 命中缓存（json 不是空，也不是空字符串）</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">json</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">Shop</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">   </span><span class="c1">// JSON 转 Shop 对象</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 4. 命中空值（防穿透，后面讲）</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// json 是 ""，说明是之前缓存了空值</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 5. 查数据库</span>
+<span class="w">    </span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shopMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">shop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 数据库也没有，缓存空值防穿透（2 分钟过期）</span>
+<span class="w">        </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 6. 写入缓存（30 分钟过期）</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span>
+<span class="w">        </span><span class="n">key</span><span class="p">,</span>
+<span class="w">        </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toJsonStr</span><span class="p">(</span><span class="n">shop</span><span class="p">),</span>
+<span class="w">        </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">shop</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <code>StrUtil.isNotBlank</code> 是 Hutool 工具，表示"不是 null 且不是空字符串"。
+<code>isNotBlank</code> = false 的情况：null、""、纯空格。这里区分两种"空"很重要。</p>
+</blockquote>
+<hr/>
+<h2 id="section-10">第三章：缓存更新策略（面试必问）</h2>
+<h3 id="section-11">3.1 三种策略对比</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+<th>一致性</th>
+<th>维护成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>内存淘汰</td>
+<td>Redis 自己满了自动删</td>
+<td>差</td>
+<td>低</td>
+</tr>
+<tr>
+<td>超时剔除</td>
+<td>给 key 设 TTL，到期自动删</td>
+<td>一般</td>
+<td>低</td>
+</tr>
+<tr>
+<td><strong>主动更新</strong></td>
+<td>修改 DB 后，手动删缓存</td>
+<td><strong>好</strong></td>
+<td>高</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>生产推荐</strong>：主动更新 + 超时剔除（兜底）</p>
+<h3 id="section-12">3.2 主动更新的三种方案</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>说明</th>
+<th>优缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cache Aside</strong></td>
+<td>自己维护（代码写）</td>
+<td>推荐，最常用</td>
+</tr>
+<tr>
+<td>Write Through</td>
+<td>缓存代理写 DB</td>
+<td>强一致，但复杂</td>
+</tr>
+<tr>
+<td>Write Behind</td>
+<td>先写缓存，异步写 DB</td>
+<td>性能好，但可能丢数据</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-13">3.3 Cache Aside 的写操作顺序（重要！）⭐⭐⭐</h3>
+<p><strong>问题</strong>：修改数据库时，缓存怎么办？</p>
+<p>有两种顺序：</p>
+<ol>
+<li>先删缓存，再改 DB</li>
+<li>先改 DB，再删缓存</li>
+</ol>
+<p><strong>为什么推荐"先改 DB，再删缓存"？</strong></p>
+<p>看"先删缓存，再改 DB"会发生什么：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>时刻 1：线程 A 要改数据，先删了缓存
+时刻 2：线程 B 来查，缓存没有，查 DB（旧值）
+时刻 3：线程 B 把旧值写入缓存
+时刻 4：线程 A 改了 DB（新值）
+结果：缓存是旧值，DB 是新值，不一致！
+</pre></div>
+</div><p>看"先改 DB，再删缓存"：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>时刻 1：线程 A 改 DB（新值）
+时刻 2：线程 B 来查，命中缓存（旧值）→ 返回
+时刻 3：线程 A 删缓存
+时刻 4：线程 C 来查，缓存没了，查 DB（新值）→ 写入缓存
+结果：只有时刻 2 那一瞬间是旧值，概率极低
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>结论</strong>：Cache Aside 用"先改 DB，再删缓存"。注意是<strong>删缓存</strong>，不是<strong>改缓存</strong>（让下次查询时重新加载）。</p>
+</blockquote>
+<h3 id="section-14">3.4 实现代码</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Override</span>
+<span class="nd">@Transactional</span><span class="w">   </span><span class="c1">// 事务保证 DB 操作原子性</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 参数校验</span>
+<span class="w">    </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shop</span><span class="p">.</span><span class="na">getId</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">fail</span><span class="p">(</span><span class="s">"店铺 id 不能为空"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2. 先更新数据库</span>
+<span class="w">    </span><span class="n">updateById</span><span class="p">(</span><span class="n">shop</span><span class="p">);</span><span class="w">   </span><span class="c1">// MyBatis-Plus 的方法</span>
+
+<span class="w">    </span><span class="c1">// 3. 再删除缓存</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">ok</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-15">第四章：缓存三大问题（重中之重）⭐⭐⭐⭐⭐</h2>
+<h3 id="section-16">4.1 缓存穿透</h3>
+<p><strong>问题</strong>：用户请求一个<strong>不存在</strong>的 key，Redis 没有，每次都打到数据库。如果有人恶意攻击，疯狂请求不存在的 ID，数据库就被打挂了。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>攻击者 → 请求 id=-1 → Redis 没有 → 查 MySQL → MySQL 也没有
+攻击者 → 请求 id=-2 → Redis 没有 → 查 MySQL → MySQL 也没有
+... 无限循环，MySQL 挂了
+</pre></div>
+</div><p><strong>解决方案</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>原理</th>
+<th>优缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>缓存空值</strong></td>
+<td>不存在也缓存 null，短过期</td>
+<td>简单，但占内存</td>
+</tr>
+<tr>
+<td><strong>布隆过滤器</strong></td>
+<td>预先加载存在的 key，请求先过布隆</td>
+<td>省内存，但有误判率</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>方案一：缓存空值（推荐，简单）</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="n">Shop</span><span class="w"> </span><span class="nf">queryShopById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 命中（有数据）</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">json</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">Shop</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 命中空值（防穿透！json 是 ""，不是 null）</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 查数据库</span>
+<span class="w">    </span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shopMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">shop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 数据库也没有 → 缓存空值，2 分钟过期</span>
+<span class="w">        </span><span class="c1">// 为什么短过期？万一以后新增了这个数据呢</span>
+<span class="w">        </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 写入缓存</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toJsonStr</span><span class="p">(</span><span class="n">shop</span><span class="p">),</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">shop</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>为什么用空字符串 <code>""</code> 而不是 <code>null</code></strong>？
+Redis 里存的就是字符串，没法存 null。用 <code>""</code> 表示"查过了，确实没有"。
+<code>isNotBlank("")</code> = false（不是有数据），<code>"" != null</code> = true（是空值），巧妙区分。</p>
+</blockquote>
+<hr/>
+<h3 id="section-17">4.2 缓存雪崩</h3>
+<p><strong>问题</strong>：大量 key <strong>同时过期</strong>，或者 Redis 宕机，所有请求打到数据库。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>0 点 → 批量缓存了 1 万个商品，TTL 都是 30 分钟
+30:00 → 1 万个 key 同时过期
+30:01 → 1 万个请求同时查 MySQL → MySQL 挂了
+</pre></div>
+</div><p><strong>解决方案</strong>：</p>
+<ol>
+<li><p><strong>给 TTL 加随机值</strong>（避免同时过期）⭐ 推荐</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 30 分钟 + 随机 0~5 分钟</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">RandomUtil</span><span class="p">.</span><span class="na">randomInt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">ttl</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+</pre></div>
+</div></li>
+<li><p><strong>Redis 集群</strong>（主从 + 哨兵，Redis 挂了有备用）</p>
+</li>
+<li><p><strong>降级限流</strong>（数据库扛不住时，限制请求量）</p>
+</li>
+<li><p><strong>多级缓存</strong>（本地缓存 + Redis）</p>
+</li>
+</ol>
+<hr/>
+<h3 id="section-18">4.3 缓存击穿</h3>
+<p><strong>问题</strong>：<strong>热点 key</strong> 过期的瞬间，大量请求同时打到数据库。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>双 11 → 商品 id=1 是爆款，缓存 30 分钟
+30:00 → 缓存过期
+30:00.001 → 1 万人同时查 id=1 → Redis 没有 → 1 万人同时查 MySQL → MySQL 挂了
+</pre></div>
+</div><p><strong>两种解决方案</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>原理</th>
+<th>一致性</th>
+<th>可用性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>互斥锁</strong></td>
+<td>只让一个线程查 DB，其他等待</td>
+<td>强一致</td>
+<td>低（等待）</td>
+</tr>
+<tr>
+<td><strong>逻辑过期</strong></td>
+<td>key 不过期，后台异步更新</td>
+<td>弱一致</td>
+<td>高</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="section-19">方案一：互斥锁 ⭐⭐</h4>
+<p><strong>思路</strong>：缓存失效时，只有一个线程能查数据库重建缓存，其他线程等待重试。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="n">Shop</span><span class="w"> </span><span class="nf">queryShopById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 1. 命中缓存</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">json</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">Shop</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2. 命中空值</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 3. 缓存未命中，尝试获取互斥锁</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">lockKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"lock:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">isLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tryLock</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">isLock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// 没拿到锁，等一会儿重试</span>
+<span class="w">            </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">queryShopById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span><span class="w">   </span><span class="c1">// 递归重试</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 4. DoubleCheck：拿到锁后再查一次缓存（可能别人刚重建好）</span>
+<span class="w">        </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">json</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">Shop</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 5. 查数据库</span>
+<span class="w">        </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shopMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">shop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 6. 写入缓存</span>
+<span class="w">        </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toJsonStr</span><span class="p">(</span><span class="n">shop</span><span class="p">),</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 7. 释放锁</span>
+<span class="w">        </span><span class="n">unlock</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">shop</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 获取锁（SETNX + 过期时间，原子操作）</span>
+<span class="kd">private</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">tryLock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Boolean</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">setIfAbsent</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="s">"1"</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">BooleanUtil</span><span class="p">.</span><span class="na">isTrue</span><span class="p">(</span><span class="n">flag</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 释放锁</span>
+<span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">unlock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>互斥锁的缺点</strong>：线程等待，性能有损失。但保证强一致性。</p>
+</blockquote>
+<h4 id="section-20">方案二：逻辑过期 ⭐⭐</h4>
+<p><strong>思路</strong>：key 永不过期（不设 TTL），但 value 里带一个"逻辑过期时间"。过期后，第一个请求触发异步重建，其他请求返回旧数据。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 包装类：包含数据和逻辑过期时间</span>
+<span class="nd">@Data</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RedisData</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">expireTime</span><span class="p">;</span><span class="w">   </span><span class="c1">// 逻辑过期时间</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w">                </span><span class="c1">// 实际数据</span>
+<span class="p">}</span>
+
+<span class="c1">// 线程池：异步重建缓存</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ExecutorService</span><span class="w"> </span><span class="n">CACHE_REBUILD_EXECUTOR</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">Executors</span><span class="p">.</span><span class="na">newFixedThreadPool</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="n">Shop</span><span class="w"> </span><span class="nf">queryWithLogicalExpire</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 1. 缓存不存在（理论上不会，热点数据提前预热）</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isBlank</span><span class="p">(</span><span class="n">json</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2. 反序列化</span>
+<span class="w">    </span><span class="n">RedisData</span><span class="w"> </span><span class="n">redisData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">RedisData</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">((</span><span class="n">JSONObject</span><span class="p">)</span><span class="w"> </span><span class="n">redisData</span><span class="p">.</span><span class="na">getData</span><span class="p">(),</span><span class="w"> </span><span class="n">Shop</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">expireTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisData</span><span class="p">.</span><span class="na">getExpireTime</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 3. 未过期 → 直接返回</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">expireTime</span><span class="p">.</span><span class="na">isAfter</span><span class="p">(</span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">shop</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 4. 已过期 → 尝试获取锁，异步重建</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">lockKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"lock:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tryLock</span><span class="p">(</span><span class="n">lockKey</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 拿到锁，异步重建缓存</span>
+<span class="w">        </span><span class="n">CACHE_REBUILD_EXECUTOR</span><span class="p">.</span><span class="na">submit</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// DoubleCheck</span>
+<span class="w">                </span><span class="n">RedisData</span><span class="w"> </span><span class="n">rd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span>
+<span class="w">                    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">),</span><span class="w"> </span><span class="n">RedisData</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rd</span><span class="p">.</span><span class="na">getExpireTime</span><span class="p">().</span><span class="na">isAfter</span><span class="p">(</span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">return</span><span class="p">;</span><span class="w">   </span><span class="c1">// 别人已经重建了</span>
+<span class="w">                </span><span class="p">}</span>
+
+<span class="w">                </span><span class="c1">// 查数据库，写入缓存</span>
+<span class="w">                </span><span class="n">Shop</span><span class="w"> </span><span class="n">newShop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shopMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">                </span><span class="n">saveShop2Redis</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="mi">30L</span><span class="p">);</span><span class="w">   </span><span class="c1">// 逻辑过期 30 分钟</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">unlock</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 5. 返回旧数据（不等待重建完成）</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">shop</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 把数据写入 Redis（带逻辑过期时间）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">saveShop2Redis</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">expireSeconds</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shopMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="n">RedisData</span><span class="w"> </span><span class="n">redisData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RedisData</span><span class="p">();</span>
+<span class="w">    </span><span class="n">redisData</span><span class="p">.</span><span class="na">setData</span><span class="p">(</span><span class="n">shop</span><span class="p">);</span>
+<span class="w">    </span><span class="n">redisData</span><span class="p">.</span><span class="na">setExpireTime</span><span class="p">(</span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">plusSeconds</span><span class="p">(</span><span class="n">expireSeconds</span><span class="p">));</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toJsonStr</span><span class="p">(</span><span class="n">redisData</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>逻辑过期的优势</strong>：所有请求都能立即返回（要么新数据要么旧数据），不会阻塞。缺点是短暂返回旧数据。</p>
+</blockquote>
+<h4 id="section-21">两种方案对比 ⭐</h4>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>互斥锁</th>
+<th>逻辑过期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一致性</td>
+<td>强（等待最新数据）</td>
+<td>弱（短暂旧数据）</td>
+</tr>
+<tr>
+<td>可用性</td>
+<td>低（等待锁）</td>
+<td>高（立即返回）</td>
+</tr>
+<tr>
+<td>实现复杂度</td>
+<td>中</td>
+<td>高（需要预热）</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>数据要求精确</td>
+<td>高并发、可容忍短暂不一致</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h3 id="section-22">4.4 三大问题总结 ⭐⭐⭐</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>现象</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>穿透</strong></td>
+<td>查不存在的数据</td>
+<td>缓存空值 / 布隆过滤器</td>
+</tr>
+<tr>
+<td><strong>雪崩</strong></td>
+<td>大量 key 同时过期</td>
+<td>随机 TTL / 集群 / 限流</td>
+</tr>
+<tr>
+<td><strong>击穿</strong></td>
+<td>热点 key 过期</td>
+<td>互斥锁 / 逻辑过期</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>记忆口诀</strong>：</p>
+<ul>
+<li>穿透 = 查不到 → 缓存空值</li>
+<li>雪崩 = 大量倒 → 加随机 TTL</li>
+<li>击穿 = 热点倒 → 加锁重建</li>
+</ul>
+</blockquote>
+<hr/>
+<h2 id="section-23">第五章：秒杀设计（项目核心）</h2>
+<h3 id="section-24">5.1 全局唯一 ID</h3>
+<p><strong>为什么需要</strong>：秒杀订单 ID 不能用数据库自增（分库分表会冲突，且暴露销量）。</p>
+<p><strong>要求</strong>：唯一、递增、高性能、安全。</p>
+<p><strong>设计方案</strong>：时间戳 + 序列号</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ID = 时间戳(31位) | 序列号(32位)
+    ↑                ↑
+    秒数(从2022年起)  Redis 自增（每天重置）
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Component</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RedisIdWorker</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 起始时间戳（2022-01-01 00:00:00）</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">BEGIN_TIMESTAMP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1640995200L</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">StringRedisTemplate</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">nextId</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">keyPrefix</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 1. 生成时间戳</span>
+<span class="w">        </span><span class="n">LocalDateTime</span><span class="w"> </span><span class="n">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDateTime</span><span class="p">.</span><span class="na">now</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">nowSecond</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="p">.</span><span class="na">toEpochSecond</span><span class="p">(</span><span class="n">ZoneOffset</span><span class="p">.</span><span class="na">UTC</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nowSecond</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">BEGIN_TIMESTAMP</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// 2. 生成序列号（Redis 自增）</span>
+<span class="w">        </span><span class="c1">// key 包含日期，每天自增从 0 开始</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">DateTimeFormatter</span><span class="p">.</span><span class="na">ofPattern</span><span class="p">(</span><span class="s">"yyyy:MM:dd"</span><span class="p">));</span>
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">increment</span><span class="p">(</span><span class="s">"icr:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">keyPrefix</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">":"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">date</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 3. 拼接（时间戳左移 32 位 + 序列号）</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">timestamp</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>为什么要加日期</strong>？key 包含日期，每天的 count 从 0 开始，不会无限增长。</p>
+</blockquote>
+<h3 id="section-25">5.2 超卖问题 ⭐⭐⭐</h3>
+<p><strong>问题</strong>：库存只剩 1 个，两个用户同时下单，都看到"有库存"，都下单成功 → 超卖。</p>
+<p><strong>解决：乐观锁</strong></p>
+<p>不用真的加锁，而是在更新时加条件判断：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ❌ 错误做法：先查再改（有并发问题）</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">voucherMapper</span><span class="p">.</span><span class="na">getStock</span><span class="p">(</span><span class="n">voucherId</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stock</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">voucherMapper</span><span class="p">.</span><span class="na">updateStock</span><span class="p">(</span><span class="n">voucherId</span><span class="p">,</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">   </span><span class="c1">// 可能已被别人改了</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ 乐观锁：一条 SQL 搞定</span>
+<span class="c1">// UPDATE voucher SET stock = stock - 1</span>
+<span class="c1">// WHERE id = ? AND stock &gt; 0</span>
+<span class="kt">boolean</span><span class="w"> </span><span class="n">success</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">seckillVoucherService</span><span class="p">.</span><span class="na">update</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">setSql</span><span class="p">(</span><span class="s">"stock = stock - 1"</span><span class="p">)</span><span class="w">            </span><span class="c1">// set stock = stock - 1</span>
+<span class="w">    </span><span class="p">.</span><span class="na">eq</span><span class="p">(</span><span class="s">"voucher_id"</span><span class="p">,</span><span class="w"> </span><span class="n">voucherId</span><span class="p">)</span><span class="w">             </span><span class="c1">// where voucher_id = ?</span>
+<span class="w">    </span><span class="p">.</span><span class="na">gt</span><span class="p">(</span><span class="s">"stock"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">                          </span><span class="c1">// and stock &gt; 0</span>
+<span class="w">    </span><span class="p">.</span><span class="na">update</span><span class="p">();</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">success</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">fail</span><span class="p">(</span><span class="s">"库存不足"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>为什么叫"乐观锁"</strong>？因为乐观地认为"大多数情况下不会冲突"，不加锁，只在最后更新时判断条件。</p>
+</blockquote>
+<h3 id="section-26">5.3 一人一单 ⭐⭐</h3>
+<p><strong>问题</strong>：用户疯狂点击，一个用户下了多单。</p>
+<p><strong>单机解决</strong>：用 <code>synchronized</code> 锁住用户 ID</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// ❌ 单机版（集群下无效）</span>
+<span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">userId</span><span class="p">.</span><span class="na">toString</span><span class="p">().</span><span class="na">intern</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 查订单、下单</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>集群问题</strong>：<code>synchronized</code> 只锁当前 JVM，多台服务器之间无效。</p>
+<p><strong>解决：分布式锁</strong>（下一章详解）</p>
+<hr/>
+<h2 id="section-27">第六章：分布式锁 ⭐⭐⭐⭐⭐（最重要）</h2>
+<h3 id="section-28">6.1 为什么需要分布式锁</h3>
+<p><strong>故事</strong>：你有 3 台服务器，用户 A 在服务器 1 上下了单，服务器 1 用 <code>synchronized</code> 锁住了。但用户 A 又在服务器 2 上点了下单，服务器 2 不知道服务器 1 锁了，又让他下单成功 → 重复下单。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>服务器1：synchronized(用户A) → 下单成功
+服务器2：synchronized(用户A) → 也下单成功 ❌（不知道服务器1锁了）
+</pre></div>
+</div><p><strong>分布式锁</strong>：所有服务器都去 Redis 上锁，谁先抢到谁能下单。</p>
+<h3 id="section-29">6.2 自实现分布式锁（SETNX）</h3>
+<p><strong>核心思路</strong>：用 <code>SETNX</code>（不存在才设置），谁设置成功谁拿到锁。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">tryLock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">lockKey</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">requestId</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">expireTime</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// SETNX + 过期时间（原子操作）</span>
+<span class="w">    </span><span class="n">Boolean</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">setIfAbsent</span><span class="p">(</span><span class="n">lockKey</span><span class="p">,</span><span class="w"> </span><span class="n">requestId</span><span class="p">,</span><span class="w"> </span><span class="n">expireTime</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">BooleanUtil</span><span class="p">.</span><span class="na">isTrue</span><span class="p">(</span><span class="n">flag</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">unlock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">lockKey</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">requestId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 先判断是不是自己的锁，再删除</span>
+<span class="w">    </span><span class="c1">// 但这两步不是原子的，有坑！后面用 Lua 解决</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">requestId</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-30">6.3 三个核心问题与解决</h3>
+<h4 id="section-31">问题 1：锁误删</h4>
+<p><strong>场景</strong>：线程 A 拿到锁，业务卡了 10 秒。锁 5 秒后自动过期，线程 B 拿到锁。线程 A 终于执行完，把锁删了（删的是 B 的锁！）</p>
+<p><strong>解决</strong>：锁里存"谁加的锁"（线程 ID），删之前判断是不是自己的。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 加锁时存线程 ID</span>
+<span class="n">String</span><span class="w"> </span><span class="n">threadId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getId</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">""</span><span class="p">;</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">setIfAbsent</span><span class="p">(</span><span class="n">lockKey</span><span class="p">,</span><span class="w"> </span><span class="n">threadId</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">);</span>
+
+<span class="c1">// 释放锁时先判断</span>
+<span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">threadId</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-32">问题 2：判断 + 删除不原子</h4>
+<p><strong>场景</strong>：判断完是自己的锁，正要删，锁过期了，B 拿到锁，A 把 B 的锁删了。</p>
+<p><strong>解决</strong>：用 Lua 脚本保证原子性</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// Lua 脚本：判断 + 删除一步完成</span>
+<span class="n">String</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="s">"if redis.call('get', KEYS[1]) == ARGV[1] then "</span><span class="w"> </span><span class="o">+</span><span class="w">   </span><span class="c1">// 判断是不是自己的</span>
+<span class="w">    </span><span class="s">"  return redis.call('del', KEYS[1]) "</span><span class="w"> </span><span class="o">+</span><span class="w">              </span><span class="c1">// 是就删</span>
+<span class="w">    </span><span class="s">"else "</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"  return 0 "</span><span class="w"> </span><span class="o">+</span><span class="w">                                        </span><span class="c1">// 不是就不删</span>
+<span class="w">    </span><span class="s">"end"</span><span class="p">;</span>
+
+<span class="n">Long</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span>
+<span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">DefaultRedisScript</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">script</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">class</span><span class="p">),</span>
+<span class="w">    </span><span class="n">Collections</span><span class="p">.</span><span class="na">singletonList</span><span class="p">(</span><span class="n">lockKey</span><span class="p">),</span><span class="w">    </span><span class="c1">// KEYS[1]</span>
+<span class="w">    </span><span class="n">threadId</span><span class="w">                                 </span><span class="c1">// ARGV[1]</span>
+<span class="p">);</span>
+</pre></div>
+</div><h4 id="section-33">问题 3：不可重入</h4>
+<p><strong>场景</strong>：同一个线程想多次获取同一把锁（递归调用），第二次获取失败。</p>
+<p><strong>解决</strong>：用 Hash 存锁次数（Redisson 实现）</p>
+<h3 id="section-34">6.4 Redisson（推荐，生产用这个）⭐⭐⭐</h3>
+<p><strong>自实现的锁问题太多</strong>，生产环境用 Redisson 框架。</p>
+<p><strong>依赖</strong>：</p>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.redisson<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>redisson-spring-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>3.13.6<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><p><strong>配置</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">RedissonClient</span><span class="w"> </span><span class="nf">redissonClient</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Config</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Config</span><span class="p">();</span>
+<span class="w">    </span><span class="n">config</span><span class="p">.</span><span class="na">useSingleServer</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">setAddress</span><span class="p">(</span><span class="s">"redis://192.168.150.101:6379"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">setPassword</span><span class="p">(</span><span class="s">"123321"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Redisson</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>使用</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Autowired</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">RedissonClient</span><span class="w"> </span><span class="n">redissonClient</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">createOrder</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 获取锁（参数：锁名）</span>
+<span class="w">    </span><span class="n">RLock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redissonClient</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">"lock:order:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 尝试加锁</span>
+<span class="w">    </span><span class="c1">// tryLock(等待时间, 锁超时时间, 时间单位)</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">isLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">isLock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">fail</span><span class="p">(</span><span class="s">"请勿重复下单"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 3. 业务逻辑（查订单、下单）</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">createOrderInternal</span><span class="p">(</span><span class="n">userId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 4. 释放锁</span>
+<span class="w">        </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-35">6.5 Redisson 的核心机制 ⭐⭐</h3>
+<h4 id="section-36">可重入锁</h4>
+<p>同一个线程可以多次获取同一把锁，内部用 Hash 存次数：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>key = lock:order:1
+value = {
+    "线程ID": 2    // 获取了 2 次
+}
+</pre></div>
+</div><h4 id="section-37">WatchDog（看门狗）⭐⭐</h4>
+<p><strong>问题</strong>：锁超时时间设短了，业务没执行完锁就过期了；设长了，进程崩了锁要等很久。</p>
+<p><strong>WatchDog 解决</strong>：不设超时时间时，WatchDog 默认 30 秒，每 10 秒自动续期。进程崩了就不再续期，锁自动过期。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>获取锁（不设超时）→ WatchDog 启动
+  ↓ 每 10 秒
+  续期到 30 秒
+  ↓ ...
+业务完成 → 释放锁 → WatchDog 停止
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>注意</strong>：WatchDog 只在<strong>不传超时时间</strong>时生效。如果传了 <code>lock.tryLock(1, 10, SECONDS)</code>，就不会有 WatchDog。</p>
+</blockquote>
+<h4 id="section-38">联锁（MultiLock）</h4>
+<p>多 Redis 实例上加锁，防单点故障：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">RLock</span><span class="w"> </span><span class="n">lock1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redissonClient1</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">"lock1"</span><span class="p">);</span>
+<span class="n">RLock</span><span class="w"> </span><span class="n">lock2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redissonClient2</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">"lock2"</span><span class="p">);</span>
+<span class="n">RLock</span><span class="w"> </span><span class="n">lock3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redissonClient3</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">"lock3"</span><span class="p">);</span>
+
+<span class="n">RLock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redissonClient</span><span class="p">.</span><span class="na">getMultiLock</span><span class="p">(</span><span class="n">lock1</span><span class="p">,</span><span class="w"> </span><span class="n">lock2</span><span class="p">,</span><span class="w"> </span><span class="n">lock3</span><span class="p">);</span>
+<span class="n">multiLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span><span class="w">   </span><span class="c1">// 3 个都锁上才算成功</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-39">第七章：秒杀优化（异步下单）</h2>
+<h3 id="section-40">7.1 传统秒杀的问题</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>请求进来 → 查库存（MySQL）→ 查一人一单（MySQL）→ 扣库存（MySQL）→ 创建订单（MySQL）
+                                                              ↓
+                                                        4 次 DB 操作，慢
+</pre></div>
+</div><h3 id="section-41">7.2 优化思路：Redis 预校验 + 异步下单</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>请求进来 → Redis 预校验（纯内存，极快）→ 通过则生成订单 ID，推到消息队列，立即返回
+                                              ↓
+                                      异步消费：从队列读取，真正写 MySQL
+</pre></div>
+</div><h3 id="section-42">7.3 Lua 脚本保证原子性</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// Lua 脚本：判断库存 + 一人一单 + 扣库存，原子操作</span>
+<span class="n">String</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="s">"local voucherId = ARGV[1]\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"local userId = ARGV[2]\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"local orderId = ARGV[3]\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"local stockKey = 'seckill:stock:' .. voucherId\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"local orderKey = 'seckill:order:' .. voucherId\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"-- 判断库存\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"if tonumber(redis.call('get', stockKey)) &lt;= 0 then return 1 end\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"-- 判断是否重复下单\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"if redis.call('sismember', orderKey, userId) == 1 then return 2 end\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"-- 扣库存\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"redis.call('incrby', stockKey, -1)\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"-- 记录用户\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"redis.call('sadd', orderKey, userId)\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"-- 推送到消息队列\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"redis.call('xadd', 'stream.orders', '*', 'userId', userId, 'voucherId', voucherId, 'id', orderId)\n"</span><span class="w"> </span><span class="o">+</span>
+<span class="w">    </span><span class="s">"return 0"</span><span class="p">;</span>
+
+<span class="c1">// 执行</span>
+<span class="n">Long</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span>
+<span class="w">    </span><span class="n">SECKILL_SCRIPT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Collections</span><span class="p">.</span><span class="na">emptyList</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">voucherId</span><span class="p">.</span><span class="na">toString</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">userId</span><span class="p">.</span><span class="na">toString</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">orderId</span><span class="p">.</span><span class="na">toString</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">// 0 = 成功，1 = 库存不足，2 = 重复下单</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Result</span><span class="p">.</span><span class="na">fail</span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"库存不足"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">"请勿重复下单"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-43">第八章：面试常问（附答案）</h2>
+<h3 id="section-44">Q1：缓存穿透、雪崩、击穿的区别？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>穿透：查不存在的数据，穿到 DB</li>
+<li>雪崩：大量 key 同时过期</li>
+<li>击穿：热点 key 过期，瞬间大量请求</li>
+</ul>
+<h3 id="section-45">Q2：Cache Aside 为什么先改 DB 再删缓存？</h3>
+<p><strong>答</strong>：先删缓存可能导致其他线程读到 DB 旧值并写回缓存。先改 DB 再删缓存，不一致概率极低。</p>
+<h3 id="section-46">Q3：分布式锁的三个问题？</h3>
+<p><strong>答</strong>：</p>
+<ol>
+<li>误删：存线程 ID，删前判断</li>
+<li>不原子：用 Lua 脚本</li>
+<li>不可重入：用 Redisson（Hash 存次数）</li>
+</ol>
+<h3 id="section-47">Q4：Redisson WatchDog 机制？</h3>
+<p><strong>答</strong>：不设超时时自动启动，每 10 秒续期到 30 秒。进程崩溃不续期，锁自动释放。</p>
+<h3 id="section-48">Q5：超卖问题怎么解决？</h3>
+<p><strong>答</strong>：乐观锁，<code>WHERE stock &gt; 0</code>，一条 SQL 判断 + 修改。</p>
+<h3 id="section-49">Q6：秒杀怎么优化？</h3>
+<p><strong>答</strong>：Redis 预校验（Lua 脚本）+ 消息队列异步下单。</p>
+<hr/>
+<h2 id="section-50">第九章：本章小结</h2>
+<h3 id="section-51">✅ 你已经掌握</h3>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Redis 代替 Session 实现登录</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>缓存基础代码</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>缓存更新策略</strong>（先改 DB，再删缓存）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>缓存穿透</strong> → 缓存空值</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>缓存雪崩</strong> → 随机 TTL</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>缓存击穿</strong> → 互斥锁 / 逻辑过期</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>全局唯一 ID（时间戳 + 序列号）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>超卖 → 乐观锁</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>分布式锁</strong>（SETNX + Lua → Redisson）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Redisson 可重入锁 + WatchDog</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>秒杀异步优化</li>
+</ul>
+<h3 id="section-52">⚠ 新手易踩的坑</h3>
+<ol>
+<li>缓存空值用 <code>""</code>，别用 <code>null</code></li>
+<li>互斥锁要 DoubleCheck（防止重复查库）</li>
+<li>释放锁用 Lua 脚本（原子性）</li>
+<li>Redisson WatchDog 只在不设超时时间时生效</li>
+<li>秒杀判断 + 扣库存要用 Lua（原子性）</li>
+</ol>
+<hr/>
+<h2 id="section-53">下一章预告</h2>
+<p><strong>Redis 高级与原理</strong>：</p>
+<ul>
+<li>持久化（RDB / AOF）</li>
+<li>集群（主从 / 哨兵 / 分片）</li>
+<li>底层数据结构（SDS、跳表）</li>
+<li>网络模型（IO 多路复用）</li>
+<li>内存淘汰策略</li>
+</ul>
+<hr/>
+<blockquote>
+<p>💡 <strong>学习建议</strong>：这一章是 Redis 最难也最重要的部分。建议把代码自己敲一遍，特别是"缓存三大问题"和"分布式锁"。面试几乎必问。</p>
+</blockquote>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="Redis%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html"><small>← 上一篇</small><strong>Redis 入门 · 保姆级详解 ⭐⭐⭐</strong></a><a href="Redis%E9%AB%98%E7%BA%A7%E4%B8%8E%E5%8E%9F%E7%90%86-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html"><small>下一篇 →</small><strong>Redis 高级与原理 · 保姆级详解 ⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">写在前面</a><a class="toc-h2" href="#section-1">第一章：短信登录（热身）</a><a class="toc-h3" href="#section-2">1.1 先讲问题：Session 不共享</a><a class="toc-h3" href="#section-3">1.2 Redis 代替 Session 的设计</a><a class="toc-h3" href="#section-4">1.3 完整代码（每行注释）</a><a class="toc-h3" href="#section-5">1.4 登录拦截器（每次请求都拦截）</a><a class="toc-h3" href="#section-6">1.5 常见报错 ⚠</a><a class="toc-h2" href="#section-7">第二章：商户查询缓存（核心中的核心）</a><a class="toc-h3" href="#section-8">2.1 什么是缓存</a><a class="toc-h3" href="#section-9">2.2 基础缓存代码</a><a class="toc-h2" href="#section-10">第三章：缓存更新策略（面试必问）</a><a class="toc-h3" href="#section-11">3.1 三种策略对比</a><a class="toc-h3" href="#section-12">3.2 主动更新的三种方案</a><a class="toc-h3" href="#section-13">3.3 Cache Aside 的写操作顺序（重要！）⭐⭐⭐</a><a class="toc-h3" href="#section-14">3.4 实现代码</a><a class="toc-h2" href="#section-15">第四章：缓存三大问题（重中之重）⭐⭐⭐⭐⭐</a><a class="toc-h3" href="#section-16">4.1 缓存穿透</a><a class="toc-h3" href="#section-17">4.2 缓存雪崩</a><a class="toc-h3" href="#section-18">4.3 缓存击穿</a><a class="toc-h4" href="#section-19">方案一：互斥锁 ⭐⭐</a><a class="toc-h4" href="#section-20">方案二：逻辑过期 ⭐⭐</a><a class="toc-h4" href="#section-21">两种方案对比 ⭐</a><a class="toc-h3" href="#section-22">4.4 三大问题总结 ⭐⭐⭐</a><a class="toc-h2" href="#section-23">第五章：秒杀设计（项目核心）</a><a class="toc-h3" href="#section-24">5.1 全局唯一 ID</a><a class="toc-h3" href="#section-25">5.2 超卖问题 ⭐⭐⭐</a><a class="toc-h3" href="#section-26">5.3 一人一单 ⭐⭐</a><a class="toc-h2" href="#section-27">第六章：分布式锁 ⭐⭐⭐⭐⭐（最重要）</a><a class="toc-h3" href="#section-28">6.1 为什么需要分布式锁</a><a class="toc-h3" href="#section-29">6.2 自实现分布式锁（SETNX）</a><a class="toc-h3" href="#section-30">6.3 三个核心问题与解决</a><a class="toc-h4" href="#section-31">问题 1：锁误删</a><a class="toc-h4" href="#section-32">问题 2：判断 + 删除不原子</a><a class="toc-h4" href="#section-33">问题 3：不可重入</a><a class="toc-h3" href="#section-34">6.4 Redisson（推荐，生产用这个）⭐⭐⭐</a><a class="toc-h3" href="#section-35">6.5 Redisson 的核心机制 ⭐⭐</a><a class="toc-h4" href="#section-36">可重入锁</a><a class="toc-h4" href="#section-37">WatchDog（看门狗）⭐⭐</a><a class="toc-h4" href="#section-38">联锁（MultiLock）</a><a class="toc-h2" href="#section-39">第七章：秒杀优化（异步下单）</a><a class="toc-h3" href="#section-40">7.1 传统秒杀的问题</a><a class="toc-h3" href="#section-41">7.2 优化思路：Redis 预校验 + 异步下单</a><a class="toc-h3" href="#section-42">7.3 Lua 脚本保证原子性</a><a class="toc-h2" href="#section-43">第八章：面试常问（附答案）</a><a class="toc-h3" href="#section-44">Q1：缓存穿透、雪崩、击穿的区别？</a><a class="toc-h3" href="#section-45">Q2：Cache Aside 为什么先改 DB 再删缓存？</a><a class="toc-h3" href="#section-46">Q3：分布式锁的三个问题？</a><a class="toc-h3" href="#section-47">Q4：Redisson WatchDog 机制？</a><a class="toc-h3" href="#section-48">Q5：超卖问题怎么解决？</a><a class="toc-h3" href="#section-49">Q6：秒杀怎么优化？</a><a class="toc-h2" href="#section-50">第九章：本章小结</a><a class="toc-h3" href="#section-51">✅ 你已经掌握</a><a class="toc-h3" href="#section-52">⚠ 新手易踩的坑</a><a class="toc-h2" href="#section-53">下一章预告</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

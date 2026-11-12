@@ -1,0 +1,1004 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Elasticsearch 搜索引擎 · 保姆级详解 ⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/详细课程/Elasticsearch搜索引擎-保姆级详解.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>详细课程</h2><nav aria-label="同专题笔记"><a href="Docker%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Docker 入门 · 保姆级详解 ⭐⭐⭐</a><a aria-current="page" href="Elasticsearch%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Elasticsearch 搜索引擎 · 保姆级详解 ⭐⭐⭐</a><a href="RabbitMQ%E5%9F%BA%E7%A1%80-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">RabbitMQ 基础 · 保姆级详解 ⭐⭐⭐</a><a href="RabbitMQ%E9%AB%98%E7%BA%A7-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">RabbitMQ 高级 · 保姆级详解 ⭐⭐⭐</a><a href="Redis%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 入门 · 保姆级详解 ⭐⭐⭐</a><a href="Redis%E5%AE%9E%E6%88%98-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 实战 · 保姆级详解 ⭐⭐⭐⭐</a><a href="Redis%E9%AB%98%E7%BA%A7%E4%B8%8E%E5%8E%9F%E7%90%86-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 高级与原理 · 保姆级详解 ⭐⭐⭐⭐</a><a href="SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">SpringCloud 微服务 · 保姆级详解 ⭐⭐⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>详细课程</div><h1>Elasticsearch 搜索引擎 · 保姆级详解 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>零基础友好 · 每个概念都配类比 · 每行代码都注释 · 每个坑都标注
+对应黑马 SpringCloud ES 实用篇 01~03</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">写在前面</h2>
+<p><strong>学习目标</strong>：学完这份笔记，你能：</p>
+<ul>
+<li>理解倒排索引，知道 ES 为什么搜索快</li>
+<li>创建索引库，定义 mapping 映射</li>
+<li>对文档进行增删改查</li>
+<li>用 DSL 语言进行各种查询（全文搜索、精确查询、地理查询）</li>
+<li>用 Java 客户端操作 ES</li>
+<li>实现聚合统计、自动补全</li>
+</ul>
+<hr/>
+<h2 id="section-1">第一章：为什么要用 Elasticsearch</h2>
+<h3 id="section-2">1.1 MySQL 搜索的问题</h3>
+<p><strong>场景</strong>：电商网站搜索商品"小米手机"。</p>
+<p>用 MySQL：</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">product</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%小米手机%'</span>
+<span class="w">  </span><span class="k">OR</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%小米手机%'</span>
+</pre></div>
+</div><p><strong>问题</strong>：</p>
+<ol>
+<li><strong>速度慢</strong>：<code>LIKE '%...%'</code> 无法使用索引，全表扫描，百万数据要几秒</li>
+<li><strong>不智能</strong>：搜"小米手机"找不到"手机 小米 新款"（词序不同）</li>
+<li><strong>不能按相关度排序</strong>：关键词出现 10 次的和出现 1 次的结果一样</li>
+</ol>
+<p><strong>Elasticsearch 解决</strong>：</p>
+<ol>
+<li><strong>速度快</strong>：基于倒排索引，O(1) 查找</li>
+<li><strong>智能分词</strong>：先分词再搜，"小米手机" = ["小米", "手机"]</li>
+<li><strong>相关度排序</strong>：关键词出现越多、位置越重要，排名越靠前</li>
+</ol>
+<h3 id="section-3">1.2 倒排索引（ES 的灵魂）⭐⭐</h3>
+<p><strong>正向索引（MySQL）</strong>：</p>
+<ul>
+<li>结构：文档 → 包含的词</li>
+<li>查询：遍历所有文档，看哪个包含关键词</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>文档1: "小米手机发布新品"
+文档2: "苹果手机降价"
+文档3: "小米电视新款"
+</pre></div>
+</div><p>搜"手机"，要扫描所有文档，O(N)。</p>
+<p><strong>倒排索引（ES）</strong>：</p>
+<ul>
+<li>结构：词 → 包含该词的文档列表</li>
+<li>查询：直接查词，O(1)</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>词         文档列表
+"小米"  → [文档1, 文档3]
+"手机"  → [文档1, 文档2]
+"苹果"  → [文档2]
+"电视"  → [文档3]
+"新品"  → [文档1]
+</pre></div>
+</div><p>搜"手机"→ 直接找"手机"这个词 → 返回[文档1, 文档2]。</p>
+<p><strong>搜"小米手机"的流程</strong>：</p>
+<ol>
+<li>分词：["小米", "手机"]</li>
+<li>查"小米"→ [文档1, 文档3]</li>
+<li>查"手机"→ [文档1, 文档2]</li>
+<li>求交集 → [文档1]（包含两个词）</li>
+<li>或者并集，按相关度排序</li>
+</ol>
+<h3 id="section-4">1.3 ES vs MySQL</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>MySQL</th>
+<th>Elasticsearch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Table（表）</td>
+<td>Index（索引库）</td>
+</tr>
+<tr>
+<td>Row（行）</td>
+<td>Document（文档），JSON 格式</td>
+</tr>
+<tr>
+<td>Column（列）</td>
+<td>Field（字段）</td>
+</tr>
+<tr>
+<td>Schema（约束）</td>
+<td>Mapping（映射）</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>DSL（JSON 查询语言）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 两者不是竞争，而是互补！MySQL 存全量数据（持久可靠），ES 存搜索数据（查询快）。</p>
+</blockquote>
+<h3 id="section-5">1.4 安装（Docker）</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 创建网络（让 ES 和 Kibana 能互访）</span>
+docker<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>es-net
+
+<span class="c1"># 安装 ES</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>es<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="s2">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span><span class="w"> </span><span class="se">\ </span><span class="w">  </span><span class="c1"># 堆内存（学习用 512m 够）</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="s2">"discovery.type=single-node"</span><span class="w"> </span><span class="se">\ </span><span class="w">         </span><span class="c1"># 单节点模式</span>
+<span class="w">  </span>-v<span class="w"> </span>es-data:/usr/share/elasticsearch/data<span class="w"> </span><span class="se">\ </span><span class="c1"># 数据持久化</span>
+<span class="w">  </span>-v<span class="w"> </span>es-plugins:/usr/share/elasticsearch/plugins<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># 插件目录</span>
+<span class="w">  </span>--privileged<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>es-net<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">9200</span>:9200<span class="w"> </span><span class="se">\ </span><span class="w">   </span><span class="c1"># REST 接口端口</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">9300</span>:9300<span class="w"> </span><span class="se">\ </span><span class="w">   </span><span class="c1"># 节点通信端口</span>
+<span class="w">  </span>elasticsearch:7.12.1
+
+<span class="c1"># 验证（浏览器访问）</span>
+<span class="c1"># http://服务器IP:9200</span>
+<span class="c1"># 返回 JSON 说明安装成功</span>
+
+<span class="c1"># 安装 Kibana（可视化管理工具）</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>kibana<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">ELASTICSEARCH_HOSTS</span><span class="o">=</span>http://es:9200<span class="w"> </span><span class="se">\ </span><span class="w">  </span><span class="c1"># 连接 ES</span>
+<span class="w">  </span>--network<span class="w"> </span>es-net<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">5601</span>:5601<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>kibana:7.12.1
+
+<span class="c1"># Kibana 访问：http://服务器IP:5601</span>
+</pre></div>
+</div><p><strong>安装 IK 分词器（中文分词必须装）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 进入 ES 容器</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>es<span class="w"> </span>bash
+
+<span class="c1"># 安装插件（需要联网，或提前下好放到 volumes 目录）</span>
+./bin/elasticsearch-plugin<span class="w"> </span>install<span class="w"> </span>https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.12.1/elasticsearch-analysis-ik-7.12.1.zip
+
+<span class="c1"># 退出并重启 ES</span>
+<span class="nb">exit</span>
+docker<span class="w"> </span>restart<span class="w"> </span>es
+</pre></div>
+</div><hr/>
+<h2 id="section-6">第二章：索引库操作（mapping 映射）⭐⭐</h2>
+<h3 id="section-7">2.1 mapping 是什么</h3>
+<p><strong>类比</strong>：MySQL 建表前要定义表结构（字段名、字段类型）。
+ES 也需要定义"索引库结构"，这就是 mapping。</p>
+<h3 id="section-8">2.2 常见字段类型</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+<th>适合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text</code></td>
+<td>可分词文本，参与全文搜索</td>
+<td>商品名称、描述</td>
+</tr>
+<tr>
+<td><code>keyword</code></td>
+<td>不分词，精确匹配</td>
+<td>品牌、ID、状态</td>
+</tr>
+<tr>
+<td><code>long / integer / short / byte</code></td>
+<td>整数</td>
+<td>价格、库存</td>
+</tr>
+<tr>
+<td><code>float / double</code></td>
+<td>浮点</td>
+<td>评分、金额</td>
+</tr>
+<tr>
+<td><code>boolean</code></td>
+<td>布尔</td>
+<td>是否上架</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>日期</td>
+<td>创建时间</td>
+</tr>
+<tr>
+<td><code>geo_point</code></td>
+<td>地理坐标（经纬度）</td>
+<td>位置信息</td>
+</tr>
+<tr>
+<td><code>object</code></td>
+<td>嵌套对象</td>
+<td>用户地址</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>重要区别</strong>：</p>
+<ul>
+<li><code>text</code>：会被分词，然后建倒排索引，支持全文搜索</li>
+<li><code>keyword</code>：不分词，存原始值，支持精确查询（<code>term</code> 查询）</li>
+</ul>
+<blockquote>
+<p>⚠ <strong>新手易错</strong>：用 <code>term</code>（精确查询）查 <code>text</code> 类型字段，查不到！因为 <code>text</code> 存的是分词后的内容，不是原文。</p>
+</blockquote>
+<h3 id="section-9">2.3 创建索引库</h3>
+<p>在 Kibana 的 Dev Tools 里执行（或用 Postman）：</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"mappings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w">       </span><span class="c1">// 酒店 ID，精确匹配</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span><span class="w">          </span><span class="c1">// 酒店名，参与全文搜索</span>
+<span class="w">        </span><span class="nt">"analyzer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ik_max_word"</span><span class="p">,</span><span class="w">   </span><span class="c1">// 写入时分词器（细粒度）</span>
+<span class="w">        </span><span class="nt">"copy_to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="w">             </span><span class="c1">// 同时复制到 all 字段</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="p">,</span><span class="w">       </span><span class="c1">// 地址，精确匹配</span>
+<span class="w">        </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">           </span><span class="c1">// 不建索引，不参与搜索</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w">        </span><span class="c1">// 价格</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w">        </span><span class="c1">// 评分</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"brand"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w">        </span><span class="c1">// 品牌，精确匹配</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w">        </span><span class="c1">// 城市</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"starName"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w">        </span><span class="c1">// 星级</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"business"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w">        </span><span class="c1">// 商圈</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"geo_point"</span><span class="w">      </span><span class="c1">// 地理坐标（经纬度）</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"pic"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="p">,</span><span class="w">       </span><span class="c1">// 图片 URL</span>
+<span class="w">        </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">           </span><span class="c1">// 不建索引</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span><span class="w">          </span><span class="c1">// 组合字段，把名称、商圈等放一起，方便全文搜索</span>
+<span class="w">        </span><span class="nt">"analyzer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ik_max_word"</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>关键配置解析</strong>：</p>
+<ul>
+<li><code>analyzer: ik_max_word</code>：用 IK 分词器，细粒度分词（"小米手机" → "小米", "手机", "小米手机"）</li>
+<li><code>copy_to: all</code>：把这个字段的值复制到 <code>all</code> 字段，<code>all</code> 字段统一搜索，提高性能</li>
+<li><code>index: false</code>：不建倒排索引，存储但不搜索（节省空间）</li>
+</ul>
+<h3 id="section-10">2.4 索引库 CRUD</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 查看索引库</span>
+<span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+
+<span class="c1">// 修改（只能添加字段，不能修改已有字段！）</span>
+<span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_mappi</span><span class="kc">n</span><span class="err">g</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"新字段"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 删除索引库（慎用！数据全没）</span>
+<span class="err">DELETE</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>重要</strong>：ES 的 mapping <strong>一旦定义不能修改</strong>！只能追加新字段。
+要修改字段，只能：1. 新建索引库 2. 数据迁移 3. 切换索引别名。</p>
+</blockquote>
+<hr/>
+<h2 id="section-11">第三章：文档 CRUD</h2>
+<h3 id="section-12">3.1 增删改查</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 新增文档（指定 ID）</span>
+<span class="err">POST</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海如家酒店"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"brand"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"starName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"二钻"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"business"</span><span class="p">:</span><span class="w"> </span><span class="s2">"徐家汇"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31.2047, 121.4489"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"pic"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://..."</span>
+<span class="p">}</span>
+
+<span class="c1">// 查询文档</span>
+<span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+
+<span class="c1">// 修改（全量覆盖，相当于先删再加）</span>
+<span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海如家酒店（已更新）"</span><span class="p">,</span>
+<span class="w">  </span><span class="err">...</span><span class="w"> </span><span class="err">所有字段</span>
+<span class="p">}</span>
+
+<span class="c1">// 局部修改（只改指定字段，推荐）</span>
+<span class="err">POST</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_upda</span><span class="kc">te</span><span class="err">/</span><span class="mi">1</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"doc"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">250</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 删除</span>
+<span class="err">DELETE</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+</pre></div>
+</div><h3 id="section-13">3.2 批量操作</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">POST</span><span class="w"> </span><span class="err">/_bulk</span>
+<span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">}}</span>
+<span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家酒店"</span><span class="p">,</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">}}</span>
+<span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"全季酒店"</span><span class="p">,</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">"delete"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">}}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 批量操作比逐条操作快得多，导入大量数据时必用。</p>
+</blockquote>
+<hr/>
+<h2 id="section-14">第四章：DSL 查询（核心）⭐⭐⭐</h2>
+<h3 id="section-15">4.1 查询语法结构</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_search</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// 查询条件</span>
+<span class="w">    </span><span class="err">...</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"from"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">       </span><span class="c1">// 分页：从第几条开始</span>
+<span class="w">  </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">      </span><span class="c1">// 每页几条</span>
+<span class="w">  </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">],</span><span class="w"> </span><span class="c1">// 排序规则</span>
+<span class="w">  </span><span class="nt">"highlight"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// 高亮配置</span>
+<span class="w">    </span><span class="err">...</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>查询结果结构</strong>：</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"hits"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="c1">// 总数</span>
+<span class="w">    </span><span class="nt">"hits"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">                      </span><span class="c1">// 命中的文档列表</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"_score"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w">             </span><span class="c1">// 相关性得分</span>
+<span class="w">        </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span><span class="w">          </span><span class="c1">// 文档原始内容</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-16">4.2 全文检索查询（match）⭐⭐⭐</h3>
+<p><strong>match 查询</strong>：先分词，然后查。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 搜索 name 中包含 "如家" 的酒店</span>
+<span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_search</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家酒店"</span>
+<span class="w">      </span><span class="c1">// 分词后：["如家", "酒店"]</span>
+<span class="w">      </span><span class="c1">// 匹配 name 中含有 "如家" OR "酒店" 的文档</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>multi_match 查询</strong>：在多个字段中搜索。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_search</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"multi_match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"business"</span><span class="p">]</span><span class="w">    </span><span class="c1">// 在 name 和 business 中搜</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>建议</strong>：用 <code>copy_to</code> 把多个字段合并到 <code>all</code> 字段，然后只搜 <code>all</code>，性能比 <code>multi_match</code> 好。</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 搜 all 字段（推荐）</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-17">4.3 精确查询（term / range）⭐⭐</h3>
+<p><strong>term 查询</strong>：精确匹配（不分词，用于 keyword 类型）。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 查询城市是上海的酒店</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海"</span><span class="w">    </span><span class="c1">// 精确匹配，不分词</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>range 查询</strong>：范围查询。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 查询价格在 100~300 之间的酒店</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"gte"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">    </span><span class="c1">// greater than or equal（大于等于）</span>
+<span class="w">        </span><span class="nt">"lte"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="w">     </span><span class="c1">// less than or equal（小于等于）</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>新手易错</strong>：<code>text</code> 类型不能用 <code>term</code> 精确查询！
+<code>text</code> 字段存的是分词后的内容，原文不完整。
+精确查询必须用 <code>keyword</code> 类型。</p>
+</blockquote>
+<h3 id="section-18">4.4 地理查询</h3>
+<p><strong>附近商家（geo_distance）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 查找距离指定坐标 5km 内的酒店</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"geo_distance"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"distance"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5km"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31.2047, 121.4489"</span><span class="w">   </span><span class="c1">// 中心坐标（纬度,经度）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-19">4.5 复合查询（bool）⭐⭐⭐（最重要）</h3>
+<p><strong>bool 查询</strong>：组合多个查询条件。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"bool"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"must"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">                           </span><span class="c1">// 必须满足（参与算分）</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"should"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">                         </span><span class="c1">// 满足则加分（非必须）</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"brand"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"must_not"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">                       </span><span class="c1">// 必须不满足（过滤，不算分）</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gt"</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"filter"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">                         </span><span class="c1">// 必须满足（过滤，不算分，性能好）</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gte"</span><span class="p">:</span><span class="w"> </span><span class="mi">45</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>四个子句的区别</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>子句</th>
+<th>是否必须满足</th>
+<th>是否参与算分</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>must</code></td>
+<td>✅ 必须</td>
+<td>✅ 参与</td>
+<td>核心搜索条件</td>
+</tr>
+<tr>
+<td><code>should</code></td>
+<td>❌ 可选</td>
+<td>✅ 参与</td>
+<td>加分条件</td>
+</tr>
+<tr>
+<td><code>must_not</code></td>
+<td>✅ 必须不满足</td>
+<td>❌ 不参与</td>
+<td>排除条件</td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td>✅ 必须满足</td>
+<td>❌ 不参与</td>
+<td>过滤条件（性能最好）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>建议</strong>：</p>
+<ul>
+<li>搜索关键词用 <code>must</code>（参与算分）</li>
+<li>筛选条件用 <code>filter</code>（不算分，性能好）</li>
+<li>价格、城市这类过滤用 <code>filter</code>，不用 <code>must</code></li>
+</ul>
+</blockquote>
+<p><strong>实战例子</strong>：搜索"酒店"，过滤城市为"上海"，价格 100-300，评分 45 分以上：</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"bool"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"must"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"酒店"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w">    </span><span class="c1">// 搜关键词，参与算分</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"filter"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="c1">// 过滤城市，不算分</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gte"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nt">"lte"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">// 过滤价格</span>
+<span class="w">        </span><span class="p">}},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gte"</span><span class="p">:</span><span class="w"> </span><span class="mi">45</span><span class="w"> </span><span class="p">}</span><span class="w">               </span><span class="c1">// 过滤评分</span>
+<span class="w">        </span><span class="p">}}</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-20">4.6 算分函数查询（function_score）⭐</h3>
+<p><strong>应用</strong>：广告位的酒店，让它排在前面。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"function_score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">               </span><span class="c1">// 基础查询</span>
+<span class="w">        </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"外滩"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"functions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"filter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">          </span><span class="c1">// 满足这个条件的...</span>
+<span class="w">            </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"brand"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="nt">"weight"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">         </span><span class="c1">// ...分数 × 10</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"boost_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"multiply"</span><span class="w">   </span><span class="c1">// 原始分 × weight</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">第五章：搜索结果处理</h2>
+<h3 id="section-22">5.1 排序</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 按评分降序（默认是相关性得分，这里改成按字段排序）</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="s2">"desc"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">    </span><span class="c1">// 评分降序</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asc"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w">       </span><span class="c1">// 价格升序（评分相同时按价格）</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="c1">// 按距离排序（附近优先）</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"_geo_distance"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31.2047, 121.4489"</span><span class="p">,</span><span class="w">   </span><span class="c1">// 我的位置</span>
+<span class="w">        </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asc"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"unit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"km"</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-23">5.2 分页</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"from"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">    </span><span class="c1">// 从第几条开始（0 = 第一页）</span>
+<span class="w">  </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="w">    </span><span class="c1">// 每页 20 条</span>
+<span class="p">}</span>
+
+<span class="c1">// 第 2 页：from=20, size=20</span>
+<span class="c1">// 第 3 页：from=40, size=20</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>深度分页问题</strong>：
+<code>from + size &gt; 10000</code> 时性能急剧下降（ES 默认限制 10000）。
+大数据量的分页用 <code>search_after</code>：</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"search_after"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"上次最后一条的sort值"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="s2">"desc"</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asc"</span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div></blockquote>
+<h3 id="section-24">5.3 高亮</h3>
+<p><strong>原理</strong>：把搜索关键词在结果中用 HTML 标签标注（前端显示时渲染为高亮色）。</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"highlight"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"pre_tags"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;em&gt;"</span><span class="p">,</span><span class="w">         </span><span class="c1">// 高亮前标签</span>
+<span class="w">        </span><span class="nt">"post_tags"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;/em&gt;"</span><span class="p">,</span><span class="w">        </span><span class="c1">// 高亮后标签</span>
+<span class="w">        </span><span class="nt">"require_field_match"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">  </span><span class="c1">// 允许不同字段高亮</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>返回结果</strong>：</p>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海如家酒店"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"highlight"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"上海&lt;em&gt;如家&lt;/em&gt;酒店"</span><span class="p">]</span><span class="w">   </span><span class="c1">// 高亮后的名称</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>前端用高亮名称替换原名称即可显示红色关键词。</p>
+<hr/>
+<h2 id="section-25">第六章：Java 客户端（RestHighLevelClient）⭐⭐⭐</h2>
+<h3 id="section-26">6.1 依赖和配置</h3>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">&lt;!-- pom.xml --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.elasticsearch.client<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>elasticsearch-rest-high-level-client<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 配置类</span>
+<span class="nd">@Configuration</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">EsConfig</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RestHighLevelClient</span><span class="w"> </span><span class="nf">restHighLevelClient</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RestHighLevelClient</span><span class="p">(</span>
+<span class="w">            </span><span class="n">RestClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span>
+<span class="w">                </span><span class="n">HttpHost</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">"http://192.168.150.101:9200"</span><span class="p">)</span>
+<span class="w">            </span><span class="p">)</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-27">6.2 文档 CRUD</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Autowired</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">RestHighLevelClient</span><span class="w"> </span><span class="n">client</span><span class="p">;</span>
+
+<span class="c1">// 新增/修改文档</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addDocument</span><span class="p">(</span><span class="n">Hotel</span><span class="w"> </span><span class="n">hotel</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 创建 Request（指定索引库和文档 ID）</span>
+<span class="w">    </span><span class="n">IndexRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">).</span><span class="na">id</span><span class="p">(</span><span class="n">hotel</span><span class="p">.</span><span class="na">getId</span><span class="p">().</span><span class="na">toString</span><span class="p">());</span>
+
+<span class="w">    </span><span class="c1">// 2. 设置文档内容（JSON 字符串）</span>
+<span class="w">    </span><span class="n">HotelDoc</span><span class="w"> </span><span class="n">hotelDoc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HotelDoc</span><span class="p">(</span><span class="n">hotel</span><span class="p">);</span>
+<span class="w">    </span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">(</span><span class="n">JSON</span><span class="p">.</span><span class="na">toJSONString</span><span class="p">(</span><span class="n">hotelDoc</span><span class="p">),</span><span class="w"> </span><span class="n">XContentType</span><span class="p">.</span><span class="na">JSON</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 3. 发送请求</span>
+<span class="w">    </span><span class="n">client</span><span class="p">.</span><span class="na">index</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 查询文档</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">HotelDoc</span><span class="w"> </span><span class="nf">getDocumentById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 创建 Request</span>
+<span class="w">    </span><span class="n">GetRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GetRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
+
+<span class="w">    </span><span class="c1">// 2. 发送请求</span>
+<span class="w">    </span><span class="n">GetResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 3. 解析结果</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getSourceAsString</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">HotelDoc</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 删除文档</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">deleteDocument</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">DeleteRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DeleteRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
+<span class="w">    </span><span class="n">client</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 批量新增（导入数据用）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">bulkAddDocuments</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Hotel</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hotels</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 创建批量 Request</span>
+<span class="w">    </span><span class="n">BulkRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BulkRequest</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 2. 添加每条数据</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Hotel</span><span class="w"> </span><span class="n">hotel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hotels</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">HotelDoc</span><span class="w"> </span><span class="n">hotelDoc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HotelDoc</span><span class="p">(</span><span class="n">hotel</span><span class="p">);</span>
+<span class="w">        </span><span class="n">request</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">IndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">id</span><span class="p">(</span><span class="n">hotel</span><span class="p">.</span><span class="na">getId</span><span class="p">().</span><span class="na">toString</span><span class="p">())</span>
+<span class="w">            </span><span class="p">.</span><span class="na">source</span><span class="p">(</span><span class="n">JSON</span><span class="p">.</span><span class="na">toJSONString</span><span class="p">(</span><span class="n">hotelDoc</span><span class="p">),</span><span class="w"> </span><span class="n">XContentType</span><span class="p">.</span><span class="na">JSON</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 3. 发送批量请求</span>
+<span class="w">    </span><span class="n">client</span><span class="p">.</span><span class="na">bulk</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-28">6.3 搜索文档 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 完整搜索示例（含 bool 查询、分页、高亮）</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">PageResult</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">RequestParams</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 创建 SearchRequest</span>
+<span class="w">    </span><span class="n">SearchRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SearchRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 构建查询条件</span>
+<span class="w">    </span><span class="n">BoolQueryBuilder</span><span class="w"> </span><span class="n">boolQuery</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">boolQuery</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 2.1 关键词搜索</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="na">getKey</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">boolQuery</span><span class="p">.</span><span class="na">must</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">matchQuery</span><span class="p">(</span><span class="s">"all"</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="na">getKey</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">boolQuery</span><span class="p">.</span><span class="na">must</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">matchAllQuery</span><span class="p">());</span><span class="w">   </span><span class="c1">// 无关键词，查全部</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2.2 过滤条件</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="na">getCity</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">boolQuery</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">termQuery</span><span class="p">(</span><span class="s">"city"</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="na">getCity</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="na">getBrand</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">boolQuery</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">termQuery</span><span class="p">(</span><span class="s">"brand"</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="na">getBrand</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="na">getMinPrice</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="na">getMaxPrice</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">boolQuery</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">rangeQuery</span><span class="p">(</span><span class="s">"price"</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">gte</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="na">getMinPrice</span><span class="p">())</span>
+<span class="w">            </span><span class="p">.</span><span class="na">lte</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="na">getMaxPrice</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2.3 算分函数（广告）</span>
+<span class="w">    </span><span class="n">FunctionScoreQueryBuilder</span><span class="w"> </span><span class="n">functionScoreQuery</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">functionScoreQuery</span><span class="p">(</span>
+<span class="w">        </span><span class="n">boolQuery</span><span class="p">,</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">FunctionScoreQueryBuilder</span><span class="p">.</span><span class="na">FilterFunctionBuilder</span><span class="o">[]</span><span class="p">{</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">FunctionScoreQueryBuilder</span><span class="p">.</span><span class="na">FilterFunctionBuilder</span><span class="p">(</span>
+<span class="w">                </span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">termQuery</span><span class="p">(</span><span class="s">"isAD"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+<span class="w">                </span><span class="n">ScoreFunctionBuilders</span><span class="p">.</span><span class="na">weightFactorFunction</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w">  </span><span class="c1">// 广告 ×10</span>
+<span class="w">            </span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">    </span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">().</span><span class="na">query</span><span class="p">(</span><span class="n">functionScoreQuery</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 3. 分页</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="na">getPage</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="na">getSize</span><span class="p">();</span>
+<span class="w">    </span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">().</span><span class="na">from</span><span class="p">((</span><span class="n">page</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">size</span><span class="p">).</span><span class="na">size</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 4. 高亮</span>
+<span class="w">    </span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">().</span><span class="na">highlighter</span><span class="p">(</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">HighlightBuilder</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="na">field</span><span class="p">(</span><span class="s">"name"</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">requireFieldMatch</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 5. 执行查询</span>
+<span class="w">    </span><span class="n">SearchResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">search</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 6. 解析结果</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">handleResponse</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 解析响应</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">PageResult</span><span class="w"> </span><span class="nf">handleResponse</span><span class="p">(</span><span class="n">SearchResponse</span><span class="w"> </span><span class="n">response</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">SearchHits</span><span class="w"> </span><span class="n">searchHits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getHits</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 总数</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">searchHits</span><span class="p">.</span><span class="na">getTotalHits</span><span class="p">().</span><span class="na">value</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 文档列表</span>
+<span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">HotelDoc</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hotels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">SearchHit</span><span class="w"> </span><span class="n">hit</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">searchHits</span><span class="p">.</span><span class="na">getHits</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 解析 JSON</span>
+<span class="w">        </span><span class="n">HotelDoc</span><span class="w"> </span><span class="n">hotelDoc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">hit</span><span class="p">.</span><span class="na">getSourceAsString</span><span class="p">(),</span><span class="w"> </span><span class="n">HotelDoc</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 处理高亮</span>
+<span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">HighlightField</span><span class="o">&gt;</span><span class="w"> </span><span class="n">highlights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hit</span><span class="p">.</span><span class="na">getHighlightFields</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">highlights</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="s">"name"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// 用高亮名称替换原名称</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">highlightName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">highlights</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">"name"</span><span class="p">).</span><span class="na">getFragments</span><span class="p">()</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">.</span><span class="na">string</span><span class="p">();</span>
+<span class="w">            </span><span class="n">hotelDoc</span><span class="p">.</span><span class="na">setName</span><span class="p">(</span><span class="n">highlightName</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">hotels</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">hotelDoc</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PageResult</span><span class="p">(</span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">hotels</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-29">6.4 聚合查询</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 获取所有品牌列表（Bucket 聚合）</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getBrands</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">SearchRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SearchRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 1. 不返回文档（只要聚合结果）</span>
+<span class="w">    </span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">().</span><span class="na">size</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 添加聚合</span>
+<span class="w">    </span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">().</span><span class="na">aggregation</span><span class="p">(</span>
+<span class="w">        </span><span class="n">AggregationBuilders</span><span class="p">.</span><span class="na">terms</span><span class="p">(</span><span class="s">"brandAgg"</span><span class="p">)</span><span class="w">    </span><span class="c1">// 按品牌分组</span>
+<span class="w">            </span><span class="p">.</span><span class="na">field</span><span class="p">(</span><span class="s">"brand"</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="na">size</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 3. 执行</span>
+<span class="w">    </span><span class="n">SearchResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">search</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 4. 解析聚合结果</span>
+<span class="w">    </span><span class="n">Terms</span><span class="w"> </span><span class="n">brandTerms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getAggregations</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="s">"brandAgg"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">brandTerms</span><span class="p">.</span><span class="na">getBuckets</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">Terms</span><span class="p">.</span><span class="na">Bucket</span><span class="p">::</span><span class="n">getKeyAsString</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-30">第七章：数据同步（MySQL → ES）⭐⭐</h2>
+<h3 id="section-31">7.1 为什么需要同步</h3>
+<p><strong>问题</strong>：MySQL 是数据源，ES 是搜索数据。MySQL 数据变了，ES 要同步更新。</p>
+<p><strong>三种方案</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>原理</th>
+<th>耦合</th>
+<th>实时性</th>
+<th>复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>同步调用</strong></td>
+<td>修改 MySQL 后直接调 ES API</td>
+<td>高</td>
+<td>强</td>
+<td>低</td>
+</tr>
+<tr>
+<td><strong>异步通知</strong></td>
+<td>修改 MySQL 发 MQ，ES 消费</td>
+<td>中</td>
+<td>较强</td>
+<td>中</td>
+</tr>
+<tr>
+<td><strong>监听 binlog</strong></td>
+<td>Canal 监听 MySQL binlog 推 ES</td>
+<td>低</td>
+<td>较弱</td>
+<td>高</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>推荐</strong>：中等规模用<strong>异步通知</strong>（解耦，不复杂）；大规模用 <strong>Canal + binlog</strong>。</p>
+<h3 id="section-32">7.2 异步通知方案实现</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 酒店服务：数据变动时发 MQ</span>
+<span class="nd">@Service</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HotelService</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">RabbitTemplate</span><span class="w"> </span><span class="n">rabbitTemplate</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">saveHotel</span><span class="p">(</span><span class="n">Hotel</span><span class="w"> </span><span class="n">hotel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 1. 保存到 MySQL</span>
+<span class="w">        </span><span class="n">save</span><span class="p">(</span><span class="n">hotel</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 发消息（通知 ES 同步）</span>
+<span class="w">        </span><span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">convertAndSend</span><span class="p">(</span><span class="s">"hotel.topic"</span><span class="p">,</span><span class="w"> </span><span class="s">"hotel.insert"</span><span class="p">,</span><span class="w"> </span><span class="n">hotel</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">deleteHotel</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">removeById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">convertAndSend</span><span class="p">(</span><span class="s">"hotel.topic"</span><span class="p">,</span><span class="w"> </span><span class="s">"hotel.delete"</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ES 服务（搜索服务）：监听消息，同步 ES</span>
+<span class="nd">@Component</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HotelListener</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">HotelService</span><span class="w"> </span><span class="n">hotelService</span><span class="p">;</span><span class="w">   </span><span class="c1">// ES 操作服务</span>
+
+<span class="w">    </span><span class="c1">// 新增/修改</span>
+<span class="w">    </span><span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">bindings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@QueueBinding</span><span class="p">(</span>
+<span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Queue</span><span class="p">(</span><span class="s">"hotel.insert.queue"</span><span class="p">),</span>
+<span class="w">        </span><span class="n">exchange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Exchange</span><span class="p">(</span><span class="s">"hotel.topic"</span><span class="p">),</span>
+<span class="w">        </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hotel.insert"</span>
+<span class="w">    </span><span class="p">))</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">onHotelInsert</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">hotelId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 从酒店服务查数据，然后写入 ES</span>
+<span class="w">        </span><span class="n">hotelService</span><span class="p">.</span><span class="na">syncHotelToEs</span><span class="p">(</span><span class="n">hotelId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 删除</span>
+<span class="w">    </span><span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">bindings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@QueueBinding</span><span class="p">(</span>
+<span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Queue</span><span class="p">(</span><span class="s">"hotel.delete.queue"</span><span class="p">),</span>
+<span class="w">        </span><span class="n">exchange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Exchange</span><span class="p">(</span><span class="s">"hotel.topic"</span><span class="p">),</span>
+<span class="w">        </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hotel.delete"</span>
+<span class="w">    </span><span class="p">))</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">onHotelDelete</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">hotelId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hotelService</span><span class="p">.</span><span class="na">deleteHotelFromEs</span><span class="p">(</span><span class="n">hotelId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-33">第八章：常见报错与解决</h2>
+<h3 id="section-34">报错 1：term 查询查不到数据</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：查询的字段是 text 类型（已被分词），用 term 精确查询查不到
+解决：
+1. 改用 match 查询
+2. 或者把字段类型改为 keyword
+</pre></div>
+</div><h3 id="section-35">报错 2：Fielddata is disabled on text fields by default</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：在 text 类型字段上做聚合或排序
+解决：
+1. 在 mapping 中启用 fielddata（不推荐，占内存）
+2. 或者在字段里加 keyword 子字段：
+   "name": {
+     "type": "text",
+     "fields": {
+       "keyword": {"type": "keyword"}
+     }
+   }
+   然后对 name.keyword 做聚合
+</pre></div>
+</div><h3 id="section-36">报错 3：Result window is too large</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：from + size 超过 10000
+解决：
+1. 修改 max_result_window 设置（不推荐，消耗内存）
+2. 改用 search_after 实现深度分页
+</pre></div>
+</div><h3 id="section-37">报错 4：mapping 修改报错</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：已存在的字段不能修改类型
+解决：
+1. 只能追加新字段
+2. 要修改只能重新创建索引 + 数据迁移
+</pre></div>
+</div><hr/>
+<h2 id="section-38">第九章：面试常问（附答案）</h2>
+<h3 id="section-39">Q1：ES 为什么搜索快？</h3>
+<p><strong>答</strong>：倒排索引。把词条 → 文档的关系预先建好，查询时直接找词条，O(1)。而 MySQL 的 <code>LIKE</code> 要全表扫描，O(N)。</p>
+<h3 id="section-40">Q2：ES 和 MySQL 的区别？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>MySQL 存全量数据，事务可靠，适合复杂关联查询</li>
+<li>ES 基于倒排索引，适合全文搜索和聚合分析</li>
+<li>两者互补：MySQL 是数据源，ES 是搜索加速层</li>
+</ul>
+<h3 id="section-41">Q3：text 和 keyword 的区别？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>text：写入时分词，参与全文搜索</li>
+<li>keyword：不分词，原始值存储，用于精确匹配、排序、聚合</li>
+</ul>
+<h3 id="section-42">Q4：bool 查询的 must 和 filter 的区别？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>must：参与相关性算分（影响排序），性能略差</li>
+<li>filter：不算分，只过滤，有缓存，<strong>性能更好</strong></li>
+</ul>
+<h3 id="section-43">Q5：ES 如何实现分页？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>普通分页：<code>from + size</code>，但超过 10000 性能急剧下降</li>
+<li>深度分页：用 <code>search_after</code>（游标分页），性能好</li>
+<li>滚动分页：用 <code>scroll</code>（适合批量导出数据）</li>
+</ul>
+<h3 id="section-44">Q6：ES 如何保证和 MySQL 数据一致？</h3>
+<p><strong>答</strong>：三种方案：</p>
+<ol>
+<li>同步调用（简单，但耦合高）</li>
+<li>异步通知（MQ + 解耦，推荐中等规模）</li>
+<li>监听 binlog（Canal，适合大规模，完全解耦）</li>
+</ol>
+<hr/>
+<h2 id="section-45">第十章：本章小结</h2>
+<h3 id="section-46">✅ 你已经掌握</h3>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>倒排索引原理（ES 为什么快）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>ES vs MySQL 对比</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>mapping 映射</strong>（text/keyword 区别）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>文档 CRUD（增删改查）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>DSL 查询</strong>（match / term / range / bool）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>bool 查询（must / should / filter / must_not）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>排序、分页、高亮</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>聚合查询（Bucket / Metric）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Java RestClient</strong> 完整搜索实现</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>MySQL → ES 数据同步（三种方案）</li>
+</ul>
+<h3 id="section-47">⚠ 新手易踩的坑</h3>
+<ol>
+<li><code>text</code> 类型不能用 <code>term</code> 精确查询</li>
+<li>mapping 字段类型一旦定义，<strong>不能修改</strong>，只能追加</li>
+<li><code>filter</code> 不参与算分，性能优于 <code>must</code>（过滤条件优先用 filter）</li>
+<li>深度分页 <code>from+size &gt; 10000</code> 性能急剧下降</li>
+<li>高亮结果要用 hit 里的 highlight 字段替换 _source 里的原字段</li>
+</ol>
+<hr/>
+<blockquote>
+<p>💡 <strong>学习建议</strong>：
+Elasticsearch 学习分三步：</p>
+<ol>
+<li>先在 Kibana Dev Tools 里用 DSL 语言练各种查询（2天）</li>
+<li>再用 Java RestClient 把 DSL 翻译成代码（1天）</li>
+<li>最后做完整项目（搜索 + 高亮 + 聚合筛选）（1天）</li>
+</ol>
+<p>DSL 和 Java 代码是对应关系，DSL 学会了，Java 代码只是翻译而已。</p>
+</blockquote>
+<p>加油！🚀</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="Docker%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html"><small>← 上一篇</small><strong>Docker 入门 · 保姆级详解 ⭐⭐⭐</strong></a><a href="RabbitMQ%E5%9F%BA%E7%A1%80-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html"><small>下一篇 →</small><strong>RabbitMQ 基础 · 保姆级详解 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">写在前面</a><a class="toc-h2" href="#section-1">第一章：为什么要用 Elasticsearch</a><a class="toc-h3" href="#section-2">1.1 MySQL 搜索的问题</a><a class="toc-h3" href="#section-3">1.2 倒排索引（ES 的灵魂）⭐⭐</a><a class="toc-h3" href="#section-4">1.3 ES vs MySQL</a><a class="toc-h3" href="#section-5">1.4 安装（Docker）</a><a class="toc-h2" href="#section-6">第二章：索引库操作（mapping 映射）⭐⭐</a><a class="toc-h3" href="#section-7">2.1 mapping 是什么</a><a class="toc-h3" href="#section-8">2.2 常见字段类型</a><a class="toc-h3" href="#section-9">2.3 创建索引库</a><a class="toc-h3" href="#section-10">2.4 索引库 CRUD</a><a class="toc-h2" href="#section-11">第三章：文档 CRUD</a><a class="toc-h3" href="#section-12">3.1 增删改查</a><a class="toc-h3" href="#section-13">3.2 批量操作</a><a class="toc-h2" href="#section-14">第四章：DSL 查询（核心）⭐⭐⭐</a><a class="toc-h3" href="#section-15">4.1 查询语法结构</a><a class="toc-h3" href="#section-16">4.2 全文检索查询（match）⭐⭐⭐</a><a class="toc-h3" href="#section-17">4.3 精确查询（term / range）⭐⭐</a><a class="toc-h3" href="#section-18">4.4 地理查询</a><a class="toc-h3" href="#section-19">4.5 复合查询（bool）⭐⭐⭐（最重要）</a><a class="toc-h3" href="#section-20">4.6 算分函数查询（function_score）⭐</a><a class="toc-h2" href="#section-21">第五章：搜索结果处理</a><a class="toc-h3" href="#section-22">5.1 排序</a><a class="toc-h3" href="#section-23">5.2 分页</a><a class="toc-h3" href="#section-24">5.3 高亮</a><a class="toc-h2" href="#section-25">第六章：Java 客户端（RestHighLevelClient）⭐⭐⭐</a><a class="toc-h3" href="#section-26">6.1 依赖和配置</a><a class="toc-h3" href="#section-27">6.2 文档 CRUD</a><a class="toc-h3" href="#section-28">6.3 搜索文档 ⭐⭐⭐</a><a class="toc-h3" href="#section-29">6.4 聚合查询</a><a class="toc-h2" href="#section-30">第七章：数据同步（MySQL → ES）⭐⭐</a><a class="toc-h3" href="#section-31">7.1 为什么需要同步</a><a class="toc-h3" href="#section-32">7.2 异步通知方案实现</a><a class="toc-h2" href="#section-33">第八章：常见报错与解决</a><a class="toc-h3" href="#section-34">报错 1：term 查询查不到数据</a><a class="toc-h3" href="#section-35">报错 2：Fielddata is disabled on text fields by default</a><a class="toc-h3" href="#section-36">报错 3：Result window is too large</a><a class="toc-h3" href="#section-37">报错 4：mapping 修改报错</a><a class="toc-h2" href="#section-38">第九章：面试常问（附答案）</a><a class="toc-h3" href="#section-39">Q1：ES 为什么搜索快？</a><a class="toc-h3" href="#section-40">Q2：ES 和 MySQL 的区别？</a><a class="toc-h3" href="#section-41">Q3：text 和 keyword 的区别？</a><a class="toc-h3" href="#section-42">Q4：bool 查询的 must 和 filter 的区别？</a><a class="toc-h3" href="#section-43">Q5：ES 如何实现分页？</a><a class="toc-h3" href="#section-44">Q6：ES 如何保证和 MySQL 数据一致？</a><a class="toc-h2" href="#section-45">第十章：本章小结</a><a class="toc-h3" href="#section-46">✅ 你已经掌握</a><a class="toc-h3" href="#section-47">⚠ 新手易踩的坑</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

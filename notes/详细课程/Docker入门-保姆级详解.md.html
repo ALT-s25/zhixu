@@ -1,0 +1,752 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Docker 入门 · 保姆级详解 ⭐⭐⭐ · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"></head><body data-note="notes/详细课程/Docker入门-保姆级详解.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>详细课程</h2><nav aria-label="同专题笔记"><a aria-current="page" href="Docker%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Docker 入门 · 保姆级详解 ⭐⭐⭐</a><a href="Elasticsearch%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Elasticsearch 搜索引擎 · 保姆级详解 ⭐⭐⭐</a><a href="RabbitMQ%E5%9F%BA%E7%A1%80-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">RabbitMQ 基础 · 保姆级详解 ⭐⭐⭐</a><a href="RabbitMQ%E9%AB%98%E7%BA%A7-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">RabbitMQ 高级 · 保姆级详解 ⭐⭐⭐</a><a href="Redis%E5%85%A5%E9%97%A8-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 入门 · 保姆级详解 ⭐⭐⭐</a><a href="Redis%E5%AE%9E%E6%88%98-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 实战 · 保姆级详解 ⭐⭐⭐⭐</a><a href="Redis%E9%AB%98%E7%BA%A7%E4%B8%8E%E5%8E%9F%E7%90%86-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">Redis 高级与原理 · 保姆级详解 ⭐⭐⭐⭐</a><a href="SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html">SpringCloud 微服务 · 保姆级详解 ⭐⭐⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>详细课程</div><h1>Docker 入门 · 保姆级详解 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>零基础友好 · 每个概念都配类比 · 每行代码都注释 · 每个坑都标注
+对应黑马 SpringCloud Docker 实用篇</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">写在前面</h2>
+<p><strong>学习目标</strong>：学完这份笔记，你能：</p>
+<ul>
+<li>理解 Docker 是什么，解决了什么问题</li>
+<li>安装 Docker，会基本的镜像和容器操作</li>
+<li>配置数据卷，实现数据持久化</li>
+<li>编写 Dockerfile，构建自己的镜像</li>
+<li>用 Docker Compose 一键部署整个项目</li>
+</ul>
+<hr/>
+<h2 id="section-1">第一章：Docker 解决了什么问题</h2>
+<h3 id="section-2">1.1 "在我电脑上能跑"的问题</h3>
+<p><strong>开发场景</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>开发机：Windows + JDK 8 + MySQL 5.7 + Redis 3.0
+测试服务器：CentOS + JDK 11 + MySQL 8.0 + Redis 6.0
+</pre></div>
+</div><p>代码在开发机能跑，放到服务器跑不了。每次部署都要花大量时间配环境。</p>
+<p><strong>Docker 的解决方案</strong>：</p>
+<blockquote>
+<p>把应用和它<strong>所有的依赖</strong>（JDK版本、库文件、配置）打包成一个<strong>镜像</strong>，拿到哪里运行都是同样的环境。</p>
+</blockquote>
+<p><strong>类比</strong>：</p>
+<ul>
+<li>没有 Docker：搬家时家具要拆散，到了新家重新组装</li>
+<li>有 Docker：整个房间集装箱打包，到哪里直接搬进去住</li>
+</ul>
+<h3 id="section-3">1.2 Docker vs 虚拟机</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>虚拟机</th>
+<th>Docker</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术原理</td>
+<td>硬件虚拟化（完整 OS）</td>
+<td>进程隔离（共享 OS 内核）</td>
+</tr>
+<tr>
+<td>启动时间</td>
+<td>分钟级</td>
+<td><strong>秒级</strong></td>
+</tr>
+<tr>
+<td>占用空间</td>
+<td>GB 级</td>
+<td><strong>MB 级</strong></td>
+</tr>
+<tr>
+<td>性能损耗</td>
+<td>大（模拟硬件）</td>
+<td><strong>小（接近原生）</strong></td>
+</tr>
+<tr>
+<td>隔离性</td>
+<td>强</td>
+<td>较强</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>虚拟机</strong>就像在办公室里建了一栋独立房子；<strong>Docker 容器</strong>就像在办公室里用隔断分出的一个工位——共用电力和空调，但各自独立工作。</p>
+</blockquote>
+<hr/>
+<h2 id="section-4">第二章：Docker 核心概念</h2>
+<h3 id="section-5">2.1 三大概念</h3>
+<p><strong>镜像（Image）</strong>：只读的模板文件，包含应用和所有依赖。</p>
+<p>类比：<strong>饺子馅的配方</strong>（只是配方，不是饺子）。</p>
+<p><strong>容器（Container）</strong>：镜像运行起来的实例，可以启动、停止、删除。</p>
+<p>类比：<strong>按照配方包出来的饺子</strong>（实际存在的饺子）。</p>
+<p><strong>仓库（Registry）</strong>：存储和分发镜像的地方，类似 GitHub，但存的是镜像。</p>
+<p>类比：<strong>菜谱网站</strong>（大家把配方传上去，别人可以下载）。</p>
+<h3 id="section-6">2.2 Docker 架构</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────┐
+│                   Docker Host（服务器）               │
+│                                                      │
+│  镜像仓库（本地）                                    │
+│  mysql:5.7   nginx:latest   redis:6.0                │
+│      ↓ run                                           │
+│  容器                                               │
+│  [mysql-c1]  [nginx-c1]  [redis-c1]                 │
+│                                                      │
+└──────────────────────────────────────────────────────┘
+              ↑ 拉取 / 推送
+      Docker Hub（远程仓库）
+</pre></div>
+</div><h3 id="section-7">2.3 安装 Docker（CentOS 7）</h3>
+<p><strong>步骤 1：卸载旧版本（如果有）</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>yum<span class="w"> </span>remove<span class="w"> </span>docker<span class="w"> </span>docker-common<span class="w"> </span>docker-selinux<span class="w"> </span>docker-engine
+</pre></div>
+</div><p><strong>步骤 2：安装依赖</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>yum<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>yum-utils<span class="w"> </span>device-mapper-persistent-data<span class="w"> </span>lvm2
+</pre></div>
+</div><p><strong>步骤 3：配置 Docker 仓库（用阿里云镜像，速度快）</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>yum-config-manager<span class="w"> </span>--add-repo<span class="w"> </span>http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+</pre></div>
+</div><p><strong>步骤 4：安装 Docker</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>yum<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>docker-ce<span class="w"> </span>docker-ce-cli<span class="w"> </span>containerd.io
+</pre></div>
+</div><p><strong>步骤 5：启动 Docker</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>systemctl<span class="w"> </span>start<span class="w"> </span>docker<span class="w">    </span><span class="c1"># 启动</span>
+systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>docker<span class="w">   </span><span class="c1"># 开机自启</span>
+</pre></div>
+</div><p><strong>步骤 6：验证</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>--version
+<span class="c1"># Docker version 20.10.17, build 100c701</span>
+docker<span class="w"> </span>info
+</pre></div>
+</div><p><strong>步骤 7：配置镜像加速（国内必配）</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 创建配置文件</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>/etc/docker
+tee<span class="w"> </span>/etc/docker/daemon.json<span class="w"> </span><span class="s">&lt;&lt;-'EOF'</span>
+<span class="s">{</span>
+<span class="s">  "registry-mirrors": [</span>
+<span class="s">    "https://镜像加速地址.mirror.aliyuncs.com"</span>
+<span class="s">  ]</span>
+<span class="s">}</span>
+<span class="s">EOF</span>
+
+<span class="c1"># 重启 Docker</span>
+systemctl<span class="w"> </span>daemon-reload
+systemctl<span class="w"> </span>restart<span class="w"> </span>docker
+</pre></div>
+</div><blockquote>
+<p>💡 阿里云镜像加速地址：登录 <a href="https://aliyun.com" rel="noopener noreferrer" target="_blank">aliyun.com</a> → 容器镜像服务 → 镜像加速器，可以看到你自己的加速地址。</p>
+</blockquote>
+<hr/>
+<h2 id="section-8">第三章：镜像操作</h2>
+<h3 id="section-9">3.1 镜像命名规则</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>仓库地址/命名空间/镜像名:标签
+mysql:5.7                    ← 官方镜像（省略了仓库地址和命名空间）
+nginx:latest                 ← latest 是默认标签
+192.168.150.101:8080/mysql:5.7  ← 私有仓库
+</pre></div>
+</div><h3 id="section-10">3.2 常用命令</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 拉取镜像（从 Docker Hub 下载）</span>
+docker<span class="w"> </span>pull<span class="w"> </span>nginx<span class="w">            </span><span class="c1"># 拉取最新版</span>
+docker<span class="w"> </span>pull<span class="w"> </span>nginx:1.23<span class="w">       </span><span class="c1"># 拉取指定版本</span>
+docker<span class="w"> </span>pull<span class="w"> </span>mysql:5.7<span class="w">        </span><span class="c1"># 拉取 MySQL 5.7</span>
+
+<span class="c1"># 查看本地所有镜像</span>
+docker<span class="w"> </span>images
+<span class="c1"># REPOSITORY   TAG       IMAGE ID       CREATED       SIZE</span>
+<span class="c1"># nginx        latest    abc123...      2 weeks ago   142MB</span>
+<span class="c1"># mysql        5.7       def456...      3 weeks ago   448MB</span>
+
+<span class="c1"># 删除镜像</span>
+docker<span class="w"> </span>rmi<span class="w"> </span>nginx<span class="w">              </span><span class="c1"># 删除 nginx:latest</span>
+docker<span class="w"> </span>rmi<span class="w"> </span>nginx:1.23<span class="w">         </span><span class="c1"># 删除指定版本</span>
+docker<span class="w"> </span>rmi<span class="w"> </span>nginx<span class="w"> </span>mysql<span class="w">        </span><span class="c1"># 删除多个</span>
+
+<span class="c1"># 保存镜像到文件（离线传输用）</span>
+docker<span class="w"> </span>save<span class="w"> </span>-o<span class="w"> </span>nginx.tar<span class="w"> </span>nginx:latest
+<span class="c1"># -o：指定输出文件名</span>
+
+<span class="c1"># 从文件加载镜像</span>
+docker<span class="w"> </span>load<span class="w"> </span>-i<span class="w"> </span>nginx.tar
+<span class="c1"># -i：指定输入文件</span>
+
+<span class="c1"># 搜索镜像</span>
+docker<span class="w"> </span>search<span class="w"> </span>redis
+</pre></div>
+</div><hr/>
+<h2 id="section-11">第四章：容器操作</h2>
+<h3 id="section-12">4.1 运行容器（最重要）</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span><span class="o">[</span>选项<span class="o">]</span><span class="w"> </span>镜像名<span class="w"> </span><span class="o">[</span>命令<span class="o">]</span>
+</pre></div>
+</div><p><strong>常用选项</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-d</code></td>
+<td>后台运行（不占终端）</td>
+</tr>
+<tr>
+<td><code>--name 容器名</code></td>
+<td>给容器起名字</td>
+</tr>
+<tr>
+<td><code>-p 宿主端口:容器端口</code></td>
+<td>端口映射</td>
+</tr>
+<tr>
+<td><code>-e 变量=值</code></td>
+<td>设置环境变量</td>
+</tr>
+<tr>
+<td><code>-v 宿主路径:容器路径</code></td>
+<td>挂载数据卷</td>
+</tr>
+<tr>
+<td><code>--network 网络名</code></td>
+<td>指定网络</td>
+</tr>
+<tr>
+<td><code>--rm</code></td>
+<td>容器停止后自动删除</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>示例：运行 nginx</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>my-nginx<span class="w"> </span><span class="se">\ </span><span class="w">         </span><span class="c1"># 容器名 my-nginx</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">80</span>:80<span class="w"> </span><span class="se">\ </span><span class="w">                </span><span class="c1"># 宿主机 80 映射到容器 80</span>
+<span class="w">  </span>nginx<span class="w">                      </span><span class="c1"># 镜像名</span>
+</pre></div>
+</div><p>运行后，访问 <code>http://服务器IP:80</code> 就能看到 nginx 页面。</p>
+<p><strong>示例：运行 MySQL</strong></p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>mysql<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">3306</span>:3306<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span><span class="m">123456</span><span class="w"> </span><span class="se">\ </span><span class="w">   </span><span class="c1"># 设置 root 密码（必须）</span>
+<span class="w">  </span>-v<span class="w"> </span>/data/mysql:/var/lib/mysql<span class="w"> </span><span class="se">\ </span><span class="w">   </span><span class="c1"># 数据持久化</span>
+<span class="w">  </span>mysql:5.7
+</pre></div>
+</div><h3 id="section-13">4.2 管理容器</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 查看运行中的容器</span>
+docker<span class="w"> </span>ps
+<span class="c1"># CONTAINER ID  IMAGE   COMMAND  CREATED  STATUS  PORTS  NAMES</span>
+<span class="c1"># abc123       nginx   ...       1 min    Up      80/tcp my-nginx</span>
+
+<span class="c1"># 查看所有容器（包含停止的）</span>
+docker<span class="w"> </span>ps<span class="w"> </span>-a
+
+<span class="c1"># 停止容器</span>
+docker<span class="w"> </span>stop<span class="w"> </span>my-nginx
+
+<span class="c1"># 启动已停止的容器</span>
+docker<span class="w"> </span>start<span class="w"> </span>my-nginx
+
+<span class="c1"># 重启容器</span>
+docker<span class="w"> </span>restart<span class="w"> </span>my-nginx
+
+<span class="c1"># 删除容器（必须先停止）</span>
+docker<span class="w"> </span>rm<span class="w"> </span>my-nginx
+
+<span class="c1"># 强制删除（不需要先停止）</span>
+docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>my-nginx
+
+<span class="c1"># 删除所有停止的容器</span>
+docker<span class="w"> </span>container<span class="w"> </span>prune
+</pre></div>
+</div><h3 id="section-14">4.3 查看日志</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 查看容器日志</span>
+docker<span class="w"> </span>logs<span class="w"> </span>my-nginx
+
+<span class="c1"># 持续输出日志（类似 tail -f）</span>
+docker<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>my-nginx
+
+<span class="c1"># 看最新 100 行</span>
+docker<span class="w"> </span>logs<span class="w"> </span>--tail<span class="w"> </span><span class="m">100</span><span class="w"> </span>my-nginx
+</pre></div>
+</div><h3 id="section-15">4.4 进入容器</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 进入容器（最常用）</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>my-nginx<span class="w"> </span>bash
+<span class="c1"># -i：交互模式</span>
+<span class="c1"># -t：分配终端</span>
+<span class="c1"># bash：进入后执行的命令（有些镜像要用 sh）</span>
+
+<span class="c1"># 进去后，可以像在 Linux 里一样操作</span>
+ls
+cat<span class="w"> </span>/etc/nginx/nginx.conf
+<span class="c1"># exit 退出（不会停止容器）</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>注意</strong>：<code>exit</code> 只是退出交互，容器还在运行。要停止用 <code>docker stop</code>。</p>
+</blockquote>
+<hr/>
+<h2 id="section-16">第五章：数据卷（持久化）⭐⭐</h2>
+<h3 id="section-17">5.1 为什么需要数据卷</h3>
+<p><strong>问题</strong>：</p>
+<ul>
+<li>容器删除 → 容器内数据也丢失</li>
+<li>在容器外部无法修改容器内的配置文件</li>
+</ul>
+<p><strong>解决</strong>：数据卷（Volume），把宿主机的目录/文件挂载到容器中。</p>
+<h3 id="section-18">5.2 两种挂载方式</h3>
+<h4 id="section-19">方式一：具名数据卷（Docker 管理）</h4>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 创建数据卷</span>
+docker<span class="w"> </span>volume<span class="w"> </span>create<span class="w"> </span>html
+
+<span class="c1"># 查看数据卷</span>
+docker<span class="w"> </span>volume<span class="w"> </span>ls
+docker<span class="w"> </span>volume<span class="w"> </span>inspect<span class="w"> </span>html<span class="w">   </span><span class="c1"># 查看具体路径</span>
+
+<span class="c1"># 使用数据卷（挂载到容器）</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>my-nginx<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">80</span>:80<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>html:/usr/share/nginx/html<span class="w"> </span><span class="se">\ </span><span class="w">  </span><span class="c1"># html 是 volume 名</span>
+<span class="w">  </span>nginx
+
+<span class="c1"># 删除数据卷</span>
+docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> </span>html
+docker<span class="w"> </span>volume<span class="w"> </span>prune<span class="w">    </span><span class="c1"># 删除未使用的数据卷</span>
+</pre></div>
+</div><p><strong>特点</strong>：</p>
+<ul>
+<li>Docker 自动管理（路径在 <code>/var/lib/docker/volumes/</code>）</li>
+<li>路径较长，不直观</li>
+<li>适合容器间共享数据</li>
+</ul>
+<h4 id="section-20">方式二：绑定挂载（Bind Mount，推荐）</h4>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>my-nginx<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">80</span>:80<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>/home/nginx/html:/usr/share/nginx/html<span class="w"> </span><span class="se">\ </span><span class="w">  </span><span class="c1"># 宿主机路径:容器路径</span>
+<span class="w">  </span>nginx
+</pre></div>
+</div><p><strong>特点</strong>：</p>
+<ul>
+<li>直接指定宿主机路径，直观</li>
+<li>修改宿主机文件，容器内立刻生效</li>
+<li>推荐开发和部署使用</li>
+</ul>
+<h3 id="section-21">5.3 数据卷实战</h3>
+<p><strong>挂载 nginx 配置文件</strong>：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>my-nginx<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">80</span>:80<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>/home/nginx/conf:/etc/nginx/conf.d<span class="w"> </span><span class="se">\ </span><span class="w">   </span><span class="c1"># 挂载配置目录</span>
+<span class="w">  </span>-v<span class="w"> </span>/home/nginx/html:/usr/share/nginx/html<span class="w"> </span><span class="se">\ </span><span class="c1"># 挂载静态文件目录</span>
+<span class="w">  </span>-v<span class="w"> </span>/home/nginx/logs:/var/log/nginx<span class="w"> </span><span class="se">\ </span><span class="w">        </span><span class="c1"># 挂载日志目录</span>
+<span class="w">  </span>nginx
+</pre></div>
+</div><p>现在修改 <code>/home/nginx/conf</code> 下的配置文件，重启容器就能生效：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 修改 nginx 配置</span>
+vi<span class="w"> </span>/home/nginx/conf/default.conf
+
+<span class="c1"># 重启使配置生效</span>
+docker<span class="w"> </span>restart<span class="w"> </span>my-nginx
+</pre></div>
+</div><p><strong>挂载 MySQL 数据</strong>：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>mysql<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">3306</span>:3306<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span><span class="m">123456</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>/data/mysql/data:/var/lib/mysql<span class="w"> </span><span class="se">\ </span><span class="w">         </span><span class="c1"># 数据目录</span>
+<span class="w">  </span>-v<span class="w"> </span>/data/mysql/conf:/etc/mysql/conf.d<span class="w"> </span><span class="se">\ </span><span class="w">      </span><span class="c1"># 配置目录</span>
+<span class="w">  </span>-v<span class="w"> </span>/data/mysql/init:/docker-entrypoint-initdb.d<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># 初始化 SQL</span>
+<span class="w">  </span>mysql:5.7
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>初始化 SQL</strong>：把 <code>.sql</code> 文件放到 <code>/data/mysql/init/</code>，容器首次启动会自动执行。</p>
+</blockquote>
+<hr/>
+<h2 id="section-22">第六章：Dockerfile 自定义镜像 ⭐⭐</h2>
+<h3 id="section-23">6.1 镜像的分层结构</h3>
+<p>镜像是一层一层叠加的：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>运行结果镜像
+    └── 设置 ENTRYPOINT 层（启动命令）
+         └── COPY app.jar 层
+              └── 安装 JRE 层
+                   └── 配置时区层
+                        └── Ubuntu 20.04 基础层
+</pre></div>
+</div><p><strong>相同的层可以复用</strong>，节省空间。</p>
+<h3 id="section-24">6.2 Dockerfile 语法</h3>
+<div class="code-block"><div class="code-top"><span>dockerfile</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c"># 基础镜像</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:20.04</span>
+
+<span class="c"># 构建者信息（可选）</span>
+<span class="k">LABEL</span><span class="w"> </span><span class="nv">maintainer</span><span class="o">=</span><span class="s2">"xxx@xxx.com"</span>
+
+<span class="c"># 在镜像里执行命令（安装软件等）</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>openjdk-8-jdk
+
+<span class="c"># 设置工作目录（后续命令都在这个目录执行）</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+
+<span class="c"># 拷贝文件（从宿主机 → 镜像）</span>
+<span class="c"># COPY 源路径 目标路径</span>
+<span class="k">COPY</span><span class="w"> </span>app.jar<span class="w"> </span>/app/app.jar
+
+<span class="c"># ADD 和 COPY 类似，但 ADD 会自动解压 tar 包</span>
+<span class="c"># ADD app.tar.gz /app/</span>
+
+<span class="c"># 设置环境变量</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/usr/lib/jvm/java-8-openjdk-amd64
+<span class="k">ENV</span><span class="w"> </span><span class="nv">TZ</span><span class="o">=</span>Asia/Shanghai
+
+<span class="c"># 声明容器要用的端口（只是声明，不是真的映射）</span>
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8080</span>
+
+<span class="c"># 容器启动时执行的命令</span>
+<span class="c"># ENTRYPOINT：不会被 docker run 后面的命令覆盖（推荐）</span>
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">"java"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-jar"</span><span class="p">,</span><span class="w"> </span><span class="s2">"app.jar"</span><span class="p">]</span>
+<span class="c"># CMD：会被 docker run 后面的命令覆盖</span>
+<span class="c"># CMD ["java", "-jar", "app.jar"]</span>
+</pre></div>
+</div><p><strong>常用指令说明</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FROM</code></td>
+<td>基础镜像（必须，第一行）</td>
+</tr>
+<tr>
+<td><code>RUN</code></td>
+<td>构建时执行命令</td>
+</tr>
+<tr>
+<td><code>COPY</code></td>
+<td>拷贝文件（不解压）</td>
+</tr>
+<tr>
+<td><code>ADD</code></td>
+<td>拷贝文件（会解压 tar）</td>
+</tr>
+<tr>
+<td><code>WORKDIR</code></td>
+<td>设置工作目录</td>
+</tr>
+<tr>
+<td><code>ENV</code></td>
+<td>设置环境变量</td>
+</tr>
+<tr>
+<td><code>EXPOSE</code></td>
+<td>声明端口</td>
+</tr>
+<tr>
+<td><code>ENTRYPOINT</code></td>
+<td>容器启动命令（不可覆盖）</td>
+</tr>
+<tr>
+<td><code>CMD</code></td>
+<td>容器启动命令（可覆盖）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-25">6.3 构建 Java 应用镜像</h3>
+<p><strong>方式 1：基于 Ubuntu（麻烦但灵活）</strong></p>
+<div class="code-block"><div class="code-top"><span>dockerfile</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:20.04</span>
+
+<span class="c"># 安装 JRE</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>openjdk-8-jdk-headless
+
+<span class="c"># 设置时区</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">TZ</span><span class="o">=</span>Asia/Shanghai
+<span class="k">RUN</span><span class="w"> </span>ln<span class="w"> </span>-snf<span class="w"> </span>/usr/share/zoneinfo/<span class="nv">$TZ</span><span class="w"> </span>/etc/localtime<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$TZ</span><span class="w"> </span>&gt;<span class="w"> </span>/etc/timezone
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">COPY</span><span class="w"> </span>app.jar<span class="w"> </span>/app/app.jar
+
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8080</span>
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">"java"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-jar"</span><span class="p">,</span><span class="w"> </span><span class="s2">"app.jar"</span><span class="p">]</span>
+</pre></div>
+</div><p><strong>方式 2：基于 java:8-alpine（推荐，更小）</strong></p>
+<div class="code-block"><div class="code-top"><span>dockerfile</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">java:8-alpine</span><span class="w">     </span><span class="c"># 已经装好了 JDK 8，体积小</span>
+
+<span class="k">COPY</span><span class="w"> </span>./app.jar<span class="w"> </span>/tmp/app.jar
+
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8080</span>
+
+<span class="k">ENTRYPOINT</span><span class="w"> </span>java<span class="w"> </span>-jar<span class="w"> </span>/tmp/app.jar
+</pre></div>
+</div><p><strong>构建命令</strong>：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 在 Dockerfile 所在目录执行</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>myapp:1.0<span class="w"> </span>.
+<span class="c1"># -t：指定镜像名和标签</span>
+<span class="c1"># .：Dockerfile 在当前目录</span>
+
+<span class="c1"># 查看构建好的镜像</span>
+docker<span class="w"> </span>images<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>myapp
+
+<span class="c1"># 运行</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>myapp<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:8080<span class="w"> </span>myapp:1.0
+</pre></div>
+</div><h3 id="section-26">6.4 Dockerfile 注意事项</h3>
+<ol>
+<li><strong>每个 RUN 指令都是一层</strong>，层太多会导致镜像大。用 <code>&amp;&amp;</code> 合并多条命令：</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>dockerfile</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c"># ❌ 不好（3层）</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>wget
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>clean
+
+<span class="c"># ✅ 好（1层）</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>wget<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>apt-get<span class="w"> </span>clean
+</pre></div>
+</div><ol start="2">
+<li><strong>把不常变动的放前面</strong>（利用缓存），把经常变动的（代码）放后面。</li>
+</ol>
+<hr/>
+<h2 id="section-27">第七章：Docker Compose ⭐⭐⭐</h2>
+<h3 id="section-28">7.1 什么是 Docker Compose</h3>
+<p><strong>问题</strong>：一个微服务项目需要启动十几个容器（MySQL、Redis、Nacos、各种服务），每次都手敲一堆命令。</p>
+<p><strong>Docker Compose 解决</strong>：用一个 <code>docker-compose.yml</code> 文件定义所有容器，一条命令启停整个项目。</p>
+<p><strong>类比</strong>：</p>
+<ul>
+<li>没有 Compose：每个乐手自己调音、自己上台</li>
+<li>有 Compose：指挥一声令下，所有乐手同时上台演奏</li>
+</ul>
+<h3 id="section-29">7.2 docker-compose.yml 语法</h3>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"3.8"</span><span class="w">   </span><span class="c1"># Compose 版本</span>
+
+<span class="nt">services</span><span class="p">:</span><span class="w">         </span><span class="c1"># 定义各个容器</span>
+<span class="w">  </span><span class="nt">mysql</span><span class="p">:</span><span class="w">          </span><span class="c1"># 服务名（容器名默认是 "目录名_服务名_序号"）</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mysql:5.7</span><span class="w">           </span><span class="c1"># 使用哪个镜像</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mysql</span><span class="w">      </span><span class="c1"># 自定义容器名</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">                     </span><span class="c1"># 端口映射</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"3306:3306"</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">               </span><span class="c1"># 环境变量</span>
+<span class="w">      </span><span class="nt">MYSQL_ROOT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="s">"123456"</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w">                   </span><span class="c1"># 数据卷</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/mysql:/var/lib/mysql</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w">                  </span><span class="c1"># 加入的网络</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-net</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w">            </span><span class="c1"># 总是自动重启</span>
+
+<span class="w">  </span><span class="nt">redis</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis:latest</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"6379:6379"</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-net</span>
+
+<span class="w">  </span><span class="nt">user-service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./user-service</span><span class="w">      </span><span class="c1"># 通过 Dockerfile 构建（指定目录）</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user-service</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"8081:8081"</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-net</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w">                </span><span class="c1"># 等 mysql 和 redis 启动后再启动</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mysql</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">SPRING_DATASOURCE_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jdbc:mysql://mysql:3306/db?...</span>
+<span class="w">      </span><span class="c1"># 注意：用容器名代替 IP（同一网络内可以互访）</span>
+
+<span class="nt">networks</span><span class="p">:</span><span class="w">         </span><span class="c1"># 定义网络</span>
+<span class="w">  </span><span class="nt">my-net</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge</span>
+
+<span class="nt">volumes</span><span class="p">:</span><span class="w">          </span><span class="c1"># 定义具名数据卷（可选）</span>
+<span class="w">  </span><span class="nt">mysql-data</span><span class="p">:</span>
+</pre></div>
+</div><h3 id="section-30">7.3 常用命令</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 启动所有容器（-d 后台运行）</span>
+docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+
+<span class="c1"># 停止并删除容器（不删数据卷）</span>
+docker-compose<span class="w"> </span>down
+
+<span class="c1"># 只停止（不删除）</span>
+docker-compose<span class="w"> </span>stop
+
+<span class="c1"># 重新构建（代码更新后）</span>
+docker-compose<span class="w"> </span>build
+docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build<span class="w">   </span><span class="c1"># 构建并启动</span>
+
+<span class="c1"># 查看日志</span>
+docker-compose<span class="w"> </span>logs<span class="w">            </span><span class="c1"># 所有容器</span>
+docker-compose<span class="w"> </span>logs<span class="w"> </span>user-service<span class="w">  </span><span class="c1"># 指定容器</span>
+docker-compose<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>user-service<span class="w">  </span><span class="c1"># 持续输出</span>
+
+<span class="c1"># 查看状态</span>
+docker-compose<span class="w"> </span>ps
+
+<span class="c1"># 重启某个服务</span>
+docker-compose<span class="w"> </span>restart<span class="w"> </span>user-service
+</pre></div>
+</div><h3 id="section-31">7.4 实战：部署微服务项目</h3>
+<p><strong>目录结构</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>deploy/
+├── docker-compose.yml
+├── mysql/
+│   └── init/
+│       └── hm.sql        # 初始化 SQL
+└── gateway/
+    └── Dockerfile
+</pre></div>
+</div><p><strong>docker-compose.yml</strong>：</p>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"3.8"</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mysql</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mysql:5.7</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mysql</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MYSQL_ROOT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="s">"123456"</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"3306:3306"</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/mysql/data:/var/lib/mysql</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/mysql/init:/docker-entrypoint-initdb.d</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hm-net</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"CMD"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"mysqladmin"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"ping"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"-h"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"localhost"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+
+<span class="w">  </span><span class="nt">redis</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis:latest</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"6379:6379"</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hm-net</span>
+
+<span class="w">  </span><span class="nt">nacos</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nacos/nacos-server:v2.1.0-slim</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nacos</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MODE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">standalone</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"8848:8848"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"9848:9848"</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hm-net</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">mysql</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service_healthy</span><span class="w">   </span><span class="c1"># 等 MySQL 健康检查通过</span>
+
+<span class="w">  </span><span class="nt">user-service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./user-service</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user-service</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"8081:8081"</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hm-net</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nacos</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mysql</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis</span>
+
+<span class="w">  </span><span class="nt">gateway</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./gateway</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gateway</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"10010:10010"</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hm-net</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nacos</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">hm-net</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-32">第八章：常见报错与解决</h2>
+<h3 id="section-33">报错 1：Cannot connect to the Docker daemon</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：Docker 没有启动
+解决：systemctl start docker
+</pre></div>
+</div><h3 id="section-34">报错 2：port is already allocated</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：宿主机的端口已被其他进程占用
+解决：
+1. netstat -nltp | grep 3306   查看占用端口的进程
+2. 换一个宿主机端口，如 -p 3307:3306
+</pre></div>
+</div><h3 id="section-35">报错 3：No space left on device</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：磁盘空间不够
+解决：
+1. df -h 查看磁盘
+2. docker system prune -a   清理没用的镜像、容器、数据卷
+</pre></div>
+</div><h3 id="section-36">报错 4：容器启动后立刻退出</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因 1：应用启动报错
+解决：docker logs 容器名  查看日志
+
+原因 2：前台命令改成了后台（daemon）
+解决：确保应用前台运行（不能加 -d 参数给应用本身）
+
+原因 3：Dockerfile 中 ENTRYPOINT 写错了
+解决：检查命令语法
+</pre></div>
+</div><h3 id="section-37">报错 5：Compose 文件格式错误</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：YAML 缩进不对
+解决：
+1. 用 docker-compose config  验证文件语法
+2. YAML 用空格缩进，不能用 Tab
+</pre></div>
+</div><hr/>
+<h2 id="section-38">第九章：面试常问（附答案）</h2>
+<h3 id="section-39">Q1：Docker 和虚拟机的区别？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>虚拟机：完整 OS 虚拟化，GB 级、分钟启动、隔离性强</li>
+<li>Docker：进程级隔离，共享 OS 内核，MB 级、秒级启动、性能好</li>
+</ul>
+<h3 id="section-40">Q2：Docker 镜像和容器的关系？</h3>
+<p><strong>答</strong>：镜像是只读的模板，容器是镜像运行的实例。一个镜像可以启动多个容器。</p>
+<h3 id="section-41">Q3：数据卷的作用？</h3>
+<p><strong>答</strong>：持久化容器数据（容器删了数据不丢），以及宿主机和容器间共享文件。</p>
+<h3 id="section-42">Q4：COPY 和 ADD 的区别？</h3>
+<p><strong>答</strong>：ADD 会自动解压 tar 包，其他与 COPY 相同。推荐用 COPY（更清晰）。</p>
+<h3 id="section-43">Q5：ENTRYPOINT 和 CMD 的区别？</h3>
+<p><strong>答</strong>：</p>
+<ul>
+<li>CMD：可被 <code>docker run</code> 后面的命令覆盖</li>
+<li>ENTRYPOINT：不可覆盖，<code>docker run</code> 后面的命令作为参数</li>
+</ul>
+<h3 id="section-44">Q6：Docker Compose 的作用？</h3>
+<p><strong>答</strong>：用 YAML 文件定义多容器应用，一条命令批量启停，简化微服务部署。</p>
+<hr/>
+<h2 id="section-45">第十章：本章小结</h2>
+<h3 id="section-46">✅ 你已经掌握</h3>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Docker 解决的问题（环境一致性）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>镜像/容器/仓库</strong> 三大概念</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>镜像操作（pull/images/rmi/save/load）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>容器操作</strong>（run/ps/stop/rm/exec/logs）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><code>docker run</code> 的常用参数（-d/-p/-v/-e/--name）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>数据卷</strong>（具名卷 vs Bind Mount）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Dockerfile</strong> 编写基本语法</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Docker Compose</strong> 一键部署</li>
+</ul>
+<h3 id="section-47">⚠ 新手易踩的坑</h3>
+<ol>
+<li>端口映射格式：<strong>宿主机端口:容器端口</strong>（顺序不要搞错）</li>
+<li><code>exec -it</code> 进容器，<code>exit</code> 退出不会停容器</li>
+<li>删容器前要先 <code>stop</code>，或用 <code>rm -f</code></li>
+<li>数据卷删容器不会删，<code>volume prune</code> 才删</li>
+<li>Compose 文件用<strong>空格</strong>缩进，不能用 Tab</li>
+<li>容器互访用<strong>容器名</strong>作为主机名（不用 IP）</li>
+</ol>
+<hr/>
+<blockquote>
+<p>💡 <strong>学习建议</strong>：Docker 是工具，重点是<strong>动手</strong>。先把 MySQL 和 Redis 用 Docker 跑起来，再学 Compose 编排多容器，最后练习打包自己的项目。每个命令都跑一遍，才能真正掌握。</p>
+</blockquote>
+<p>加油！🚀</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="Elasticsearch%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E-%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AF%A6%E8%A7%A3.md.html"><small>下一篇 →</small><strong>Elasticsearch 搜索引擎 · 保姆级详解 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">写在前面</a><a class="toc-h2" href="#section-1">第一章：Docker 解决了什么问题</a><a class="toc-h3" href="#section-2">1.1 &quot;在我电脑上能跑&quot;的问题</a><a class="toc-h3" href="#section-3">1.2 Docker vs 虚拟机</a><a class="toc-h2" href="#section-4">第二章：Docker 核心概念</a><a class="toc-h3" href="#section-5">2.1 三大概念</a><a class="toc-h3" href="#section-6">2.2 Docker 架构</a><a class="toc-h3" href="#section-7">2.3 安装 Docker（CentOS 7）</a><a class="toc-h2" href="#section-8">第三章：镜像操作</a><a class="toc-h3" href="#section-9">3.1 镜像命名规则</a><a class="toc-h3" href="#section-10">3.2 常用命令</a><a class="toc-h2" href="#section-11">第四章：容器操作</a><a class="toc-h3" href="#section-12">4.1 运行容器（最重要）</a><a class="toc-h3" href="#section-13">4.2 管理容器</a><a class="toc-h3" href="#section-14">4.3 查看日志</a><a class="toc-h3" href="#section-15">4.4 进入容器</a><a class="toc-h2" href="#section-16">第五章：数据卷（持久化）⭐⭐</a><a class="toc-h3" href="#section-17">5.1 为什么需要数据卷</a><a class="toc-h3" href="#section-18">5.2 两种挂载方式</a><a class="toc-h4" href="#section-19">方式一：具名数据卷（Docker 管理）</a><a class="toc-h4" href="#section-20">方式二：绑定挂载（Bind Mount，推荐）</a><a class="toc-h3" href="#section-21">5.3 数据卷实战</a><a class="toc-h2" href="#section-22">第六章：Dockerfile 自定义镜像 ⭐⭐</a><a class="toc-h3" href="#section-23">6.1 镜像的分层结构</a><a class="toc-h3" href="#section-24">6.2 Dockerfile 语法</a><a class="toc-h3" href="#section-25">6.3 构建 Java 应用镜像</a><a class="toc-h3" href="#section-26">6.4 Dockerfile 注意事项</a><a class="toc-h2" href="#section-27">第七章：Docker Compose ⭐⭐⭐</a><a class="toc-h3" href="#section-28">7.1 什么是 Docker Compose</a><a class="toc-h3" href="#section-29">7.2 docker-compose.yml 语法</a><a class="toc-h3" href="#section-30">7.3 常用命令</a><a class="toc-h3" href="#section-31">7.4 实战：部署微服务项目</a><a class="toc-h2" href="#section-32">第八章：常见报错与解决</a><a class="toc-h3" href="#section-33">报错 1：Cannot connect to the Docker daemon</a><a class="toc-h3" href="#section-34">报错 2：port is already allocated</a><a class="toc-h3" href="#section-35">报错 3：No space left on device</a><a class="toc-h3" href="#section-36">报错 4：容器启动后立刻退出</a><a class="toc-h3" href="#section-37">报错 5：Compose 文件格式错误</a><a class="toc-h2" href="#section-38">第九章：面试常问（附答案）</a><a class="toc-h3" href="#section-39">Q1：Docker 和虚拟机的区别？</a><a class="toc-h3" href="#section-40">Q2：Docker 镜像和容器的关系？</a><a class="toc-h3" href="#section-41">Q3：数据卷的作用？</a><a class="toc-h3" href="#section-42">Q4：COPY 和 ADD 的区别？</a><a class="toc-h3" href="#section-43">Q5：ENTRYPOINT 和 CMD 的区别？</a><a class="toc-h3" href="#section-44">Q6：Docker Compose 的作用？</a><a class="toc-h2" href="#section-45">第十章：本章小结</a><a class="toc-h3" href="#section-46">✅ 你已经掌握</a><a class="toc-h3" href="#section-47">⚠ 新手易踩的坑</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
