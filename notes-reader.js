@@ -14,6 +14,8 @@ let category='all';const cards=[...document.querySelectorAll('.note-card')];card
 let topic='all';
 function topicOf(c){
  const path=c.dataset.notePath,title=c.querySelector('h2').textContent;
+ if(c.dataset.topic)return c.dataset.topic;
+ if(path.includes('补充笔记')){const parts=path.split('/');return parts.length>3?parts[2].replace('详解',' · 详细课程'):'后端复习与学习路线'}
  if(c.dataset.category==='后端详细课程')return ['Redis','RabbitMQ','Docker','Elasticsearch','SpringCloud'].find(t=>title.includes(t))||'其他课程';
  if(path.includes('C++'))return 'C++ 基础';
  if(path.includes('数据结构'))return '数据结构';

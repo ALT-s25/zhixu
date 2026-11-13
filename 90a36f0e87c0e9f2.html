@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>03 · Redis 入门 ⭐⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/90a36f0e87c0e9f2.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>后端复习与路线</h2><nav aria-label="同专题笔记"><a href="54477528d302620b.html">01 · RabbitMQ 基础 ⭐⭐⭐</a><a href="206542e38dd22c89.html">02 · RabbitMQ 高级 ⭐⭐⭐</a><a aria-current="page" href="90a36f0e87c0e9f2.html">03 · Redis 入门 ⭐⭐⭐</a><a href="842df3b73dd46ca0.html">04 · Redis 实战（黑马点评项目）⭐⭐⭐⭐</a><a href="bdd7a14efe9ef984.html">05 · Redis 高级与原理 ⭐⭐⭐⭐</a><a href="0ae96682439409b1.html">06 · SpringCloud 微服务 ⭐⭐⭐⭐</a><a href="600b65140adc614a.html">07 · Docker 入门 ⭐⭐⭐</a><a href="b024350084c2cebd.html">08 · Elasticsearch 搜索引擎 ⭐⭐⭐</a><a href="0c840c43a3afe14b.html">后端复习与路线 · 学习指南</a><a href="bc10de1a27d66030.html">D:\za 全部学习笔记总览</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>后端复习与路线</div><h1>03 · Redis 入门 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：3 天
+对应视频：黑马 Redis 基础篇
+<strong>项目导向</strong>：缓存、会话、排行榜、计数器——后端项目必备</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Redis 入门
+├── 1. 认识 Redis（NoSQL vs SQL）⭐
+├── 2. Redis 安装与配置
+├── 3. Redis 五种数据类型 ⭐⭐⭐
+│   ├── String（字符串）
+│   ├── Hash（哈希）
+│   ├── List（列表）
+│   ├── Set（集合）
+│   └── SortedSet（有序集合）
+├── 4. 通用命令 ⭐⭐
+├── 5. Java 客户端 ⭐⭐⭐
+│   ├── Jedis
+│   └── SpringDataRedis（推荐）
+└── 6. 数据序列化
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、认识 Redis ⭐</h2>
+<h3 id="section-2">2.1 NoSQL vs SQL</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>关系型（MySQL）</th>
+<th>非关系型（Redis）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据结构</td>
+<td>结构化表</td>
+<td>灵活（KV/文档/图）</td>
+</tr>
+<tr>
+<td>关联关系</td>
+<td>外键约束</td>
+<td>无，业务维护</td>
+</tr>
+<tr>
+<td>查询方式</td>
+<td>SQL 标准</td>
+<td>各异</td>
+</tr>
+<tr>
+<td>事务</td>
+<td>完整 ACID</td>
+<td>基本一致性</td>
+</tr>
+<tr>
+<td>存储</td>
+<td>磁盘</td>
+<td><strong>内存</strong>（快）</td>
+</tr>
+<tr>
+<td>扩展</td>
+<td>垂直扩展</td>
+<td>水平扩展</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-3">2.2 Redis 特点</h3>
+<ul>
+<li><strong>键值型</strong>：key 是 String，value 支持多种结构</li>
+<li><strong>单线程</strong>：每个命令原子性</li>
+<li><strong>速度快</strong>：基于内存 + IO 多路复用</li>
+<li><strong>持久化</strong>：RDB + AOF</li>
+<li><strong>集群</strong>：主从 + 分片</li>
+</ul>
+<blockquote>
+<p>Redis 全称：<strong>Re</strong>mote <strong>D</strong>ictionary <strong>S</strong>erver（远程词典服务器）</p>
+</blockquote>
+<hr/>
+<h2 id="section-4">三、安装与配置</h2>
+<h3 id="section-5">3.1 配置文件（redis.conf）</h3>
+<div class="code-block"><div class="code-top"><span>properties</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 允许任意 IP 访问（生产环境谨慎）</span>
+<span class="na">bind</span><span class="w"> </span><span class="s">0.0.0.0</span>
+<span class="c1"># 后台守护进程运行</span>
+<span class="na">daemonize</span><span class="w"> </span><span class="s">yes</span>
+<span class="c1"># 访问密码</span>
+<span class="na">requirepass</span><span class="w"> </span><span class="s">123321</span>
+<span class="c1"># 端口</span>
+<span class="na">port</span><span class="w"> </span><span class="s">6379</span>
+<span class="c1"># 最大内存</span>
+<span class="na">maxmemory</span><span class="w"> </span><span class="s">512mb</span>
+<span class="c1"># 日志文件</span>
+<span class="na">logfile</span><span class="w"> </span><span class="s">"redis.log"</span>
+<span class="c1"># 数据库数量（默认16个，编号0~15）</span>
+<span class="na">databases</span><span class="w"> </span><span class="s">16</span>
+</pre></div>
+</div><h3 id="section-6">3.2 启动与停止</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>redis-server<span class="w"> </span>redis.conf<span class="w">       </span><span class="c1"># 启动</span>
+redis-cli<span class="w"> </span>-h<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>-p<span class="w"> </span><span class="m">6379</span><span class="w"> </span>-a<span class="w"> </span><span class="m">123321</span><span class="w">   </span><span class="c1"># 连接</span>
+redis-cli<span class="w"> </span>-a<span class="w"> </span><span class="m">123321</span><span class="w"> </span>shutdown<span class="w">   </span><span class="c1"># 停止</span>
+</pre></div>
+</div><h3 id="section-7">3.3 Docker 安装（推荐）</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>redis<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">6379</span>:6379<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>redis:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>redis-server<span class="w"> </span>--requirepass<span class="w"> </span><span class="m">123321</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-8">四、通用命令 ⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>KEYS<span class="w"> </span>pattern<span class="w">        </span><span class="c1"># 查找 key（生产不推荐，O(N)）</span>
+DEL<span class="w"> </span>key<span class="w"> </span><span class="o">[</span>key...<span class="o">]</span><span class="w">    </span><span class="c1"># 删除</span>
+EXISTS<span class="w"> </span>key<span class="w">          </span><span class="c1"># 判断是否存在（1存在，0不存在）</span>
+EXPIRE<span class="w"> </span>key<span class="w"> </span>seconds<span class="w">  </span><span class="c1"># 设置过期时间</span>
+TTL<span class="w"> </span>key<span class="w">             </span><span class="c1"># 查看剩余时间（-1永不过期，-2已过期）</span>
+TYPE<span class="w"> </span>key<span class="w">            </span><span class="c1"># 查看 key 的类型</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>生产环境禁用 <code>KEYS *</code></strong>，key 过多时会阻塞 Redis！</p>
+</blockquote>
+<hr/>
+<h2 id="section-9">五、五种数据类型 ⭐⭐⭐</h2>
+<h3 id="section-10">5.1 String（字符串）⭐⭐⭐</h3>
+<p>value 可以是<strong>字符串 / 整数 / 浮点数</strong>。</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>SET<span class="w"> </span>key<span class="w"> </span>value<span class="w">           </span><span class="c1"># 设置（存在则覆盖）</span>
+GET<span class="w"> </span>key<span class="w">                 </span><span class="c1"># 获取</span>
+MSET<span class="w"> </span>k1<span class="w"> </span>v1<span class="w"> </span>k2<span class="w"> </span>v2<span class="w">       </span><span class="c1"># 批量设置</span>
+MGET<span class="w"> </span>k1<span class="w"> </span>k2<span class="w">             </span><span class="c1"># 批量获取</span>
+SETNX<span class="w"> </span>key<span class="w"> </span>value<span class="w">         </span><span class="c1"># 不存在才设置（分布式锁常用）</span>
+SETEX<span class="w"> </span>key<span class="w"> </span>seconds<span class="w"> </span>value<span class="w"> </span><span class="c1"># 设置并指定过期时间</span>
+SET<span class="w"> </span>key<span class="w"> </span>value<span class="w"> </span>EX<span class="w"> </span>seconds<span class="w"> </span><span class="c1"># 同上，推荐写法</span>
+
+INCR<span class="w"> </span>key<span class="w">               </span><span class="c1"># 整数自增 1</span>
+INCRBY<span class="w"> </span>key<span class="w"> </span>num<span class="w">         </span><span class="c1"># 整数自增 num</span>
+INCRBYFLOAT<span class="w"> </span>key<span class="w"> </span>num<span class="w">    </span><span class="c1"># 浮点自增</span>
+DECR<span class="w"> </span>key<span class="w">               </span><span class="c1"># 自减 1</span>
+</pre></div>
+</div><p><strong>Key 层级结构</strong>（推荐）：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 格式：项目名:类型:id</span>
+SET<span class="w"> </span>heima:user:1<span class="w"> </span><span class="s1">'{"id":1,"name":"Jack","age":21}'</span>
+SET<span class="w"> </span>heima:order:101<span class="w"> </span><span class="s1">'{"id":101,"amount":99.9}'</span>
+</pre></div>
+</div><p><strong>使用场景</strong>：</p>
+<ul>
+<li>缓存 JSON 对象</li>
+<li>计数器（浏览量、库存）</li>
+<li>分布式 ID（<code>INCR id</code> 生成唯一 ID）</li>
+<li>分布式锁（<code>SETNX</code>）</li>
+</ul>
+<h3 id="section-11">5.2 Hash（哈希）⭐⭐</h3>
+<p>value 是一个<strong>无序字典</strong>，适合存储对象的各个字段。</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>HSET<span class="w"> </span>key<span class="w"> </span>field<span class="w"> </span>value<span class="w">        </span><span class="c1"># 设置一个字段</span>
+HGET<span class="w"> </span>key<span class="w"> </span>field<span class="w">              </span><span class="c1"># 获取一个字段</span>
+HMSET<span class="w"> </span>key<span class="w"> </span>f1<span class="w"> </span>v1<span class="w"> </span>f2<span class="w"> </span>v2<span class="w">      </span><span class="c1"># 批量设置</span>
+HMGET<span class="w"> </span>key<span class="w"> </span>f1<span class="w"> </span>f2<span class="w">             </span><span class="c1"># 批量获取</span>
+HGETALL<span class="w"> </span>key<span class="w">                 </span><span class="c1"># 获取所有字段和值</span>
+HKEYS<span class="w"> </span>key<span class="w">                   </span><span class="c1"># 获取所有字段名</span>
+HVALS<span class="w"> </span>key<span class="w">                   </span><span class="c1"># 获取所有字段值</span>
+HLEN<span class="w"> </span>key<span class="w">                    </span><span class="c1"># 字段数量</span>
+HDEL<span class="w"> </span>key<span class="w"> </span>field<span class="w">              </span><span class="c1"># 删除字段</span>
+HSETNX<span class="w"> </span>key<span class="w"> </span>field<span class="w"> </span>value<span class="w">      </span><span class="c1"># 字段不存在才设置</span>
+HINCRBY<span class="w"> </span>key<span class="w"> </span>field<span class="w"> </span>num<span class="w">       </span><span class="c1"># 字段自增</span>
+</pre></div>
+</div><p><strong>String vs Hash 存对象对比</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>String</th>
+<th>Hash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>存储方式</td>
+<td>整个对象序列化为 JSON</td>
+<td>每个字段独立存储</td>
+</tr>
+<tr>
+<td>修改字段</td>
+<td>需要全量读写</td>
+<td>直接修改单字段</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>整体读取</td>
+<td>频繁修改单字段</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>使用场景</strong>：购物车（<code>HSET cart:uid itemId count</code>）、用户信息缓存</p>
+<h3 id="section-12">5.3 List（列表）⭐⭐</h3>
+<p><strong>双向链表</strong>，有序可重复，可从两端操作。</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>LPUSH<span class="w"> </span>key<span class="w"> </span>v1<span class="w"> </span>v2<span class="w">    </span><span class="c1"># 左侧插入（结果：v2 v1）</span>
+RPUSH<span class="w"> </span>key<span class="w"> </span>v1<span class="w"> </span>v2<span class="w">    </span><span class="c1"># 右侧插入</span>
+LPOP<span class="w"> </span>key<span class="w">           </span><span class="c1"># 左侧弹出</span>
+RPOP<span class="w"> </span>key<span class="w">           </span><span class="c1"># 右侧弹出</span>
+LRANGE<span class="w"> </span>key<span class="w"> </span><span class="m">0</span><span class="w"> </span>-1<span class="w">    </span><span class="c1"># 查看所有（-1表示最后一个）</span>
+LLEN<span class="w"> </span>key<span class="w">           </span><span class="c1"># 长度</span>
+BLPOP<span class="w"> </span>key<span class="w"> </span>timeout<span class="w">  </span><span class="c1"># 阻塞等待弹出（超时返回nil）</span>
+</pre></div>
+</div><p><strong>常见模式</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>栈（LIFO）</td>
+<td>LPUSH + LPOP</td>
+</tr>
+<tr>
+<td>队列（FIFO）</td>
+<td>LPUSH + RPOP</td>
+</tr>
+<tr>
+<td>阻塞队列</td>
+<td>LPUSH + BLPOP</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>使用场景</strong>：消息队列（轻量）、朋友圈动态、最新文章列表</p>
+<h3 id="section-13">5.4 Set（集合）⭐⭐</h3>
+<p><strong>无序、不重复</strong>，底层是 hash 表，查找 O(1)。</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>SADD<span class="w"> </span>key<span class="w"> </span>m1<span class="w"> </span>m2<span class="w">     </span><span class="c1"># 添加元素</span>
+SREM<span class="w"> </span>key<span class="w"> </span>m1<span class="w">        </span><span class="c1"># 删除元素</span>
+SCARD<span class="w"> </span>key<span class="w">          </span><span class="c1"># 元素数量</span>
+SISMEMBER<span class="w"> </span>key<span class="w"> </span>m<span class="w">    </span><span class="c1"># 判断是否存在（1存在）</span>
+SMEMBERS<span class="w"> </span>key<span class="w">       </span><span class="c1"># 获取所有元素</span>
+
+<span class="c1"># 集合运算</span>
+SINTER<span class="w"> </span>k1<span class="w"> </span>k2<span class="w">       </span><span class="c1"># 交集（共同好友）</span>
+SDIFF<span class="w"> </span>k1<span class="w"> </span>k2<span class="w">        </span><span class="c1"># 差集（k1有但k2没有）</span>
+SUNION<span class="w"> </span>k1<span class="w"> </span>k2<span class="w">       </span><span class="c1"># 并集</span>
+</pre></div>
+</div><p><strong>使用场景</strong>：</p>
+<ul>
+<li>共同好友（交集）</li>
+<li>抽奖（<code>SRANDMEMBER</code> 随机取）</li>
+<li>UV 统计（用户 ID 去重计数）</li>
+<li>标签系统</li>
+</ul>
+<h3 id="section-14">5.5 SortedSet（有序集合）⭐⭐⭐</h3>
+<p><strong>有序、不重复</strong>，每个元素带 <code>score</code> 分数，底层是<strong>跳表（SkipList）</strong>。</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ZADD<span class="w"> </span>key<span class="w"> </span>score<span class="w"> </span>member<span class="w">        </span><span class="c1"># 添加元素</span>
+ZREM<span class="w"> </span>key<span class="w"> </span>member<span class="w">              </span><span class="c1"># 删除</span>
+ZSCORE<span class="w"> </span>key<span class="w"> </span>member<span class="w">            </span><span class="c1"># 获取分数</span>
+ZRANK<span class="w"> </span>key<span class="w"> </span>member<span class="w">             </span><span class="c1"># 获取升序排名（从0开始）</span>
+ZREVRANK<span class="w"> </span>key<span class="w"> </span>member<span class="w">          </span><span class="c1"># 获取降序排名</span>
+ZCARD<span class="w"> </span>key<span class="w">                    </span><span class="c1"># 元素数量</span>
+ZINCRBY<span class="w"> </span>key<span class="w"> </span>increment<span class="w"> </span>member<span class="w"> </span><span class="c1"># 分数自增</span>
+
+<span class="c1"># 范围查询</span>
+ZRANGE<span class="w"> </span>key<span class="w"> </span>min<span class="w"> </span>max<span class="w">           </span><span class="c1"># 按排名范围查（升序）</span>
+ZREVRANGE<span class="w"> </span>key<span class="w"> </span>min<span class="w"> </span>max<span class="w">        </span><span class="c1"># 按排名范围查（降序）</span>
+ZRANGEBYSCORE<span class="w"> </span>key<span class="w"> </span>min<span class="w"> </span>max<span class="w">    </span><span class="c1"># 按分数范围查</span>
+ZRANGEBYSCORE<span class="w"> </span>key<span class="w"> </span>min<span class="w"> </span>max<span class="w"> </span>WITHSCORES<span class="w">  </span><span class="c1"># 带分数</span>
+
+<span class="c1"># 集合运算</span>
+ZDIFF<span class="w"> </span>/<span class="w"> </span>ZINTER<span class="w"> </span>/<span class="w"> </span>ZUNION
+</pre></div>
+</div><blockquote>
+<p>💡 降序命令规律：在 Z 后加 REV，如 <code>ZREVRANK</code>、<code>ZREVRANGE</code></p>
+</blockquote>
+<p><strong>使用场景</strong>：</p>
+<ul>
+<li><strong>排行榜</strong>（游戏、销售额）</li>
+<li>延迟队列（score 存时间戳）</li>
+<li>滑动窗口限流</li>
+</ul>
+<hr/>
+<h2 id="section-15">六、五种数据类型对比 ⭐⭐</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>底层结构</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td>简单 KV</td>
+<td>SDS</td>
+<td>缓存、计数、锁</td>
+</tr>
+<tr>
+<td>Hash</td>
+<td>字段独立</td>
+<td>ziplist/hashtable</td>
+<td>用户信息、购物车</td>
+</tr>
+<tr>
+<td>List</td>
+<td>有序可重复</td>
+<td>ziplist/quicklist</td>
+<td>消息队列、动态</td>
+</tr>
+<tr>
+<td>Set</td>
+<td>无序不重复</td>
+<td>hashtable</td>
+<td>标签、共同好友</td>
+</tr>
+<tr>
+<td>SortedSet</td>
+<td>有序不重复</td>
+<td>ziplist/skiplist</td>
+<td>排行榜</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-16">七、Java 客户端 ⭐⭐⭐</h2>
+<h3 id="section-17">7.1 SpringDataRedis（推荐）</h3>
+<p><strong>依赖</strong>：</p>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-data-redis<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><p><strong>配置</strong>：</p>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">redis</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.150.101</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6379</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">123321</span>
+<span class="w">    </span><span class="nt">lettuce</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">pool</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">max-active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span><span class="w">   </span><span class="c1"># 最大连接数</span>
+<span class="w">        </span><span class="nt">max-idle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="w">        </span><span class="nt">min-idle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div><p><strong>使用</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Autowired</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">RedisTemplate</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">;</span>
+
+<span class="c1">// String</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="s">"name"</span><span class="p">,</span><span class="w"> </span><span class="s">"Jack"</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="s">"name"</span><span class="p">);</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="s">"code"</span><span class="p">,</span><span class="w"> </span><span class="s">"1234"</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+
+<span class="c1">// Hash</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForHash</span><span class="p">().</span><span class="na">put</span><span class="p">(</span><span class="s">"user:1"</span><span class="p">,</span><span class="w"> </span><span class="s">"name"</span><span class="p">,</span><span class="w"> </span><span class="s">"Jack"</span><span class="p">);</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForHash</span><span class="p">().</span><span class="na">put</span><span class="p">(</span><span class="s">"user:1"</span><span class="p">,</span><span class="w"> </span><span class="s">"age"</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">);</span>
+<span class="n">Map</span><span class="o">&lt;</span><span class="n">Object</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForHash</span><span class="p">().</span><span class="na">entries</span><span class="p">(</span><span class="s">"user:1"</span><span class="p">);</span>
+
+<span class="c1">// List</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForList</span><span class="p">().</span><span class="na">leftPush</span><span class="p">(</span><span class="s">"list"</span><span class="p">,</span><span class="w"> </span><span class="s">"a"</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="p">)</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForList</span><span class="p">().</span><span class="na">leftPop</span><span class="p">(</span><span class="s">"list"</span><span class="p">);</span>
+
+<span class="c1">// Set</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForSet</span><span class="p">().</span><span class="na">add</span><span class="p">(</span><span class="s">"tags"</span><span class="p">,</span><span class="w"> </span><span class="s">"java"</span><span class="p">,</span><span class="w"> </span><span class="s">"redis"</span><span class="p">);</span>
+<span class="n">Boolean</span><span class="w"> </span><span class="n">isMember</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForSet</span><span class="p">().</span><span class="na">isMember</span><span class="p">(</span><span class="s">"tags"</span><span class="p">,</span><span class="w"> </span><span class="s">"java"</span><span class="p">);</span>
+
+<span class="c1">// ZSet</span>
+<span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForZSet</span><span class="p">().</span><span class="na">add</span><span class="p">(</span><span class="s">"rank"</span><span class="p">,</span><span class="w"> </span><span class="s">"user1"</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">top3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForZSet</span><span class="p">().</span><span class="na">reverseRange</span><span class="p">(</span><span class="s">"rank"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-18">7.2 配置 JSON 序列化器（重要）⭐</h3>
+<p>默认使用 Java 序列化（JDK），对象存入 Redis 后乱码。配置 JSON 序列化：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Configuration</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RedisConfig</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RedisTemplate</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">redisTemplate</span><span class="p">(</span><span class="n">RedisConnectionFactory</span><span class="w"> </span><span class="n">factory</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">RedisTemplate</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RedisTemplate</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">template</span><span class="p">.</span><span class="na">setConnectionFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// key 使用 String 序列化</span>
+<span class="w">        </span><span class="n">template</span><span class="p">.</span><span class="na">setKeySerializer</span><span class="p">(</span><span class="n">RedisSerializer</span><span class="p">.</span><span class="na">string</span><span class="p">());</span>
+<span class="w">        </span><span class="n">template</span><span class="p">.</span><span class="na">setHashKeySerializer</span><span class="p">(</span><span class="n">RedisSerializer</span><span class="p">.</span><span class="na">string</span><span class="p">());</span>
+
+<span class="w">        </span><span class="c1">// value 使用 JSON 序列化</span>
+<span class="w">        </span><span class="n">template</span><span class="p">.</span><span class="na">setValueSerializer</span><span class="p">(</span><span class="n">RedisSerializer</span><span class="p">.</span><span class="na">json</span><span class="p">());</span>
+<span class="w">        </span><span class="n">template</span><span class="p">.</span><span class="na">setHashValueSerializer</span><span class="p">(</span><span class="n">RedisSerializer</span><span class="p">.</span><span class="na">json</span><span class="p">());</span>
+
+<span class="w">        </span><span class="n">template</span><span class="p">.</span><span class="na">afterPropertiesSet</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">template</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-19">7.3 StringRedisTemplate（更简洁）</h3>
+<p>如果 value 自己手动转 JSON，直接用 <code>StringRedisTemplate</code>，无需配置序列化：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Autowired</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">StringRedisTemplate</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">;</span>
+
+<span class="nd">@Autowired</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">ObjectMapper</span><span class="w"> </span><span class="n">objectMapper</span><span class="p">;</span>
+
+<span class="c1">// 存对象</span>
+<span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">(</span><span class="s">"Jack"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">objectMapper</span><span class="p">.</span><span class="na">writeValueAsString</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+<span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="s">"user:1"</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">);</span>
+
+<span class="c1">// 取对象</span>
+<span class="n">String</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="s">"user:1"</span><span class="p">);</span>
+<span class="n">User</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">objectMapper</span><span class="p">.</span><span class="na">readValue</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">User</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+</pre></div>
+</div><blockquote>
+<p>💡 推荐 <code>StringRedisTemplate</code> + 手动 JSON 转换，更清晰可控。</p>
+</blockquote>
+<hr/>
+<h2 id="section-20">八、项目场景（实战导向）⭐</h2>
+<h3 id="section-21">🎯 场景 1：缓存查询</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="n">Shop</span><span class="w"> </span><span class="nf">queryShopById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 从 Redis 查</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cache:shop:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">StrUtil</span><span class="p">.</span><span class="na">isNotBlank</span><span class="p">(</span><span class="n">json</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toBean</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">Shop</span><span class="p">.</span><span class="na">class</span><span class="p">);</span><span class="w">  </span><span class="c1">// 命中缓存</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2. 查数据库</span>
+<span class="w">    </span><span class="n">Shop</span><span class="w"> </span><span class="n">shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shopMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">shop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 3. 写入缓存（30 分钟过期）</span>
+<span class="w">    </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">JSONUtil</span><span class="p">.</span><span class="na">toJsonStr</span><span class="p">(</span><span class="n">shop</span><span class="p">),</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">shop</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-22">🎯 场景 2：计数器（商品浏览量）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 每次访问 +1</span>
+<span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">increment</span><span class="p">(</span><span class="s">"view:product:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">productId</span><span class="p">);</span>
+
+<span class="c1">// 获取浏览量</span>
+<span class="n">String</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="s">"view:product:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">productId</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-23">🎯 场景 3：排行榜</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 更新分数（销售额）</span>
+<span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForZSet</span><span class="p">().</span><span class="na">incrementScore</span><span class="p">(</span><span class="s">"rank:sales"</span><span class="p">,</span><span class="w"> </span><span class="s">"product_1"</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+
+<span class="c1">// 获取 TOP 10</span>
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">ZSetOperations</span><span class="p">.</span><span class="na">TypedTuple</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">top</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stringRedisTemplate</span><span class="p">.</span><span class="na">opsForZSet</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">reverseRangeWithScores</span><span class="p">(</span><span class="s">"rank:sales"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-24">九、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>Redis 为什么快？</strong></p>
+<ol>
+<li>纯内存操作</li>
+<li>单线程避免竞争</li>
+<li>IO 多路复用（epoll）</li>
+<li>高效数据结构（SDS、跳表等）</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Redis 和 MySQL 的区别？</strong>
+Redis 基于内存、访问快、数据结构丰富，用于缓存热点数据；MySQL 基于磁盘、持久可靠，存全量数据。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>五种数据类型的使用场景？</strong></p>
+<ul>
+<li>String：缓存、计数、锁</li>
+<li>Hash：用户信息（字段级操作）</li>
+<li>List：消息队列、时间线</li>
+<li>Set：去重、共同好友</li>
+<li>SortedSet：排行榜、延迟队列</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>KEYS 为什么不能用于生产？</strong>
+O(N) 操作，key 多时会阻塞 Redis，用 <code>SCAN</code> 替代。</p>
+</blockquote>
+<hr/>
+<h2 id="section-25">十、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>NoSQL vs SQL 对比</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Redis 安装配置</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>五种数据类型及常用命令</strong>（重点）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>通用命令（DEL/EXISTS/EXPIRE/TTL）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Key 层级命名规范</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>SpringDataRedis 配置与使用</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>JSON 序列化器配置</strong></li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>生产禁用 <code>KEYS *</code></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><code>TTL -1</code> 永不过期，<code>-2</code> 已过期/不存在</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>未配置序列化器会导致乱码</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><code>ZRANGE</code> 默认升序，降序用 <code>ZREVRANGE</code></li>
+</ul>
+<p>下一章：<a href="842df3b73dd46ca0.html">04-Redis实战.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="206542e38dd22c89.html"><small>← 上一篇</small><strong>02 · RabbitMQ 高级 ⭐⭐⭐</strong></a><a href="842df3b73dd46ca0.html"><small>下一篇 →</small><strong>04 · Redis 实战（黑马点评项目）⭐⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、认识 Redis ⭐</a><a class="toc-h3" href="#section-2">2.1 NoSQL vs SQL</a><a class="toc-h3" href="#section-3">2.2 Redis 特点</a><a class="toc-h2" href="#section-4">三、安装与配置</a><a class="toc-h3" href="#section-5">3.1 配置文件（redis.conf）</a><a class="toc-h3" href="#section-6">3.2 启动与停止</a><a class="toc-h3" href="#section-7">3.3 Docker 安装（推荐）</a><a class="toc-h2" href="#section-8">四、通用命令 ⭐⭐</a><a class="toc-h2" href="#section-9">五、五种数据类型 ⭐⭐⭐</a><a class="toc-h3" href="#section-10">5.1 String（字符串）⭐⭐⭐</a><a class="toc-h3" href="#section-11">5.2 Hash（哈希）⭐⭐</a><a class="toc-h3" href="#section-12">5.3 List（列表）⭐⭐</a><a class="toc-h3" href="#section-13">5.4 Set（集合）⭐⭐</a><a class="toc-h3" href="#section-14">5.5 SortedSet（有序集合）⭐⭐⭐</a><a class="toc-h2" href="#section-15">六、五种数据类型对比 ⭐⭐</a><a class="toc-h2" href="#section-16">七、Java 客户端 ⭐⭐⭐</a><a class="toc-h3" href="#section-17">7.1 SpringDataRedis（推荐）</a><a class="toc-h3" href="#section-18">7.2 配置 JSON 序列化器（重要）⭐</a><a class="toc-h3" href="#section-19">7.3 StringRedisTemplate（更简洁）</a><a class="toc-h2" href="#section-20">八、项目场景（实战导向）⭐</a><a class="toc-h3" href="#section-21">🎯 场景 1：缓存查询</a><a class="toc-h3" href="#section-22">🎯 场景 2：计数器（商品浏览量）</a><a class="toc-h3" href="#section-23">🎯 场景 3：排行榜</a><a class="toc-h2" href="#section-24">九、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-25">十、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

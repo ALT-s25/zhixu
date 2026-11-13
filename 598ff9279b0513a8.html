@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL 多表查询完整详解（连接 &amp; 子查询） · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/598ff9279b0513a8.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a aria-current="page" href="598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL 多表查询完整详解（连接 &amp; 子查询）</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>保姆级笔记 · 零基础友好 · 面试必备</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">目录</h2>
+<ol>
+<li><a href="#1-%E5%A4%9A%E8%A1%A8%E5%85%B3%E7%B3%BB%E6%A6%82%E8%BF%B0">多表关系概述</a></li>
+<li><a href="#2-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A7%AF%E9%97%AE%E9%A2%98">笛卡尔积问题</a></li>
+<li><a href="#3-%E5%86%85%E8%BF%9E%E6%8E%A5-inner-join">内连接 INNER JOIN</a></li>
+<li><a href="#4-%E5%A4%96%E8%BF%9E%E6%8E%A5-leftright-join">外连接 LEFT/RIGHT JOIN</a></li>
+<li><a href="#5-%E5%85%A8%E8%BF%9E%E6%8E%A5-full-join">全连接 FULL JOIN</a></li>
+<li><a href="#6-%E8%87%AA%E8%BF%9E%E6%8E%A5">自连接</a></li>
+<li><a href="#7-%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2-union--union-all">联合查询 UNION / UNION ALL</a></li>
+<li><a href="#8-%E5%AD%90%E6%9F%A5%E8%AF%A2">子查询</a></li>
+<li><a href="#9-in--exists--any--all">IN / EXISTS / ANY / ALL</a></li>
+<li><a href="#10-%E7%BB%BC%E5%90%88%E6%A1%88%E4%BE%8B">综合案例</a></li>
+<li><a href="#11-%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E6%B1%87%E6%80%BB">常见报错汇总</a></li>
+<li><a href="#12-%E9%9D%A2%E8%AF%95%E5%B8%B8%E9%97%AE">面试常问</a></li>
+<li><a href="#13-%E6%9C%AC%E7%AB%A0%E5%B0%8F%E7%BB%93">本章小结</a></li>
+</ol>
+<hr/>
+<h2 id="section-1">1. 多表关系概述</h2>
+<h3 id="section-2">1.1 为什么要多张表？</h3>
+<p><strong>反例（全放一张表）</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>order_id</th>
+<th>customer_name</th>
+<th>customer_phone</th>
+<th>product_name</th>
+<th>product_price</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>张三</td>
+<td>138xxx</td>
+<td>苹果手机</td>
+<td>8999</td>
+</tr>
+<tr>
+<td>2</td>
+<td>张三</td>
+<td>138xxx</td>
+<td>耳机</td>
+<td>299</td>
+</tr>
+<tr>
+<td>3</td>
+<td>李四</td>
+<td>139xxx</td>
+<td>苹果手机</td>
+<td>8999</td>
+</tr>
+</tbody>
+</table></div>
+<p>问题：</p>
+<ul>
+<li><strong>数据冗余</strong>：张三的手机号存了两遍，苹果手机的价格存了两遍</li>
+<li><strong>更新异常</strong>：张三换号码，要改所有行</li>
+<li><strong>删除异常</strong>：删掉订单1，苹果手机信息也没了</li>
+</ul>
+<p><strong>正例（拆成多张表）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>customers 表：customer_id, name, phone
+products 表：product_id, name, price
+orders 表：order_id, customer_id, product_id（通过 ID 引用其他表）
+</pre></div>
+</div><h3 id="section-3">1.2 三种多表关系</h3>
+<h4 id="section-4">一对多（最常见）</h4>
+<p>一个部门有多个员工，一个员工只属于一个部门。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>dept 表：dept_id, dept_name
+emp 表：emp_id, emp_name, dept_id（外键指向 dept.dept_id）
+</pre></div>
+</div><h4 id="section-5">多对多</h4>
+<p>一个学生选多门课，一门课被多个学生选。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>student 表：student_id, name
+course 表：course_id, name
+student_course 表（中间表）：student_id, course_id（联合主键）
+</pre></div>
+</div><p>中间表是多对多关系的标准解法。</p>
+<h4 id="section-6">一对一</h4>
+<p>一个人只有一个身份证，一个身份证只属于一个人（相对少见）。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>person 表：person_id, name
+id_card 表：id_card_id, card_no, person_id UNIQUE（外键+唯一约束）
+</pre></div>
+</div><hr/>
+<h2 id="section-7">2. 笛卡尔积问题</h2>
+<h3 id="section-8">2.1 什么是笛卡尔积</h3>
+<p>两张表直接查询，不加连接条件，会返回 M×N 行（所有组合），这就是笛卡尔积，也叫"交叉连接"。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 建立测试数据（下面所有例子都用这组数据）</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">multi_query_demo</span><span class="p">;</span>
+<span class="n">USE</span><span class="w"> </span><span class="n">multi_query_demo</span><span class="p">;</span>
+
+<span class="c1">-- 部门表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">dept_id</span><span class="w">   </span><span class="nb">INT</span><span class="w">         </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dept_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="k">location</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- 员工表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">emp_id</span><span class="w">    </span><span class="nb">INT</span><span class="w">          </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">emp_name</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w">  </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dept_id</span><span class="w">   </span><span class="nb">INT</span><span class="p">,</span><span class="w">                        </span><span class="c1">-- 注意：不加外键，方便演示</span>
+<span class="w">    </span><span class="n">salary</span><span class="w">    </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">manager_id</span><span class="w"> </span><span class="nb">INT</span><span class="w">                        </span><span class="c1">-- 上级的 emp_id（自连接用）</span>
+<span class="p">);</span>
+
+<span class="c1">-- 薪资等级表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">sal_grade</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">grade</span><span class="w">      </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">low_sal</span><span class="w">    </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="n">high_sal</span><span class="w">   </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- 插入部门数据</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s1">'市场部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'上海'</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s1">'财务部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'广州'</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="s1">'人事部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'深圳'</span><span class="p">);</span><span class="w">   </span><span class="c1">-- 故意插一个没有员工的部门</span>
+
+<span class="c1">-- 插入员工数据</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w">  </span><span class="s1">'刘备'</span><span class="p">,</span><span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">20000</span><span class="p">,</span><span class="w"> </span><span class="k">NULL</span><span class="p">),</span><span class="w">   </span><span class="c1">-- 技术部，无上级</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w">  </span><span class="s1">'关羽'</span><span class="p">,</span><span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">15000</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w">      </span><span class="c1">-- 技术部，上级是刘备</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w">  </span><span class="s1">'张飞'</span><span class="p">,</span><span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">12000</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w">      </span><span class="c1">-- 技术部，上级是刘备</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w">  </span><span class="s1">'诸葛亮'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">18000</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w">     </span><span class="c1">-- 市场部，上级是刘备</span>
+<span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w">  </span><span class="s1">'赵云'</span><span class="p">,</span><span class="w">  </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">14000</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">),</span><span class="w">      </span><span class="c1">-- 市场部，上级是诸葛亮</span>
+<span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w">  </span><span class="s1">'马超'</span><span class="p">,</span><span class="w">  </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">11000</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w">      </span><span class="c1">-- 财务部，上级是刘备</span>
+<span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="w">  </span><span class="s1">'黄忠'</span><span class="p">,</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">    </span><span class="c1">-- 部门为 NULL（无部门员工）</span>
+
+<span class="c1">-- 插入薪资等级</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">sal_grade</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">      </span><span class="mi">5000</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w">  </span><span class="mi">5001</span><span class="p">,</span><span class="w">   </span><span class="mi">10000</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w">  </span><span class="mi">10001</span><span class="p">,</span><span class="w">  </span><span class="mi">15000</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w">  </span><span class="mi">15001</span><span class="p">,</span><span class="w">  </span><span class="mi">20000</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w">  </span><span class="mi">20001</span><span class="p">,</span><span class="w">  </span><span class="mi">99999</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-9">2.2 笛卡尔积示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误示范：没有连接条件，产生笛卡尔积</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">;</span>
+<span class="c1">-- 结果：7(员工) × 4(部门) = 28 行，大量无意义数据！</span>
+
+<span class="c1">-- 正确做法：加连接条件</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">emp</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dept</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 隐式内连接</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-10">3. 内连接 INNER JOIN</h2>
+<h3 id="section-11">3.1 核心概念</h3>
+<p>内连接只返回<strong>两张表都能匹配上</strong>的行。
+类比：两个班的花名册取<strong>交集</strong>，两边都有的人才算。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>emp 表：有 7 名员工
+dept 表：有 4 个部门
+
+内连接结果：只有 dept_id 在两表都存在的行
+- 黄忠（dept_id=NULL）→ 不出现
+- 人事部（没有员工）→ 不出现
+</pre></div>
+</div><h3 id="section-12">3.2 语法</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 显式内连接（推荐）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="err">列名</span>
+<span class="k">FROM</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="err">连接条件</span><span class="p">;</span><span class="w">   </span><span class="c1">-- INNER 可以省略，直接 JOIN</span>
+
+<span class="c1">-- 隐式内连接（老写法）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="err">列名</span>
+<span class="k">FROM</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">连接条件</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-13">3.3 完整示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：查询员工姓名和所在部门</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工姓名'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门名称'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="k">location</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'地点'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+<span class="c1">-- 结果：6行（黄忠因 dept_id=NULL 被排除）</span>
+
+<span class="c1">-- 示例2：查询员工姓名、部门、薪资等级</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="s1">'薪资'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">sg</span><span class="p">.</span><span class="n">grade</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="s1">'薪资等级'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w">       </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w">                 </span><span class="c1">-- 连接部门</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">sal_grade</span><span class="w"> </span><span class="n">sg</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="n">sg</span><span class="p">.</span><span class="n">low_sal</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">sg</span><span class="p">.</span><span class="n">high_sal</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 连接薪资等级</span>
+<span class="c1">-- 多表连接：依次 JOIN 即可</span>
+
+<span class="c1">-- 示例3：带条件过滤的内连接</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="w">    </span><span class="c1">-- 过滤：只看技术部</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w">         </span><span class="c1">-- 过滤：薪资大于 10000</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">4. 外连接 LEFT/RIGHT JOIN</h2>
+<h3 id="section-15">4.1 核心概念</h3>
+<p>外连接在内连接基础上，额外保留<strong>某一侧</strong>的所有记录，即使对面没有匹配。</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>保留哪边</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LEFT JOIN</td>
+<td>左表全部保留</td>
+<td>右表无匹配的行，右表列显示 NULL</td>
+</tr>
+<tr>
+<td>RIGHT JOIN</td>
+<td>右表全部保留</td>
+<td>左表无匹配的行，左表列显示 NULL</td>
+</tr>
+</tbody>
+</table></div>
+<p>类比：</p>
+<ul>
+<li>LEFT JOIN：以左表为基础，能拼上的拼，拼不上的右边填 NULL</li>
+<li>RIGHT JOIN：以右表为基础，能拼上的拼，拼不上的左边填 NULL</li>
+</ul>
+<h3 id="section-16">4.2 LEFT JOIN 示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询所有员工（包括没有部门的员工）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工姓名'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门名称'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+<span class="c1">-- 结果：7行（黄忠也出现，dept_name 显示 NULL）</span>
+
+<span class="c1">-- 查找没有部门的员工</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'无部门员工'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 右表为 NULL，说明左表没有匹配</span>
+<span class="c1">-- 结果：黄忠</span>
+
+<span class="c1">-- 查询所有部门及其员工数（包括空部门）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w">     </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门'</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">emp_id</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工数'</span><span class="w">   </span><span class="c1">-- COUNT 对 NULL 不计数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="p">;</span>
+<span class="c1">-- 结果：4行（人事部员工数为 0）</span>
+</pre></div>
+</div><h3 id="section-17">4.3 RIGHT JOIN 示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询所有部门（包括没有员工的部门）</span>
+<span class="c1">-- 以 dept 为右表，所有部门都保留</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工姓名'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门名称'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">RIGHT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+<span class="c1">-- 结果：7行（人事部出现，emp_name 显示 NULL）</span>
+
+<span class="c1">-- 等价的 LEFT JOIN 写法（推荐统一用 LEFT JOIN，更直观）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工姓名'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门名称'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+<span class="c1">-- 和上面 RIGHT JOIN 结果相同</span>
+</pre></div>
+</div><blockquote>
+<p>建议：统一使用 <code>LEFT JOIN</code>，把"主表"放在左边，可读性更好。</p>
+</blockquote>
+<hr/>
+<h2 id="section-18">5. 全连接 FULL JOIN</h2>
+<h3 id="section-19">5.1 核心概念</h3>
+<p>全连接 = LEFT JOIN ∪ RIGHT JOIN，保留两张表所有记录，能匹配上的合并，匹配不上的填 NULL。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>LEFT JOIN 结果 + RIGHT JOIN 结果（去掉重复行）
+</pre></div>
+</div><p><strong>MySQL 不支持 <code>FULL OUTER JOIN</code> 语法</strong>，需要用 <code>UNION</code> 模拟。</p>
+<h3 id="section-20">5.2 用 UNION 模拟全连接</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 全连接：所有员工 + 所有部门（包括无部门员工和无员工部门）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w">   </span><span class="c1">-- 左连接：所有员工</span>
+
+<span class="k">UNION</span><span class="w">                                        </span><span class="c1">-- 合并去重</span>
+
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">RIGHT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span><span class="w"> </span><span class="c1">-- 右连接：所有部门</span>
+<span class="c1">-- 结果：8行（7名员工 + 1个空部门"人事部"）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">6. 自连接</h2>
+<h3 id="section-22">6.1 核心概念</h3>
+<p>自连接：一张表和<strong>自己</strong>连接，通常用于处理<strong>层级关系</strong>（如组织架构、分类树）。</p>
+<p>类比：员工表里有"上级 ID"，查"员工和他上级的名字"，就需要把员工表和自己 JOIN。</p>
+<p>技巧：给同一张表起<strong>两个别名</strong>，把它当成两张表来看。</p>
+<h3 id="section-23">6.2 完整示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询每个员工和他的直接上级</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'上级'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w">                              </span><span class="c1">-- e：员工</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">manager_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">emp_id</span><span class="p">;</span><span class="w">  </span><span class="c1">-- m：上级（同一张表，别名不同）</span>
+<span class="c1">-- LEFT JOIN 保证刘备（无上级）也出现，上级显示 NULL</span>
+
+<span class="c1">-- 结果：</span>
+<span class="c1">-- 刘备   NULL（没有上级）</span>
+<span class="c1">-- 关羽   刘备</span>
+<span class="c1">-- 张飞   刘备</span>
+<span class="c1">-- 诸葛亮 刘备</span>
+<span class="c1">-- 赵云   诸葛亮</span>
+<span class="c1">-- 马超   刘备</span>
+<span class="c1">-- 黄忠   刘备</span>
+
+<span class="c1">-- 查询下级比上级薪资还高的员工</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工薪资'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">emp_name</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="s1">'上级'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">salary</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="s1">'上级薪资'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">manager_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">emp_id</span><span class="w">  </span><span class="c1">-- 内连接，只看有上级的</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">salary</span><span class="p">;</span><span class="w">                   </span><span class="c1">-- 下级薪资 &gt; 上级薪资</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-24">7. 联合查询 UNION / UNION ALL</h2>
+<h3 id="section-25">7.1 核心概念</h3>
+<p><code>UNION</code> 把多条 SELECT 的结果<strong>纵向合并</strong>（上下拼接），每条 SELECT 的列数和类型必须一致。</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>是否去重</th>
+<th>性能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UNION</td>
+<td>去重（相同行只保留一行）</td>
+<td>较慢（需要排序去重）</td>
+</tr>
+<tr>
+<td>UNION ALL</td>
+<td>不去重，全部保留</td>
+<td>快</td>
+</tr>
+</tbody>
+</table></div>
+<p>类比：</p>
+<ul>
+<li>UNION：合并两个班花名册，同名同姓的合并成一个</li>
+<li>UNION ALL：直接把两个花名册叠放，不管重复</li>
+</ul>
+<h3 id="section-26">7.2 完整示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：查询薪资 &lt; 10000 或薪资 &gt; 18000 的员工</span>
+<span class="c1">-- 方式一：OR 条件</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10000</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">18000</span><span class="p">;</span>
+
+<span class="c1">-- 方式二：UNION（对于复杂条件可读性更好）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10000</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">18000</span><span class="p">;</span>
+
+<span class="c1">-- 示例2：合并员工和部门名称列表（列名取第一条 SELECT 的列名）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'名称'</span><span class="p">,</span><span class="w"> </span><span class="s1">'员工'</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'类型'</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">UNION</span><span class="w"> </span><span class="k">ALL</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'名称'</span><span class="p">,</span><span class="w"> </span><span class="s1">'部门'</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'类型'</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="p">;</span>
+
+<span class="c1">-- 示例3：UNION 去重效果</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">12000</span><span class="p">;</span>
+<span class="c1">-- 刘备、关羽同时满足两个条件，UNION 只出现一次</span>
+
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="k">UNION</span><span class="w"> </span><span class="k">ALL</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">12000</span><span class="p">;</span>
+<span class="c1">-- UNION ALL：刘备、关羽会出现两次</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-27">8. 子查询</h2>
+<h3 id="section-28">8.1 核心概念</h3>
+<p>子查询：一条 SQL 语句<strong>嵌套在另一条 SQL 里</strong>作为数据来源或条件。
+外层 SQL 叫"主查询"，括号里的叫"子查询"。</p>
+<p>类比：你先查出"技术部的 dept_id"，再用这个 ID 查员工。
+子查询就是把这两步合成一步，括号里先算。</p>
+<h3 id="section-29">8.2 按结果分类</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>返回结果</th>
+<th>配合使用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标量子查询</td>
+<td>一行一列（单个值）</td>
+<td><code>=</code>、<code>&gt;</code>、<code>&lt;</code> 等比较运算符</td>
+</tr>
+<tr>
+<td>行子查询</td>
+<td>一行多列</td>
+<td><code>=</code>、<code>!=</code>、<code>IN</code> 配合 <code>()</code></td>
+</tr>
+<tr>
+<td>列子查询</td>
+<td>多行一列（一组值）</td>
+<td><code>IN</code>、<code>NOT IN</code>、<code>ANY</code>、<code>ALL</code></td>
+</tr>
+<tr>
+<td>表子查询</td>
+<td>多行多列</td>
+<td>当作临时表放在 FROM 子句</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-30">8.3 标量子查询（最常见）</h3>
+<p>子查询返回单一值，用于比较条件。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询薪资高于平均薪资的员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span><span class="w">  </span><span class="c1">-- 子查询先算平均薪资</span>
+<span class="c1">-- 子查询结果：约 14143（单一值）</span>
+<span class="c1">-- 主查询：salary &gt; 14143</span>
+
+<span class="c1">-- 查询和"诸葛亮"同一部门的员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">dept_id</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'诸葛亮'</span><span class="p">)</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'诸葛亮'</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 排除诸葛亮自己</span>
+
+<span class="c1">-- 查询最高薪资的员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-31">8.4 列子查询（多行单列）</h3>
+<p>子查询返回一列多行，配合 <code>IN</code>、<code>NOT IN</code>、<code>ANY</code>、<code>ALL</code> 使用。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询在"技术部"或"市场部"工作的员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">dept_id</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span>
+<span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">'技术部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'市场部'</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="c1">-- 子查询返回：(1, 2)</span>
+<span class="c1">-- 主查询：dept_id IN (1, 2)</span>
+
+<span class="c1">-- 查询不在任何有员工的部门工作的员工（dept 表中没有该部门）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="c1">-- ANY：薪资高于技术部任意一名员工（即高于技术部最低薪资）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="k">ANY</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="p">);</span>
+
+<span class="c1">-- ALL：薪资高于技术部所有员工（即高于技术部最高薪资）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="p">);</span>
+</pre></div>
+</div><h3 id="section-32">8.5 行子查询（单行多列）</h3>
+<p>子查询返回一行多列，用于多列同时匹配。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询和"关羽"薪资相同、上级也相同的员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">manager_id</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="p">(</span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">manager_id</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">manager_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'关羽'</span>
+<span class="p">)</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'关羽'</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-33">8.6 表子查询（多行多列）</h3>
+<p>子查询返回多行多列，当作临时表使用（必须给别名）。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 把高薪员工子查询当作临时表，再连接部门</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">emp_id</span><span class="p">,</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">12000</span><span class="w">               </span><span class="c1">-- 子查询：先过滤高薪员工</span>
+<span class="p">)</span><span class="w"> </span><span class="n">t</span><span class="w">                                    </span><span class="c1">-- 必须给子查询一个别名</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+
+<span class="c1">-- 表子查询作为 FROM（派生表）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">avg_sal</span>
+<span class="k">FROM</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">)</span><span class="w"> </span><span class="n">t</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">dept_id</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-34">8.7 WHERE vs HAVING 中的子查询</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- WHERE 中的子查询（过滤行）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span>
+
+<span class="c1">-- HAVING 中的子查询（过滤分组后的结果）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">avg_sal</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">dept_id</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span><span class="w">  </span><span class="c1">-- 高于全公司平均薪资的部门</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-35">9. IN / EXISTS / ANY / ALL</h2>
+<h3 id="section-36">9.1 IN vs EXISTS</h3>
+<p><strong>IN</strong>：先执行子查询，把结果集拿出来，再逐行比较。
+适合：子查询结果集<strong>小</strong>的情况。</p>
+<p><strong>EXISTS</strong>：对主查询每一行，执行一次子查询，看是否有结果（有→保留，无→丢弃）。
+适合：主查询结果集<strong>小</strong>、子查询结果集<strong>大</strong>的情况。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- IN 写法：查询有员工的部门</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">dept</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="c1">-- EXISTS 写法：等价查询</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w">  </span><span class="c1">-- 能找到匹配行就返回 TRUE</span>
+<span class="p">);</span>
+<span class="c1">-- EXISTS 里写什么无所谓，只看是否有结果，通常写 SELECT 1 表示"只要存在"</span>
+
+<span class="c1">-- NOT IN vs NOT EXISTS</span>
+<span class="c1">-- 注意：NOT IN 遇到 NULL 值会有坑！</span>
+<span class="c1">-- 如果子查询结果含 NULL，NOT IN 结果为空集</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span><span class="w">  </span><span class="c1">-- 坑！emp.dept_id 有 NULL，结果为空</span>
+
+<span class="c1">-- NOT EXISTS 更安全</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="p">);</span>
+</pre></div>
+</div><h3 id="section-37">9.2 NOT IN 的 NULL 坑</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 演示 NOT IN 的 NULL 陷阱</span>
+<span class="c1">-- emp 表中有一行 dept_id = NULL</span>
+
+<span class="c1">-- 预期：找出没有员工的部门（dept_id=4 的人事部）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span>
+<span class="c1">-- 实际结果：空！因为 NOT IN (1, 2, 3, NULL) 中含 NULL，整个条件为 UNKNOWN</span>
+
+<span class="c1">-- 修复方案1：过滤掉子查询中的 NULL</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="c1">-- 修复方案2：改用 NOT EXISTS（推荐）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="p">);</span>
+</pre></div>
+</div><h3 id="section-38">9.3 ANY 和 ALL</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ANY（SOME）：满足子查询中任意一个值即可</span>
+<span class="c1">-- salary &gt; ANY(...) 等价于 salary &gt; MIN(子查询结果)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="k">ANY</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">-- 只要比技术部某人薪资高就行</span>
+
+<span class="c1">-- ALL：必须满足子查询中所有值</span>
+<span class="c1">-- salary &gt; ALL(...) 等价于 salary &gt; MAX(子查询结果)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">-- 必须比技术部所有人薪资都高</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-39">10. 综合案例</h2>
+<h3 id="section-40">10.1 准备完整数据</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 以上面建好的 dept、emp、sal_grade 表为基础</span>
+
+<span class="c1">-- 查询每个员工的：姓名、部门、薪资、薪资等级、上级姓名</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="w">           </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w">          </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w">             </span><span class="k">AS</span><span class="w"> </span><span class="s1">'薪资'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">sg</span><span class="p">.</span><span class="n">grade</span><span class="w">             </span><span class="k">AS</span><span class="w"> </span><span class="s1">'薪资等级'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">emp_name</span><span class="w">           </span><span class="k">AS</span><span class="w"> </span><span class="s1">'直属上级'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w">                           </span><span class="c1">-- 连接部门</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">sal_grade</span><span class="w"> </span><span class="n">sg</span>
+<span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="n">sg</span><span class="p">.</span><span class="n">low_sal</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">sg</span><span class="p">.</span><span class="n">high_sal</span><span class="w">     </span><span class="c1">-- 连接薪资等级</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">m</span>
+<span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">manager_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">emp_id</span><span class="p">;</span><span class="w">                        </span><span class="c1">-- 自连接查上级</span>
+</pre></div>
+</div><h3 id="section-41">10.2 统计分析查询</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 各部门的员工数、平均薪资、最高薪资</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="w">            </span><span class="k">AS</span><span class="w"> </span><span class="s1">'部门'</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">emp_id</span><span class="p">)</span><span class="w">        </span><span class="k">AS</span><span class="w"> </span><span class="s1">'员工数'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'平均薪资'</span><span class="p">,</span>
+<span class="w">    </span><span class="k">MAX</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="p">)</span><span class="w">          </span><span class="k">AS</span><span class="w"> </span><span class="s1">'最高薪资'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+
+<span class="c1">-- 查询平均薪资高于全公司平均薪资的部门</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">avg_sal</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="n">avg_sal</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="p">);</span>
+
+<span class="c1">-- 查询每个部门薪资最高的员工（相关子查询）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w">  </span><span class="c1">-- 相关子查询：引用了外层的 e.dept_id</span>
+<span class="p">);</span>
+</pre></div>
+</div><h3 id="section-42">10.3 多对多查询（使用中间表）</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建学生、课程、选课表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">student</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">stu_id</span><span class="w">   </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">stu_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">course</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">course_id</span><span class="w">   </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">course_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">stu_course</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">stu_id</span><span class="w">    </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">course_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">score</span><span class="w">     </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">stu_id</span><span class="p">,</span><span class="w"> </span><span class="n">course_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- 插入数据</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">student</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s1">'小明'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="s1">'小红'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s1">'小张'</span><span class="p">);</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">course</span><span class="w">  </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s1">'MySQL'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="s1">'Java'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s1">'Python'</span><span class="p">);</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">stu_course</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">85</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 小明选了 MySQL、Java</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">78</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">92</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 小红选了 MySQL、Python</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">88</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">76</span><span class="p">);</span><span class="w">    </span><span class="c1">-- 小张选了 Java、Python</span>
+
+<span class="c1">-- 查询每个学生的选课情况</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">stu_name</span><span class="w">   </span><span class="k">AS</span><span class="w"> </span><span class="s1">'学生'</span><span class="p">,</span>
+<span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">course_name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s1">'课程'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="s1">'成绩'</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">student</span><span class="w"> </span><span class="n">s</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">stu_course</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">stu_id</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">course</span><span class="w"> </span><span class="k">c</span><span class="w">     </span><span class="k">ON</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">course_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">course_id</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_id</span><span class="p">,</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+
+<span class="c1">-- 查询选了 MySQL 课程的学生</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">student</span><span class="w"> </span><span class="n">s</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">stu_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">stu_course</span><span class="w"> </span><span class="n">sc</span>
+<span class="w">    </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">course</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">course_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">course_id</span>
+<span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">course_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'MySQL'</span>
+<span class="p">);</span>
+
+<span class="c1">-- 查询同时选了 MySQL 和 Java 的学生</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">student</span><span class="w"> </span><span class="n">s</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">stu_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">stu_course</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">course</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">course_id</span><span class="o">=</span><span class="k">c</span><span class="p">.</span><span class="n">course_id</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">course_name</span><span class="o">=</span><span class="s1">'MySQL'</span><span class="p">)</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">stu_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">stu_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">stu_course</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">course</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="n">course_id</span><span class="o">=</span><span class="k">c</span><span class="p">.</span><span class="n">course_id</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">course_name</span><span class="o">=</span><span class="s1">'Java'</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-43">11. 常见报错汇总</h2>
+<h3 id="section-44">11.1 Column 'xx' in field list is ambiguous</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1052 (23000): Column 'dept_id' in field list is ambiguous
+原因：两张表都有 dept_id 列，不知道用哪个
+解决：加表名/别名前缀
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">emp</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dept</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+<span class="c1">-- 正确</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">emp</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dept</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+<span class="c1">-- 或用别名</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-45">11.2 子查询返回多行（标量子查询）</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1242 (21000): Subquery returns more than 1 row
+原因：在需要单值的地方，子查询返回了多行
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误：dept_name='技术部'只有一个，但如果有多个就会报错</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%部'</span><span class="p">);</span><span class="w">  </span><span class="c1">-- 多个部门名含'部'</span>
+<span class="c1">-- 修复：用 IN 代替 =</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%部'</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-46">11.3 NOT IN 返回空结果</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>现象：NOT IN 子查询没有报错，但结果为空
+原因：子查询结果集含 NULL，NOT IN (..., NULL) 恒为 UNKNOWN
+解决：在子查询加 WHERE column IS NOT NULL，或改用 NOT EXISTS
+</pre></div>
+</div><h3 id="section-47">11.4 UNION 列数不匹配</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1222 (21000): The used SELECT statements have a different number of columns
+原因：UNION 两侧 SELECT 的列数不同
+解决：确保列数相同，用 NULL 或常量补齐
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="p">,</span><span class="w"> </span><span class="k">location</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 列数不同</span>
+
+<span class="c1">-- 修复</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">location</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dept_name</span><span class="p">,</span><span class="w"> </span><span class="k">location</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dept</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-48">11.5 子查询别名缺失</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1248 (42000): Every derived table must have its own alias
+原因：FROM 子句中的子查询没有别名
+解决：给子查询加 AS 别名
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
+
+<span class="c1">-- 修复</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">emp_name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">high_sal_emp</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-49">12. 面试常问</h2>
+<h3 id="section-50">Q1：INNER JOIN 和 LEFT JOIN 的区别？</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>对比</th>
+<th>INNER JOIN</th>
+<th>LEFT JOIN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>返回行数</td>
+<td>只返回两表都匹配的行</td>
+<td>左表全部保留，右表无匹配填 NULL</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>只关心有关联的数据</td>
+<td>需要保留主表所有数据</td>
+</tr>
+<tr>
+<td>NULL 处理</td>
+<td>自动过滤左表/右表 NULL</td>
+<td>保留左表，右表可能为 NULL</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-51">Q2：子查询什么时候比 JOIN 慢？</h3>
+<p>子查询可能较慢的场景：</p>
+<ol>
+<li><p><strong>相关子查询</strong>（Correlated Subquery）：子查询引用了外层的列，外层每一行都要重新执行一次子查询。</p>
+<ul>
+<li>例：<code>WHERE salary = (SELECT MAX(salary) FROM emp WHERE dept_id = e.dept_id)</code></li>
+<li>外层有 N 行，子查询执行 N 次，复杂度 O(N²)</li>
+</ul>
+</li>
+<li><p>子查询结果无法被索引利用时</p>
+</li>
+</ol>
+<p><strong>改进方法</strong>：用 JOIN 或窗口函数替代相关子查询：</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 相关子查询（慢）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="p">);</span>
+
+<span class="c1">-- 改用 JOIN（通常更快）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">max_sal</span>
+<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">dept_id</span>
+<span class="p">)</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">max_sal</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-52">Q3：IN 和 EXISTS 如何选择？</h3>
+<ul>
+<li>子查询结果集<strong>小</strong>（如几百行）→ 用 <code>IN</code>，简单直观</li>
+<li>子查询结果集<strong>大</strong>（如几万行）→ 用 <code>EXISTS</code>，只判断是否存在，不用加载全部数据</li>
+<li>有 NULL 参与时 → 优先用 <code>EXISTS</code>，避免 <code>NOT IN</code> 的 NULL 陷阱</li>
+</ul>
+<h3 id="section-53">Q4：UNION 和 UNION ALL 的区别及使用建议？</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>对比</th>
+<th>UNION</th>
+<th>UNION ALL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>去重</td>
+<td>是（排序后去重）</td>
+<td>否</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>较慢</td>
+<td>快</td>
+</tr>
+<tr>
+<td>使用建议</td>
+<td>确实需要去重时用</td>
+<td>明确知道无重复或不关心重复时用</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>建议优先用 UNION ALL</strong>，显式去重可以用 <code>DISTINCT</code>。</p>
+<h3 id="section-54">Q5：什么是笛卡尔积，如何避免？</h3>
+<p>笛卡尔积 = 多表查询不加连接条件，结果为 M×N 行。
+避免方法：始终在 <code>ON</code> 或 <code>WHERE</code> 子句加连接条件。</p>
+<h3 id="section-55">Q6：自连接的典型应用场景？</h3>
+<ul>
+<li>员工表查上级/下属</li>
+<li>分类表查父分类（菜单树、商品分类树）</li>
+<li>朋友关系表查共同好友</li>
+</ul>
+<h3 id="section-56">Q7：LEFT JOIN 后 WHERE 条件和 ON 条件的区别？</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ON 条件：连接时就过滤（影响连接结果）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="k">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">;</span>
+<span class="c1">-- 结果：所有员工都出现，但只有北京部门的员工才能显示 dept_name</span>
+
+<span class="c1">-- WHERE 条件：连接后再过滤（影响最终行数）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">emp_name</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">dept_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="k">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">;</span>
+<span class="c1">-- 结果：只有北京员工，非北京员工被过滤掉了</span>
+</pre></div>
+</div><p>规律：LEFT JOIN 时，过滤条件放 <code>ON</code> 和 <code>WHERE</code> 结果不同，<code>ON</code> 保留左表所有行，<code>WHERE</code> 对结果再过滤。</p>
+<hr/>
+<h2 id="section-57">13. 本章小结</h2>
+<h3 id="section-58">连接类型速查表</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>连接类型</th>
+<th>语法</th>
+<th>结果</th>
+<th>类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>内连接</td>
+<td>INNER JOIN</td>
+<td>交集</td>
+<td>两张名单都有的人</td>
+</tr>
+<tr>
+<td>左外连接</td>
+<td>LEFT JOIN</td>
+<td>左表全部 + 匹配</td>
+<td>以左表为准</td>
+</tr>
+<tr>
+<td>右外连接</td>
+<td>RIGHT JOIN</td>
+<td>右表全部 + 匹配</td>
+<td>以右表为准</td>
+</tr>
+<tr>
+<td>全连接</td>
+<td>UNION 模拟</td>
+<td>并集</td>
+<td>两张名单合并</td>
+</tr>
+<tr>
+<td>自连接</td>
+<td>表别名自连接</td>
+<td>层级关系</td>
+<td>员工找上级</td>
+</tr>
+<tr>
+<td>交叉连接</td>
+<td>CROSS JOIN</td>
+<td>笛卡尔积</td>
+<td>通常是 BUG</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-59">子查询使用场景</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>子查询类型</th>
+<th>返回</th>
+<th>常见用法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标量子查询</td>
+<td>单个值</td>
+<td><code>WHERE col = (...)</code></td>
+</tr>
+<tr>
+<td>列子查询</td>
+<td>多行单列</td>
+<td><code>WHERE col IN (...)</code></td>
+</tr>
+<tr>
+<td>行子查询</td>
+<td>一行多列</td>
+<td><code>WHERE (a,b) = (...)</code></td>
+</tr>
+<tr>
+<td>表子查询</td>
+<td>多行多列</td>
+<td><code>FROM (...) AS t</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-60">学习建议</h3>
+<ol>
+<li>先把 <code>INNER JOIN</code>、<code>LEFT JOIN</code> 练熟，这是最常用的 80%</li>
+<li><code>UNION ALL</code> 在报表统计里很有用</li>
+<li>子查询从标量子查询开始，逐步理解 <code>IN</code>/<code>EXISTS</code></li>
+<li>自连接是处理层级数据的利器，理解后非常有用</li>
+<li>多表查询一定要养成<strong>加表别名</strong>的习惯，提高可读性</li>
+</ol>
+<hr/>
+<p><em>上一章：<a href="021c5ead51bc463f.html">05-约束</a></em></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="021c5ead51bc463f.html"><small>← 上一篇</small><strong>MySQL 约束完整详解</strong></a><a href="2c22ea380678760b.html"><small>下一篇 →</small><strong>MySQL 事务与并发控制 — 保姆级详解</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">目录</a><a class="toc-h2" href="#section-1">1. 多表关系概述</a><a class="toc-h3" href="#section-2">1.1 为什么要多张表？</a><a class="toc-h3" href="#section-3">1.2 三种多表关系</a><a class="toc-h4" href="#section-4">一对多（最常见）</a><a class="toc-h4" href="#section-5">多对多</a><a class="toc-h4" href="#section-6">一对一</a><a class="toc-h2" href="#section-7">2. 笛卡尔积问题</a><a class="toc-h3" href="#section-8">2.1 什么是笛卡尔积</a><a class="toc-h3" href="#section-9">2.2 笛卡尔积示例</a><a class="toc-h2" href="#section-10">3. 内连接 INNER JOIN</a><a class="toc-h3" href="#section-11">3.1 核心概念</a><a class="toc-h3" href="#section-12">3.2 语法</a><a class="toc-h3" href="#section-13">3.3 完整示例</a><a class="toc-h2" href="#section-14">4. 外连接 LEFT/RIGHT JOIN</a><a class="toc-h3" href="#section-15">4.1 核心概念</a><a class="toc-h3" href="#section-16">4.2 LEFT JOIN 示例</a><a class="toc-h3" href="#section-17">4.3 RIGHT JOIN 示例</a><a class="toc-h2" href="#section-18">5. 全连接 FULL JOIN</a><a class="toc-h3" href="#section-19">5.1 核心概念</a><a class="toc-h3" href="#section-20">5.2 用 UNION 模拟全连接</a><a class="toc-h2" href="#section-21">6. 自连接</a><a class="toc-h3" href="#section-22">6.1 核心概念</a><a class="toc-h3" href="#section-23">6.2 完整示例</a><a class="toc-h2" href="#section-24">7. 联合查询 UNION / UNION ALL</a><a class="toc-h3" href="#section-25">7.1 核心概念</a><a class="toc-h3" href="#section-26">7.2 完整示例</a><a class="toc-h2" href="#section-27">8. 子查询</a><a class="toc-h3" href="#section-28">8.1 核心概念</a><a class="toc-h3" href="#section-29">8.2 按结果分类</a><a class="toc-h3" href="#section-30">8.3 标量子查询（最常见）</a><a class="toc-h3" href="#section-31">8.4 列子查询（多行单列）</a><a class="toc-h3" href="#section-32">8.5 行子查询（单行多列）</a><a class="toc-h3" href="#section-33">8.6 表子查询（多行多列）</a><a class="toc-h3" href="#section-34">8.7 WHERE vs HAVING 中的子查询</a><a class="toc-h2" href="#section-35">9. IN / EXISTS / ANY / ALL</a><a class="toc-h3" href="#section-36">9.1 IN vs EXISTS</a><a class="toc-h3" href="#section-37">9.2 NOT IN 的 NULL 坑</a><a class="toc-h3" href="#section-38">9.3 ANY 和 ALL</a><a class="toc-h2" href="#section-39">10. 综合案例</a><a class="toc-h3" href="#section-40">10.1 准备完整数据</a><a class="toc-h3" href="#section-41">10.2 统计分析查询</a><a class="toc-h3" href="#section-42">10.3 多对多查询（使用中间表）</a><a class="toc-h2" href="#section-43">11. 常见报错汇总</a><a class="toc-h3" href="#section-44">11.1 Column 'xx' in field list is ambiguous</a><a class="toc-h3" href="#section-45">11.2 子查询返回多行（标量子查询）</a><a class="toc-h3" href="#section-46">11.3 NOT IN 返回空结果</a><a class="toc-h3" href="#section-47">11.4 UNION 列数不匹配</a><a class="toc-h3" href="#section-48">11.5 子查询别名缺失</a><a class="toc-h2" href="#section-49">12. 面试常问</a><a class="toc-h3" href="#section-50">Q1：INNER JOIN 和 LEFT JOIN 的区别？</a><a class="toc-h3" href="#section-51">Q2：子查询什么时候比 JOIN 慢？</a><a class="toc-h3" href="#section-52">Q3：IN 和 EXISTS 如何选择？</a><a class="toc-h3" href="#section-53">Q4：UNION 和 UNION ALL 的区别及使用建议？</a><a class="toc-h3" href="#section-54">Q5：什么是笛卡尔积，如何避免？</a><a class="toc-h3" href="#section-55">Q6：自连接的典型应用场景？</a><a class="toc-h3" href="#section-56">Q7：LEFT JOIN 后 WHERE 条件和 ON 条件的区别？</a><a class="toc-h2" href="#section-57">13. 本章小结</a><a class="toc-h3" href="#section-58">连接类型速查表</a><a class="toc-h3" href="#section-59">子查询使用场景</a><a class="toc-h3" href="#section-60">学习建议</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

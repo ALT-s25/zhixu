@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>08 - IO流 保姆级详解笔记 · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/16dba041bd83aa9f.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>黑马JavaSE详解</h2><nav aria-label="同专题笔记"><a href="c4d82d2ecbe7239d.html">黑马程序员 JavaSE 课堂笔记 · 保姆级详解</a><a href="da696b5c15eec7b5.html">12. JavaSE 第一阶段实战项目：学生管理系统</a><a href="663d8dce41c9de31.html">Java入门与基础语法 · 保姆级详解</a><a href="627e1922662e46fd.html">02 · 流程控制（Scanner / if / switch / for / while）</a><a href="b698d403e94b67c0.html">03 · 数组（一维数组 / 二维数组 / 内存图）</a><a href="68cd2bab6f503260.html">04 · 方法（定义 / 重载 / 参数传递 / 递归）</a><a href="0086a4e3d2151a0f.html">07 · 异常处理与常用API（异常体系 / Object / Math / Date / 包装类）</a><a href="8cd2529e780dbff1.html">03 — 面向对象基础（类 · 对象 · 封装）</a><a href="093a6372f7f27376.html">05 · 面向对象基础（类与对象 / 封装 / 构造方法 / this / static）</a><a href="0173d6327acd426b.html">06 · 继承多态抽象类接口内部类（extends / super / override / 多态 / abstract / interface）</a><a href="7559b20ccd712917.html">第九章：网络编程、正则表达式与设计模式</a><a href="2a943d8b1e978d56.html">12 · JDK新特性（Lambda / 方法引用 / Stream流 / Optional / 新Date API）</a><a href="b042d23174c3a83e.html">13 · 反射与注解（Class对象 / 获取构造方法字段方法 / 自定义注解）</a><a aria-current="page" href="16dba041bd83aa9f.html">08 - IO流 保姆级详解笔记</a><a href="3cf636d3d26f8b64.html">09 · 多线程（Thread / Runnable / 线程状态 / synchronized / Lock / 线程池）</a><a href="a5ef4afa16838c9d.html">10 · 集合框架（ArrayList / LinkedList / HashSet / TreeSet / HashMap / TreeMap）</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>黑马JavaSE详解</div><h1>08 - IO流 保姆级详解笔记</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>整合自：模块21.IO流 + 模块22.IO流（黑马JavaSE）</p>
+<p>适合人群：零基础学生 / 想系统复习的同学</p>
+<p>版本说明：JDK 8+</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">知识框架总览</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>IO流
+├── 第一部分：File 类（操作文件/文件夹对象）
+│   ├── 静态成员（路径分隔符）
+│   ├── 构造方法（3种）
+│   ├── 获取方法（路径、名称、长度）
+│   ├── 创建方法（createNewFile / mkdirs）
+│   ├── 删除方法（delete）
+│   ├── 判断方法（isFile / isDirectory / exists）
+│   └── 遍历方法（list / listFiles）
+│
+├── 第二部分：字节流（万能流，读写任何文件）
+│   ├── FileOutputStream（字节输出流）
+│   └── FileInputStream（字节输入流）
+│
+├── 第三部分：字符流（专门操作文本文档）
+│   ├── FileWriter（字符输出流）
+│   └── FileReader（字符输入流）
+│
+├── 第四部分：缓冲流（提升读写效率）
+│   ├── BufferedOutputStream / BufferedInputStream（字节缓冲）
+│   └── BufferedWriter / BufferedReader（字符缓冲，含特有方法）
+│
+├── 第五部分：转换流（解决编码乱码问题）
+│   ├── InputStreamReader（字节流→字符流，读时指定编码）
+│   └── OutputStreamWriter（字符流→字节流，写时指定编码）
+│
+├── 第六部分：序列化流（读写对象，持久化）
+│   ├── ObjectOutputStream（序列化，写对象）
+│   └── ObjectInputStream（反序列化，读对象）
+│
+├── 第七部分：打印流 PrintStream（了解）
+│
+├── 第八部分：Properties 集合配合 IO 流（读配置文件）
+│
+└── 第九部分：Commons-IO 工具包（第三方库简化操作）
+</pre></div>
+</div><hr/>
+<h2 id="section-1">IO流四大基类速记表</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方向 \ 类型</th>
+<th>字节流（万能）</th>
+<th>字符流（文本专用）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出（写）</td>
+<td>OutputStream</td>
+<td>Writer</td>
+</tr>
+<tr>
+<td>输入（读）</td>
+<td>InputStream</td>
+<td>Reader</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>生活类比：</p>
+<ul>
+<li><strong>字节流</strong> 像快递员，什么东西都能运（图片、视频、文字），但要一件件搬。</li>
+<li><strong>字符流</strong> 像中文快递员，专门帮你搬文字，搬的时候懂得识字，不会乱拆。</li>
+</ul>
+</blockquote>
+<hr/>
+<h1>第一章 File 类</h1>
+<h2 id="section-2">1.1 什么是 File 类</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 概述：java.io.File 代表文件或文件夹（目录）的抽象路径名对象</span>
+<span class="c1">// 注意：File对象只是路径的"描述"，文件不一定真实存在！</span>
+<span class="c1">// File file = new File("E:\\Idea\\io\\1.jpg");</span>
+<span class="c1">// 上面这行代码只是创建了一个"描述"1.jpg路径的对象，不代表1.jpg真的存在</span>
+</pre></div>
+</div><p><strong>生活类比：</strong> File 对象就像一张地图上标注的地点，你可以在地图上标注一个地方，但这个地方不一定真的建好了。</p>
+<h2 id="section-3">1.2 计算机常识</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>1. 以 .jpg 结尾的文件一定是图片吗？
+   答：不一定，扩展名可以骗人，有可能是文件夹命名成了 xxx.jpg
+
+2. 什么是文本文档？
+   答：用记事本打开后人能看懂的文件，比如 .txt .html .css 等
+
+3. 路径分隔符：
+   - 路径名称分隔符（文件夹层级之间的分隔）：
+     Windows: \
+     Linux/Mac: /
+   - 路径分隔符（多个路径之间分隔）：;（分号）
+</pre></div>
+</div><h2 id="section-4">1.3 File 的静态成员</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// File 有两个静态常量，用来获取当前操作系统的分隔符</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01File</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// static String pathSeparator：路径和路径之间的分隔符（多路径场景，如 classpath）</span>
+<span class="w">        </span><span class="c1">// Windows 下是 ;（分号）</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">pathSeparator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="na">pathSeparator</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"pathSeparator = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pathSeparator</span><span class="p">);</span><span class="w"> </span><span class="c1">// 输出: ;</span>
+
+<span class="w">        </span><span class="c1">// static String separator：路径名称分隔符（文件夹层级之间的分隔符）</span>
+<span class="w">        </span><span class="c1">// Windows 下是 \（反斜杠）</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">separator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="na">separator</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"separator = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">separator</span><span class="p">);</span><span class="w"> </span><span class="c1">// 输出: \</span>
+
+<span class="w">        </span><span class="c1">// =========================================</span>
+<span class="w">        </span><span class="c1">// 实际开发建议：路径使用 File.separator 拼接，保证跨平台</span>
+<span class="w">        </span><span class="c1">// 下面两种写法效果相同，但第二种能跨 Windows/Linux 运行</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">path1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"E:\\Idea\\io"</span><span class="p">;</span><span class="w">                              </span><span class="c1">// 只在 Windows 有效</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">path2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"E:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="na">separator</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"Idea"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="na">separator</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"io"</span><span class="p">;</span><span class="w"> </span><span class="c1">// 跨平台写法</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">path1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">path2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-5">1.4 File 的三种构造方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 三种创建 File 对象的方式，路径可以不存在（只是描述）</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02File</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 方式1：File(String parent, String child) - 父路径+子路径分开传</span>
+<span class="w">        </span><span class="c1">// parent：父路径（文件夹部分）</span>
+<span class="w">        </span><span class="c1">// child：子路径（文件名部分）</span>
+<span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io"</span><span class="p">,</span><span class="w"> </span><span class="s">"1.jpg"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"file1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file1</span><span class="p">);</span><span class="w"> </span><span class="c1">// 输出: E:\Idea\io\1.jpg</span>
+
+<span class="w">        </span><span class="c1">// 方式2：File(File parent, String child) - 父路径是 File 对象</span>
+<span class="w">        </span><span class="c1">// 好处：可以对父路径做判断、操作，更灵活</span>
+<span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io"</span><span class="p">);</span><span class="w">     </span><span class="c1">// 父路径先封装成 File 对象</span>
+<span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="s">"1.jpg"</span><span class="p">);</span><span class="w">     </span><span class="c1">// 再和子路径合并</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"file2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file2</span><span class="p">);</span><span class="w">    </span><span class="c1">// 输出: E:\Idea\io\1.jpg</span>
+
+<span class="w">        </span><span class="c1">// 方式3：File(String pathname) - 直接写完整路径</span>
+<span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.jpg"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"file3 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">file3</span><span class="p">);</span><span class="w">    </span><span class="c1">// 输出: E:\Idea\io\1.jpg</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p><strong>细节：</strong> 创建 File 对象时，传入不存在的路径也不会报错！但调用创建、读写等操作时才会出问题。</p>
+</blockquote>
+<h2 id="section-6">1.5 相对路径和绝对路径</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 绝对路径：从盘符开始的完整路径</span>
+<span class="c1">// 例：E:\Idea\idea2022\workspace\javase\module21\1.txt</span>
+
+<span class="c1">// 相对路径：不从盘符开始</span>
+<span class="c1">// 在 IDEA 中，参照路径是当前 project 的绝对路径</span>
+<span class="c1">// 口诀：能省略哪段就省略哪段（即参照路径部分不写）</span>
+
+<span class="c1">// 假设项目绝对路径：E:\Idea\idea2022\workspace\javase</span>
+<span class="c1">// 1.txt 的位置：  E:\Idea\idea2022\workspace\javase\module21\1.txt</span>
+<span class="c1">// 相对路径写法：  module21\1.txt  （省略了前面公共部分）</span>
+
+<span class="c1">// 注意：如果直接写文件名，比如 "1.txt"，默认在 project 根目录下</span>
+<span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span><span class="w"> </span><span class="c1">// IDEA 中常见写法</span>
+</pre></div>
+</div><h2 id="section-7">1.6 File 的获取方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// File 的 4 个获取方法</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">file01</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// getAbsolutePath()：获取绝对路径（带盘符的完整路径）</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"1.txt"</span><span class="p">);</span><span class="w">                   </span><span class="c1">// 相对路径创建</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file1</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">());</span><span class="w">      </span><span class="c1">// 输出: 当前项目根目录\1.txt</span>
+
+<span class="w">    </span><span class="c1">// getPath()：获取"封装路径"，就是 new File 时传进去的原始路径</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"io\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file2</span><span class="p">.</span><span class="na">getPath</span><span class="p">());</span><span class="w">              </span><span class="c1">// 输出: io\1.txt（原样返回）</span>
+
+<span class="w">    </span><span class="c1">// getName()：获取文件名或文件夹名（路径最后一段）</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.jpg"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file3</span><span class="p">.</span><span class="na">getName</span><span class="p">());</span><span class="w">              </span><span class="c1">// 输出: 1.jpg</span>
+
+<span class="w">    </span><span class="c1">// length()：获取文件长度（字节数）</span>
+<span class="w">    </span><span class="c1">// 注意：如果 File 对象代表文件夹，length() 返回 0</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file4</span><span class="p">.</span><span class="na">length</span><span class="p">());</span><span class="w">               </span><span class="c1">// 输出: 文件的字节数</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-8">1.7 File 的创建方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 两个创建方法</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">file02</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// createNewFile()：创建文件（不是文件夹）</span>
+<span class="w">    </span><span class="c1">// 文件已存在 → 创建失败，返回 false</span>
+<span class="w">    </span><span class="c1">// 文件不存在 → 创建成功，返回 true</span>
+<span class="w">    </span><span class="c1">// 注意：如果父文件夹不存在，会抛出 IOException（找不到路径）</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file1</span><span class="p">.</span><span class="na">createNewFile</span><span class="p">());</span><span class="w"> </span><span class="c1">// true（第一次运行）/ false（已存在）</span>
+
+<span class="w">    </span><span class="c1">// mkdirs()：创建文件夹（目录）</span>
+<span class="w">    </span><span class="c1">// 可以一次创建多级文件夹（推荐使用 mkdirs 而不是 mkdir）</span>
+<span class="w">    </span><span class="c1">// 文件夹已存在 → 创建失败，返回 false</span>
+<span class="w">    </span><span class="c1">// 文件夹不存在 → 创建成功，返回 true</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\haha\\heihei\\hehe"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 一次创建3层文件夹</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file2</span><span class="p">.</span><span class="na">mkdirs</span><span class="p">());</span><span class="w"> </span><span class="c1">// true（成功创建多级文件夹）</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p><strong>常见报错：</strong> <code>java.io.IOException: 系统找不到指定的路径</code> → 通常是父文件夹不存在，先用 <code>mkdirs()</code> 创建父文件夹再调用 <code>createNewFile()</code>。</p>
+</blockquote>
+<h2 id="section-9">1.8 File 的删除方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// delete()：删除文件或文件夹</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">file03</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 删除文件</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file1</span><span class="p">.</span><span class="na">delete</span><span class="p">());</span><span class="w"> </span><span class="c1">// true 删成功 / false 删失败</span>
+
+<span class="w">    </span><span class="c1">// 删除文件夹（注意：必须是空文件夹才能删除）</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\haha"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file2</span><span class="p">.</span><span class="na">delete</span><span class="p">());</span><span class="w"> </span><span class="c1">// 只有 haha 是空文件夹才返回 true</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>注意两点：</strong></p>
+<ol>
+<li>删除的文件/文件夹<strong>不走回收站</strong>，直接永久删除！</li>
+<li>删除文件夹时，该文件夹必须是<strong>空文件夹</strong>（里面没有任何文件），否则返回 false。</li>
+</ol>
+<h2 id="section-10">1.9 File 的判断方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 三个判断方法</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">file04</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.txt"</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// isDirectory()：判断是否为文件夹（目录）</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">isDirectory</span><span class="p">());</span><span class="w"> </span><span class="c1">// false（1.txt 是文件不是文件夹）</span>
+
+<span class="w">    </span><span class="c1">// isFile()：判断是否为文件</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">isFile</span><span class="p">());</span><span class="w"> </span><span class="c1">// true（1.txt 是文件）</span>
+
+<span class="w">    </span><span class="c1">// exists()：判断文件或文件夹是否存在</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">exists</span><span class="p">());</span><span class="w"> </span><span class="c1">// true 或 false</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-11">1.10 File 的遍历方法</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 两个遍历方法</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">file05</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\aa"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 要遍历的文件夹</span>
+
+<span class="w">    </span><span class="c1">// list()：遍历文件夹，返回 String[] 数组（只有名字，没有路径信息）</span>
+<span class="w">    </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">list</span><span class="p">();</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w"> </span><span class="c1">// 只打印文件名，如：1.jpg、2.txt</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"=============="</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// listFiles()：遍历文件夹，返回 File[] 数组（推荐用这个！）</span>
+<span class="w">    </span><span class="c1">// 底层：先调用 list() 得到名字数组，再把每个名字封装成 File 对象返回</span>
+<span class="w">    </span><span class="c1">// 优势：每个 File 对象包含完整路径，可以继续调用各种方法</span>
+<span class="w">    </span><span class="n">File</span><span class="o">[]</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">listFiles</span><span class="p">();</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">File</span><span class="w"> </span><span class="n">file1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">files</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">file1</span><span class="p">);</span><span class="w"> </span><span class="c1">// 打印完整路径，如：E:\Idea\io\aa\1.jpg</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>listFiles() 的底层原理：</strong></p>
+<ol>
+<li>先调用 <code>list()</code> 获取文件名 String 数组</li>
+<li>遍历数组，把每个名字和父路径拼接，封装成 File 对象</li>
+<li>返回 File 数组</li>
+</ol>
+<h3 id="section-12">综合练习：递归遍历所有 .jpg 文件</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 需求：遍历指定文件夹下（含子文件夹）所有的 .jpg 文件</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04File</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 第1步：创建 File 对象，指定要遍历的顶层文件夹</span>
+<span class="w">        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\aa"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">method</span><span class="p">(</span><span class="n">file</span><span class="p">);</span><span class="w"> </span><span class="c1">// 调用递归方法</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 第2步：调用 listFiles() 获取当前层所有文件/文件夹</span>
+<span class="w">        </span><span class="n">File</span><span class="o">[]</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">listFiles</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 第3步：遍历数组，逐个判断</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">File</span><span class="w"> </span><span class="n">file1</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">files</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">file1</span><span class="p">.</span><span class="na">isFile</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// 是文件：判断文件名是否以 .jpg 结尾</span>
+<span class="w">                </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">file1</span><span class="p">.</span><span class="na">getName</span><span class="p">();</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">".jpg"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">name</span><span class="p">);</span><span class="w"> </span><span class="c1">// 找到了！打印出来</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// 是文件夹：递归调用自己，继续向下遍历</span>
+<span class="w">                </span><span class="n">method</span><span class="p">(</span><span class="n">file1</span><span class="p">);</span><span class="w"> </span><span class="c1">// 递归</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// 递归原理：方法自己调用自己，每次深入一层文件夹，直到没有子文件夹为止</span>
+</pre></div>
+</div><hr/>
+<h1>第二章 字节流</h1>
+<h2 id="section-13">2.1 IO流是什么，为什么要学</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>1. IO流 = Input/Output，数据在设备（硬盘/内存/网络）之间传输的技术
+
+2. 为什么需要 IO 流？
+   - 数组、集合只能临时保存数据（程序结束，数据消失）
+   - IO 流可以把数据写到硬盘，实现"永久保存"
+   - 网络传输数据也需要 IO 流
+
+3. 流向理解：
+   - 输入流（Input）：硬盘 → 内存（读文件）
+   - 输出流（Output）：内存 → 硬盘（写文件）
+</pre></div>
+</div><p><strong>生活类比：</strong></p>
+<ul>
+<li>输出流 = 你把东西从家（内存）打包寄出去（写到硬盘）</li>
+<li>输入流 = 快递来了，从快递站（硬盘）取回家（读到内存）</li>
+</ul>
+<h2 id="section-14">2.2 IO流的四大基类</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>字节流（万能流，可操作任意文件）：
+  - 字节输出流：OutputStream（抽象类）→ 子类 FileOutputStream
+  - 字节输入流：InputStream（抽象类） → 子类 FileInputStream
+
+字符流（专门处理文本文档）：
+  - 字符输出流：Writer（抽象类）→ 子类 FileWriter
+  - 字符输入流：Reader（抽象类）→ 子类 FileReader
+</pre></div>
+</div><h2 id="section-15">2.3 FileOutputStream 字节输出流</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：把数据（字节）从内存写出到硬盘文件</span>
+
+<span class="c1">// ===== 构造方法 =====</span>
+<span class="c1">// FileOutputStream(File file)   —— 传 File 对象</span>
+<span class="c1">// FileOutputStream(String name) —— 传文件路径字符串</span>
+<span class="c1">// FileOutputStream(String name, boolean append) —— append=true 时追加写，不覆盖原文件</span>
+
+<span class="c1">// ===== 特点 =====</span>
+<span class="c1">// 1. 指定的文件如果不存在，输出流会自动创建该文件</span>
+<span class="c1">// 2. 默认情况（append=false）：每次运行都会重新创建文件，覆盖旧内容</span>
+
+<span class="c1">// ===== 写一个字节 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method01</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="mi">97</span><span class="p">);</span><span class="w"> </span><span class="c1">// 写入字节 97，对应 ASCII 字符 'a'，文件里会看到 a</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">   </span><span class="c1">// 关流（必须关！否则资源泄漏）</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 写一个字节数组 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">97</span><span class="p">,</span><span class="w"> </span><span class="mi">98</span><span class="p">,</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">101</span><span class="p">,</span><span class="w"> </span><span class="mi">102</span><span class="p">,</span><span class="w"> </span><span class="mi">103</span><span class="p">};</span><span class="w"> </span><span class="c1">// 对应 a b c d e f g</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">bytes</span><span class="p">);</span><span class="w">  </span><span class="c1">// 一次写入整个数组</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 写字节数组的一部分 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method03</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">97</span><span class="p">,</span><span class="w"> </span><span class="mi">98</span><span class="p">,</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">101</span><span class="p">,</span><span class="w"> </span><span class="mi">102</span><span class="p">,</span><span class="w"> </span><span class="mi">103</span><span class="p">};</span><span class="w"> </span><span class="c1">// a b c d e f g</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// 从索引 0 开始，写 2 个字节 → 文件里只有 ab</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 写字符串（先转字节数组）=====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method04</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"abcde"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span><span class="w"> </span><span class="c1">// String.getBytes() 把字符串转为字节数组</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 追加写 + 换行 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method05</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// append=true：追加续写，不覆盖原有内容</span>
+<span class="w">    </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"床前明月光\r\n"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span><span class="w"> </span><span class="c1">// \r\n 是 Windows 换行符（占2字节）</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"疑是地上霜\n"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span><span class="w">   </span><span class="c1">// \n 是 Linux/通用换行符</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"举头望明月\n"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"低头思故乡\n"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+<span class="w">    </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>换行符说明：</strong></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>系统</th>
+<th>换行符</th>
+<th>占用字节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows</td>
+<td><code>\r\n</code></td>
+<td>2字节</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>\n</code></td>
+<td>1字节</td>
+</tr>
+<tr>
+<td>Mac OS</td>
+<td><code>\r</code></td>
+<td>1字节</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-16">2.4 FileInputStream 字节输入流</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：把文件数据从硬盘读取到内存</span>
+
+<span class="c1">// 构造方法：</span>
+<span class="c1">// FileInputStream(File file)</span>
+<span class="c1">// FileInputStream(String path)</span>
+
+<span class="c1">// 方法：</span>
+<span class="c1">// int read()                   —— 一次读一个字节，返回读到的字节值；到文件末尾返回 -1</span>
+<span class="c1">// int read(byte[] b)           —— 一次读一个字节数组，返回实际读到的字节个数；到末尾返回 -1</span>
+<span class="c1">// int read(byte[] b,int off,int len) —— 一次读数组的一部分</span>
+<span class="c1">// void close()                 —— 关流</span>
+
+<span class="c1">// ===== 一次读一个字节 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method01</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 定义变量 len 接收每次读到的字节值</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 读到 -1 表示文件末尾，循环结束</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">((</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w">  </span><span class="c1">// 把字节转成字符打印</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// 关流</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 一次读一个字节数组（高效） =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 创建缓冲数组，每次最多读 2 个字节（实际开发用 1024 或 1024 的倍数）</span>
+<span class="w">    </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span><span class="w"> </span><span class="c1">// 接收本次实际读到的字节个数</span>
+
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// new String(bytes, 0, len)：只转换实际读到的字节，避免最后一次读不满时出现残留</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>关于 -1 的解释：</strong>
+每个文件末尾都有一个看不见的"结束标记"，当 <code>read()</code> 读到这个标记时，就返回 -1 告诉你"文件读完了"。</p>
+<p><strong>常见报错：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>java.io.IOException: Stream Closed
+</pre></div>
+</div><p>原因：流关闭后（调用了 <code>close()</code>）还继续调用 <code>read()</code> 就会报此错误。记住：关流之后不能再使用该流对象。</p>
+<h2 id="section-17">2.5 字节流实现文件复制</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 需求：把 E:\Idea\io\24.jpg 复制一份到 E:\Idea\io\大姐.jpg</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01CopyFile</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 第1步：创建输入流，指向源文件（要复制谁）</span>
+<span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\24.jpg"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 第2步：创建输出流，指向目标位置（要复制到哪里）</span>
+<span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\大姐.jpg"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 第3步：定义缓冲数组（1024 字节 = 1KB，每次读写 1KB）</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// 第4步：边读边写（循环，直到读完）</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w"> </span><span class="c1">// 读了多少就写多少，避免末尾多余数据</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 第5步：关流（先开的后关，后开的先关）</span>
+<span class="w">        </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h1>第三章 字符流</h1>
+<h2 id="section-18">3.1 为什么要有字符流</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>字节流读中文的问题：
+  - UTF-8：一个汉字占 3 个字节
+  - GBK：  一个汉字占 2 个字节
+  - 如果用字节流一个字节一个字节地读，读到汉字时会读"半个汉字"，直接输出就是乱码
+
+解决方案：使用字符流（以字符为单位读写，不会把汉字拆开）
+注意：字符流只适合操作文本文档，复制图片/视频必须用字节流
+</pre></div>
+</div><h2 id="section-19">3.2 FileReader 字符输入流</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：读取文本文档内容（以字符为单位）</span>
+
+<span class="c1">// 构造方法：</span>
+<span class="c1">// FileReader(File file)</span>
+<span class="c1">// FileReader(String path)</span>
+
+<span class="c1">// 方法：</span>
+<span class="c1">// int read()                      —— 一次读一个字符，返回字符对应的 int 值；末尾返回 -1</span>
+<span class="c1">// int read(char[] cbuf)           —— 一次读一个字符数组，返回实际读到的个数</span>
+<span class="c1">// int read(char[] cbuf,int off,int len) —— 读数组的一部分</span>
+<span class="c1">// void close()</span>
+
+<span class="c1">// ===== 一次读一个字符 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method01</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileReader</span><span class="w"> </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fr</span><span class="p">.</span><span class="na">read</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// 返回字符对应的 int 值，-1 表示末尾</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">((</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w">  </span><span class="c1">// 转成 char 打印字符</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">fr</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 一次读一个字符数组 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">FileReader</span><span class="w"> </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"module21\\1.txt"</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">char</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="c1">// 每次最多读 2 个字符</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fr</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">chars</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">chars</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">));</span><span class="w"> </span><span class="c1">// 只转实际读到的部分</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">fr</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-20">3.3 FileWriter 字符输出流</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：把字符数据写到文本文件</span>
+
+<span class="c1">// 构造方法：</span>
+<span class="c1">// FileWriter(File file)</span>
+<span class="c1">// FileWriter(String fileName)</span>
+<span class="c1">// FileWriter(String fileName, boolean append) —— append=true 追加写</span>
+
+<span class="c1">// 方法：</span>
+<span class="c1">// void write(int c)                     —— 写一个字符</span>
+<span class="c1">// void write(char[] cbuf)               —— 写一个字符数组</span>
+<span class="c1">// void write(char[] cbuf, int off, int len) —— 写字符数组一部分</span>
+<span class="c1">// void write(String str)                —— 直接写一个字符串（！字节流没有这个方法）</span>
+<span class="c1">// void flush()                          —— 刷新缓冲区（把缓冲区数据写到文件）</span>
+<span class="c1">// void close()                          —— 先刷新后关流</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01FileWriter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">FileWriter</span><span class="w"> </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">"module21\\2.txt"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 创建字符输出流，指向目标文件</span>
+<span class="w">        </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"千山鸟飞绝\r\n"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 直接写字符串，FileWriter 独有！</span>
+<span class="w">        </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"万径人踪灭\r\n"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"孤舟蓑笠翁\r\n"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"独钓寒江雪\r\n"</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// fw.flush(); // 刷新：把缓冲区数据强制写入文件，刷新后流还能继续用</span>
+<span class="w">        </span><span class="n">fw</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w">   </span><span class="c1">// 关流：先刷新再关闭，关闭后流对象不能再用</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>flush() 和 close() 的区别：</strong></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>操作</th>
+<th>后续能否使用流</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>flush()</code></td>
+<td>把缓冲区数据写入文件</td>
+<td>可以继续使用</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>先 flush，再关闭流</td>
+<td>不能再使用</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>重要提醒：</strong> FileWriter 底层自带缓冲区，数据先写到缓冲区，不调用 <code>flush()</code> 或 <code>close()</code> 数据可能丢失！</p>
+<h2 id="section-21">3.4 IO 异常处理（传统方式）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 传统方式：try-catch-finally 确保流一定被关闭</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">FileWriter</span><span class="w"> </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w"> </span><span class="c1">// 在 try 外声明，以便 finally 中访问</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">"module21\\3.txt"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 可能抛出 IOException</span>
+<span class="w">            </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"你好"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w"> </span><span class="c1">// 打印异常堆栈信息</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// finally 块无论如何都会执行（即使 try 里抛异常也执行）</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fw</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 先判断不为 null，再关闭（防止 new 失败后 close 空指针）</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">fw</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// close() 本身也可能抛异常，需要再套一层 try-catch</span>
+<span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-22">3.5 JDK 7+ try-with-resources（推荐！）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// JDK 7 新语法：try-with-resources</span>
+<span class="c1">// 格式：try(IO对象的声明) { ... } catch(...) { ... }</span>
+<span class="c1">// 特点：括号内声明的 IO 对象，程序结束时会自动关闭（无论是否报错）</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 在 try 的 () 中声明需要自动关闭的资源</span>
+<span class="w">        </span><span class="c1">// 注意：括号内的类必须实现 AutoCloseable 接口（IO 流都实现了）</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">FileWriter</span><span class="w"> </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">"module21\\4.txt"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"你好"</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// 不需要手动 close()！括号里的资源会在 try 块结束时自动关闭</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// JDK 9 进一步改进：可以把已声明的变量放到 try() 中</span>
+<span class="c1">// FileWriter fw = new FileWriter("4.txt");</span>
+<span class="c1">// try (fw) { fw.write("..."); }  // 直接引用外部变量</span>
+</pre></div>
+</div><p><strong>生活类比：</strong> try-with-resources 就像"租用图书馆的书，到时间自动还"，不用自己手动去还。</p>
+<hr/>
+<h1>第四章 缓冲流（提升性能的关键）</h1>
+<h2 id="section-23">4.1 为什么需要缓冲流？（原理非常重要！）</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>基本流（FileInputStream / FileOutputStream）的问题：
+  - read() / write() 是 native 方法（底层直接和操作系统/硬盘打交道）
+  - 每次调用都是一次磁盘 I/O 操作
+  - 磁盘速度 &lt;&lt; 内存速度，大量磁盘操作 = 效率极低
+
+缓冲流的解决方案：
+  - 缓冲流底层自带一个长度为 8192 字节（8KB）的数组（缓冲区）
+  - 读写操作在内存的缓冲区之间完成，大幅减少磁盘操作次数
+  - 读：一次性从磁盘读 8192 字节到输入缓冲区，程序再从缓冲区取数据
+  - 写：程序先把数据写入输出缓冲区，缓冲区满了再一次性写到磁盘
+</pre></div>
+</div><p><strong>生活类比：</strong></p>
+<blockquote>
+<p>不用缓冲流 = 每写一个字就跑一趟快递站寄出去。
+用缓冲流 = 先把东西攒起来，攒满一箱再统一去一趟快递站，效率高 N 倍。</p>
+</blockquote>
+<p><strong>缓冲流读写过程详解：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>读过程：
+1. 调用 bis.read() —— 程序向缓冲输入流要数据
+2. 缓冲输入流底层调用基本流 fis.read()，一次性从硬盘读 8192 字节到 【输入缓冲区】
+3. 程序从【输入缓冲区】取数据（内存操作，极快）
+4. 【输入缓冲区】空了，再次触发第2步从磁盘读
+
+写过程：
+1. 调用 bos.write() —— 程序向缓冲输出流写数据
+2. 数据进入【输出缓冲区】（内存操作，极快）
+3. 【输出缓冲区】满了（8192字节），底层调用基本流 fos.write()，一次性写到磁盘
+4. 关流时会强制把剩余缓冲区数据 flush 到磁盘
+</pre></div>
+</div><h2 id="section-24">4.2 字节缓冲流</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 字节缓冲输出流：BufferedOutputStream</span>
+<span class="c1">// 构造：BufferedOutputStream(OutputStream out) —— 传入基本字节输出流</span>
+<span class="c1">// 用法：和 FileOutputStream 完全一样，只是效率更高</span>
+
+<span class="c1">// 字节缓冲输入流：BufferedInputStream</span>
+<span class="c1">// 构造：BufferedInputStream(InputStream in) —— 传入基本字节输入流</span>
+<span class="c1">// 用法：和 FileInputStream 完全一样，只是效率更高</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01BufferedInputStream_OutputStream</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">method02</span><span class="p">();</span><span class="w"> </span><span class="c1">// 测试缓冲流复制文件的速度</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// ===== 用基本流复制文件（慢） =====</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method01</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span><span class="w"> </span><span class="c1">// 记录开始时间</span>
+
+<span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.avi"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 基本输入流</span>
+<span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\2.avi"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 基本输出流</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 每次从磁盘读 1 字节（！极慢）</span>
+<span class="w">            </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">len</span><span class="p">);</span><span class="w">                 </span><span class="c1">// 每次向磁盘写 1 字节（！极慢）</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"基本流耗时: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"ms"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 可能几十秒</span>
+
+<span class="w">        </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// ===== 用缓冲流复制文件（快）=====</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span><span class="w"> </span><span class="c1">// 记录开始时间</span>
+
+<span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.avi"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\2.avi"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 把基本流"包装"成缓冲流（装饰器模式）</span>
+<span class="w">        </span><span class="n">BufferedInputStream</span><span class="w"> </span><span class="n">bis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedInputStream</span><span class="p">(</span><span class="n">fis</span><span class="p">);</span>
+<span class="w">        </span><span class="n">BufferedOutputStream</span><span class="w"> </span><span class="n">bos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedOutputStream</span><span class="p">(</span><span class="n">fos</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bis</span><span class="p">.</span><span class="na">read</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 表面是读1字节，底层其实是从8KB缓冲区取数据</span>
+<span class="w">            </span><span class="n">bos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">len</span><span class="p">);</span><span class="w">                 </span><span class="c1">// 写到输出缓冲区，缓冲区满了才写磁盘</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"缓冲流耗时: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"ms"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 快很多！</span>
+
+<span class="w">        </span><span class="n">bos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// 关缓冲流，底层会自动关基本流（不需要单独关 fos/fis）</span>
+<span class="w">        </span><span class="n">bis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>两个细节问题：</strong></p>
+<p><strong>Q1：为什么只关缓冲流，不用单独关基本流？</strong></p>
+<blockquote>
+<p>缓冲流的 <code>close()</code> 底层会自动调用包装的基本流的 <code>close()</code>，所以不需要手动关基本流。</p>
+</blockquote>
+<p><strong>Q2：缓冲流 <code>len</code> 变量的作用是什么？</strong></p>
+<blockquote>
+<p><code>len</code> 是在两个缓冲区之间来回"倒腾"数据的桥梁：</p>
+<ul>
+<li>把输入缓冲区的数据一个一个取出来（赋值给 len）</li>
+<li>再把 len 写入输出缓冲区</li>
+<li>当输入缓冲区空了，底层再从磁盘读 8192 字节填充</li>
+<li>当输出缓冲区满了，底层再一次性写到磁盘</li>
+</ul>
+</blockquote>
+<h2 id="section-25">4.3 字符缓冲流</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>字符基本流（FileReader/FileWriter）本身底层已经有缓冲区了，
+所以字符缓冲流的速度提升不如字节缓冲流明显，
+但字符缓冲流有两个非常有用的特有方法！
+</pre></div>
+</div><h3 id="section-26">BufferedWriter 字符缓冲输出流</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 构造：BufferedWriter(Writer w)   —— 包装基本字符输出流</span>
+<span class="c1">// 特有方法：newLine()              —— 写一个跨平台的换行符（Windows/Linux/Mac都适用）</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02BufferedWriter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// append=true 表示追加写，不覆盖原文件</span>
+<span class="w">        </span><span class="n">BufferedWriter</span><span class="w"> </span><span class="n">bw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedWriter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">"module22\\1.txt"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">));</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"床前明月光"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 写内容</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">newLine</span><span class="p">();</span><span class="w">           </span><span class="c1">// 换行（比 \r\n 更好，自动适配操作系统）</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"疑是地上霜"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">newLine</span><span class="p">();</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"举头望明月"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">newLine</span><span class="p">();</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"低头思故乡"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">newLine</span><span class="p">();</span>
+<span class="w">        </span><span class="n">bw</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// 关流（自动刷新+关闭）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-27">BufferedReader 字符缓冲输入流</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 构造：BufferedReader(Reader r)   —— 包装基本字符输入流</span>
+<span class="c1">// 特有方法：String readLine()      —— 一次读一整行（不包含换行符）</span>
+<span class="c1">//            如果读到文件末尾，返回 null</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03BufferedReader</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileReader</span><span class="p">(</span><span class="s">"module22\\1.txt"</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// 推荐写法：用 readLine() 循环读每一行</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w"> </span><span class="c1">// 用于接收每次读到的一行内容</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">br</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// null 表示文件读完了</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">line</span><span class="p">);</span><span class="w"> </span><span class="c1">// 打印这一行</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">br</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>readLine() 的核心价值：</strong>
+读文本文件不再需要自己处理换行符，直接按行读取，代码更简洁。</p>
+<hr/>
+<h1>第五章 转换流</h1>
+<h2 id="section-28">5.1 字符编码和字符集基础</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>编码：按照某种规则，把字符存储为计算机能识别的二进制数
+解码：把计算机中的二进制数，按照某种规则解析回字符
+乱码原因：编码和解码用的规则不一样！
+</pre></div>
+</div><p><strong>常见字符集对比：</strong></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>字符集</th>
+<th>说明</th>
+<th>中文占用字节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ASCII</td>
+<td>只有英文+数字+符号，128个字符</td>
+<td>不支持中文</td>
+</tr>
+<tr>
+<td>ISO-8859-1</td>
+<td>西欧字符，单字节编码</td>
+<td>不支持中文</td>
+</tr>
+<tr>
+<td>GB2312</td>
+<td>简体中文，7000+汉字</td>
+<td>2字节</td>
+</tr>
+<tr>
+<td><strong>GBK</strong></td>
+<td>最常用中文编码，21003个汉字，兼容 GB2312</td>
+<td><strong>2字节</strong></td>
+</tr>
+<tr>
+<td>GB18030</td>
+<td>最新中文编码，70244个汉字</td>
+<td>1/2/4字节</td>
+</tr>
+<tr>
+<td><strong>UTF-8</strong></td>
+<td>万国码，支持所有语言，互联网首选</td>
+<td><strong>中文3字节</strong></td>
+</tr>
+<tr>
+<td>UTF-16</td>
+<td>大多数字符2字节</td>
+<td>2字节</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>核心结论：
+1. 想要不乱码，编码和解码遵循的规则必须一致
+   → 文件用 GBK 存的，读取时也要用 GBK；用 UTF-8 存的，读取也用 UTF-8
+2. UTF-8 中一个汉字占 3 个字节
+3. GBK 中一个汉字占 2 个字节
+</pre></div>
+</div><h2 id="section-29">5.2 什么时候会乱码？</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>情况1：用字节流读中文
+  → 一次读1字节，把汉字拆成多个字节分开输出，肯定乱码
+  → 解决：用字符流读
+
+情况2：用字符流，但编码不匹配
+  → 比如文件是 GBK 编码存的，但用默认 UTF-8 的 FileReader 读
+  → 解决：用转换流，手动指定编码
+
+转换流就是为了解决"编码不一致"的乱码问题！
+</pre></div>
+</div><h2 id="section-30">5.3 InputStreamReader（读时指定编码）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 概述：字节流 → 字符流的桥梁（读数据时使用）</span>
+<span class="c1">// 构造：InputStreamReader(InputStream in, String charsetName)</span>
+<span class="c1">//        charsetName：指定编码，不区分大小写，如 "gbk" "GBK" "UTF-8" 都可以</span>
+<span class="c1">// 作用：按照指定编码去读取文件内容，解决乱码问题</span>
+<span class="c1">// 用法：和 FileReader 完全一样（其实 FileReader 就是 InputStreamReader 的子类）</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01InputStreamReader</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 读取一个用 GBK 编码保存的文件</span>
+<span class="w">        </span><span class="c1">// 用 FileReader 默认 UTF-8 读 GBK 文件 → 乱码</span>
+<span class="w">        </span><span class="c1">// 用 InputStreamReader 指定 GBK → 正常</span>
+<span class="w">        </span><span class="n">InputStreamReader</span><span class="w"> </span><span class="n">isr</span><span class="w"> </span><span class="o">=</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.txt"</span><span class="p">),</span><span class="w"> </span><span class="s">"gbk"</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// 底层：FileInputStream 负责读字节，InputStreamReader 负责按 GBK 把字节转字符</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isr</span><span class="p">.</span><span class="na">read</span><span class="p">();</span><span class="w"> </span><span class="c1">// 读一个字符（返回字符对应的 int 值）</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">((</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">data</span><span class="p">);</span><span class="w"> </span><span class="c1">// 转成字符打印</span>
+<span class="w">        </span><span class="n">isr</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-31">5.4 OutputStreamWriter（写时指定编码）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 概述：字符流 → 字节流的桥梁（写数据时使用）</span>
+<span class="c1">// 构造：OutputStreamWriter(OutputStream out, String charsetName)</span>
+<span class="c1">// 作用：按照指定编码把字符写入文件</span>
+<span class="c1">// 用法：和 FileWriter 完全一样</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02OutputStreamWriter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 要求：把"你好"用 GBK 编码写入文件</span>
+<span class="w">        </span><span class="n">OutputStreamWriter</span><span class="w"> </span><span class="n">osw</span><span class="w"> </span><span class="o">=</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">OutputStreamWriter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\1.txt"</span><span class="p">),</span><span class="w"> </span><span class="s">"gbk"</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// 底层：OutputStreamWriter 把字符按 GBK 转成字节，FileOutputStream 负责写字节</span>
+
+<span class="w">        </span><span class="n">osw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"你好"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 按 GBK 编码写入</span>
+<span class="w">        </span><span class="n">osw</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// 关流（自动刷新）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>转换流总结：</strong></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>流</th>
+<th>方向</th>
+<th>解决的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InputStreamReader</code></td>
+<td>字节流→字符流（读）</td>
+<td>读取特定编码的文件不乱码</td>
+</tr>
+<tr>
+<td><code>OutputStreamWriter</code></td>
+<td>字符流→字节流（写）</td>
+<td>按特定编码写出文件</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h1>第六章 序列化流</h1>
+<h2 id="section-32">6.1 什么是序列化？</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>序列化：把 Java 对象转换成字节序列，写到文件/网络（持久化）
+反序列化：从文件/网络读取字节序列，重新还原成 Java 对象
+
+应用场景：
+  - 游戏存档：人物对象（角色属性、等级、血量）→ 写入文件 → 下次启动读回来
+  - 网络传输：对象 → 字节 → 通过网络发送 → 对方接收字节 → 还原对象
+  - Session 持久化：Web 中用户会话对象存到磁盘
+</pre></div>
+</div><p><strong>生活类比：</strong> 序列化就像把家具拆散（对象→字节），装箱运输（写入文件/网络），到达目的地再重新组装（字节→对象）。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>注意：序列化后的文件是二进制，直接打开看不懂，这是正常的！
+      这正是我们想要的效果——保护数据不被随意篡改
+</pre></div>
+</div><h2 id="section-33">6.2 ObjectOutputStream 序列化流（写对象）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：把 Java 对象写入文件（序列化）</span>
+<span class="c1">// 构造：ObjectOutputStream(OutputStream out)</span>
+<span class="c1">// 方法：writeObject(Object obj) —— 写对象</span>
+
+<span class="c1">// 前置条件：被序列化的类必须实现 Serializable 接口！</span>
+<span class="c1">// Serializable 是标记接口（没有任何方法），只是作为"允许被序列化"的标志</span>
+
+<span class="c1">// ===== 第1步：让 Person 类实现 Serializable 接口 =====</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 强烈建议：手动声明 serialVersionUID（序列化版本号）</span>
+<span class="w">    </span><span class="c1">// 作用：标识这个类的版本，序列化和反序列化时用来校验类是否一致</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">serialVersionUID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42L</span><span class="p">;</span><span class="w"> </span><span class="c1">// 值可以随意定，保持唯一即可</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Person</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// getter/setter 省略...</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">"Person{name='"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"', age="</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="sc">'}'</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ===== 第2步：序列化对象到文件 =====</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">write</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 创建序列化流（包装一个 FileOutputStream）</span>
+<span class="w">    </span><span class="n">ObjectOutputStream</span><span class="w"> </span><span class="n">oos</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectOutputStream</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module22\\person.txt"</span><span class="p">));</span>
+
+<span class="w">    </span><span class="n">Person</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"涛哥"</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">);</span><span class="w"> </span><span class="c1">// 创建要存储的对象</span>
+<span class="w">    </span><span class="n">oos</span><span class="p">.</span><span class="na">writeObject</span><span class="p">(</span><span class="n">p1</span><span class="p">);</span><span class="w"> </span><span class="c1">// 把对象序列化写入文件（文件内容是二进制，看不懂是正常的）</span>
+<span class="w">    </span><span class="n">oos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// 关流</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-34">6.3 ObjectInputStream 反序列化流（读对象）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：从文件读取 Java 对象（反序列化）</span>
+<span class="c1">// 构造：ObjectInputStream(InputStream in)</span>
+<span class="c1">// 方法：Object readObject() —— 读对象（返回 Object，需要强转）</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">read</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 创建反序列化流</span>
+<span class="w">    </span><span class="n">ObjectInputStream</span><span class="w"> </span><span class="n">ois</span><span class="w"> </span><span class="o">=</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectInputStream</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"module22\\person.txt"</span><span class="p">));</span>
+
+<span class="w">    </span><span class="c1">// 读取对象，需要强转为 Person 类型</span>
+<span class="w">    </span><span class="n">Person</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Person</span><span class="p">)</span><span class="w"> </span><span class="n">ois</span><span class="p">.</span><span class="na">readObject</span><span class="p">();</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">person</span><span class="p">);</span><span class="w"> </span><span class="c1">// 输出：Person{name='涛哥', age=12}</span>
+<span class="w">    </span><span class="n">ois</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-35">6.4 transient 关键字（不序列化某个字段）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 如果某个字段不想被序列化（如密码、临时计算结果），用 transient 修饰</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">transient</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span><span class="w"> </span><span class="c1">// 加 transient，序列化时跳过这个字段</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+<span class="c1">// 反序列化后，password 字段会是 null（没有被保存）</span>
+</pre></div>
+</div><h2 id="section-36">6.5 InvalidClassException 序列化版本冲突问题</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>问题描述：
+  1. 对 Person 对象进行了序列化，存到文件中
+  2. 修改了 Person.java（比如加了个字段）
+  3. 没有重新序列化，直接反序列化读取
+  → 报错：InvalidClassException: local class incompatible: stream classdesc serialVersionUID = X, local class serialVersionUID = Y
+
+原因分析：
+  Java 序列化机制会根据类的结构自动生成一个 serialVersionUID（版本号）
+  类结构改变后，自动生成的 serialVersionUID 也会改变
+  文件里存的是旧版本号，当前类是新版本号，两者不匹配 → 报错
+
+解决方案：
+  手动固定 serialVersionUID，不让它自动变化
+  → 在类中声明：public static final long serialVersionUID = 42L;
+  → 这样不管类怎么改，版本号都是 42L，不会再出现版本冲突
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 手动固定版本号，以后无论怎么修改类，这个号不变，就不会再有版本冲突</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">serialVersionUID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42L</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// 以后加字段也没问题了</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-37">6.6 EOFException：循环读取对象</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>问题描述：
+  文件里存了多个对象，循环反序列化时次数和对象个数不对，就会报：
+  EOFException: Unexpected end of ZLIB input stream（文件意外到达结尾）
+
+原因：
+  比如文件里只有 3 个对象，但循环写了 for(int i=0; i&lt;4; i++)，第4次读无数据
+
+解决方案：
+  将多个对象先放到集合（如 ArrayList）中，再序列化整个集合
+  反序列化时读出来就是一个集合，直接遍历集合即可，不需要多次 readObject
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// write(); // 先序列化</span>
+<span class="w">        </span><span class="n">read</span><span class="p">();</span><span class="w">     </span><span class="c1">// 再反序列化</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 序列化：将多个对象放入集合，整体序列化</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">write</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ObjectOutputStream</span><span class="w"> </span><span class="n">oos</span><span class="w"> </span><span class="o">=</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectOutputStream</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module22\\person.txt"</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// 创建集合，存多个 Person 对象</span>
+<span class="w">        </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Person</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"涛哥"</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">));</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"三上"</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">));</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"金莲"</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">oos</span><span class="p">.</span><span class="na">writeObject</span><span class="p">(</span><span class="n">list</span><span class="p">);</span><span class="w"> </span><span class="c1">// 序列化整个集合（一次 writeObject）</span>
+<span class="w">        </span><span class="n">oos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 反序列化：读出集合，遍历集合</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">read</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ObjectInputStream</span><span class="w"> </span><span class="n">ois</span><span class="w"> </span><span class="o">=</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">ObjectInputStream</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"module22\\person.txt"</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// 读出来就是一个集合，强转</span>
+<span class="w">        </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Person</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Person</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">ois</span><span class="p">.</span><span class="na">readObject</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// 遍历集合即可，不需要多次 readObject，不会出现 EOFException</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Person</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">person</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">ois</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h1>第七章 打印流 PrintStream（了解）</h1>
+<h2 id="section-38">7.1 PrintStream 基本使用</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 作用：打印数据到文件（比 FileWriter 更方便，可以原样输出任何类型）</span>
+
+<span class="c1">// 构造：</span>
+<span class="c1">// PrintStream(String fileName)          —— 传文件路径</span>
+<span class="c1">// PrintStream(OutputStream out)         —— 传输出流（可以实现追加）</span>
+
+<span class="c1">// 方法：</span>
+<span class="c1">// println()：原样输出，自带换行</span>
+<span class="c1">// print()：  原样输出，不带换行</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01PrintStream</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">PrintStream</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PrintStream</span><span class="p">(</span><span class="s">"module22\\printstream.txt"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ps</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"涛哥是一个大帅哥"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 写入并换行</span>
+<span class="w">        </span><span class="n">ps</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"涛哥是一个小鲜肉"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ps</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"涛哥和金莲不为人知的故事"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ps</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-39">7.2 改变输出流向（System.setOut）</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// System.out.println() 默认输出到控制台（屏幕）</span>
+<span class="c1">// 可以用 System.setOut() 改变输出目标，让输出语句写到文件（日志）</span>
+
+<span class="c1">// 使用场景：记录日志，永久保存运行信息</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02PrintStream</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">PrintStream</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PrintStream</span><span class="p">(</span><span class="s">"module22\\log.txt"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 创建打印流指向日志文件</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">setOut</span><span class="p">(</span><span class="n">ps</span><span class="p">);</span><span class="w"> </span><span class="c1">// 改变流向：让 System.out 的输出去往 log.txt 而不是控制台</span>
+
+<span class="w">        </span><span class="c1">// 以下输出都会写入 log.txt，不再显示在控制台</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"这个错误是今天下午2点出现的"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"这个错误是文件意外到达结尾异常"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"出现的原因是循环反序列化次数不对"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ps</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-40">7.3 PrintStream 实现续写</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// PrintStream 本身不支持追加，但可以包装支持续写的 FileOutputStream</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03PrintStream</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// FileOutputStream 的 append=true 实现续写</span>
+<span class="w">        </span><span class="n">PrintStream</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PrintStream</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"module22\\log.txt"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">));</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">setOut</span><span class="p">(</span><span class="n">ps</span><span class="p">);</span><span class="w"> </span><span class="c1">// 改变流向</span>
+
+<span class="w">        </span><span class="c1">// 追加写入，不覆盖之前的日志</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"这个错误是今天下午2点出现的"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"这个错误是文件意外到达结尾异常"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"出现的原因是循环反序列化次数不对"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">ps</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h1>第八章 Properties 集合配合 IO 流</h1>
+<h2 id="section-41">8.1 Properties 回顾</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// Properties 是 Hashtable 的子类</span>
+<span class="c1">// 特点：</span>
+<span class="c1">//   - 无序，无索引</span>
+<span class="c1">//   - key 唯一，value 可重复</span>
+<span class="c1">//   - 线程安全</span>
+<span class="c1">//   - key 和 value 默认都是 String 类型（！不需要泛型）</span>
+
+<span class="c1">// 特有方法：</span>
+<span class="c1">// setProperty(String key, String value)  —— 存键值对</span>
+<span class="c1">// getProperty(String key)                —— 根据 key 获取 value</span>
+<span class="c1">// stringPropertyNames()                  —— 获取所有 key，存入 Set 集合</span>
+<span class="c1">// load(InputStream in)                   —— 从 IO 流中加载键值对到集合</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Properties</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Properties</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Properties</span><span class="p">();</span>
+<span class="w">        </span><span class="n">properties</span><span class="p">.</span><span class="na">setProperty</span><span class="p">(</span><span class="s">"username"</span><span class="p">,</span><span class="w"> </span><span class="s">"root"</span><span class="p">);</span><span class="w"> </span><span class="c1">// 存入键值对</span>
+<span class="w">        </span><span class="n">properties</span><span class="p">.</span><span class="na">setProperty</span><span class="p">(</span><span class="s">"password"</span><span class="p">,</span><span class="w"> </span><span class="s">"1234"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 获取所有 key（放到 Set 中）</span>
+<span class="w">        </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">properties</span><span class="p">.</span><span class="na">stringPropertyNames</span><span class="p">();</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">set</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">properties</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="n">key</span><span class="p">));</span><span class="w"> </span><span class="c1">// 根据 key 取 value</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-42">8.2 为什么要用 Properties 读配置文件？</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>实际开发中，数据库的用户名/密码等配置信息不能硬编码（写死）在源码里！
+原因：
+  - 一旦修改配置，就要改源码、重新编译、重新部署 —— 麻烦，而且危险
+  - 源码可能被多人看到，密码暴露
+
+正确做法：
+  - 把配置数据写在 .properties 文件中
+  - 程序启动时用 Properties + IO 流读取配置文件
+  - 以后改配置只需修改 .properties 文件，源码不用动
+</pre></div>
+</div><h2 id="section-43">8.3 .properties 配置文件规范</h2>
+<div class="code-block"><div class="code-top"><span>properties</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 这是注释（# 开头的行是注释，不会被读取）</span>
+<span class="c1"># 配置文件格式规范：</span>
+<span class="c1"># 1. 每行一个键值对，格式：key=value</span>
+<span class="c1"># 2. key 和 value 都是字符串，不要加双引号</span>
+<span class="c1"># 3. 每个键值对写完后换行</span>
+<span class="c1"># 4. 键值对之间最好不要有空格（有也能用，但不建议）</span>
+<span class="c1"># 5. 建议不要用中文（会乱码，需要用转换流处理）</span>
+
+<span class="na">jdbc.username</span><span class="o">=</span><span class="s">root</span>
+<span class="na">jdbc.password</span><span class="o">=</span><span class="s">1234</span>
+</pre></div>
+</div><p><strong>如何在 IDEA 中创建 .properties 文件：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>在模块名上右键 → New → File → 输入 jdbc.properties → 回车
+然后按上面格式填写配置内容
+</pre></div>
+</div><h2 id="section-44">8.4 读取配置文件</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Properties</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 创建 Properties 集合</span>
+<span class="w">        </span><span class="n">Properties</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Properties</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 创建输入流，指向配置文件</span>
+<span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"module22\\jdbc.properties"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// load(InputStream)：读取流中数据，自动解析 key=value，存入集合</span>
+<span class="w">        </span><span class="n">properties</span><span class="p">.</span><span class="na">load</span><span class="p">(</span><span class="n">fis</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 遍历所有键值对</span>
+<span class="w">        </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">properties</span><span class="p">.</span><span class="na">stringPropertyNames</span><span class="p">();</span><span class="w"> </span><span class="c1">// 获取所有 key</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">set</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"..."</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">properties</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="n">key</span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// 输出：jdbc.username...root</span>
+<span class="w">            </span><span class="c1">//       jdbc.password...1234</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h1>第九章 Commons-IO 工具包</h1>
+<h2 id="section-45">9.1 为什么要用第三方工具包？</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Apache Commons-IO 是 Apache 软件基金会开发的 IO 工具类库
+解决了原生 IO 代码量大、重复率高的问题
+比如：复制目录需要写很多递归代码，用 Commons-IO 一行就能搞定
+</pre></div>
+</div><h2 id="section-46">9.2 如何引入 jar 包（IDEA）</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>1. 在当前模块下创建文件夹，取名 lib 或 libs
+2. 把下载好的 commons-io-xxx.jar 放到这个文件夹里
+3. 右键 jar 包 → Add as Library（或右键 lib 文件夹整体添加）
+4. Level 选 Module 级别，点 OK
+5. 完成！可以使用工具类了
+</pre></div>
+</div><h2 id="section-47">9.3 IOUtils 类</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01IOUtils</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// ===== IOUtils.copy() =====</span>
+<span class="w">        </span><span class="c1">// 传入字节输入流 + 字节输出流，自动完成文件复制（内部有缓冲，效率高）</span>
+<span class="w">        </span><span class="c1">// IOUtils.copy(new FileInputStream("E:\\Idea\\io\\8.jpg"),</span>
+<span class="w">        </span><span class="c1">//              new FileOutputStream("E:\\Idea\\io\\孝敏.jpg"));</span>
+
+<span class="w">        </span><span class="c1">// ===== IOUtils.closeQuietly() =====</span>
+<span class="w">        </span><span class="c1">// 安静地关闭流，自动处理 close() 可能抛出的异常，不需要 try-catch</span>
+<span class="w">        </span><span class="n">FileWriter</span><span class="w"> </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">"module22\\commons.txt"</span><span class="p">);</span>
+<span class="w">            </span><span class="n">fw</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"你好"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fw</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">IOUtils</span><span class="p">.</span><span class="na">closeQuietly</span><span class="p">(</span><span class="n">fw</span><span class="p">);</span><span class="w"> </span><span class="c1">// 比手动 try-catch 关流更简洁</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-48">9.4 FileUtils 类</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02FileUtils</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// ===== FileUtils.copyDirectoryToDirectory() =====</span>
+<span class="w">        </span><span class="c1">// 整个文件夹复制（自动递归，含子文件夹）</span>
+<span class="w">        </span><span class="c1">// src：要复制的文件夹</span>
+<span class="w">        </span><span class="c1">// dest：复制到哪个目录下（结果：dest/src 文件夹）</span>
+<span class="w">        </span><span class="n">FileUtils</span><span class="p">.</span><span class="na">copyDirectoryToDirectory</span><span class="p">(</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\aa"</span><span class="p">),</span><span class="w">    </span><span class="c1">// 要复制的文件夹</span>
+<span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\cc"</span><span class="p">)</span><span class="w">     </span><span class="c1">// 目标目录（cc 下会出现 aa 文件夹）</span>
+<span class="w">        </span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// ===== FileUtils.writeStringToFile() =====</span>
+<span class="w">        </span><span class="c1">// 把字符串写入文件（原始 IO 需要创建流、写数据、关流，这里一行搞定）</span>
+<span class="w">        </span><span class="n">FileUtils</span><span class="p">.</span><span class="na">writeStringToFile</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"module22\\commons.txt"</span><span class="p">),</span><span class="w"> </span><span class="s">"haha"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// ===== FileUtils.readFileToString() =====</span>
+<span class="w">        </span><span class="c1">// 读取整个文本文件为一个字符串（非常方便）</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileUtils</span><span class="p">.</span><span class="na">readFileToString</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s">"module22\\commons.txt"</span><span class="p">));</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w"> </span><span class="c1">// 输出: haha</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h1>常见报错汇总与解决方法</h1>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>报错</th>
+<th>原因</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FileNotFoundException</code></td>
+<td>路径写错，或者文件/父文件夹不存在（读取时）</td>
+<td>检查路径是否正确；写操作自动创建文件，读操作需文件已存在</td>
+</tr>
+<tr>
+<td><code>IOException: Stream Closed</code></td>
+<td>流已关闭后还在使用</td>
+<td>检查代码，确保关流前完成所有读写操作</td>
+</tr>
+<tr>
+<td><code>InvalidClassException</code></td>
+<td>序列化和反序列化的 <code>serialVersionUID</code> 不匹配</td>
+<td>在类中手动声明 <code>public static final long serialVersionUID = 42L;</code></td>
+</tr>
+<tr>
+<td><code>EOFException</code></td>
+<td>反序列化循环次数超过文件中对象个数</td>
+<td>把多个对象放到集合再序列化，反序列化时读整个集合</td>
+</tr>
+<tr>
+<td><code>NotSerializableException</code></td>
+<td>被序列化的类没有实现 <code>Serializable</code> 接口</td>
+<td>给类添加 <code>implements Serializable</code></td>
+</tr>
+<tr>
+<td>中文乱码</td>
+<td>文件编码和读取编码不一致</td>
+<td>用转换流 <code>InputStreamReader</code>/<code>OutputStreamWriter</code> 指定正确编码</td>
+</tr>
+<tr>
+<td><code>NullPointerException</code></td>
+<td><code>listFiles()</code> 返回 null（路径不存在或不是文件夹）</td>
+<td>先判断 <code>file.exists() &amp;&amp; file.isDirectory()</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h1>面试常问</h1>
+<p><strong>Q1：字节流和字符流的区别是什么？分别用于什么场景？</strong></p>
+<blockquote>
+<ul>
+<li>字节流（InputStream/OutputStream）：以字节为单位，可操作任意文件（图片、视频、文档等），万能流。</li>
+<li>字符流（Reader/Writer）：以字符为单位，底层会自动处理字符编码，专门用于文本文档读写。</li>
+<li>场景：文件复制用字节流；读写文本内容用字符流（防止乱码）。</li>
+</ul>
+</blockquote>
+<p><strong>Q2：缓冲流为什么能提升性能？底层原理是什么？</strong></p>
+<blockquote>
+<p>缓冲流底层维护了一个 8192 字节（8KB）的数组缓冲区。读时，一次从磁盘读 8KB 存入缓冲区，程序再从缓冲区取，减少磁盘访问次数。写时，程序先写到缓冲区，缓冲区满了才一次性写到磁盘。内存操作比磁盘操作快几个数量级，所以效率大幅提升。</p>
+</blockquote>
+<p><strong>Q3：序列化时为什么要声明 serialVersionUID？</strong></p>
+<blockquote>
+<p>Java 序列化默认会根据类结构自动生成 <code>serialVersionUID</code>，类结构改变后 ID 会变，导致旧序列化文件无法反序列化（<code>InvalidClassException</code>）。手动声明一个固定值后，类怎么改 ID 都不变，保证兼容性。</p>
+</blockquote>
+<p><strong>Q4：Serializable 接口有什么方法？为什么没有方法也要实现它？</strong></p>
+<blockquote>
+<p><code>Serializable</code> 是标记接口（marker interface），没有任何方法。实现它只是给 JVM 一个"标志"，告诉 JVM 这个类允许被序列化。JVM 在序列化时会检查该标志，没有实现则抛 <code>NotSerializableException</code>。</p>
+</blockquote>
+<p><strong>Q5：transient 关键字有什么作用？</strong></p>
+<blockquote>
+<p><code>transient</code> 修饰的字段不参与序列化，反序列化后该字段为默认值（引用类型为 null，基本类型为 0/false）。常用于密码、敏感信息、可从其他字段计算出来的字段等。</p>
+</blockquote>
+<p><strong>Q6：flush() 和 close() 有什么区别？</strong></p>
+<blockquote>
+<ul>
+<li><code>flush()</code>：把缓冲区数据强制写入目标（文件/网络），流对象之后还能继续使用。</li>
+<li><code>close()</code>：先执行 flush，再释放系统资源，流对象关闭后不能再使用。</li>
+<li>建议：用 try-with-resources 语法，自动调用 close()。</li>
+</ul>
+</blockquote>
+<p><strong>Q7：try-with-resources 语法是什么？有什么好处？</strong></p>
+<blockquote>
+<p>JDK 7 引入的语法糖：<code>try(Resource r = new Resource()) { ... }</code>，括号中声明的资源会在 try 块结束后自动调用 <code>close()</code>，即使发生异常也会关闭。好处：代码简洁，不会忘记关流，不用写 finally。</p>
+</blockquote>
+<p><strong>Q8：Properties 类的 load() 方法做了什么？</strong></p>
+<blockquote>
+<p><code>load(InputStream)</code> 读取 <code>.properties</code> 文件（流中的文本数据），自动按 <code>key=value</code> 格式解析每一行，把键值对存入 Properties 集合。之后可以用 <code>getProperty(key)</code> 直接取值，无需手动解析。</p>
+</blockquote>
+<p><strong>Q9：InputStreamReader 和 FileReader 有什么关系？</strong></p>
+<blockquote>
+<p><code>FileReader</code> 是 <code>InputStreamReader</code> 的子类。<code>FileReader</code> 使用的是系统默认编码（通常是 UTF-8），如果文件是 GBK 编码就会乱码。<code>InputStreamReader</code> 可以手动指定编码，更灵活。需要指定编码时用 <code>InputStreamReader</code>，系统默认编码时可以直接用 <code>FileReader</code>。</p>
+</blockquote>
+<hr/>
+<h1>本章小结</h1>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>IO流知识体系总结：
+
+1. File 类 —— 操作文件/文件夹（增删改查），但不负责文件内容的读写
+
+2. 字节流 —— 万能，适合复制任何文件
+   FileOutputStream（写）/ FileInputStream（读）
+
+3. 字符流 —— 专门处理文本，防止中文乱码
+   FileWriter（写）/ FileReader（读）
+   
+4. 缓冲流 —— 在基本流外面包一层，提升效率（内存缓冲区 8192 字节）
+   字节缓冲：BufferedOutputStream / BufferedInputStream
+   字符缓冲：BufferedWriter（特有 newLine()）/ BufferedReader（特有 readLine()）
+
+5. 转换流 —— 解决编码不一致导致的乱码，可以手动指定编码
+   InputStreamReader / OutputStreamWriter
+
+6. 序列化流 —— 把对象持久化到文件/网络传输
+   ObjectOutputStream（序列化，写对象）/ ObjectInputStream（反序列化，读对象）
+   注意：类必须 implements Serializable，建议声明 serialVersionUID
+
+7. 打印流 PrintStream —— 原样输出，可改变输出流向（System.setOut）
+
+8. Properties —— 专门读取 .properties 配置文件，解耦配置和代码
+
+9. try-with-resources —— JDK7+ 的 IO 异常处理推荐写法，自动关流
+
+选流原则：
+  - 操作文本文件（边读边看内容）→ 字符流
+  - 复制文件（任意类型）→ 字节流 + 缓冲流
+  - 文件编码不一致 → 转换流
+  - 读写 Java 对象 → 序列化流
+  - 读配置文件 → Properties.load()
+</pre></div>
+</div><hr/>
+<blockquote>
+<p>笔记整合自黑马JavaSE模块21+22，整合时间：2026年</p>
+</blockquote>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="b042d23174c3a83e.html"><small>← 上一篇</small><strong>13 · 反射与注解（Class对象 / 获取构造方法字段方法 / 自定义注解）</strong></a><a href="3cf636d3d26f8b64.html"><small>下一篇 →</small><strong>09 · 多线程（Thread / Runnable / 线程状态 / synchronized / Lock / 线程池）</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">知识框架总览</a><a class="toc-h2" href="#section-1">IO流四大基类速记表</a><a class="toc-h2" href="#section-2">1.1 什么是 File 类</a><a class="toc-h2" href="#section-3">1.2 计算机常识</a><a class="toc-h2" href="#section-4">1.3 File 的静态成员</a><a class="toc-h2" href="#section-5">1.4 File 的三种构造方法</a><a class="toc-h2" href="#section-6">1.5 相对路径和绝对路径</a><a class="toc-h2" href="#section-7">1.6 File 的获取方法</a><a class="toc-h2" href="#section-8">1.7 File 的创建方法</a><a class="toc-h2" href="#section-9">1.8 File 的删除方法</a><a class="toc-h2" href="#section-10">1.9 File 的判断方法</a><a class="toc-h2" href="#section-11">1.10 File 的遍历方法</a><a class="toc-h3" href="#section-12">综合练习：递归遍历所有 .jpg 文件</a><a class="toc-h2" href="#section-13">2.1 IO流是什么，为什么要学</a><a class="toc-h2" href="#section-14">2.2 IO流的四大基类</a><a class="toc-h2" href="#section-15">2.3 FileOutputStream 字节输出流</a><a class="toc-h2" href="#section-16">2.4 FileInputStream 字节输入流</a><a class="toc-h2" href="#section-17">2.5 字节流实现文件复制</a><a class="toc-h2" href="#section-18">3.1 为什么要有字符流</a><a class="toc-h2" href="#section-19">3.2 FileReader 字符输入流</a><a class="toc-h2" href="#section-20">3.3 FileWriter 字符输出流</a><a class="toc-h2" href="#section-21">3.4 IO 异常处理（传统方式）</a><a class="toc-h2" href="#section-22">3.5 JDK 7+ try-with-resources（推荐！）</a><a class="toc-h2" href="#section-23">4.1 为什么需要缓冲流？（原理非常重要！）</a><a class="toc-h2" href="#section-24">4.2 字节缓冲流</a><a class="toc-h2" href="#section-25">4.3 字符缓冲流</a><a class="toc-h3" href="#section-26">BufferedWriter 字符缓冲输出流</a><a class="toc-h3" href="#section-27">BufferedReader 字符缓冲输入流</a><a class="toc-h2" href="#section-28">5.1 字符编码和字符集基础</a><a class="toc-h2" href="#section-29">5.2 什么时候会乱码？</a><a class="toc-h2" href="#section-30">5.3 InputStreamReader（读时指定编码）</a><a class="toc-h2" href="#section-31">5.4 OutputStreamWriter（写时指定编码）</a><a class="toc-h2" href="#section-32">6.1 什么是序列化？</a><a class="toc-h2" href="#section-33">6.2 ObjectOutputStream 序列化流（写对象）</a><a class="toc-h2" href="#section-34">6.3 ObjectInputStream 反序列化流（读对象）</a><a class="toc-h2" href="#section-35">6.4 transient 关键字（不序列化某个字段）</a><a class="toc-h2" href="#section-36">6.5 InvalidClassException 序列化版本冲突问题</a><a class="toc-h2" href="#section-37">6.6 EOFException：循环读取对象</a><a class="toc-h2" href="#section-38">7.1 PrintStream 基本使用</a><a class="toc-h2" href="#section-39">7.2 改变输出流向（System.setOut）</a><a class="toc-h2" href="#section-40">7.3 PrintStream 实现续写</a><a class="toc-h2" href="#section-41">8.1 Properties 回顾</a><a class="toc-h2" href="#section-42">8.2 为什么要用 Properties 读配置文件？</a><a class="toc-h2" href="#section-43">8.3 .properties 配置文件规范</a><a class="toc-h2" href="#section-44">8.4 读取配置文件</a><a class="toc-h2" href="#section-45">9.1 为什么要用第三方工具包？</a><a class="toc-h2" href="#section-46">9.2 如何引入 jar 包（IDEA）</a><a class="toc-h2" href="#section-47">9.3 IOUtils 类</a><a class="toc-h2" href="#section-48">9.4 FileUtils 类</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

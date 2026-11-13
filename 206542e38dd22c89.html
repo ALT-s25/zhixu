@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>02 · RabbitMQ 高级 ⭐⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/206542e38dd22c89.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>后端复习与路线</h2><nav aria-label="同专题笔记"><a href="54477528d302620b.html">01 · RabbitMQ 基础 ⭐⭐⭐</a><a aria-current="page" href="206542e38dd22c89.html">02 · RabbitMQ 高级 ⭐⭐⭐</a><a href="90a36f0e87c0e9f2.html">03 · Redis 入门 ⭐⭐⭐</a><a href="842df3b73dd46ca0.html">04 · Redis 实战（黑马点评项目）⭐⭐⭐⭐</a><a href="bdd7a14efe9ef984.html">05 · Redis 高级与原理 ⭐⭐⭐⭐</a><a href="0ae96682439409b1.html">06 · SpringCloud 微服务 ⭐⭐⭐⭐</a><a href="600b65140adc614a.html">07 · Docker 入门 ⭐⭐⭐</a><a href="b024350084c2cebd.html">08 · Elasticsearch 搜索引擎 ⭐⭐⭐</a><a href="0c840c43a3afe14b.html">后端复习与路线 · 学习指南</a><a href="bc10de1a27d66030.html">D:\za 全部学习笔记总览</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>后端复习与路线</div><h1>02 · RabbitMQ 高级 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中高 | <strong>学习建议</strong>：2 天
+对应视频：黑马 SpringCloud 微服务 MQ 高级篇
+<strong>项目导向</strong>：解决消息丢失、重复消费、延迟消息——生产环境必备</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>RabbitMQ 高级
+├── 1. 发送者可靠性 ⭐⭐⭐
+│   ├── 生产者重试机制
+│   └── 生产者确认（Confirm + Return）
+├── 2. MQ 可靠性 ⭐⭐
+│   ├── 数据持久化（交换机/队列/消息）
+│   └── LazyQueue 惰性队列
+├── 3. 消费者可靠性 ⭐⭐⭐
+│   ├── 消费者确认机制（ACK/NACK/REJECT）
+│   ├── 失败重试机制
+│   ├── 失败处理策略
+│   └── 业务幂等性 ⭐⭐⭐
+├── 4. 延迟消息 ⭐⭐⭐
+│   ├── 死信交换机
+│   └── DelayExchange 插件
+└── 5. 实战：订单超时取消
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、消息丢失的三个环节</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>生产者 → [1] → MQ(交换机+队列) → [2] → 消费者 → [3]
+                      ↓
+                 持久化存储
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>环节</th>
+<th>丢失原因</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>[1] 发送到 MQ</strong></td>
+<td>网络故障、Exchange 不存在、路由失败</td>
+<td>重试机制 + 生产者确认</td>
+</tr>
+<tr>
+<td><strong>[2] MQ 存储</strong></td>
+<td>MQ 宕机、内存未持久化</td>
+<td>持久化 + LazyQueue</td>
+</tr>
+<tr>
+<td><strong>[3] 消费者处理</strong></td>
+<td>消费者宕机、处理异常</td>
+<td>消费者确认 + 失败重试</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-2">三、发送者可靠性 ⭐⭐⭐</h2>
+<h3 id="section-3">3.1 生产者重试机制</h3>
+<p>连接 MQ 失败时自动重试（阻塞式，会影响性能）：</p>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">rabbitmq</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">connection-timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1s</span>
+<span class="w">    </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">retry</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">initial-interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000ms</span><span class="w">  </span><span class="c1"># 初始等待时间</span>
+<span class="w">        </span><span class="nt">multiplier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">             </span><span class="c1"># 下次等待 = 上次 × multiplier</span>
+<span class="w">        </span><span class="nt">max-attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">           </span><span class="c1"># 最大重试次数</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ 重试是<strong>阻塞式</strong>的，对性能有影响，非网络不稳定环境建议不开启。</p>
+</blockquote>
+<h3 id="section-4">3.2 生产者确认机制</h3>
+<p>RabbitMQ 提供两种回执：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>机制</th>
+<th>触发时机</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Publisher Confirm（ACK）</strong></td>
+<td>消息成功投递到交换机并入队</td>
+<td>投递成功</td>
+</tr>
+<tr>
+<td><strong>Publisher Confirm（NACK）</strong></td>
+<td>MQ 内部故障</td>
+<td>投递失败</td>
+</tr>
+<tr>
+<td><strong>Publisher Return</strong></td>
+<td>消息到达交换机但路由失败</td>
+<td>路由失败（但 Confirm 还是 ACK）</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="section-5">3.2.1 开启配置</h4>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">rabbitmq</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">publisher-confirm-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">correlated</span><span class="w">  </span><span class="c1"># none/simple/correlated</span>
+<span class="w">    </span><span class="nt">publisher-returns</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div><ul>
+<li><code>none</code>：关闭确认</li>
+<li><code>simple</code>：同步阻塞等待回执</li>
+<li><code>correlated</code>：<strong>异步回调</strong>（推荐）</li>
+</ul>
+<h4 id="section-6">3.2.2 ReturnCallback（路由失败回调）</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Slf4j</span>
+<span class="nd">@AllArgsConstructor</span>
+<span class="nd">@Configuration</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MqConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">RabbitTemplate</span><span class="w"> </span><span class="n">rabbitTemplate</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@PostConstruct</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">setReturnsCallback</span><span class="p">(</span><span class="n">returned</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">log</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">"消息路由失败：exchange={}, routingKey={}, reason={}"</span><span class="p">,</span>
+<span class="w">                </span><span class="n">returned</span><span class="p">.</span><span class="na">getExchange</span><span class="p">(),</span><span class="w"> </span><span class="n">returned</span><span class="p">.</span><span class="na">getRoutingKey</span><span class="p">(),</span><span class="w"> </span><span class="n">returned</span><span class="p">.</span><span class="na">getReplyText</span><span class="p">());</span>
+<span class="w">            </span><span class="c1">// 可以在这里重新投递或记录日志</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-7">3.2.3 ConfirmCallback（投递结果回调）</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 每条消息发送时设置</span>
+<span class="n">CorrelationData</span><span class="w"> </span><span class="n">cd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CorrelationData</span><span class="p">();</span>
+<span class="n">cd</span><span class="p">.</span><span class="na">getFuture</span><span class="p">().</span><span class="na">addCallback</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ListenableFutureCallback</span><span class="o">&lt;</span><span class="n">CorrelationData</span><span class="p">.</span><span class="na">Confirm</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">onSuccess</span><span class="p">(</span><span class="n">CorrelationData</span><span class="p">.</span><span class="na">Confirm</span><span class="w"> </span><span class="n">result</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">isAck</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">log</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">"消息投递成功，收到 ACK"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">log</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">"消息投递失败，收到 NACK，原因：{}"</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">getReason</span><span class="p">());</span>
+<span class="w">            </span><span class="c1">// 重新投递 / 记录到数据库</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">onFailure</span><span class="p">(</span><span class="n">Throwable</span><span class="w"> </span><span class="n">ex</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">log</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">"消息投递异常"</span><span class="p">,</span><span class="w"> </span><span class="n">ex</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">});</span>
+
+<span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">convertAndSend</span><span class="p">(</span><span class="s">"exchange"</span><span class="p">,</span><span class="w"> </span><span class="s">"routingKey"</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">cd</span><span class="p">);</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>生产者确认会消耗 MQ 性能</strong>，只在消息可靠性要求极高时开启，且仅开启 Confirm 即可（Return 触发大多是编程错误）。</p>
+</blockquote>
+<hr/>
+<h2 id="section-8">四、MQ 可靠性 ⭐⭐</h2>
+<h3 id="section-9">4.1 数据持久化</h3>
+<p>三种持久化全部要配置才能保证消息不丢失：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 交换机持久化（默认已持久化）</span>
+<span class="n">ExchangeBuilder</span><span class="p">.</span><span class="na">directExchange</span><span class="p">(</span><span class="s">"my.exchange"</span><span class="p">).</span><span class="na">durable</span><span class="p">(</span><span class="kc">true</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+
+<span class="c1">// 队列持久化</span>
+<span class="n">QueueBuilder</span><span class="p">.</span><span class="na">durable</span><span class="p">(</span><span class="s">"my.queue"</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+
+<span class="c1">// 消息持久化（Spring 默认已设置）</span>
+<span class="c1">// DeliveryMode.PERSISTENT</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ SpringAMQP 通过注解 <code>@Queue(durable="true")</code> 创建的队列默认持久化。</p>
+</blockquote>
+<h3 id="section-10">4.2 LazyQueue 惰性队列 ⭐⭐</h3>
+<p><strong>问题</strong>：默认队列数据存内存，消息堆积时会触发 PageOut（刷盘），阻塞所有消息处理。</p>
+<p><strong>LazyQueue 特点</strong>：</p>
+<ul>
+<li>消息<strong>直接存磁盘</strong>，内存只保留少量索引</li>
+<li>支持<strong>数百万条消息</strong>积压</li>
+<li>3.12+ 版本已是默认模式</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 代码声明 Lazy 队列</span>
+<span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Queue</span><span class="w"> </span><span class="nf">lazyQueue</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">QueueBuilder</span><span class="p">.</span><span class="na">durable</span><span class="p">(</span><span class="s">"lazy.queue"</span><span class="p">).</span><span class="na">lazy</span><span class="p">().</span><span class="na">build</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// 注解声明</span>
+<span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">queuesToDeclare</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Queue</span><span class="p">(</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"lazy.queue"</span><span class="p">,</span>
+<span class="w">    </span><span class="n">durable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"true"</span><span class="p">,</span>
+<span class="w">    </span><span class="n">arguments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Argument</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"x-queue-mode"</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"lazy"</span><span class="p">)</span>
+<span class="p">))</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">listenLazy</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-11">五、消费者可靠性 ⭐⭐⭐</h2>
+<h3 id="section-12">5.1 消费者确认机制（ACK）</h3>
+<p>MQ 投递消息给消费者后，等待消费者确认：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>确认方式</th>
+<th>含义</th>
+<th>MQ 行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ACK</strong></td>
+<td>处理成功</td>
+<td>删除消息</td>
+</tr>
+<tr>
+<td><strong>NACK</strong></td>
+<td>处理失败</td>
+<td>重新投递（或丢弃）</td>
+</tr>
+<tr>
+<td><strong>REJECT</strong></td>
+<td>拒绝</td>
+<td>重新投递或丢弃</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">rabbitmq</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">listener</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">simple</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">acknowledge-mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span><span class="w">  </span><span class="c1"># none/manual/auto</span>
+</pre></div>
+</div><ul>
+<li><code>none</code>：不确认，消息投递即删除（不安全）</li>
+<li><code>manual</code>：手动确认（代码复杂）</li>
+<li><code>auto</code>：<strong>自动</strong>（无异常 → ACK，有异常 → NACK，推荐）</li>
+</ul>
+<h3 id="section-13">5.2 失败重试机制 ⭐</h3>
+<p>消费者处理失败后，默认会无限重投，CPU 飙升。配置本地重试：</p>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">rabbitmq</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">listener</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">simple</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">retry</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">          </span><span class="nt">initial-interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000ms</span><span class="w">  </span><span class="c1"># 初始等待</span>
+<span class="w">          </span><span class="nt">multiplier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">          </span><span class="nt">max-attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">           </span><span class="c1"># 最大重试 3 次</span>
+<span class="w">          </span><span class="nt">stateless</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">           </span><span class="c1"># 无状态重试（有事务用 false）</span>
+</pre></div>
+</div><blockquote>
+<p>重试 3 次后仍失败 → 触发<strong>失败处理策略</strong></p>
+</blockquote>
+<h3 id="section-14">5.3 失败处理策略 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">MessageRecoverer</span><span class="w"> </span><span class="nf">republishMessageRecoverer</span><span class="p">(</span><span class="n">RabbitTemplate</span><span class="w"> </span><span class="n">rabbitTemplate</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 重试耗尽后，将失败消息投递到指定交换机（error 队列）</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RepublishMessageRecoverer</span><span class="p">(</span><span class="n">rabbitTemplate</span><span class="p">,</span><span class="w"> </span><span class="s">"error.direct"</span><span class="p">,</span><span class="w"> </span><span class="s">"error"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>类</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>丢弃（默认）</td>
+<td>RejectAndDontRequeueRecoverer</td>
+<td>直接丢弃</td>
+</tr>
+<tr>
+<td>重新入队</td>
+<td>ImmediateRequeueMessageRecoverer</td>
+<td>重新入队（可能死循环）</td>
+</tr>
+<tr>
+<td><strong>投到 error 队列</strong></td>
+<td>RepublishMessageRecoverer</td>
+<td><strong>推荐</strong>，人工处理</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-15">5.4 业务幂等性 ⭐⭐⭐</h3>
+<p><strong>问题</strong>：消息可能因网络问题被重复投递，消费者需保证<strong>同一消息处理多次结果相同</strong>。</p>
+<h4 id="section-16">方案一：唯一消息 ID</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 发送时设置唯一 ID</span>
+<span class="n">CorrelationData</span><span class="w"> </span><span class="n">cd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CorrelationData</span><span class="p">(</span><span class="n">UUID</span><span class="p">.</span><span class="na">randomUUID</span><span class="p">().</span><span class="na">toString</span><span class="p">());</span>
+<span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">convertAndSend</span><span class="p">(</span><span class="s">"exchange"</span><span class="p">,</span><span class="w"> </span><span class="s">"key"</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="n">cd</span><span class="p">);</span>
+
+<span class="c1">// 消费时检查 ID</span>
+<span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">queues</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"queue"</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">listen</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="n">Message</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">msgId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="na">getMessageProperties</span><span class="p">().</span><span class="na">getMessageId</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// 查 Redis/DB，ID 已存在则跳过</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">redisTemplate</span><span class="p">.</span><span class="na">opsForValue</span><span class="p">().</span><span class="na">setIfAbsent</span><span class="p">(</span><span class="s">"mq:msg:"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">msgId</span><span class="p">,</span><span class="w"> </span><span class="s">"1"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">DAYS</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 首次处理</span>
+<span class="w">        </span><span class="n">doProcess</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// 重复消息直接忽略</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-17">方案二：业务判断（更推荐）</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 下单业务幂等性：先查订单状态，已处理则跳过</span>
+<span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">queues</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"pay.success.queue"</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">handlePaySuccess</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">orderId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Order</span><span class="w"> </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orderService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="n">orderId</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">order</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">order</span><span class="p">.</span><span class="na">getStatus</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">OrderStatus</span><span class="p">.</span><span class="na">UNPAID</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"> </span><span class="c1">// 已处理过，幂等跳过</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">orderService</span><span class="p">.</span><span class="na">updateStatus</span><span class="p">(</span><span class="n">orderId</span><span class="p">,</span><span class="w"> </span><span class="n">OrderStatus</span><span class="p">.</span><span class="na">PAID</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>业务判断方案更可靠</strong>，不依赖消息 ID，推荐优先使用。</p>
+</blockquote>
+<hr/>
+<h2 id="section-18">六、延迟消息 ⭐⭐⭐</h2>
+<h3 id="section-19">6.1 死信交换机（Dead Letter Exchange）</h3>
+<p>消息变成"死信"的三种情况：</p>
+<ol>
+<li>消费者 REJECT/NACK 且 requeue=false</li>
+<li>消息在队列中过期（TTL 超时）</li>
+<li>队列消息数超过上限</li>
+</ol>
+<p><strong>TTL + 死信 实现延迟</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Queue</span><span class="w"> </span><span class="nf">ttlQueue</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">QueueBuilder</span><span class="p">.</span><span class="na">durable</span><span class="p">(</span><span class="s">"ttl.queue"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">ttl</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="w">                    </span><span class="c1">// 消息 10秒 过期</span>
+<span class="w">        </span><span class="p">.</span><span class="na">deadLetterExchange</span><span class="p">(</span><span class="s">"dl.direct"</span><span class="p">)</span><span class="w">  </span><span class="c1">// 死信交换机</span>
+<span class="w">        </span><span class="p">.</span><span class="na">deadLetterRoutingKey</span><span class="p">(</span><span class="s">"dl"</span><span class="p">)</span><span class="w">       </span><span class="c1">// 死信 routingKey</span>
+<span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nd">@Bean</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Queue</span><span class="w"> </span><span class="nf">dlQueue</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">QueueBuilder</span><span class="p">.</span><span class="na">durable</span><span class="p">(</span><span class="s">"dl.queue"</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ 缺点：TTL 是固定的，无法按消息设置不同延迟时间（前面的消息阻塞后面的）。</p>
+</blockquote>
+<h3 id="section-20">6.2 DelayExchange 插件（推荐）⭐⭐</h3>
+<p><strong>安装</strong>（需要 RabbitMQ 插件）：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>mq<span class="w"> </span>rabbitmq-plugins<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>rabbitmq_delayed_message_exchange
+</pre></div>
+</div><p><strong>声明延迟交换机</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">bindings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@QueueBinding</span><span class="p">(</span>
+<span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Queue</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"delay.queue"</span><span class="p">,</span><span class="w"> </span><span class="n">durable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"true"</span><span class="p">),</span>
+<span class="w">    </span><span class="n">exchange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Exchange</span><span class="p">(</span>
+<span class="w">        </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"delay.direct"</span><span class="p">,</span>
+<span class="w">        </span><span class="n">delayed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"true"</span><span class="p">,</span><span class="w">    </span><span class="c1">// 开启延迟</span>
+<span class="w">        </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ExchangeTypes</span><span class="p">.</span><span class="na">DIRECT</span>
+<span class="w">    </span><span class="p">),</span>
+<span class="w">    </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"delay"</span>
+<span class="p">))</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">listenDelayQueue</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"延迟消息到达：{}"</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>发送延迟消息</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Test</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">testDelayMessage</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">convertAndSend</span><span class="p">(</span><span class="s">"delay.direct"</span><span class="p">,</span><span class="w"> </span><span class="s">"delay"</span><span class="p">,</span><span class="w"> </span><span class="s">"Hello Delay"</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">msg</span><span class="p">.</span><span class="na">getMessageProperties</span><span class="p">().</span><span class="na">setDelay</span><span class="p">(</span><span class="mi">10000</span><span class="p">);</span><span class="w"> </span><span class="c1">// 延迟 10秒</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 DelayExchange 消息存在交换机内存中，RabbitMQ 重启会丢失！生产环境要配合持久化。</p>
+</blockquote>
+<hr/>
+<h2 id="section-21">七、实战：订单超时自动取消 ⭐⭐</h2>
+<p><strong>流程</strong>：下单 → 发送延迟消息（30分钟）→ 消费者查支付状态 → 未支付则取消订单</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 定义常量</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">MqConstants</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">PAY_EXCHANGE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"pay.topic"</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">DELAY_EXCHANGE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"trade.delay.topic"</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">DELAY_ORDER_QUEUE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"trade.order.delay.queue"</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">DELAY_ORDER_ROUTING_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"order.query"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// 下单时发延迟消息</span>
+<span class="nd">@Service</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">OrderService</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">RabbitTemplate</span><span class="w"> </span><span class="n">rabbitTemplate</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="nf">createOrder</span><span class="p">(</span><span class="n">OrderFormDTO</span><span class="w"> </span><span class="n">orderDTO</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 保存订单...</span>
+<span class="w">        </span><span class="n">Long</span><span class="w"> </span><span class="n">orderId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">saveOrder</span><span class="p">(</span><span class="n">orderDTO</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 发送延迟消息（20分钟后检查支付状态）</span>
+<span class="w">        </span><span class="n">rabbitTemplate</span><span class="p">.</span><span class="na">convertAndSend</span><span class="p">(</span>
+<span class="w">            </span><span class="n">MqConstants</span><span class="p">.</span><span class="na">DELAY_EXCHANGE</span><span class="p">,</span>
+<span class="w">            </span><span class="n">MqConstants</span><span class="p">.</span><span class="na">DELAY_ORDER_ROUTING_KEY</span><span class="p">,</span>
+<span class="w">            </span><span class="n">orderId</span><span class="p">,</span>
+<span class="w">            </span><span class="n">msg</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">msg</span><span class="p">.</span><span class="na">getMessageProperties</span><span class="p">().</span><span class="na">setDelay</span><span class="p">(</span><span class="mi">1200000</span><span class="p">);</span><span class="w"> </span><span class="c1">// 20分钟</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="w">            </span><span class="p">});</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">orderId</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 消费者：检查支付状态，未支付则取消</span>
+<span class="nd">@Component</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">OrderDelayMessageListener</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">OrderService</span><span class="w"> </span><span class="n">orderService</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@RabbitListener</span><span class="p">(</span><span class="n">bindings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@QueueBinding</span><span class="p">(</span>
+<span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Queue</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MqConstants</span><span class="p">.</span><span class="na">DELAY_ORDER_QUEUE</span><span class="p">,</span><span class="w"> </span><span class="n">durable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"true"</span><span class="p">),</span>
+<span class="w">        </span><span class="n">exchange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@Exchange</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MqConstants</span><span class="p">.</span><span class="na">DELAY_EXCHANGE</span><span class="p">,</span><span class="w"> </span><span class="n">delayed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"true"</span><span class="p">,</span>
+<span class="w">                             </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ExchangeTypes</span><span class="p">.</span><span class="na">TOPIC</span><span class="p">),</span>
+<span class="w">        </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MqConstants</span><span class="p">.</span><span class="na">DELAY_ORDER_ROUTING_KEY</span>
+<span class="w">    </span><span class="p">))</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">listenOrderDelayMessage</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">orderId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 查询支付状态</span>
+<span class="w">        </span><span class="n">Order</span><span class="w"> </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orderService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="n">orderId</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">order</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">order</span><span class="p">.</span><span class="na">getStatus</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">OrderStatus</span><span class="p">.</span><span class="na">UNPAID</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="p">;</span><span class="w"> </span><span class="c1">// 已支付，忽略</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">// 取消订单</span>
+<span class="w">        </span><span class="n">orderService</span><span class="p">.</span><span class="na">cancelOrder</span><span class="p">(</span><span class="n">orderId</span><span class="p">);</span>
+<span class="w">        </span><span class="n">log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"订单 {} 超时未支付，自动取消"</span><span class="p">,</span><span class="w"> </span><span class="n">orderId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-22">八、MQ 可靠性全链路总结 ⭐⭐</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>生产者
+  ├── 重试机制：网络故障自动重试
+  └── 生产者确认：NACK 时补偿重发
+
+MQ
+  ├── 交换机持久化
+  ├── 队列持久化
+  ├── 消息持久化
+  └── LazyQueue：防止消息堆积崩溃
+
+消费者
+  ├── ACK 自动确认：异常时 NACK 重投
+  ├── 本地重试：最多 3 次
+  ├── RepublishMessageRecoverer：失败进 error 队列人工处理
+  └── 业务幂等性：防重复消费
+</pre></div>
+</div><hr/>
+<h2 id="section-23">九、面试常问 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>如何保证消息不丢失？</strong></p>
+<ul>
+<li>生产者：Confirm + Return 确认</li>
+<li>MQ：持久化（交换机/队列/消息）+ LazyQueue</li>
+<li>消费者：ACK 确认 + 失败重试 + error 队列</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>如何保证消息不重复消费（幂等）？</strong></p>
+<ul>
+<li>业务判断（先查状态，已处理则跳过）</li>
+<li>唯一消息 ID + Redis 去重</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>延迟消息实现方案？</strong></p>
+<ul>
+<li>方案一：TTL + 死信队列（无法按消息设置延迟）</li>
+<li>方案二：<strong>DelayExchange 插件</strong>（推荐，可按消息设置延迟）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>消息堆积怎么办？</strong></p>
+<ul>
+<li>配置 LazyQueue（消息直接存磁盘）</li>
+<li>增加消费者数量（扩容）</li>
+<li>增大 prefetch 数量</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>死信队列的三种触发场景？</strong></p>
+<ol>
+<li>消费者 NACK/REJECT（requeue=false）</li>
+<li>消息 TTL 过期</li>
+<li>队列长度超限</li>
+</ol>
+</blockquote>
+<hr/>
+<h2 id="section-24">十、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>消息丢失三大环节与解决方案</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>生产者重试 + 生产者确认（Confirm/Return）</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>数据持久化</strong> + <strong>LazyQueue</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>消费者 ACK 机制</strong>（auto 模式）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>失败重试 + RepublishMessageRecoverer</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>业务幂等性</strong>（优先业务判断）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>延迟消息</strong>：TTL 死信 vs DelayExchange 插件</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>订单超时取消完整实现</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>生产者确认消耗性能，非必要不开</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>LazyQueue 在 3.12+ 已是默认，低版本要手动设置</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>延迟消息要安装 rabbitmq_delayed_message_exchange 插件</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>消息重试后仍失败需要投递到 error 队列人工处理</li>
+</ul>
+<p>下一章：<a href="90a36f0e87c0e9f2.html">03-Redis入门.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="54477528d302620b.html"><small>← 上一篇</small><strong>01 · RabbitMQ 基础 ⭐⭐⭐</strong></a><a href="90a36f0e87c0e9f2.html"><small>下一篇 →</small><strong>03 · Redis 入门 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、消息丢失的三个环节</a><a class="toc-h2" href="#section-2">三、发送者可靠性 ⭐⭐⭐</a><a class="toc-h3" href="#section-3">3.1 生产者重试机制</a><a class="toc-h3" href="#section-4">3.2 生产者确认机制</a><a class="toc-h4" href="#section-5">3.2.1 开启配置</a><a class="toc-h4" href="#section-6">3.2.2 ReturnCallback（路由失败回调）</a><a class="toc-h4" href="#section-7">3.2.3 ConfirmCallback（投递结果回调）</a><a class="toc-h2" href="#section-8">四、MQ 可靠性 ⭐⭐</a><a class="toc-h3" href="#section-9">4.1 数据持久化</a><a class="toc-h3" href="#section-10">4.2 LazyQueue 惰性队列 ⭐⭐</a><a class="toc-h2" href="#section-11">五、消费者可靠性 ⭐⭐⭐</a><a class="toc-h3" href="#section-12">5.1 消费者确认机制（ACK）</a><a class="toc-h3" href="#section-13">5.2 失败重试机制 ⭐</a><a class="toc-h3" href="#section-14">5.3 失败处理策略 ⭐</a><a class="toc-h3" href="#section-15">5.4 业务幂等性 ⭐⭐⭐</a><a class="toc-h4" href="#section-16">方案一：唯一消息 ID</a><a class="toc-h4" href="#section-17">方案二：业务判断（更推荐）</a><a class="toc-h2" href="#section-18">六、延迟消息 ⭐⭐⭐</a><a class="toc-h3" href="#section-19">6.1 死信交换机（Dead Letter Exchange）</a><a class="toc-h3" href="#section-20">6.2 DelayExchange 插件（推荐）⭐⭐</a><a class="toc-h2" href="#section-21">七、实战：订单超时自动取消 ⭐⭐</a><a class="toc-h2" href="#section-22">八、MQ 可靠性全链路总结 ⭐⭐</a><a class="toc-h2" href="#section-23">九、面试常问 ⭐⭐⭐</a><a class="toc-h2" href="#section-24">十、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

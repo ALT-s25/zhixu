@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/d88a39a488d6e59d.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a aria-current="page" href="d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中高 | <strong>学习建议</strong>：2 天
+对应黑马课件：08_数据库高级和新特性.pptx
+<strong>项目导向</strong>：了解即可，实际项目大多用 ORM 代替，但面试会问</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、视图（View）</h2>
+<h3 id="section-1">1.1 什么是视图</h3>
+<p><strong>视图</strong>是基于 SQL 查询定义的<strong>虚拟表</strong>，不存储数据，每次查询视图时动态执行底层 SQL。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>类比：视图就像报表模板，每次打开都是实时数据
+</pre></div>
+</div><h3 id="section-2">1.2 创建视图</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建视图：查询员工和部门的联合信息</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">VIEW</span><span class="w"> </span><span class="n">v_emp_dept</span><span class="w"> </span><span class="k">AS</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">emp_name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="n">salary</span><span class="p">,</span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employee</span><span class="w"> </span><span class="n">e</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+
+<span class="c1">-- 查询视图（和查表一样）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">v_emp_dept</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-3">1.3 更新和删除视图</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 修改视图</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">REPLACE</span><span class="w"> </span><span class="k">VIEW</span><span class="w"> </span><span class="n">v_emp_dept</span><span class="w"> </span><span class="k">AS</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">dept_name</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employee</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+
+<span class="c1">-- 删除视图</span>
+<span class="k">DROP</span><span class="w"> </span><span class="k">VIEW</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">v_emp_dept</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-4">1.4 视图的优缺点</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>简化复杂查询</td>
+<td>更新受限</td>
+</tr>
+<tr>
+<td>隐藏表结构</td>
+<td>性能不佳（每次重新执行）</td>
+</tr>
+<tr>
+<td>权限控制（只给视图权限）</td>
+<td>调试困难</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-5">二、存储过程（Stored Procedure）</h2>
+<h3 id="section-6">2.1 什么是存储过程</h3>
+<p>预先编译好的 SQL 语句集合，存在数据库中，可以反复调用。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建存储过程</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="o">//</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">p_add_user</span><span class="p">(</span>
+<span class="w">    </span><span class="k">IN</span><span class="w">  </span><span class="n">p_name</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span><span class="w">     </span><span class="c1">-- 输入参数</span>
+<span class="w">    </span><span class="k">IN</span><span class="w">  </span><span class="n">p_phone</span><span class="w">   </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+<span class="w">    </span><span class="k">OUT</span><span class="w"> </span><span class="n">p_id</span><span class="w">      </span><span class="nb">BIGINT</span><span class="w">            </span><span class="c1">-- 输出参数</span>
+<span class="p">)</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="k">user</span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">phone</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="n">p_name</span><span class="p">,</span><span class="w"> </span><span class="n">p_phone</span><span class="p">);</span>
+<span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">p_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LAST_INSERT_ID</span><span class="p">();</span><span class="w">   </span><span class="c1">-- 获取自增 id</span>
+<span class="k">END</span><span class="w"> </span><span class="o">//</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span>
+
+<span class="c1">-- 调用存储过程</span>
+<span class="k">CALL</span><span class="w"> </span><span class="n">p_add_user</span><span class="p">(</span><span class="s1">'张三'</span><span class="p">,</span><span class="w"> </span><span class="s1">'13800138000'</span><span class="p">,</span><span class="w"> </span><span class="o">@</span><span class="n">new_id</span><span class="p">);</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">@</span><span class="n">new_id</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 查看输出参数</span>
+</pre></div>
+</div><h3 id="section-7">2.2 流程控制</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">DELIMITER</span><span class="w"> </span><span class="o">//</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">p_grade</span><span class="p">(</span><span class="k">IN</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span><span class="w"> </span><span class="k">OUT</span><span class="w"> </span><span class="n">grade</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">90</span><span class="w"> </span><span class="k">THEN</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="n">grade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'A'</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ELSEIF</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="k">THEN</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="n">grade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'B'</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ELSEIF</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">70</span><span class="w"> </span><span class="k">THEN</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="n">grade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'C'</span><span class="p">;</span>
+<span class="w">    </span><span class="k">ELSE</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="n">grade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'D'</span><span class="p">;</span>
+<span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<span class="k">END</span><span class="w"> </span><span class="o">//</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-8">2.3 循环</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">DELIMITER</span><span class="w"> </span><span class="o">//</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">p_sum</span><span class="p">(</span><span class="k">IN</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span><span class="w"> </span><span class="k">OUT</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="nb">INT</span><span class="p">)</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">WHILE</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">DO</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="n">WHILE</span><span class="p">;</span>
+<span class="k">END</span><span class="w"> </span><span class="o">//</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span>
+
+<span class="k">CALL</span><span class="w"> </span><span class="n">p_sum</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="o">@</span><span class="n">s</span><span class="p">);</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">@</span><span class="n">s</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 5050</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-9">三、函数（Function）</h2>
+<h3 id="section-10">3.1 创建函数</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 函数有且只有一个返回值（区别于存储过程）</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="o">//</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">f_full_name</span><span class="p">(</span><span class="n">first_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span><span class="w"> </span><span class="n">last_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+<span class="k">RETURNS</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">DETERMINISTIC</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">RETURN</span><span class="w"> </span><span class="n">CONCAT</span><span class="p">(</span><span class="n">last_name</span><span class="p">,</span><span class="w"> </span><span class="n">first_name</span><span class="p">);</span>
+<span class="k">END</span><span class="w"> </span><span class="o">//</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span>
+
+<span class="c1">-- 使用函数</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">f_full_name</span><span class="p">(</span><span class="s1">'三'</span><span class="p">,</span><span class="w"> </span><span class="s1">'张'</span><span class="p">);</span><span class="w">   </span><span class="c1">-- 张三</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-11">四、触发器（Trigger）</h2>
+<h3 id="section-12">4.1 什么是触发器</h3>
+<p>在数据变更时<strong>自动执行</strong>的 SQL，可在 INSERT/UPDATE/DELETE 前后触发。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景：订单删除后，自动记录到历史表</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="o">//</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TRIGGER</span><span class="w"> </span><span class="n">trg_order_delete</span>
+<span class="k">AFTER</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="o">`</span><span class="k">order</span><span class="o">`</span><span class="w">           </span><span class="c1">-- 在 order 表删除后触发</span>
+<span class="k">FOR</span><span class="w"> </span><span class="k">EACH</span><span class="w"> </span><span class="k">ROW</span><span class="w">                       </span><span class="c1">-- 每行触发一次</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">order_history</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">,</span><span class="w"> </span><span class="n">delete_time</span><span class="p">)</span>
+<span class="w">    </span><span class="k">VALUES</span><span class="p">(</span><span class="k">OLD</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">OLD</span><span class="p">.</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="k">OLD</span><span class="p">.</span><span class="n">amount</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">());</span>
+<span class="w">    </span><span class="c1">-- OLD 表示被删除的那行数据</span>
+<span class="k">END</span><span class="w"> </span><span class="o">//</span>
+<span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>时机</th>
+<th>操作</th>
+<th>NEW / OLD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BEFORE INSERT</td>
+<td>INSERT 前</td>
+<td>NEW（新数据）</td>
+</tr>
+<tr>
+<td>AFTER INSERT</td>
+<td>INSERT 后</td>
+<td>NEW（新数据）</td>
+</tr>
+<tr>
+<td>BEFORE UPDATE</td>
+<td>UPDATE 前</td>
+<td>OLD/NEW</td>
+</tr>
+<tr>
+<td>AFTER UPDATE</td>
+<td>UPDATE 后</td>
+<td>OLD/NEW</td>
+</tr>
+<tr>
+<td>BEFORE DELETE</td>
+<td>DELETE 前</td>
+<td>OLD（旧数据）</td>
+</tr>
+<tr>
+<td>AFTER DELETE</td>
+<td>DELETE 后</td>
+<td>OLD（旧数据）</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-13">五、锁机制 ⭐⭐⭐</h2>
+<h3 id="section-14">5.1 锁的分类</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>MySQL 锁
+├── 全局锁：锁整个数据库（备份用）
+├── 表锁
+│   ├── 表共享读锁（S Lock）：多个事务可同时读
+│   └── 表独占写锁（X Lock）：只能一个事务写
+└── 行锁（InnoDB）⭐
+    ├── 行共享锁（S Lock）
+    ├── 行排他锁（X Lock）
+    ├── 意向锁
+    ├── 间隙锁（Gap Lock）
+    └── 临键锁（Next-Key Lock）
+</pre></div>
+</div><h3 id="section-15">5.2 行锁 ⭐⭐</h3>
+<p><strong>InnoDB 支持行级锁</strong>（性能好，并发高）。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 加共享锁（允许其他事务读，不允许写）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">LOCK</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">SHARE</span><span class="w"> </span><span class="k">MODE</span><span class="p">;</span>
+
+<span class="c1">-- 加排他锁（不允许其他事务读写）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-16">5.3 死锁</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 事务 A</span>
+<span class="k">BEGIN</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 锁住 id=1</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 等 id=2</span>
+
+<span class="c1">-- 事务 B（同时执行）</span>
+<span class="k">BEGIN</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 锁住 id=2</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 等 id=1</span>
+
+<span class="c1">-- 结果：A 等 B，B 等 A，死锁！</span>
+<span class="c1">-- MySQL 会自动检测死锁，回滚代价小的那个事务</span>
+</pre></div>
+</div><p><strong>避免死锁</strong>：</p>
+<ul>
+<li>多表操作保持固定顺序（先操作 id 小的）</li>
+<li>控制事务范围，不要太长</li>
+<li>超时自动回滚：<code>innodb_lock_wait_timeout</code></li>
+</ul>
+<hr/>
+<h2 id="section-17">六、SQL 优化技巧 ⭐⭐</h2>
+<h3 id="section-18">6.1 慢查询日志</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 开启慢查询日志</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">slow_query_log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="p">;</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">long_query_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 超过 2 秒的记录</span>
+
+<span class="c1">-- 查看慢查询日志位置</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'slow_query_log_file'</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-19">6.2 EXPLAIN 分析执行计划</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Jack'</span><span class="p">;</span>
+</pre></div>
+</div><p>关键字段：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+<th>好/坏</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>访问类型</td>
+<td>const/ref 好，ALL 坏（全表扫描）</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td>实际使用的索引</td>
+<td>有 key 表示用了索引</td>
+</tr>
+<tr>
+<td><code>rows</code></td>
+<td>预估扫描行数</td>
+<td>越小越好</td>
+</tr>
+<tr>
+<td><code>Extra</code></td>
+<td>额外信息</td>
+<td>Using filesort / Using temporary 坏</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-20">七、常见面试题 ⭐⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>MyISAM 和 InnoDB 的区别？</strong>
+| 维度 | MyISAM | InnoDB |
+|------|--------|--------|
+| 事务 | 不支持 | ✅ 支持 |
+| 外键 | 不支持 | ✅ 支持 |
+| 行锁 | ❌ 表锁 | ✅ 行锁 |
+| 崩溃恢复 | 较差 | ✅ 好 |
+| 推荐 | 只读 | <strong>生产必用</strong> |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>MySQL 的存储引擎有哪些？</strong>
+InnoDB（默认，支持事务行锁）、MyISAM（不支持事务）、Memory（内存引擎）。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>MySQL 有哪些日志？</strong></p>
+<ul>
+<li>redo log（重做日志）：crash recovery，保证持久化</li>
+<li>undo log（回滚日志）：事务回滚，MVCC</li>
+<li>binlog（二进制日志）：主从复制，数据归档</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>MVCC 是什么？</strong>
+Multi-Version Concurrency Control（多版本并发控制）。在 READ COMMITTED 和 REPEATABLE READ 隔离级别下，通过 undo log 实现读不加锁，提高并发。</p>
+</blockquote>
+<hr/>
+<h2 id="section-21">八、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>视图（CREATE VIEW / DROP VIEW）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>存储过程（DELIMITER / IN-OUT 参数 / 流程控制）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>函数（CREATE FUNCTION）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>触发器（BEFORE/AFTER + INSERT/UPDATE/DELETE + OLD/NEW）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>行锁（SELECT...FOR UPDATE / LOCK IN SHARE MODE）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>死锁产生与避免</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>EXPLAIN 执行计划分析</li>
+</ul>
+<hr/>
+<blockquote>
+<p><strong>MySQL 全套笔记位置</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>D:\za\笔记整理\MySQL详解\
+├── 01-MySQL入门与数据库概述.md
+├── 02-DDL（数据库与表的定义）.md
+├── 03-DML（数据增删改）.md         ← Agent 生成
+├── 04-DQL单表查询.md               ← Agent 生成
+├── 05-约束.md                      ← Agent 生成
+├── 06-多表查询（连接与子查询）.md  ← Agent 生成
+├── 07-事务与并发控制.md            ← Agent 生成
+├── 08-索引与性能优化.md            ← Agent 生成
+└── 09-MySQL高级（视图+存储过程+触发器+锁）.md
+</pre></div>
+</div></blockquote>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="3b62987a0315e0e3.html"><small>← 上一篇</small><strong>MySQL 索引与性能优化 — 保姆级详解</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、视图（View）</a><a class="toc-h3" href="#section-1">1.1 什么是视图</a><a class="toc-h3" href="#section-2">1.2 创建视图</a><a class="toc-h3" href="#section-3">1.3 更新和删除视图</a><a class="toc-h3" href="#section-4">1.4 视图的优缺点</a><a class="toc-h2" href="#section-5">二、存储过程（Stored Procedure）</a><a class="toc-h3" href="#section-6">2.1 什么是存储过程</a><a class="toc-h3" href="#section-7">2.2 流程控制</a><a class="toc-h3" href="#section-8">2.3 循环</a><a class="toc-h2" href="#section-9">三、函数（Function）</a><a class="toc-h3" href="#section-10">3.1 创建函数</a><a class="toc-h2" href="#section-11">四、触发器（Trigger）</a><a class="toc-h3" href="#section-12">4.1 什么是触发器</a><a class="toc-h2" href="#section-13">五、锁机制 ⭐⭐⭐</a><a class="toc-h3" href="#section-14">5.1 锁的分类</a><a class="toc-h3" href="#section-15">5.2 行锁 ⭐⭐</a><a class="toc-h3" href="#section-16">5.3 死锁</a><a class="toc-h2" href="#section-17">六、SQL 优化技巧 ⭐⭐</a><a class="toc-h3" href="#section-18">6.1 慢查询日志</a><a class="toc-h3" href="#section-19">6.2 EXPLAIN 分析执行计划</a><a class="toc-h2" href="#section-20">七、常见面试题 ⭐⭐⭐</a><a class="toc-h2" href="#section-21">八、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>
