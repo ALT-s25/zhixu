@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL DML（数据增删改）完整详解 · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/f978c6e9910217b1.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a aria-current="page" href="../f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL DML（数据增删改）完整详解</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>DML = Data Manipulation Language</strong>，即数据操作语言
+专门用于对表中的<strong>数据</strong>进行增（INSERT）、改（UPDATE）、删（DELETE）操作
+注意：DML 操作的是<strong>数据行</strong>，不是表结构（表结构用 DDL）</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架总览</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>DML
+├── INSERT  插入数据
+│   ├── 单行插入
+│   ├── 多行插入
+│   ├── 子查询插入
+│   ├── INSERT IGNORE（忽略错误）
+│   └── ON DUPLICATE KEY UPDATE（存在则更新）
+│
+├── UPDATE  修改数据
+│   ├── 单表更新
+│   ├── WHERE 条件过滤
+│   └── UPDATE JOIN 多表联合更新
+│
+└── DELETE  删除数据
+    ├── 单表删除
+    ├── DELETE JOIN 多表联合删除
+    └── TRUNCATE vs DELETE 对比
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、环境准备：示例表结构</h2>
+<blockquote>
+<p>以下所有示例都基于这三张表，请先创建好</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建用户表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 主键，自增</span>
+<span class="w">    </span><span class="n">name</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">            </span><span class="c1">-- 姓名，不能为空</span>
+<span class="w">    </span><span class="n">email</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="p">,</span><span class="w">             </span><span class="c1">-- 邮箱，唯一约束</span>
+<span class="w">    </span><span class="n">age</span><span class="w">      </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w">                  </span><span class="c1">-- 年龄，默认18</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w">         </span><span class="c1">-- 创建时间，默认当前时间</span>
+<span class="p">);</span>
+
+<span class="c1">-- 创建商品表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 主键，自增</span>
+<span class="w">    </span><span class="n">name</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">           </span><span class="c1">-- 商品名称</span>
+<span class="w">    </span><span class="n">price</span><span class="w">    </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">         </span><span class="c1">-- 价格，2位小数</span>
+<span class="w">    </span><span class="n">stock</span><span class="w">    </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">                   </span><span class="c1">-- 库存，默认0</span>
+<span class="w">    </span><span class="n">category</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w">                      </span><span class="c1">-- 分类</span>
+<span class="p">);</span>
+
+<span class="c1">-- 创建订单表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">         </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w"> </span><span class="c1">-- 订单主键</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">    </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">                   </span><span class="c1">-- 用户ID（外键）</span>
+<span class="w">    </span><span class="n">product_id</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">                   </span><span class="c1">-- 商品ID（外键）</span>
+<span class="w">    </span><span class="n">quantity</span><span class="w">   </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">         </span><span class="c1">-- 购买数量</span>
+<span class="w">    </span><span class="n">total</span><span class="w">      </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w">                 </span><span class="c1">-- 订单总价</span>
+<span class="w">    </span><span class="n">status</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'pending'</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 订单状态</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span><span class="w">         </span><span class="c1">-- 下单时间</span>
+<span class="w">    </span><span class="k">FOREIGN</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span><span class="w">       </span><span class="c1">-- 外键约束</span>
+<span class="w">    </span><span class="k">FOREIGN</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">product_id</span><span class="p">)</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">products</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 外键约束</span>
+<span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-2">三、INSERT：插入数据</h2>
+<h3 id="section-3">3.1 单行插入</h3>
+<h4 id="section-4">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 方式一：指定列名（推荐！列名和值对应）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="p">(</span><span class="err">列</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+
+<span class="c1">-- 方式二：不指定列名（必须给所有列赋值，包括AUTO_INCREMENT列写0或NULL）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+</pre></div>
+</div><h4 id="section-5">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：指定列名插入用户（推荐写法）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'张三'</span><span class="p">,</span><span class="w"> </span><span class="s1">'zhangsan@example.com'</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">);</span>
+<span class="c1">-- id 和 created_at 会自动填充（AUTO_INCREMENT 和 DEFAULT）</span>
+
+<span class="c1">-- 示例2：不指定列名（必须按照表结构顺序填写所有列）</span>
+<span class="c1">-- id 写 NULL 让它自增，created_at 写 NOW() 获取当前时间</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="s1">'李四'</span><span class="p">,</span><span class="w"> </span><span class="s1">'lisi@example.com'</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">());</span>
+
+<span class="c1">-- 示例3：插入商品</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">price</span><span class="p">,</span><span class="w"> </span><span class="n">stock</span><span class="p">,</span><span class="w"> </span><span class="n">category</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'苹果手机'</span><span class="p">,</span><span class="w"> </span><span class="mi">6999</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">);</span>
+
+<span class="c1">-- 示例4：只插入必填列，其他用默认值</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">price</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'华为手机'</span><span class="p">,</span><span class="w"> </span><span class="mi">5999</span><span class="p">.</span><span class="mi">00</span><span class="p">);</span>
+<span class="c1">-- stock 会用默认值 0，category 为 NULL</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-6">3.2 多行插入</h3>
+<blockquote>
+<p>一条 SQL 插入多行，比多条 SQL 执行效率更高</p>
+</blockquote>
+<h4 id="section-7">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="p">(</span><span class="err">列</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="w">    </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...),</span><span class="w">  </span><span class="c1">-- 第1行</span>
+<span class="w">    </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...),</span><span class="w">  </span><span class="c1">-- 第2行</span>
+<span class="w">    </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span><span class="w">  </span><span class="c1">-- 第3行（末尾是分号）</span>
+</pre></div>
+</div><h4 id="section-8">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 一次插入多个用户</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'王五'</span><span class="p">,</span><span class="w">   </span><span class="s1">'wangwu@example.com'</span><span class="p">,</span><span class="w">   </span><span class="mi">28</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 第1行</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'赵六'</span><span class="p">,</span><span class="w">   </span><span class="s1">'zhaoliu@example.com'</span><span class="p">,</span><span class="w">  </span><span class="mi">22</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 第2行</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'孙七'</span><span class="p">,</span><span class="w">   </span><span class="s1">'sunqi@example.com'</span><span class="p">,</span><span class="w">    </span><span class="mi">35</span><span class="p">),</span><span class="w">    </span><span class="c1">-- 第3行</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'周八'</span><span class="p">,</span><span class="w">   </span><span class="s1">'zhouba@example.com'</span><span class="p">,</span><span class="w">   </span><span class="mi">19</span><span class="p">);</span><span class="w">    </span><span class="c1">-- 第4行</span>
+
+<span class="c1">-- 一次插入多个商品</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">price</span><span class="p">,</span><span class="w"> </span><span class="n">stock</span><span class="p">,</span><span class="w"> </span><span class="n">category</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'小米手机'</span><span class="p">,</span><span class="w">   </span><span class="mi">2999</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'iPad'</span><span class="p">,</span><span class="w">       </span><span class="mi">4999</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="s1">'平板'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'MacBook'</span><span class="p">,</span><span class="w">   </span><span class="mi">12999</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w">  </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="s1">'电脑'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'AirPods'</span><span class="p">,</span><span class="w">    </span><span class="mi">1299</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="s1">'耳机'</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-9">3.3 子查询插入（INSERT INTO ... SELECT）</h3>
+<blockquote>
+<p>把一张表的查询结果，插入到另一张表中</p>
+</blockquote>
+<h4 id="section-10">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="err">目标表</span><span class="w"> </span><span class="p">(</span><span class="err">列</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="err">列</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...</span>
+<span class="k">FROM</span><span class="w"> </span><span class="err">来源表</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="p">;</span>
+</pre></div>
+</div><h4 id="section-11">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景：把用户表中年龄大于30的用户复制到 vip_users 表</span>
+<span class="c1">-- 假设 vip_users 表已经存在，结构与 users 相同</span>
+
+<span class="c1">-- 先创建 vip_users 表（结构参考 users）</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">vip_users</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 复制表结构</span>
+
+<span class="c1">-- 把 users 中 age &gt; 30 的用户插入到 vip_users</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">vip_users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="w">    </span><span class="c1">-- 从 users 表查询这三列</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w">                 </span><span class="c1">-- 来源表</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span><span class="w">            </span><span class="c1">-- 只取年龄大于30的</span>
+
+<span class="c1">-- 结果：users 表中符合条件的记录被复制到了 vip_users</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-12">3.4 INSERT IGNORE：忽略重复错误</h3>
+<blockquote>
+<p>如果插入的数据违反了唯一约束（UNIQUE），正常情况下会报错并终止
+加了 IGNORE 后，会<strong>静默跳过</strong>冲突的行，继续插入其他行</p>
+</blockquote>
+<h4 id="section-13">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">IGNORE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="p">(</span><span class="err">列</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div><h4 id="section-14">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景：users 表中 email 有唯一约束</span>
+<span class="c1">-- 假设 zhangsan@example.com 已经存在</span>
+
+<span class="c1">-- 不加 IGNORE：会报错 Duplicate entry，整个插入失败</span>
+<span class="c1">-- INSERT INTO users (name, email) VALUES ('张三2', 'zhangsan@example.com');</span>
+<span class="c1">-- ERROR 1062 (23000): Duplicate entry 'zhangsan@example.com' for key 'email'</span>
+
+<span class="c1">-- 加了 IGNORE：冲突行被跳过，不报错，其他行正常插入</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">IGNORE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'张三2'</span><span class="p">,</span><span class="w"> </span><span class="s1">'zhangsan@example.com'</span><span class="p">,</span><span class="w"> </span><span class="mi">26</span><span class="p">),</span><span class="w">  </span><span class="c1">-- 邮箱重复，被跳过</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'新用户'</span><span class="p">,</span><span class="w"> </span><span class="s1">'newuser@example.com'</span><span class="p">,</span><span class="w">  </span><span class="mi">20</span><span class="p">);</span><span class="w"> </span><span class="c1">-- 正常插入</span>
+
+<span class="c1">-- 执行结果：只有"新用户"被插入，"张三2"被忽略（Query OK, 1 row affected）</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-15">3.5 INSERT INTO ... ON DUPLICATE KEY UPDATE</h3>
+<blockquote>
+<p>核心逻辑：<strong>有则更新，无则插入</strong>（Upsert 操作）
+当插入的数据触发了<strong>唯一键或主键</strong>冲突时，不报错，改为执行 UPDATE</p>
+</blockquote>
+<h4 id="section-16">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="p">(</span><span class="err">列</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span>
+<span class="w">    </span><span class="err">列</span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">新值</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="err">列</span><span class="mi">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">新值</span><span class="mi">2</span><span class="p">;</span>
+</pre></div>
+</div><h4 id="section-17">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景：用户登录系统，记录每个用户的登录次数和最后登录时间</span>
+<span class="c1">-- 创建登录记录表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">user_login_log</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">    </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span><span class="w">          </span><span class="c1">-- 用户ID（主键，唯一）</span>
+<span class="w">    </span><span class="n">login_count</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">           </span><span class="c1">-- 登录次数</span>
+<span class="w">    </span><span class="n">last_login</span><span class="w">  </span><span class="n">DATETIME</span><span class="w">                 </span><span class="c1">-- 最后登录时间</span>
+<span class="p">);</span>
+
+<span class="c1">-- 第一次插入用户1的登录记录（表中没有，执行 INSERT）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">user_login_log</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">login_count</span><span class="p">,</span><span class="w"> </span><span class="n">last_login</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">())</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span>
+<span class="w">    </span><span class="n">login_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">login_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 登录次数 +1</span>
+<span class="w">    </span><span class="n">last_login</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">NOW</span><span class="p">();</span><span class="w">            </span><span class="c1">-- 更新最后登录时间</span>
+
+<span class="c1">-- 第二次同样执行这条SQL（user_id=1 已存在，执行 UPDATE）</span>
+<span class="c1">-- 结果：login_count 变成 2，last_login 更新为当前时间</span>
+
+<span class="c1">-- 使用 VALUES() 函数引用要插入的值（MySQL 8.0.20+ 推荐用别名方式）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">price</span><span class="p">,</span><span class="w"> </span><span class="n">stock</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">'苹果手机'</span><span class="p">,</span><span class="w"> </span><span class="mi">6999</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">150</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 假设 id=1 已存在</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span>
+<span class="w">    </span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="n">stock</span><span class="p">),</span><span class="w">    </span><span class="c1">-- stock 更新为插入语句中指定的 150</span>
+<span class="w">    </span><span class="n">price</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="n">price</span><span class="p">);</span><span class="w">    </span><span class="c1">-- price 也更新</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-18">四、UPDATE：更新数据</h2>
+<h3 id="section-19">4.1 单表更新</h3>
+<h4 id="section-20">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">UPDATE</span><span class="w"> </span><span class="err">表名</span>
+<span class="k">SET</span><span class="w"> </span><span class="err">列</span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">值</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列</span><span class="mi">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">值</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="p">;</span><span class="w">         </span><span class="c1">-- ⚠️ 强烈建议加 WHERE！不加会更新所有行！</span>
+</pre></div>
+</div><h4 id="section-21">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：更新单个字段（把 id=1 的用户年龄改为 26）</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">26</span><span class="w">          </span><span class="c1">-- 修改 age 字段</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">         </span><span class="c1">-- 只更新 id=1 的行</span>
+
+<span class="c1">-- 示例2：同时更新多个字段</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">age</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">                        </span><span class="c1">-- 修改年龄</span>
+<span class="w">    </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'newemail@example.com'</span><span class="w">     </span><span class="c1">-- 修改邮箱</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                          </span><span class="c1">-- 条件：id=1</span>
+
+<span class="c1">-- 示例3：用当前值计算新值（商品降价10%）</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">9</span><span class="w">    </span><span class="c1">-- 新价格 = 旧价格 × 0.9（打9折）</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 只更新手机类商品</span>
+
+<span class="c1">-- 示例4：更新库存（进货了，库存增加）</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">50</span><span class="w">    </span><span class="c1">-- 库存增加50</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">             </span><span class="c1">-- 只更新 id=1 的商品</span>
+
+<span class="c1">-- 示例5：批量更新所有手机的分类名称</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'smartphone'</span><span class="w">    </span><span class="c1">-- 把"手机"改为"smartphone"</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">;</span>
+
+<span class="c1">-- ⚠️ 危险！不加 WHERE 会更新所有行</span>
+<span class="c1">-- UPDATE products SET price = 0;  -- 所有商品价格变成0！千万别这样！</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-22">4.2 UPDATE JOIN：多表联合更新</h3>
+<blockquote>
+<p>根据一张表的数据，更新另一张表（需要两表有关联关系）</p>
+</blockquote>
+<h4 id="section-23">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">UPDATE</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="p">.</span><span class="err">关联列</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="p">.</span><span class="err">关联列</span>
+<span class="k">SET</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="p">.</span><span class="err">列</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">新值</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="p">;</span>
+</pre></div>
+</div><h4 id="section-24">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景1：把 VIP 用户（vip_users 表中的用户）的年龄全部+1</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u</span><span class="w">                          </span><span class="c1">-- u 是 users 的别名</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">vip_users</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">id</span><span class="w">        </span><span class="c1">-- 关联条件：两表 id 相同</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                 </span><span class="c1">-- 更新 users 表的 age</span>
+
+<span class="c1">-- 场景2：根据订单信息更新商品库存（下单后减库存）</span>
+<span class="c1">-- orders 表中 status='completed' 的订单，减去对应商品的 quantity</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="n">p</span><span class="w">                                 </span><span class="c1">-- p 是 products 别名</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">product_id</span><span class="w">             </span><span class="c1">-- 关联商品ID</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">stock</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">quantity</span><span class="w">               </span><span class="c1">-- 库存减去订单数量</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'completed'</span><span class="p">;</span><span class="w">                    </span><span class="c1">-- 只处理已完成的订单</span>
+
+<span class="c1">-- 场景3：LEFT JOIN（无论右表是否有匹配都更新左表）</span>
+<span class="c1">-- 把没有下过订单的用户的 age 重置为 0（示例，实际不这样用）</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">user_id</span><span class="w">    </span><span class="c1">-- 左连接</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">    </span><span class="c1">-- o.id 为 NULL 表示该用户没有订单</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-25">五、DELETE：删除数据</h2>
+<h3 id="section-26">5.1 单表删除</h3>
+<h4 id="section-27">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="err">表名</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="p">;</span><span class="w">    </span><span class="c1">-- ⚠️ 强烈建议加 WHERE！不加会删除所有行！</span>
+</pre></div>
+</div><h4 id="section-28">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：删除指定 id 的用户</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 删除 id=1 的用户</span>
+
+<span class="c1">-- 示例2：删除满足条件的多行（删除年龄小于18的用户）</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">18</span><span class="p">;</span>
+
+<span class="c1">-- 示例3：删除指定范围（删除 id 在 10到20 之间的记录）</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 删除 id 10~20 的记录</span>
+
+<span class="c1">-- 示例4：删除库存为0的商品</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">products</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 删除没有库存的商品</span>
+
+<span class="c1">-- 示例5：配合 LIMIT 限制删除行数（安全删除，防止误删太多）</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">60</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 最多删除10行，避免误删大量数据</span>
+
+<span class="c1">-- ⚠️ 危险！删除全部数据</span>
+<span class="c1">-- DELETE FROM users;  -- 会删掉所有用户，慎用！</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-29">5.2 DELETE JOIN：多表联合删除</h3>
+<blockquote>
+<p>同时从多张表删除数据（表间有关联关系）</p>
+</blockquote>
+<h4 id="section-30">语法格式</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 只删除表1</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="p">.</span><span class="err">关联列</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="p">.</span><span class="err">关联列</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="p">;</span>
+
+<span class="c1">-- 同时删除表1和表2中的数据</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="err">表</span><span class="mi">1</span><span class="p">.</span><span class="err">关联列</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">表</span><span class="mi">2</span><span class="p">.</span><span class="err">关联列</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="p">;</span>
+</pre></div>
+</div><h4 id="section-31">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景1：删除指定用户及其所有订单（同时删两张表）</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">o</span><span class="w">          </span><span class="c1">-- 要删除的表：u（users）和 o（orders）</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u</span><span class="w">                              </span><span class="c1">-- 主表（带别名）</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">user_id</span><span class="w">        </span><span class="c1">-- 关联订单表</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">                          </span><span class="c1">-- 删除 id=5 的用户及其订单</span>
+
+<span class="c1">-- 场景2：只删除孤立的订单（商品已经被删除的订单）</span>
+<span class="c1">-- 商品不存在了，但订单还在，清理这些脏数据</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="n">o</span><span class="w">               </span><span class="c1">-- 只删除 orders 表数据</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="n">o</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">product_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id</span><span class="w">    </span><span class="c1">-- 左连接商品表</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">                            </span><span class="c1">-- 商品不存在（左连接结果为NULL）</span>
+
+<span class="c1">-- 场景3：删除重复数据（保留最小 id，删除其他重复 email）</span>
+<span class="c1">-- 注意：这里用自连接，MySQL 中 DELETE 不能直接对被删表做子查询</span>
+<span class="c1">-- 需要用临时表方式处理（进阶用法）</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="n">u1</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u1</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u2</span><span class="w">                             </span><span class="c1">-- 自连接</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">u1</span><span class="p">.</span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u2</span><span class="p">.</span><span class="n">email</span><span class="w">                   </span><span class="c1">-- 相同邮箱</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">u1</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">u2</span><span class="p">.</span><span class="n">id</span><span class="p">;</span><span class="w">                       </span><span class="c1">-- 保留 id 小的，删除 id 大的</span>
+</pre></div>
+</div><hr/>
+<h3 id="section-32">5.3 TRUNCATE vs DELETE</h3>
+<h4 id="section-33">核心区别对比表</h4>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>DELETE</th>
+<th>TRUNCATE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>语法</strong></td>
+<td><code>DELETE FROM 表名 WHERE 条件</code></td>
+<td><code>TRUNCATE TABLE 表名</code></td>
+</tr>
+<tr>
+<td><strong>能加 WHERE</strong></td>
+<td>✅ 可以加条件，精准删除</td>
+<td>❌ 不能加条件，全表清空</td>
+</tr>
+<tr>
+<td><strong>事务</strong></td>
+<td>✅ 支持事务，可回滚（ROLLBACK）</td>
+<td>❌ 不支持事务，无法回滚</td>
+</tr>
+<tr>
+<td><strong>触发器</strong></td>
+<td>✅ 会触发 DELETE 触发器</td>
+<td>❌ 不触发触发器</td>
+</tr>
+<tr>
+<td><strong>自增重置</strong></td>
+<td>❌ 不重置 AUTO_INCREMENT</td>
+<td>✅ 重置 AUTO_INCREMENT 为 1</td>
+</tr>
+<tr>
+<td><strong>执行速度</strong></td>
+<td>较慢（逐行删除，记录日志）</td>
+<td>极快（直接重建表）</td>
+</tr>
+<tr>
+<td><strong>返回行数</strong></td>
+<td>返回实际删除的行数</td>
+<td>返回 0（不统计行数）</td>
+</tr>
+<tr>
+<td><strong>外键约束</strong></td>
+<td>受外键约束限制</td>
+<td>有外键时不能执行</td>
+</tr>
+<tr>
+<td><strong>DDL/DML</strong></td>
+<td>DML（数据操作语言）</td>
+<td>DDL（数据定义语言）</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="section-34">完整示例</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- DELETE 示例</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">           </span><span class="c1">-- 删除所有行，AUTO_INCREMENT 不重置</span>
+<span class="c1">-- 假设之前 id 到了 100，下次插入的 id 还是 101</span>
+
+<span class="c1">-- TRUNCATE 示例</span>
+<span class="k">TRUNCATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="p">;</span><span class="w">        </span><span class="c1">-- 清空所有行，AUTO_INCREMENT 重置为 1</span>
+<span class="c1">-- 下次插入的 id 从 1 开始</span>
+
+<span class="c1">-- 验证区别（可自己测试）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'测试'</span><span class="p">,</span><span class="w"> </span><span class="s1">'test@test.com'</span><span class="p">);</span>
+<span class="c1">-- DELETE 后插入，id 可能是 101</span>
+<span class="c1">-- TRUNCATE 后插入，id 一定是 1</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-35">六、常见报错及解决方法</h2>
+<h3 id="section-36">6.1 Data truncated for column</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1265 (01000): Data truncated for column 'age' at row 1
+</pre></div>
+</div><p><strong>原因</strong>：插入的数据超出了列的范围或类型不匹配</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误示例（age 是 INT，但插入了字符串）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'张三'</span><span class="p">,</span><span class="w"> </span><span class="s1">'abc'</span><span class="p">);</span><span class="w">  </span><span class="c1">-- age 不能是字符串</span>
+
+<span class="c1">-- 错误示例（age 是 INT，但插入了浮点数——会被截断）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'张三'</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">.</span><span class="mi">9</span><span class="p">);</span><span class="w">   </span><span class="c1">-- 25.9 被截断为 25</span>
+
+<span class="c1">-- 解决：确保数据类型正确</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'张三'</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">);</span><span class="w">     </span><span class="c1">-- 正确</span>
+</pre></div>
+</div><h3 id="section-37">6.2 Cannot add or update a child row: a foreign key constraint fails</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails
+(`mydb`.`orders`, CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`))
+</pre></div>
+</div><p><strong>原因</strong>：插入订单时，<code>user_id</code> 在 <code>users</code> 表中不存在（外键约束）</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误示例（users 表中没有 id=999 的用户）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">product_id</span><span class="p">,</span><span class="w"> </span><span class="n">quantity</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">999</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">.</span><span class="mi">00</span><span class="p">);</span><span class="w">    </span><span class="c1">-- user_id=999 不存在，报错</span>
+
+<span class="c1">-- 解决方法1：先确认用户存在</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">999</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 先查一下</span>
+
+<span class="c1">-- 解决方法2：先插入用户，再插入订单</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'新用户'</span><span class="p">,</span><span class="w"> </span><span class="s1">'new@test.com'</span><span class="p">);</span>
+<span class="k">SET</span><span class="w"> </span><span class="o">@</span><span class="n">new_user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LAST_INSERT_ID</span><span class="p">();</span><span class="w">    </span><span class="c1">-- 获取刚插入的用户ID</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">product_id</span><span class="p">,</span><span class="w"> </span><span class="n">quantity</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="o">@</span><span class="n">new_user_id</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">.</span><span class="mi">00</span><span class="p">);</span><span class="w">   </span><span class="c1">-- 用真实存在的 user_id</span>
+
+<span class="c1">-- 解决方法3（临时方案，不推荐用于生产）：关闭外键检查</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">FOREIGN_KEY_CHECKS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 关闭外键检查</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">...;</span><span class="w">         </span><span class="c1">-- 执行插入</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">FOREIGN_KEY_CHECKS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 重新开启外键检查</span>
+</pre></div>
+</div><h3 id="section-38">6.3 Duplicate entry for key</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1062 (23000): Duplicate entry 'zhangsan@example.com' for key 'email'
+</pre></div>
+</div><p><strong>原因</strong>：违反了唯一约束（UNIQUE KEY）</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 解决方法1：使用 INSERT IGNORE（静默跳过）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">IGNORE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'张三2'</span><span class="p">,</span><span class="w"> </span><span class="s1">'zhangsan@example.com'</span><span class="p">);</span>
+
+<span class="c1">-- 解决方法2：使用 ON DUPLICATE KEY UPDATE（冲突时更新）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'张三2'</span><span class="p">,</span><span class="w"> </span><span class="s1">'zhangsan@example.com'</span><span class="p">,</span><span class="w"> </span><span class="mi">26</span><span class="p">)</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 邮箱冲突时，只更新年龄</span>
+
+<span class="c1">-- 解决方法3：先查后插（代码层判断）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'zhangsan@example.com'</span><span class="p">;</span>
+<span class="c1">-- 如果有结果，说明存在，不再插入</span>
+</pre></div>
+</div><h3 id="section-39">6.4 You are using safe update mode</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1175 (HY000): You are using safe update mode and you tried to update a table
+without a WHERE that uses a KEY column
+</pre></div>
+</div><p><strong>原因</strong>：MySQL 安全更新模式下，不允许没有主键条件的 UPDATE/DELETE</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 临时关闭安全模式（当前会话有效）</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">SQL_SAFE_UPDATES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">-- 执行你的更新</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">9</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">;</span>
+
+<span class="c1">-- 重新开启（建议用完立即恢复）</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">SQL_SAFE_UPDATES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-40">6.5 Column cannot be null</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1048 (23000): Column 'name' cannot be null
+</pre></div>
+</div><p><strong>原因</strong>：向 <code>NOT NULL</code> 的列插入了 NULL 值</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="s1">'test@test.com'</span><span class="p">);</span><span class="w">   </span><span class="c1">-- name 是 NOT NULL</span>
+
+<span class="c1">-- 解决：给 name 赋值</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'默认名称'</span><span class="p">,</span><span class="w"> </span><span class="s1">'test@test.com'</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-41">七、面试常问：DELETE vs TRUNCATE vs DROP</h2>
+<blockquote>
+<p>这是 MySQL 面试中最高频的考题之一，务必牢记！</p>
+</blockquote>
+<h3 id="section-42">完整对比</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>DELETE</th>
+<th>TRUNCATE</th>
+<th>DROP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>属于</strong></td>
+<td>DML</td>
+<td>DDL</td>
+<td>DDL</td>
+</tr>
+<tr>
+<td><strong>作用对象</strong></td>
+<td>数据行</td>
+<td>数据行（全部）</td>
+<td>整张表（含结构）</td>
+</tr>
+<tr>
+<td><strong>能加 WHERE</strong></td>
+<td>✅ 能</td>
+<td>❌ 不能</td>
+<td>❌ 不能</td>
+</tr>
+<tr>
+<td><strong>事务/回滚</strong></td>
+<td>✅ 支持</td>
+<td>❌ 不支持</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td><strong>触发器</strong></td>
+<td>✅ 触发</td>
+<td>❌ 不触发</td>
+<td>❌ 不触发</td>
+</tr>
+<tr>
+<td><strong>自增重置</strong></td>
+<td>❌ 不重置</td>
+<td>✅ 重置为1</td>
+<td>表没了</td>
+</tr>
+<tr>
+<td><strong>速度</strong></td>
+<td>慢</td>
+<td>快</td>
+<td>最快</td>
+</tr>
+<tr>
+<td><strong>表结构</strong></td>
+<td>保留</td>
+<td>保留</td>
+<td>删除</td>
+</tr>
+<tr>
+<td><strong>回收空间</strong></td>
+<td>否（需 OPTIMIZE）</td>
+<td>是</td>
+<td>是</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-43">一句话总结</h3>
+<ul>
+<li><strong>DELETE</strong>：精准删除，可回滚，可加 WHERE 条件，适合删除<strong>部分数据</strong></li>
+<li><strong>TRUNCATE</strong>：清空表数据，不可回滚，自增重置，适合<strong>清空整张表</strong>（保留结构）</li>
+<li><strong>DROP</strong>：彻底删除表（结构+数据），不可恢复，适合<strong>删除整张表</strong></li>
+</ul>
+<h3 id="section-44">记忆口诀</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>DELETE：外科手术刀（精准切除，可撤销）
+TRUNCATE：格式化硬盘（清空数据，保留表）
+DROP：炸掉整栋楼（表都没了）
+</pre></div>
+</div><hr/>
+<h2 id="section-45">八、DML 操作安全规范</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ✅ 好习惯1：UPDATE/DELETE 前先 SELECT 确认影响范围</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">18</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 先看看有多少行会被影响</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">18</span><span class="p">;</span><span class="w">      </span><span class="c1">-- 确认无误后再删除</span>
+
+<span class="c1">-- ✅ 好习惯2：使用事务包裹重要操作，出错可回滚</span>
+<span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span><span class="w">                     </span><span class="c1">-- 开启事务</span>
+
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">9</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">;</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'cancelled'</span><span class="p">;</span>
+
+<span class="c1">-- 确认结果正确</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'手机'</span><span class="p">;</span>
+
+<span class="k">COMMIT</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 确认无误，提交事务</span>
+<span class="c1">-- ROLLBACK;  -- 如果有问题，回滚，恢复数据</span>
+
+<span class="c1">-- ✅ 好习惯3：LIMIT 限制批量删除的数量</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">logs</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="s1">'2024-01-01'</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 分批删除</span>
+
+<span class="c1">-- ✅ 好习惯4：UPDATE 时用精确的主键条件</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">26</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">         </span><span class="c1">-- 精准（用主键）</span>
+<span class="c1">-- 而不是 WHERE name = '张三'（name 可能重复）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-46">九、本章小结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>关键语法</th>
+<th>注意事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>单行插入</strong></td>
+<td><code>INSERT INTO 表 (列) VALUES (值)</code></td>
+<td>推荐指定列名</td>
+</tr>
+<tr>
+<td><strong>多行插入</strong></td>
+<td><code>VALUES (v1),(v2),(v3)</code></td>
+<td>比多条SQL效率高</td>
+</tr>
+<tr>
+<td><strong>子查询插入</strong></td>
+<td><code>INSERT INTO ... SELECT ...</code></td>
+<td>列数和类型要匹配</td>
+</tr>
+<tr>
+<td><strong>忽略冲突</strong></td>
+<td><code>INSERT IGNORE</code></td>
+<td>冲突行被跳过</td>
+</tr>
+<tr>
+<td><strong>存在更新</strong></td>
+<td><code>ON DUPLICATE KEY UPDATE</code></td>
+<td>触发唯一键/主键冲突时</td>
+</tr>
+<tr>
+<td><strong>单表更新</strong></td>
+<td><code>UPDATE 表 SET 列=值 WHERE 条件</code></td>
+<td>一定要加WHERE！</td>
+</tr>
+<tr>
+<td><strong>多表更新</strong></td>
+<td><code>UPDATE t1 JOIN t2 ON ... SET ...</code></td>
+<td>需要有关联关系</td>
+</tr>
+<tr>
+<td><strong>单表删除</strong></td>
+<td><code>DELETE FROM 表 WHERE 条件</code></td>
+<td>一定要加WHERE！</td>
+</tr>
+<tr>
+<td><strong>多表删除</strong></td>
+<td><code>DELETE t1,t2 FROM t1 JOIN t2 ...</code></td>
+<td>指定要删除哪张表</td>
+</tr>
+<tr>
+<td><strong>清空表</strong></td>
+<td><code>TRUNCATE TABLE 表名</code></td>
+<td>不可回滚，自增重置</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>最重要的一条原则：UPDATE 和 DELETE 操作，永远先写 WHERE 条件，永远先用 SELECT 确认影响范围！</strong></p>
+</blockquote>
+<hr/>
+<p><em>笔记结束 | 下一章：04-DQL单表查询</em></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="9f88756ac2d869f3.html"><small>← 上一篇</small><strong>MySQL 02 · DDL 数据定义语言 ⭐⭐</strong></a><a href="808a58512cfb7c56.html"><small>下一篇 →</small><strong>MySQL DQL 单表查询完整详解</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架总览</a><a class="toc-h2" href="#section-1">二、环境准备：示例表结构</a><a class="toc-h2" href="#section-2">三、INSERT：插入数据</a><a class="toc-h3" href="#section-3">3.1 单行插入</a><a class="toc-h4" href="#section-4">语法格式</a><a class="toc-h4" href="#section-5">完整示例</a><a class="toc-h3" href="#section-6">3.2 多行插入</a><a class="toc-h4" href="#section-7">语法格式</a><a class="toc-h4" href="#section-8">完整示例</a><a class="toc-h3" href="#section-9">3.3 子查询插入（INSERT INTO ... SELECT）</a><a class="toc-h4" href="#section-10">语法格式</a><a class="toc-h4" href="#section-11">完整示例</a><a class="toc-h3" href="#section-12">3.4 INSERT IGNORE：忽略重复错误</a><a class="toc-h4" href="#section-13">语法格式</a><a class="toc-h4" href="#section-14">完整示例</a><a class="toc-h3" href="#section-15">3.5 INSERT INTO ... ON DUPLICATE KEY UPDATE</a><a class="toc-h4" href="#section-16">语法格式</a><a class="toc-h4" href="#section-17">完整示例</a><a class="toc-h2" href="#section-18">四、UPDATE：更新数据</a><a class="toc-h3" href="#section-19">4.1 单表更新</a><a class="toc-h4" href="#section-20">语法格式</a><a class="toc-h4" href="#section-21">完整示例</a><a class="toc-h3" href="#section-22">4.2 UPDATE JOIN：多表联合更新</a><a class="toc-h4" href="#section-23">语法格式</a><a class="toc-h4" href="#section-24">完整示例</a><a class="toc-h2" href="#section-25">五、DELETE：删除数据</a><a class="toc-h3" href="#section-26">5.1 单表删除</a><a class="toc-h4" href="#section-27">语法格式</a><a class="toc-h4" href="#section-28">完整示例</a><a class="toc-h3" href="#section-29">5.2 DELETE JOIN：多表联合删除</a><a class="toc-h4" href="#section-30">语法格式</a><a class="toc-h4" href="#section-31">完整示例</a><a class="toc-h3" href="#section-32">5.3 TRUNCATE vs DELETE</a><a class="toc-h4" href="#section-33">核心区别对比表</a><a class="toc-h4" href="#section-34">完整示例</a><a class="toc-h2" href="#section-35">六、常见报错及解决方法</a><a class="toc-h3" href="#section-36">6.1 Data truncated for column</a><a class="toc-h3" href="#section-37">6.2 Cannot add or update a child row: a foreign key constraint fails</a><a class="toc-h3" href="#section-38">6.3 Duplicate entry for key</a><a class="toc-h3" href="#section-39">6.4 You are using safe update mode</a><a class="toc-h3" href="#section-40">6.5 Column cannot be null</a><a class="toc-h2" href="#section-41">七、面试常问：DELETE vs TRUNCATE vs DROP</a><a class="toc-h3" href="#section-42">完整对比</a><a class="toc-h3" href="#section-43">一句话总结</a><a class="toc-h3" href="#section-44">记忆口诀</a><a class="toc-h2" href="#section-45">八、DML 操作安全规范</a><a class="toc-h2" href="#section-46">九、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

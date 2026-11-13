@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MybatisPlus · 保姆级详解 ⭐⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/fe15cbae96310829.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MybatisPlus详解</h2><nav aria-label="同专题笔记"><a aria-current="page" href="../fe15cbae96310829.html">MybatisPlus · 保姆级详解 ⭐⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MybatisPlus详解</div><h1>MybatisPlus · 保姆级详解 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中 | <strong>学习建议</strong>：2 天
+对应黑马 SpringCloud 微服务资料：day01-MybatisPlus
+<strong>项目导向</strong>：MyBatis-Plus 是 MyBatis 的增强版，做项目必用，能减少 80% 的 CRUD 代码</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、什么是 MybatisPlus</h2>
+<h3 id="section-1">1.1 MyBatis 的痛点</h3>
+<p>用 MyBatis 写每张表的 CRUD，要写大量重复 XML 或注解：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 每张表都要写这些方法！烦死了</span>
+<span class="n">insertUser</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">);</span>
+<span class="n">deleteUserById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="n">updateUser</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">);</span>
+<span class="n">selectUserById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="n">selectAll</span><span class="p">();</span>
+</pre></div>
+</div><h3 id="section-2">1.2 MybatisPlus 的解决</h3>
+<p><strong>只需继承 <code>BaseMapper&lt;T&gt;</code>，立刻拥有所有 CRUD 方法</strong>！</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 一行代码，18个现成方法</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">UserMapper</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BaseMapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 什么都不写，insert/delete/update/select 全有了</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>官方说法</strong>：MyBatis-Plus（简称 MP）是 MyBatis 的增强工具，在 MyBatis 基础上<strong>只做增强不做改变</strong>，为简化开发、提高效率而生。</p>
+<hr/>
+<h2 id="section-3">二、快速入门 ⭐⭐</h2>
+<h3 id="section-4">2.1 依赖</h3>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">&lt;!-- 添加 MybatisPlus 依赖（代替 mybatis-spring-boot-starter） --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.baomidou<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>mybatis-plus-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>3.5.3.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>mysql<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>mysql-connector-java<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>MybatisPlus 已包含 MyBatis</strong>，不需要再引入 mybatis-spring-boot-starter，否则版本冲突。</p>
+</blockquote>
+<h3 id="section-5">2.2 配置</h3>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">datasource</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jdbc:mysql://localhost:3306/mydb?useSSL=false&amp;serverTimezone=Asia/Shanghai</span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root1234</span>
+<span class="w">    </span><span class="nt">driver-class-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">com.mysql.cj.jdbc.Driver</span>
+
+<span class="nt">mybatis-plus</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">configuration</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">log-impl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">org.apache.ibatis.logging.stdout.StdOutImpl</span><span class="w">   </span><span class="c1"># 打印 SQL 日志（开发用）</span>
+<span class="w">  </span><span class="nt">global-config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">db-config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">id-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span><span class="w">          </span><span class="c1"># 主键策略：auto = 数据库自增</span>
+<span class="w">      </span><span class="nt">update-strategy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">not_null</span><span class="w">  </span><span class="c1"># 更新时只更新非 null 字段</span>
+</pre></div>
+</div><h3 id="section-6">2.3 实体类</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Data</span>
+<span class="nd">@TableName</span><span class="p">(</span><span class="s">"user"</span><span class="p">)</span><span class="w">  </span><span class="c1">// 对应的表名（类名与表名一致时可省略）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">User</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@TableId</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IdType</span><span class="p">.</span><span class="na">AUTO</span><span class="p">)</span><span class="w">  </span><span class="c1">// 主键，AUTO = 数据库自增</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@TableField</span><span class="p">(</span><span class="s">"nick_name"</span><span class="p">)</span><span class="w">   </span><span class="c1">// 字段名与属性名不一致时用</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">nickName</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@TableField</span><span class="p">(</span><span class="n">exist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w">  </span><span class="c1">// 该字段在数据库中不存在</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">tempField</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@TableLogic</span><span class="w">   </span><span class="c1">// 逻辑删除字段（软删除）</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">deleted</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-7">2.4 Mapper 接口</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 只需继承 BaseMapper，18 个 CRUD 方法全有了！</span>
+<span class="nd">@Mapper</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">UserMapper</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BaseMapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 自定义 SQL 仍然在这里写</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-8">2.5 使用</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@SpringBootTest</span>
+<span class="kd">class</span> <span class="nc">UserMapperTest</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Autowired</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">UserMapper</span><span class="w"> </span><span class="n">userMapper</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">testInsert</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">();</span>
+<span class="w">        </span><span class="n">user</span><span class="p">.</span><span class="na">setUsername</span><span class="p">(</span><span class="s">"Jack"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">user</span><span class="p">.</span><span class="na">setPassword</span><span class="p">(</span><span class="s">"123456"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">userMapper</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">user</span><span class="p">);</span><span class="w">         </span><span class="c1">// 自动设置 id</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"id = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="na">getId</span><span class="p">());</span><span class="w">   </span><span class="c1">// 拿到自增的 id</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">testSelectById</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userMapper</span><span class="p">.</span><span class="na">selectById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">testUpdate</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">();</span>
+<span class="w">        </span><span class="n">user</span><span class="p">.</span><span class="na">setId</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="w">        </span><span class="n">user</span><span class="p">.</span><span class="na">setPassword</span><span class="p">(</span><span class="s">"654321"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">userMapper</span><span class="p">.</span><span class="na">updateById</span><span class="p">(</span><span class="n">user</span><span class="p">);</span><span class="w">     </span><span class="c1">// 只更新非 null 字段</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">testDelete</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">userMapper</span><span class="p">.</span><span class="na">deleteById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">testSelectList</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userMapper</span><span class="p">.</span><span class="na">selectList</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span><span class="w">  </span><span class="c1">// null = 无条件，查全部</span>
+<span class="w">        </span><span class="n">users</span><span class="p">.</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-9">三、条件构造器（Wrapper）⭐⭐⭐</h2>
+<h3 id="section-10">3.1 什么是 Wrapper</h3>
+<p>用 Java 代码构建 SQL 的 WHERE 条件，不用写 SQL 字符串。</p>
+<h3 id="section-11">3.2 QueryWrapper（查询 / 删除）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 查询：name = 'Jack' AND age &gt;= 18</span>
+<span class="n">QueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">QueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">eq</span><span class="p">(</span><span class="s">"username"</span><span class="p">,</span><span class="w"> </span><span class="s">"Jack"</span><span class="p">)</span><span class="w">        </span><span class="c1">// username = 'Jack'</span>
+<span class="w">    </span><span class="p">.</span><span class="na">ge</span><span class="p">(</span><span class="s">"age"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">)</span><span class="w">                  </span><span class="c1">// age &gt;= 18</span>
+<span class="w">    </span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="s">"email"</span><span class="p">,</span><span class="w"> </span><span class="s">"@qq.com"</span><span class="p">)</span><span class="w">      </span><span class="c1">// email LIKE '%@qq.com%'</span>
+<span class="w">    </span><span class="p">.</span><span class="na">orderByDesc</span><span class="p">(</span><span class="s">"create_time"</span><span class="p">)</span><span class="w">    </span><span class="c1">// ORDER BY create_time DESC</span>
+<span class="w">    </span><span class="p">.</span><span class="na">last</span><span class="p">(</span><span class="s">"LIMIT 10"</span><span class="p">);</span><span class="w">              </span><span class="c1">// 拼接到 SQL 末尾</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userMapper</span><span class="p">.</span><span class="na">selectList</span><span class="p">(</span><span class="n">wrapper</span><span class="p">);</span>
+</pre></div>
+</div><p><strong>常用方法</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>SQL 含义</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eq("col", val)</code></td>
+<td>col = val</td>
+<td>精确匹配</td>
+</tr>
+<tr>
+<td><code>ne("col", val)</code></td>
+<td>col != val</td>
+<td>不等于</td>
+</tr>
+<tr>
+<td><code>gt/ge("col", val)</code></td>
+<td>col &gt; / &gt;= val</td>
+<td>大于/大于等于</td>
+</tr>
+<tr>
+<td><code>lt/le("col", val)</code></td>
+<td>col &lt; / &lt;= val</td>
+<td>小于/小于等于</td>
+</tr>
+<tr>
+<td><code>like("col", val)</code></td>
+<td>col LIKE %val%</td>
+<td>模糊匹配</td>
+</tr>
+<tr>
+<td><code>likeLeft/Right</code></td>
+<td>%val / val%</td>
+<td>左/右模糊</td>
+</tr>
+<tr>
+<td><code>between("col", a, b)</code></td>
+<td>col BETWEEN a AND b</td>
+<td>区间</td>
+</tr>
+<tr>
+<td><code>in("col", list)</code></td>
+<td>col IN (...)</td>
+<td>包含</td>
+</tr>
+<tr>
+<td><code>isNull/isNotNull</code></td>
+<td>col IS NULL / NOT NULL</td>
+<td>空值</td>
+</tr>
+<tr>
+<td><code>orderByAsc/Desc</code></td>
+<td>ORDER BY col ASC/DESC</td>
+<td>排序</td>
+</tr>
+<tr>
+<td><code>select("col1", "col2")</code></td>
+<td>SELECT col1, col2</td>
+<td>指定查询字段</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-12">3.3 UpdateWrapper（更新）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// UPDATE user SET status=0 WHERE (age &lt; 18)</span>
+<span class="n">UpdateWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UpdateWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="s">"status"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">              </span><span class="c1">// SET status = 0</span>
+<span class="w">    </span><span class="p">.</span><span class="na">lt</span><span class="p">(</span><span class="s">"age"</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span><span class="w">                </span><span class="c1">// WHERE age &lt; 18</span>
+
+<span class="n">userMapper</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">wrapper</span><span class="p">);</span><span class="w">  </span><span class="c1">// 第一个参数 null 表示不用实体类</span>
+</pre></div>
+</div><h3 id="section-13">3.4 LambdaQueryWrapper（推荐，避免写错字段名）⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 用 Lambda 引用字段，编译时检查，不怕写错字段名</span>
+<span class="n">LambdaQueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LambdaQueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">eq</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getUsername</span><span class="p">,</span><span class="w"> </span><span class="s">"Jack"</span><span class="p">)</span><span class="w">       </span><span class="c1">// username = 'Jack'</span>
+<span class="w">    </span><span class="p">.</span><span class="na">ge</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getAge</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">)</span><span class="w">               </span><span class="c1">// age &gt;= 18</span>
+<span class="w">    </span><span class="p">.</span><span class="na">like</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getEmail</span><span class="p">,</span><span class="w"> </span><span class="s">"@qq.com"</span><span class="p">)</span><span class="w">    </span><span class="c1">// email LIKE '%@qq.com%'</span>
+<span class="w">    </span><span class="p">.</span><span class="na">orderByDesc</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getCreateTime</span><span class="p">);</span><span class="w">  </span><span class="c1">// ORDER BY create_time DESC</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userMapper</span><span class="p">.</span><span class="na">selectList</span><span class="p">(</span><span class="n">wrapper</span><span class="p">);</span>
+</pre></div>
+</div><p><strong>条件构建（动态 SQL）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Jack"</span><span class="p">;</span><span class="w">      </span><span class="c1">// 可能是 null</span>
+<span class="n">Integer</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">         </span><span class="c1">// 条件不传，不加入 SQL</span>
+
+<span class="n">LambdaQueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LambdaQueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">// 第一个参数是 boolean：false 时不加这个条件</span>
+<span class="w">    </span><span class="p">.</span><span class="na">eq</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">User</span><span class="p">::</span><span class="n">getUsername</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">ge</span><span class="p">(</span><span class="n">age</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">User</span><span class="p">::</span><span class="n">getAge</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">四、IService 接口（Service 层）⭐⭐</h2>
+<h3 id="section-15">4.1 为什么用 IService</h3>
+<p>BaseMapper 只提供 Mapper 层操作，IService 在 Service 层封装了更多<strong>业务方法</strong>（批量操作等）。</p>
+<h3 id="section-16">4.2 实现步骤</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. Service 接口继承 IService</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">UserService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">IService</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 自定义方法</span>
+<span class="p">}</span>
+
+<span class="c1">// 2. Service 实现类继承 ServiceImpl</span>
+<span class="nd">@Service</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UserServiceImpl</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ServiceImpl</span><span class="o">&lt;</span><span class="n">UserMapper</span><span class="p">,</span><span class="w"> </span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">UserService</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 已有所有 CRUD，直接用</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-17">4.3 IService 常用方法</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 注入 Service</span>
+<span class="nd">@Autowired</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">UserService</span><span class="w"> </span><span class="n">userService</span><span class="p">;</span>
+
+<span class="c1">// =================== 增 ===================</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">save</span><span class="p">(</span><span class="n">user</span><span class="p">);</span><span class="w">                       </span><span class="c1">// 保存一个</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">saveBatch</span><span class="p">(</span><span class="n">list</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 批量保存（推荐用这个！）</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">saveOrUpdate</span><span class="p">(</span><span class="n">user</span><span class="p">);</span><span class="w">               </span><span class="c1">// 有 id 则更新，无则插入</span>
+
+<span class="c1">// =================== 删 ===================</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">removeById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">removeByIds</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="mi">2L</span><span class="p">,</span><span class="w"> </span><span class="mi">3L</span><span class="p">));</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">wrapper</span><span class="p">);</span><span class="w">                   </span><span class="c1">// 按条件删除</span>
+
+<span class="c1">// =================== 改 ===================</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">updateById</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">wrapper</span><span class="p">);</span>
+<span class="n">userService</span><span class="p">.</span><span class="na">lambdaUpdate</span><span class="p">().</span><span class="na">eq</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getId</span><span class="p">,</span><span class="w"> </span><span class="mi">1L</span><span class="p">).</span><span class="na">set</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getStatus</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">).</span><span class="na">update</span><span class="p">();</span>
+
+<span class="c1">// =================== 查 ===================</span>
+<span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">list</span><span class="p">();</span><span class="w">          </span><span class="c1">// 查全部</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">list</span><span class="p">(</span><span class="n">wrapper</span><span class="p">);</span><span class="w">   </span><span class="c1">// 按条件查</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">count</span><span class="p">();</span><span class="w">              </span><span class="c1">// 总数</span>
+
+<span class="c1">// =================== 分页 ===================</span>
+<span class="n">Page</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Page</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">           </span><span class="c1">// 第 1 页，每页 10 条</span>
+<span class="n">Page</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">page</span><span class="p">(</span><span class="n">page</span><span class="p">,</span><span class="w"> </span><span class="n">wrapper</span><span class="p">);</span>
+<span class="n">result</span><span class="p">.</span><span class="na">getRecords</span><span class="p">();</span><span class="w">     </span><span class="c1">// 当前页数据</span>
+<span class="n">result</span><span class="p">.</span><span class="na">getTotal</span><span class="p">();</span><span class="w">       </span><span class="c1">// 总条数</span>
+<span class="n">result</span><span class="p">.</span><span class="na">getPages</span><span class="p">();</span><span class="w">       </span><span class="c1">// 总页数</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-18">五、分页插件 ⭐⭐</h2>
+<h3 id="section-19">5.1 配置分页插件</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Configuration</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MybatisPlusConfig</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">MybatisPlusInterceptor</span><span class="w"> </span><span class="nf">mybatisPlusInterceptor</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">MybatisPlusInterceptor</span><span class="w"> </span><span class="n">interceptor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MybatisPlusInterceptor</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// 分页拦截器（指定数据库类型）</span>
+<span class="w">        </span><span class="n">interceptor</span><span class="p">.</span><span class="na">addInnerInterceptor</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">PaginationInnerInterceptor</span><span class="p">(</span><span class="n">DbType</span><span class="p">.</span><span class="na">MYSQL</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">interceptor</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-20">5.2 使用分页</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 创建分页对象（页码从 1 开始）</span>
+<span class="n">Page</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Page</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">pageNum</span><span class="p">,</span><span class="w"> </span><span class="n">pageSize</span><span class="p">);</span>
+
+<span class="c1">// 2. 执行分页查询</span>
+<span class="n">LambdaQueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LambdaQueryWrapper</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">eq</span><span class="p">(</span><span class="n">User</span><span class="p">::</span><span class="n">getStatus</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="n">Page</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userMapper</span><span class="p">.</span><span class="na">selectPage</span><span class="p">(</span><span class="n">page</span><span class="p">,</span><span class="w"> </span><span class="n">wrapper</span><span class="p">);</span>
+
+<span class="c1">// 3. 获取结果</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">records</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">getRecords</span><span class="p">();</span><span class="w">     </span><span class="c1">// 当前页数据列表</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">getTotal</span><span class="p">();</span><span class="w">              </span><span class="c1">// 总记录数</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">pages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">getPages</span><span class="p">();</span><span class="w">              </span><span class="c1">// 总页数</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">current</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">getCurrent</span><span class="p">();</span><span class="w">          </span><span class="c1">// 当前页码</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">getSize</span><span class="p">();</span><span class="w">                </span><span class="c1">// 每页大小</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">六、主键策略 ⭐</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@TableId</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IdType</span><span class="p">.</span><span class="na">AUTO</span><span class="p">)</span><span class="w">         </span><span class="c1">// 数据库自增（推荐，小项目）</span>
+<span class="nd">@TableId</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IdType</span><span class="p">.</span><span class="na">ASSIGN_ID</span><span class="p">)</span><span class="w">    </span><span class="c1">// 雪花算法（全局唯一，分布式用）</span>
+<span class="nd">@TableId</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IdType</span><span class="p">.</span><span class="na">ASSIGN_UUID</span><span class="p">)</span><span class="w">  </span><span class="c1">// UUID（字符串，不推荐）</span>
+<span class="nd">@TableId</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IdType</span><span class="p">.</span><span class="na">INPUT</span><span class="p">)</span><span class="w">        </span><span class="c1">// 手动输入</span>
+<span class="nd">@TableId</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IdType</span><span class="p">.</span><span class="na">NONE</span><span class="p">)</span><span class="w">         </span><span class="c1">// 不设置</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-22">七、逻辑删除（软删除）⭐⭐</h2>
+<p><strong>物理删除</strong>：真正从数据库删除记录（<code>DELETE</code>）。</p>
+<p><strong>逻辑删除</strong>：不删记录，只改一个标记字段（如 <code>deleted=1</code>），查询时自动过滤。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 实体类加注解</span>
+<span class="nd">@TableLogic</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">deleted</span><span class="p">;</span><span class="w">    </span><span class="c1">// 0=正常，1=删除</span>
+
+<span class="c1">// 配置（全局）</span>
+<span class="n">mybatis</span><span class="o">-</span><span class="n">plus</span><span class="p">:</span>
+<span class="w">  </span><span class="n">global</span><span class="o">-</span><span class="n">config</span><span class="p">:</span>
+<span class="w">    </span><span class="n">db</span><span class="o">-</span><span class="n">config</span><span class="p">:</span>
+<span class="w">      </span><span class="n">logic</span><span class="o">-</span><span class="n">delete</span><span class="o">-</span><span class="n">field</span><span class="p">:</span><span class="w"> </span><span class="n">deleted</span><span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="n">逻辑删除字段名</span>
+<span class="w">      </span><span class="n">logic</span><span class="o">-</span><span class="n">delete</span><span class="o">-</span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">          </span><span class="err">#</span><span class="w"> </span><span class="n">删除标记值</span>
+<span class="w">      </span><span class="n">logic</span><span class="o">-</span><span class="n">not</span><span class="o">-</span><span class="n">delete</span><span class="o">-</span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">      </span><span class="err">#</span><span class="w"> </span><span class="n">正常标记值</span>
+</pre></div>
+</div><p><strong>效果</strong>：</p>
+<ul>
+<li><code>deleteById(id)</code> 实际执行：<code>UPDATE user SET deleted=1 WHERE id=?</code></li>
+<li><code>selectById(id)</code> 实际执行：<code>SELECT ... WHERE id=? AND deleted=0</code></li>
+</ul>
+<hr/>
+<h2 id="section-23">八、常见报错</h2>
+<p><strong>报错 1：Property 'sqlSessionFactory' or 'sqlSessionTemplate' are required</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：MybatisPlus 和 MyBatis 同时引入，版本冲突
+解决：只保留 mybatis-plus-boot-starter，删除 mybatis-spring-boot-starter
+</pre></div>
+</div><p><strong>报错 2：Field 'id' doesn't have a default value</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：主键策略配置问题，AUTO_INCREMENT 没设好
+解决：确认数据库 id 字段是 AUTO_INCREMENT；或 @TableId(type = IdType.AUTO)
+</pre></div>
+</div><p><strong>报错 3：No property xxx found</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：实体类属性名与数据库字段名不一致且没有配置映射
+解决：加 @TableField("db_field_name") 注解
+</pre></div>
+</div><hr/>
+<h2 id="section-24">九、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>MybatisPlus 和 MyBatis 的区别？</strong>
+MybatisPlus 是 MyBatis 的增强版，提供了通用 CRUD（BaseMapper/IService）、条件构造器、分页插件等，减少重复代码。底层还是 MyBatis。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>LambdaQueryWrapper 和 QueryWrapper 的区别？</strong>
+LambdaQueryWrapper 用 Lambda 表达式（<code>User::getName</code>）引用字段，编译期检查，不怕写错字段名。QueryWrapper 用字符串写字段名，容易写错。推荐 LambdaQueryWrapper。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>逻辑删除的优缺点？</strong>
+优点：数据可追溯（不真删），方便数据恢复。
+缺点：查询都要带 <code>deleted=0</code> 条件，唯一索引会失效（需加 <code>deleted</code> 到唯一索引）。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>MP 分页和 PageHelper 的区别？</strong>
+MP 分页是拦截器方式，无侵入；PageHelper 是线程变量方式（<code>PageHelper.startPage()</code>），两者效果类似，SpringBoot 项目推荐 MP 自带分页。</p>
+</blockquote>
+<hr/>
+<h2 id="section-25">十、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>MybatisPlus 依赖配置</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>实体类注解</strong>（@TableName / @TableId / @TableField / @TableLogic）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>继承 BaseMapper / IService</strong></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>条件构造器</strong>（QueryWrapper / LambdaQueryWrapper）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>分页插件</strong> 配置与使用</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>主键策略（AUTO 自增 / ASSIGN_ID 雪花）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>逻辑删除</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>不要同时引入 mybatis 和 mybatis-plus 依赖</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>分页需要先配置分页插件</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>LambdaQueryWrapper 条件方法第一个参数是 boolean（动态条件）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>逻辑删除字段配置后 DELETE/SELECT 都会自动处理</li>
+</ul>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、什么是 MybatisPlus</a><a class="toc-h3" href="#section-1">1.1 MyBatis 的痛点</a><a class="toc-h3" href="#section-2">1.2 MybatisPlus 的解决</a><a class="toc-h2" href="#section-3">二、快速入门 ⭐⭐</a><a class="toc-h3" href="#section-4">2.1 依赖</a><a class="toc-h3" href="#section-5">2.2 配置</a><a class="toc-h3" href="#section-6">2.3 实体类</a><a class="toc-h3" href="#section-7">2.4 Mapper 接口</a><a class="toc-h3" href="#section-8">2.5 使用</a><a class="toc-h2" href="#section-9">三、条件构造器（Wrapper）⭐⭐⭐</a><a class="toc-h3" href="#section-10">3.1 什么是 Wrapper</a><a class="toc-h3" href="#section-11">3.2 QueryWrapper（查询 / 删除）</a><a class="toc-h3" href="#section-12">3.3 UpdateWrapper（更新）</a><a class="toc-h3" href="#section-13">3.4 LambdaQueryWrapper（推荐，避免写错字段名）⭐</a><a class="toc-h2" href="#section-14">四、IService 接口（Service 层）⭐⭐</a><a class="toc-h3" href="#section-15">4.1 为什么用 IService</a><a class="toc-h3" href="#section-16">4.2 实现步骤</a><a class="toc-h3" href="#section-17">4.3 IService 常用方法</a><a class="toc-h2" href="#section-18">五、分页插件 ⭐⭐</a><a class="toc-h3" href="#section-19">5.1 配置分页插件</a><a class="toc-h3" href="#section-20">5.2 使用分页</a><a class="toc-h2" href="#section-21">六、主键策略 ⭐</a><a class="toc-h2" href="#section-22">七、逻辑删除（软删除）⭐⭐</a><a class="toc-h2" href="#section-23">八、常见报错</a><a class="toc-h2" href="#section-24">九、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-25">十、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

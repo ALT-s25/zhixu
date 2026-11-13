@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Sentinel 服务保护 · 保姆级详解 ⭐⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/e4ebc0c1bd03f5db.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>微服务高级详解</h2><nav aria-label="同专题笔记"><a aria-current="page" href="../e4ebc0c1bd03f5db.html">Sentinel 服务保护 · 保姆级详解 ⭐⭐⭐</a><a href="6fef09bb3935840b.html">Seata 分布式事务 · 保姆级详解 ⭐⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>微服务高级详解</div><h1>Sentinel 服务保护 · 保姆级详解 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中高 | <strong>学习建议</strong>：2 天
+对应黑马 SpringCloud 资料：day05-服务保护和分布式事务
+<strong>项目导向</strong>：微服务生产环境必备，防止服务雪崩</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、为什么需要服务保护</h2>
+<h3 id="section-1">1.1 服务雪崩</h3>
+<p><strong>场景</strong>：微服务 A 调用 B，B 调用 C，C 因为某原因响应慢。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>用户 → A → B → C（慢！）
+              ↓
+     B 的线程全在等 C
+     B 的线程池耗尽
+     A 的请求也开始积压
+     A 的线程池耗尽
+              ↓
+       整个系统崩溃！
+</pre></div>
+</div><p>这就是<strong>服务雪崩</strong>：一个服务故障，导致整个调用链都崩了。</p>
+<h3 id="section-2">1.2 Sentinel 的三大保护措施</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>保护措施</th>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>流量控制（限流）</strong></td>
+<td>高并发</td>
+<td>超出阈值的请求直接拒绝</td>
+</tr>
+<tr>
+<td><strong>熔断降级</strong></td>
+<td>下游故障</td>
+<td>下游不可用时快速失败，不等待</td>
+</tr>
+<tr>
+<td><strong>系统自适应保护</strong></td>
+<td>整体负载</td>
+<td>根据 CPU/内存动态调整</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-3">二、Sentinel 快速入门</h2>
+<h3 id="section-4">2.1 引入依赖</h3>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">&lt;!-- 服务调用方（order-service 等）引入 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.alibaba.cloud<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-alibaba-sentinel<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><h3 id="section-5">2.2 配置连接 Sentinel 控制台</h3>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">cloud</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">sentinel</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">transport</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">dashboard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost:8080</span><span class="w">   </span><span class="c1"># Sentinel 控制台地址</span>
+<span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8719</span><span class="w">                   </span><span class="c1"># 本服务的 Sentinel 通信端口</span>
+</pre></div>
+</div><h3 id="section-6">2.3 启动 Sentinel 控制台</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 下载 sentinel-dashboard.jar</span>
+java<span class="w"> </span>-jar<span class="w"> </span>sentinel-dashboard-1.8.1.jar<span class="w"> </span>--server.port<span class="o">=</span><span class="m">8080</span>
+<span class="c1"># 访问：http://localhost:8080，用 sentinel/sentinel 登录</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-7">三、流量控制（限流）⭐⭐⭐</h2>
+<h3 id="section-8">3.1 资源定义</h3>
+<p>Sentinel 保护的对象叫"资源"，默认把每个 Controller 接口作为资源。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 方式一：注解（推荐）</span>
+<span class="nd">@SentinelResource</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"queryUser"</span><span class="p">,</span><span class="w">  </span><span class="c1">// 资源名</span>
+<span class="w">    </span><span class="n">blockHandler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"blockQueryUser"</span><span class="p">)</span><span class="w">     </span><span class="c1">// 被限流时调用的方法</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">User</span><span class="w"> </span><span class="nf">queryUser</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 被限流时的降级方法（参数要和原方法一致，最后多 BlockException）</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">User</span><span class="w"> </span><span class="nf">blockQueryUser</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">BlockException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">(</span><span class="o">-</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="s">"服务繁忙，请稍后重试"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 方式二：API</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Entry</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SphU</span><span class="p">.</span><span class="na">entry</span><span class="p">(</span><span class="s">"queryUser"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">BlockException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">(</span><span class="o">-</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="s">"限流了"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-9">3.2 控制台配置流控规则</h3>
+<p>在 Sentinel 控制台 → 簇点链路 → 选择资源 → 点击"流控"：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>资源名</td>
+<td>要保护的接口/方法</td>
+</tr>
+<tr>
+<td>阈值类型</td>
+<td>QPS（每秒请求数）/ 并发线程数</td>
+</tr>
+<tr>
+<td>单机阈值</td>
+<td>超过这个数量触发限流</td>
+</tr>
+<tr>
+<td>流控模式</td>
+<td>直接/关联/链路</td>
+</tr>
+<tr>
+<td>流控效果</td>
+<td>快速失败/Warm Up/排队等待</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>三种流控效果</strong>：</p>
+<ul>
+<li><strong>快速失败</strong>：超过阈值立即返回 <code>FlowException</code></li>
+<li><strong>Warm Up（预热）</strong>：初始只允许阈值/3，经过预热时间后达到阈值（防冷启动）</li>
+<li><strong>排队等待</strong>：超过阈值的请求排队等，适合削峰填谷</li>
+</ul>
+<hr/>
+<h2 id="section-10">四、熔断降级 ⭐⭐⭐</h2>
+<h3 id="section-11">4.1 熔断原理（断路器模式）</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>正常状态（Closed）
+    ↓ 失败率过高
+熔断状态（Open）：直接返回降级，不请求下游
+    ↓ 经过熔断时长
+半开状态（Half-Open）：放行一个请求试探
+    ↓ 试探成功
+正常状态（Closed）
+    ↓ 试探失败
+熔断状态（Open）（重新计时）
+</pre></div>
+</div><h3 id="section-12">4.2 控制台配置熔断规则</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>熔断策略</td>
+<td>慢调用比例 / 异常比例 / 异常数</td>
+</tr>
+<tr>
+<td>最小请求数</td>
+<td>统计窗口内的最小请求数</td>
+</tr>
+<tr>
+<td>统计时长</td>
+<td>时间窗口（单位毫秒）</td>
+</tr>
+<tr>
+<td>比例阈值</td>
+<td>超过这个比例触发熔断</td>
+</tr>
+<tr>
+<td>熔断时长</td>
+<td>熔断多久后进入半开状态</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>三种熔断策略</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>触发条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>慢调用比例</td>
+<td>慢响应（超过 RT）请求比例超过阈值</td>
+</tr>
+<tr>
+<td>异常比例</td>
+<td>异常请求比例超过阈值</td>
+</tr>
+<tr>
+<td>异常数</td>
+<td>异常请求数超过阈值</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-13">4.3 Feign 整合 Sentinel（熔断降级）⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">feign</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">sentinel</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">   </span><span class="c1"># 开启 Feign 对 Sentinel 的支持</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 1. 定义降级处理类</span>
+<span class="nd">@Component</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UserClientFallback</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">UserClient</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">User</span><span class="w"> </span><span class="nf">getUserById</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 下游不可用时的降级返回</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">User</span><span class="p">(</span><span class="o">-</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="s">"服务暂时不可用"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 2. 在 FeignClient 注解上指定降级类</span>
+<span class="nd">@FeignClient</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"user-service"</span><span class="p">,</span>
+<span class="w">             </span><span class="n">fallback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UserClientFallback</span><span class="p">.</span><span class="na">class</span><span class="p">)</span><span class="w">  </span><span class="c1">// 指定降级类</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">UserClient</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@GetMapping</span><span class="p">(</span><span class="s">"/user/{id}"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="nf">getUserById</span><span class="p">(</span><span class="nd">@PathVariable</span><span class="p">(</span><span class="s">"id"</span><span class="p">)</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">五、@SentinelResource 注解详解</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@SentinelResource</span><span class="p">(</span>
+<span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"queryHot"</span><span class="p">,</span><span class="w">                   </span><span class="c1">// 资源名</span>
+<span class="w">    </span><span class="n">blockHandler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"blockHandler"</span><span class="p">,</span><span class="w">         </span><span class="c1">// 限流/熔断处理方法</span>
+<span class="w">    </span><span class="n">blockHandlerClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MyHandler</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w">   </span><span class="c1">// 处理方法所在类（不在同一类时）</span>
+<span class="w">    </span><span class="n">fallback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"fallbackMethod"</span><span class="p">,</span><span class="w">           </span><span class="c1">// 业务异常时的降级方法</span>
+<span class="w">    </span><span class="n">exceptionsToIgnore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">NullPointerException</span><span class="p">.</span><span class="na">class</span><span class="p">}</span><span class="w">  </span><span class="c1">// 忽略某些异常，不降级</span>
+<span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">HotItem</span><span class="w"> </span><span class="nf">queryHot</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">itemId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">hotService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="n">itemId</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// blockHandler：只处理 BlockException（限流/熔断）</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">HotItem</span><span class="w"> </span><span class="nf">blockHandler</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">itemId</span><span class="p">,</span><span class="w"> </span><span class="n">BlockException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">HotItem</span><span class="p">.</span><span class="na">defaultItem</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// fallback：处理所有业务异常</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">HotItem</span><span class="w"> </span><span class="nf">fallbackMethod</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">itemId</span><span class="p">,</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">HotItem</span><span class="p">.</span><span class="na">defaultItem</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-15">六、热点规则 ⭐</h2>
+<p><strong>场景</strong>：某个参数值特别热（如商品 id=1 是爆款），限制这个参数值的访问频率。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@SentinelResource</span><span class="p">(</span><span class="s">"queryItem"</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Item</span><span class="w"> </span><span class="nf">queryItem</span><span class="p">(</span><span class="nd">@RequestParam</span><span class="p">(</span><span class="s">"itemId"</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">itemId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">itemService</span><span class="p">.</span><span class="na">getById</span><span class="p">(</span><span class="n">itemId</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>在控制台：热点规则 → 资源名 <code>queryItem</code> → 参数索引 0（第一个参数）→ 阈值 100 QPS</p>
+<p><strong>可以针对某个参数值设置例外</strong>：
+如 itemId=1 是 VIP 商品，允许 1000 QPS，其他参数值只允许 100 QPS。</p>
+<hr/>
+<h2 id="section-16">七、规则持久化 ⭐⭐</h2>
+<p><strong>问题</strong>：Sentinel 控制台配置的规则，服务重启后会丢失！</p>
+<p><strong>解决</strong>：把规则持久化到 Nacos 配置中心。</p>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.alibaba.csp<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>sentinel-datasource-nacos<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">spring</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">cloud</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">sentinel</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">datasource</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">flow</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">nacos</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">server-addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost:8848</span>
+<span class="w">            </span><span class="nt">dataId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${spring.application.name}-flow-rules</span>
+<span class="w">            </span><span class="nt">groupId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SENTINEL_GROUP</span>
+<span class="w">            </span><span class="nt">rule-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flow</span><span class="w">    </span><span class="c1"># 流控规则</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-17">八、常见报错</h2>
+<p><strong>报错 1：BlockException 未捕获，直接返回 500</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：没有配置 blockHandler
+解决：加 @SentinelResource(blockHandler="xxx") 或 全局异常处理
+</pre></div>
+</div><p><strong>报错 2：Sentinel 控制台看不到服务</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：服务没有发起过请求（懒加载）
+解决：先访问一次接口，或配置 eager: true
+</pre></div>
+</div><hr/>
+<h2 id="section-18">九、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>服务雪崩是什么？怎么解决？</strong>
+一个服务故障，导致调用链上所有服务都崩。用 Sentinel 限流+熔断解决。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>限流和熔断的区别？</strong></p>
+<ul>
+<li>限流：控制进来的流量（如每秒最多 100 个请求）</li>
+<li>熔断：检测下游是否正常，不正常就断开（不再调用下游）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>熔断的三种状态？</strong>
+Closed（正常）→ Open（熔断）→ Half-Open（半开）</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Sentinel 和 Hystrix 的区别？</strong>
+| 维度 | Sentinel | Hystrix |
+|------|---------|---------|
+| 控制台 | ✅ 有 | ❌ 无 |
+| 规则配置 | 动态（控制台/Nacos）| 静态代码 |
+| 熔断策略 | 慢调用/异常比例/数 | 仅异常比例 |
+| 维护状态 | ✅ 活跃 | ❌ 停止维护 |</p>
+</blockquote>
+<hr/>
+<h2 id="section-19">十、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>服务雪崩的原因和解决方案</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>流量控制</strong>（QPS/并发线程数，三种效果）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>熔断降级</strong>（三种策略，三种状态）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Feign 整合 Sentinel</strong>（fallback 降级）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>@SentinelResource 注解（blockHandler vs fallback）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>热点规则</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>规则持久化到 Nacos</li>
+</ul>
+<p>下一章：<a href="6fef09bb3935840b.html">02-Seata分布式事务.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="6fef09bb3935840b.html"><small>下一篇 →</small><strong>Seata 分布式事务 · 保姆级详解 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、为什么需要服务保护</a><a class="toc-h3" href="#section-1">1.1 服务雪崩</a><a class="toc-h3" href="#section-2">1.2 Sentinel 的三大保护措施</a><a class="toc-h2" href="#section-3">二、Sentinel 快速入门</a><a class="toc-h3" href="#section-4">2.1 引入依赖</a><a class="toc-h3" href="#section-5">2.2 配置连接 Sentinel 控制台</a><a class="toc-h3" href="#section-6">2.3 启动 Sentinel 控制台</a><a class="toc-h2" href="#section-7">三、流量控制（限流）⭐⭐⭐</a><a class="toc-h3" href="#section-8">3.1 资源定义</a><a class="toc-h3" href="#section-9">3.2 控制台配置流控规则</a><a class="toc-h2" href="#section-10">四、熔断降级 ⭐⭐⭐</a><a class="toc-h3" href="#section-11">4.1 熔断原理（断路器模式）</a><a class="toc-h3" href="#section-12">4.2 控制台配置熔断规则</a><a class="toc-h3" href="#section-13">4.3 Feign 整合 Sentinel（熔断降级）⭐⭐</a><a class="toc-h2" href="#section-14">五、@SentinelResource 注解详解</a><a class="toc-h2" href="#section-15">六、热点规则 ⭐</a><a class="toc-h2" href="#section-16">七、规则持久化 ⭐⭐</a><a class="toc-h2" href="#section-17">八、常见报错</a><a class="toc-h2" href="#section-18">九、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-19">十、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>第九章：网络编程、正则表达式与设计模式 · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/7559b20ccd712917.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>黑马JavaSE详解</h2><nav aria-label="同专题笔记"><a href="../c4d82d2ecbe7239d.html">黑马程序员 JavaSE 课堂笔记 · 保姆级详解</a><a href="../da696b5c15eec7b5.html">12. JavaSE 第一阶段实战项目：学生管理系统</a><a href="663d8dce41c9de31.html">Java入门与基础语法 · 保姆级详解</a><a href="627e1922662e46fd.html">02 · 流程控制（Scanner / if / switch / for / while）</a><a href="../b698d403e94b67c0.html">03 · 数组（一维数组 / 二维数组 / 内存图）</a><a href="68cd2bab6f503260.html">04 · 方法（定义 / 重载 / 参数传递 / 递归）</a><a href="0086a4e3d2151a0f.html">07 · 异常处理与常用API（异常体系 / Object / Math / Date / 包装类）</a><a href="../8cd2529e780dbff1.html">03 — 面向对象基础（类 · 对象 · 封装）</a><a href="093a6372f7f27376.html">05 · 面向对象基础（类与对象 / 封装 / 构造方法 / this / static）</a><a href="0173d6327acd426b.html">06 · 继承多态抽象类接口内部类（extends / super / override / 多态 / abstract / interface）</a><a aria-current="page" href="../7559b20ccd712917.html">第九章：网络编程、正则表达式与设计模式</a><a href="2a943d8b1e978d56.html">12 · JDK新特性（Lambda / 方法引用 / Stream流 / Optional / 新Date API）</a><a href="../b042d23174c3a83e.html">13 · 反射与注解（Class对象 / 获取构造方法字段方法 / 自定义注解）</a><a href="16dba041bd83aa9f.html">08 - IO流 保姆级详解笔记</a><a href="3cf636d3d26f8b64.html">09 · 多线程（Thread / Runnable / 线程状态 / synchronized / Lock / 线程池）</a><a href="../a5ef4afa16838c9d.html">10 · 集合框架（ArrayList / LinkedList / HashSet / TreeSet / HashMap / TreeMap）</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>黑马JavaSE详解</div><h1>第九章：网络编程、正则表达式与设计模式</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>本章对应原模块23，涵盖网络编程（UDP/TCP）、正则表达式校验、常用设计模式（模板方法/单例）以及 Lombok 工具的使用。</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>网络编程
+├── 软件结构：C/S 和 B/S
+├── 通信三要素：IP 地址 / 协议 / 端口号
+├── UDP 协议编程（DatagramSocket / DatagramPacket）
+├── TCP 协议编程（Socket / ServerSocket）
+│   └── 三次握手 / 四次挥手
+└── 文件上传（单线程 / 多线程服务端）
+
+正则表达式
+├── 字符类 []
+├── 逻辑运算符 &amp;&amp; |
+├── 预定义字符 \d \D \w \s .
+├── 数量词 ? * + {n} {n,} {n,m}
+├── 分组括号 ()
+└── String 中的正则方法：matches / split / replaceAll
+
+设计模式
+├── 模板方法模式（Template Method）
+└── 单例模式（Singleton）
+    ├── 饿汉式
+    └── 懒汉式（双重检查锁）
+
+Lombok
+└── 常用注解：@Getter/@Setter/@ToString/@Data 等
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、模块22快速回顾</h2>
+<p>在正式学习本模块之前，简单回顾上一模块的 IO 知识：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类/方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BufferedOutputStream</code> / <code>BufferedInputStream</code></td>
+<td>字节缓冲流，用法同 FileOutputStream/FileInputStream</td>
+</tr>
+<tr>
+<td><code>BufferedWriter</code> / <code>BufferedReader</code></td>
+<td>字符缓冲流，特有方法 <code>newLine()</code> / <code>readLine()</code></td>
+</tr>
+<tr>
+<td><code>OutputStreamWriter</code> / <code>InputStreamReader</code></td>
+<td>转换流，可指定编码格式</td>
+</tr>
+<tr>
+<td><code>ObjectOutputStream</code> / <code>ObjectInputStream</code></td>
+<td>序列化流，读写对象</td>
+</tr>
+<tr>
+<td><code>PrintStream</code></td>
+<td>打印流，<code>println</code> / <code>print</code></td>
+</tr>
+<tr>
+<td><code>Properties</code> + <code>load(InputStream)</code></td>
+<td>加载配置文件到集合</td>
+</tr>
+<tr>
+<td><code>FileUtils</code> / <code>IOUtils</code>（Commons-IO）</td>
+<td>第三方工具类</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h1>第一部分：网络编程</h1>
+<h2 id="section-2">1. 概述与软件结构</h2>
+<p>网络编程：在网络通信协议下，不同计算机上运行的程序之间进行数据传输。<br/>
+应用场景：通信、视频通话、网游、邮件……只要涉及计算机之间通过网络传数据，就有网络编程。</p>
+<h3 id="section-3">1.1 软件结构</h3>
+<p><strong>C/S 结构（Client/Server，客户端/服务器）</strong></p>
+<p>[图示：C/S 架构示意图——客户端与服务器直接通信，常见如 QQ、飞秋等桌面应用]</p>
+<ul>
+<li>特点：需要安装专属客户端软件，功能强大，可直接使用本地资源。</li>
+<li>代表：QQ、红蜘蛛、飞秋。</li>
+</ul>
+<p><strong>B/S 结构（Browser/Server，浏览器/服务器）</strong></p>
+<p>[图示：B/S 架构示意图——用浏览器作为客户端访问服务器，常见如网页应用]</p>
+<ul>
+<li>特点：用浏览器访问，无需安装额外软件，更新维护方便。</li>
+<li>代表：各类网站、Web 应用。</li>
+</ul>
+<blockquote>
+<p>两种架构各有优劣，但无论哪种架构，都离不开网络的支持。</p>
+</blockquote>
+<hr/>
+<h2 id="section-4">2. 服务器概念</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>服务器：安装了服务器软件的计算机。
+后面会学到的服务器软件：Tomcat（Web 服务器）
+</pre></div>
+</div><p><strong>生活类比：</strong> 服务器就像一家 24 小时营业的便利店，它随时等待顾客（客户端）上门，然后提供服务（返回数据）。</p>
+<p><strong>网络通信协议：</strong> 两台计算机在做数据交互时要遵守的规则，对数据的格式、速率等做出规定。就像两个人打电话要用同一种语言一样，只有都遵守协议，才能完成数据交互。</p>
+<p>[图示：网络通信协议层级示意图——展示协议如何约束数据交互的格式和流程]</p>
+<hr/>
+<h2 id="section-5">3. 通信三要素</h2>
+<p>网络通信需要三个基本要素：<strong>IP 地址</strong>、<strong>协议</strong>、<strong>端口号</strong>。</p>
+<p>[图示：通信三要素关系图——IP 定位机器，端口定位程序，协议规定通信方式]</p>
+<h3 id="section-6">3.1 IP 地址</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>概述：互联网协议地址（Internet Protocol Address），俗称 IP，是计算机的唯一标识。
+作用：用于两台计算机之间建立连接。
+
+IPV4：
+  32 位二进制数，通常分成 4 组，每组 0~255 的十进制整数，格式如 192.168.65.100
+  最多表示约 42 亿个地址（已经不够用了）
+
+IPV6：
+  128 位地址，每 16 个字节一组，共 8 组十六进制数
+  格式：ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
+  号称能给地球上每一粒沙子分配一个 IP 地址
+
+常用命令：
+  ipconfig          → 查看本机 IP
+  ping IP地址       → 测试能否连接某台计算机
+
+特殊地址（代表本机，到哪里都不变）：
+  127.0.0.1
+  localhost
+  
+访问本机服务格式：localhost:端口号/应用名称/资源路径
+  例如：localhost:8080/应用名称/index.html
+</pre></div>
+</div><h3 id="section-7">3.2 协议</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>TCP：面向连接协议
+  需要先确认连接，才能进行数据交互（三次握手）
+  好处：数据安全，提供可靠的传输环境
+  坏处：效率相对低一些
+
+UDP：面向无连接协议
+  不需要建立连接，直接发送
+  好处：效率高，速度快
+  坏处：传输的数据不安全，容易丢失数据包
+</pre></div>
+</div><p><strong>生活类比：</strong></p>
+<ul>
+<li>TCP 就像打电话：先拨号等接通（三次握手），通话中途不会丢字，挂断时礼貌道别（四次挥手）。</li>
+<li>UDP 就像发短信：发出去就不管了，对方收没收到不知道，但速度快。</li>
+</ul>
+<h4 id="section-8">TCP 三次握手（建立连接）</h4>
+<p>[图示：TCP 三次握手流程图——客户端和服务器各自的状态变化]</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>第一次握手：客户端向服务器发出连接请求，等待服务器确认。
+            （客户端：我想连接你，你在吗？）
+
+第二次握手：服务器向客户端回送响应，通知客户端收到了连接请求。
+            （服务器：我在，我听到了，你能听到我吗？）
+
+第三次握手：客户端再次向服务器发送确认信息，确认连接建立。
+            （客户端：好的，我也听到你了，我们开始通信吧！）
+</pre></div>
+</div><p><strong>为什么需要三次？</strong> 两次握手无法确保双方都具备收发能力，三次才能确认双向通道都正常。</p>
+<h4 id="section-9">TCP 四次挥手（断开连接）</h4>
+<p>[图示：TCP 四次挥手流程图——连接断开的四个步骤]</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>第一次挥手：客户端向服务器提出结束连接，不再发数据（但还能接收）。
+            （客户端：我说完了，准备挂电话吧）
+
+第二次挥手：服务器接收到后，把最后的数据发给客户端，并告知上层不再接收数据。
+            （服务器：好的，我还有几句话，你先听着）
+
+第三次挥手：服务器发完最后的数据，给客户端发送释放连接的报文。
+            （服务器：我也说完了，可以挂了）
+
+第四次挥手：客户端回复彻底断开的报文，然后等待 2MSL 时间再彻底关闭。
+            （客户端：收到，我们就此再见）
+            
+注：客户端等待 2MSL 是为了防止服务器没收到最后的报文，
+    如果服务器重发了释放请求，客户端在等待时间内能重新确认。
+</pre></div>
+</div><p><strong>为什么是四次而不是三次？</strong> 因为 TCP 是全双工的，双方各自有发送和接收，关闭时需要各自确认关闭，所以比握手多一次。</p>
+<h3 id="section-10">3.3 端口号</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>作用：每一个应用程序的唯一标识（在同一台机器上）
+
+范围：用两个字节表示的整数，0~65535
+  0~1023：知名端口，用于知名的网络服务（如 HTTP:80, HTTPS:443, FTP:21）
+  1024 以上：普通应用程序使用
+
+注意：如果端口号被其他程序占用，当前程序启动会失败！
+</pre></div>
+</div><p><strong>生活类比：</strong> IP 地址就像大楼地址，端口号就像大楼里的具体房间号。快递员（数据）找到大楼（IP）后，还需要知道送到哪个房间（端口）。</p>
+<hr/>
+<h2 id="section-11">4. UDP 协议编程</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>DatagramSocket  → 好比寄快递找的快递公司
+DatagramPacket  → 好比快递公司的打包装箱
+</pre></div>
+</div><h3 id="section-12">4.1 客户端（发送端）</h3>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>创建 <code>DatagramSocket</code> 对象（快递公司）</li>
+<li>创建 <code>DatagramPacket</code> 对象，将数据进行打包（指定接收端IP和端口）</li>
+<li>发送数据</li>
+<li>释放资源</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.DatagramSocket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.DatagramPacket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.InetAddress</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UDPSend</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 DatagramSocket 对象（代表快递公司）</span>
+<span class="w">        </span><span class="c1">//    空参：系统随机分配一个可用端口号</span>
+<span class="w">        </span><span class="c1">//    有参：自己指定端口号，如 new DatagramSocket(8888)</span>
+<span class="w">        </span><span class="n">DatagramSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DatagramSocket</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 2. 准备要发送的数据，转换为字节数组</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"你好呀"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 3. 指定接收端的 IP 地址（127.0.0.1 表示本机）</span>
+<span class="w">        </span><span class="n">InetAddress</span><span class="w"> </span><span class="n">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InetAddress</span><span class="p">.</span><span class="na">getByName</span><span class="p">(</span><span class="s">"127.0.0.1"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 4. 指定接收端的端口号</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6666</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// 5. 创建 DatagramPacket 对象，将数据打包</span>
+<span class="w">        </span><span class="c1">//    参数：数据字节数组、数据长度、目标IP、目标端口</span>
+<span class="w">        </span><span class="n">DatagramPacket</span><span class="w"> </span><span class="n">dp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DatagramPacket</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">.</span><span class="na">length</span><span class="p">,</span><span class="w"> </span><span class="n">ip</span><span class="p">,</span><span class="w"> </span><span class="n">port</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 6. 通过 socket 发送数据包</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">send</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 7. 释放资源（关闭 socket）</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>重要：在没有接收端的情况下，发送端执行不会报错！因为 UDP 是面向无连接协议，不管有没有接收端，照发不误。</p>
+</blockquote>
+<h3 id="section-13">4.2 服务端（接收端）</h3>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>创建 <code>DatagramSocket</code> 对象，指定服务端端口号</li>
+<li>准备数组，创建 <code>DatagramPacket</code> 接收数据包</li>
+<li>接收数据包</li>
+<li>解析数据包</li>
+<li>释放资源</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.DatagramSocket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.DatagramPacket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.InetAddress</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UDPReceive</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 DatagramSocket 对象，指定服务端监听的端口号（要与发送端一致）</span>
+<span class="w">        </span><span class="n">DatagramSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DatagramSocket</span><span class="p">(</span><span class="mi">6666</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 创建字节数组，用于保存接收到的数据</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// 3. 创建 DatagramPacket 对象，用于接收数据包（只需传入字节数组和长度）</span>
+<span class="w">        </span><span class="n">DatagramPacket</span><span class="w"> </span><span class="n">dp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DatagramPacket</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">.</span><span class="na">length</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 4. 调用 receive 方法接收数据包（此方法会阻塞，直到收到数据）</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">receive</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 5. 解析数据包</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dp</span><span class="p">.</span><span class="na">getData</span><span class="p">();</span><span class="w">         </span><span class="c1">// 获取接收到的字节数据</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dp</span><span class="p">.</span><span class="na">getLength</span><span class="p">();</span><span class="w">           </span><span class="c1">// 获取实际接收的数据长度</span>
+<span class="w">        </span><span class="n">InetAddress</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dp</span><span class="p">.</span><span class="na">getAddress</span><span class="p">();</span><span class="w"> </span><span class="c1">// 获取发送端的 IP 地址</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dp</span><span class="p">.</span><span class="na">getPort</span><span class="p">();</span><span class="w">            </span><span class="c1">// 获取发送端的端口号</span>
+
+<span class="w">        </span><span class="c1">// 6. 将字节数组转换为字符串并打印（从0开始，读 len 个字节）</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">));</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">address</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"..."</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">port</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 7. 释放资源</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">5. TCP 协议编程</h2>
+<p>[图示：TCP 客户端与服务器通信流程图——服务器先 accept 等待，客户端发起连接，双方通过 Socket 流通信]</p>
+<p>[图示：TCP 数据传输过程——客户端写出数据到服务器，服务器读入数据后写出响应，客户端读入响应]</p>
+<h3 id="section-15">5.1 编写客户端</h3>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>创建 <code>Socket</code> 对象，指定服务端的 IP 和端口号（建立连接）</li>
+<li>通过 <code>getOutputStream()</code> 向服务端发送数据</li>
+<li>通过 <code>getInputStream()</code> 读取服务端响应的数据</li>
+<li>关流</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.Socket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.OutputStream</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.InputStream</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TCPClient</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 Socket 对象，指定服务端的 IP 和端口号</span>
+<span class="w">        </span><span class="c1">//    执行此行代码时，就会与服务器发起三次握手建立连接</span>
+<span class="w">        </span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Socket</span><span class="p">(</span><span class="s">"127.0.0.1"</span><span class="p">,</span><span class="w"> </span><span class="mi">6666</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 通过 socket 获取输出流，用于向服务端发送数据</span>
+<span class="w">        </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getOutputStream</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 3. 将字符串转为字节数组，写出给服务端</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"我想下载一个小电影"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+
+<span class="w">        </span><span class="c1">// 4. 通过 socket 获取输入流，用于读取服务端响应的数据</span>
+<span class="w">        </span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 5. 创建字节数组准备接收数据</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// 6. 读取服务端响应，返回实际读到的字节数</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 7. 将字节数组转为字符串并打印</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// 8. 关流（先关 is 和 os，最后关 socket）</span>
+<span class="w">        </span><span class="n">is</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-16">5.2 编写服务端</h3>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>创建 <code>ServerSocket</code> 对象，设置端口号</li>
+<li>调用 <code>accept()</code> 方法等待客户端连接（阻塞），返回 <code>Socket</code> 对象</li>
+<li>通过 <code>getInputStream()</code> 读取客户端发来的数据</li>
+<li>通过 <code>getOutputStream()</code> 向客户端响应数据</li>
+<li>关闭资源</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.ServerSocket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.Socket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.InputStream</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.OutputStream</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TCPServer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 ServerSocket 对象，绑定端口号 6666（服务端监听此端口）</span>
+<span class="w">        </span><span class="n">ServerSocket</span><span class="w"> </span><span class="n">ss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ServerSocket</span><span class="p">(</span><span class="mi">6666</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 调用 accept() 方法，等待客户端连接</span>
+<span class="w">        </span><span class="c1">//    此方法会阻塞（程序暂停在这里），直到有客户端连接进来</span>
+<span class="w">        </span><span class="c1">//    连接成功后返回一个 Socket 对象，代表与该客户端的连接</span>
+<span class="w">        </span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ss</span><span class="p">.</span><span class="na">accept</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 3. 通过 socket 获取输入流，读取客户端发来的数据</span>
+<span class="w">        </span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// 4. 读取数据，返回实际读到的字节数</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 5. 打印客户端发来的内容</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// 6. 通过 socket 获取输出流，给客户端发送响应</span>
+<span class="w">        </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getOutputStream</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 7. 向客户端写出响应内容</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"给你一个小电影"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+
+<span class="w">        </span><span class="c1">// 8. 关闭资源（注意顺序，先关子流，再关 socket，最后关 ServerSocket）</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">is</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">ss</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-17">6. 文件上传</h2>
+<p>[图示：文件上传流程图——客户端读本地文件，通过 Socket 流传给服务器，服务器写到硬盘，再响应"上传成功"]</p>
+<p>[图示：服务端接收文件的详细步骤——获取流、边读边写、响应客户端]</p>
+<h3 id="section-18">6.1 文件上传——单线程版本</h3>
+<p><strong>客户端代码：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.Socket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.*</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UploadClient</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 Socket 对象，连接服务端</span>
+<span class="w">        </span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Socket</span><span class="p">(</span><span class="s">"127.0.0.1"</span><span class="p">,</span><span class="w"> </span><span class="mi">6666</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 创建 FileInputStream，读取本地要上传的图片</span>
+<span class="w">        </span><span class="n">FileInputStream</span><span class="w"> </span><span class="n">fis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileInputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\24.jpg"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 3. 获取 socket 的输出流，用于将图片数据传给服务端</span>
+<span class="w">        </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getOutputStream</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 4. 边读本地文件，边写给服务端（循环传输，直到文件读完）</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fis</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w">  </span><span class="c1">// 每次只写实际读到的字节数，避免多余数据</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 5. 给服务端写一个结束标记（告诉服务端文件已经传完了）</span>
+<span class="w">        </span><span class="c1">//    不加这个，服务端的 while 循环会永远等待，不知道文件传完没有</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">shutdownOutput</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"======以下代码是读取响应的结果======"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 6. 获取 socket 的输入流，读取服务端的响应结果</span>
+<span class="w">        </span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 7. 打印服务端响应内容（比如"上传成功"）</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">bytes1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len1</span><span class="p">));</span>
+
+<span class="w">        </span><span class="c1">// 8. 关流（顺序：先关读写流，再关 socket）</span>
+<span class="w">        </span><span class="n">is</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">fis</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>服务端代码：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.ServerSocket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.Socket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.*</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.UUID</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UploadServer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 ServerSocket 对象，监听端口 6666</span>
+<span class="w">        </span><span class="n">ServerSocket</span><span class="w"> </span><span class="n">ss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ServerSocket</span><span class="p">(</span><span class="mi">6666</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 等待客户端连接</span>
+<span class="w">        </span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ss</span><span class="p">.</span><span class="na">accept</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 3. 获取 socket 的输入流，读取客户端传来的图片数据</span>
+<span class="w">        </span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 4. 生成唯一文件名，避免多个客户端上传时文件名冲突</span>
+<span class="w">        </span><span class="c1">//    UUID.randomUUID() 生成一个随机的十六进制唯一字符串</span>
+<span class="w">        </span><span class="c1">//    再拼上系统时间戳，双重保险确保唯一</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UUID</span><span class="p">.</span><span class="na">randomUUID</span><span class="p">().</span><span class="na">toString</span><span class="p">();</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
+
+<span class="w">        </span><span class="c1">// 5. 创建 FileOutputStream，将接收到的图片写到硬盘上</span>
+<span class="w">        </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\upload\\"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">".jpg"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 6. 边读客户端数据，边写到本地文件（循环直到 read 返回 -1，即收到结束标记）</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"======以下代码是给客户端的响应结果======"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 7. 获取 socket 的输出流，给客户端发送"上传成功"的响应</span>
+<span class="w">        </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getOutputStream</span><span class="p">();</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"上传成功"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+
+<span class="w">        </span><span class="c1">// 8. 关流</span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">is</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">        </span><span class="n">ss</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>UUID 演示：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.UUID</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UUIDDemo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// UUID.randomUUID() 生成一个随机的 UUID 对象</span>
+<span class="w">        </span><span class="c1">// toString() 将 UUID 转为字符串格式，如 "550e8400-e29b-41d4-a716-446655440000"</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UUID</span><span class="p">.</span><span class="na">randomUUID</span><span class="p">().</span><span class="na">toString</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"string = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">string</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-19">6.2 文件上传服务端——多线程版本</h3>
+<p><strong>问题：</strong> 上面的单线程服务端只能同时处理一个客户端。第二个客户端连接时，必须等第一个处理完。</p>
+<p><strong>解决方案：</strong> 每来一个客户端，就开一个新线程去处理它，主线程继续等待下一个连接。</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.ServerSocket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.Socket</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.*</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.UUID</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UploadServerThread</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 1. 创建 ServerSocket 对象，监听端口 6666</span>
+<span class="w">        </span><span class="n">ServerSocket</span><span class="w"> </span><span class="n">ss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ServerSocket</span><span class="p">(</span><span class="mi">6666</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 2. 用 while(true) 让服务器持续运行，不断接受新客户端</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// 3. 等待客户端连接（阻塞），每来一个客户端就会返回一个新 Socket</span>
+<span class="w">            </span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ss</span><span class="p">.</span><span class="na">accept</span><span class="p">();</span>
+
+<span class="w">            </span><span class="c1">// 4. 每来一个客户端，开启一个新线程处理它</span>
+<span class="w">            </span><span class="c1">//    这样主线程可以立即回去 accept() 等待下一个客户端</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Runnable</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nd">@Override</span>
+<span class="w">                </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">                    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="c1">// 5. 获取输入流，读取客户端传来的图片</span>
+<span class="w">                        </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">();</span>
+
+<span class="w">                        </span><span class="c1">// 6. 生成唯一文件名（UUID + 时间戳）</span>
+<span class="w">                        </span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UUID</span><span class="p">.</span><span class="na">randomUUID</span><span class="p">().</span><span class="na">toString</span><span class="p">();</span>
+<span class="w">                        </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
+
+<span class="w">                        </span><span class="c1">// 7. 创建文件输出流，准备写到本地磁盘</span>
+<span class="w">                        </span><span class="n">fos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="s">"E:\\Idea\\io\\upload\\"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">".jpg"</span><span class="p">);</span>
+
+<span class="w">                        </span><span class="c1">// 8. 边读边写，循环直到客户端发送结束标记</span>
+<span class="w">                        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">                        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">bytes</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                            </span><span class="n">fos</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span>
+<span class="w">                        </span><span class="p">}</span>
+
+<span class="w">                        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"======以下代码是给客户端的响应结果======"</span><span class="p">);</span>
+
+<span class="w">                        </span><span class="c1">// 9. 给客户端发送响应</span>
+<span class="w">                        </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="na">getOutputStream</span><span class="p">();</span>
+<span class="w">                        </span><span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">"上传成功"</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+
+<span class="w">                    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w"> </span><span class="c1">// 打印异常信息，方便排查问题</span>
+<span class="w">                    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="c1">// 10. 无论成功还是失败，都要关流（放在 finally 确保一定执行）</span>
+<span class="w">                        </span><span class="n">CloseUtils</span><span class="p">.</span><span class="na">closeQ</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">fos</span><span class="p">,</span><span class="w"> </span><span class="n">is</span><span class="p">,</span><span class="w"> </span><span class="n">os</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}).</span><span class="na">start</span><span class="p">();</span><span class="w"> </span><span class="c1">// 启动线程</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>关流工具类：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.*</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.net.Socket</span><span class="p">;</span>
+
+<span class="c1">// 工具类，统一处理关流操作，避免主业务代码中出现大量 try-catch</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CloseUtils</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 私有构造，防止外界 new 这个工具类（工具类不需要实例化）</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">CloseUtils</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// 关闭所有流资源的静态方法（每个都单独 try-catch，一个出错不影响其他）</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">closeQ</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="w"> </span><span class="n">fos</span><span class="p">,</span><span class="w"> </span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="p">,</span><span class="w"> </span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 关闭输出流</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">os</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">os</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 关闭文件输出流</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fos</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">fos</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 关闭输入流</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">is</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// 关闭 Socket</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">socket</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">socket</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">7. 网络编程常见报错</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>报错信息</th>
+<th>原因</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Connection refused</code></td>
+<td>服务端没有启动，或端口号写错</td>
+<td>先启动服务端，再启动客户端；检查端口号是否一致</td>
+</tr>
+<tr>
+<td><code>BindException: Address already in use</code></td>
+<td>端口被占用</td>
+<td>换一个端口号，或关掉占用该端口的程序</td>
+</tr>
+<tr>
+<td><code>SocketTimeoutException</code></td>
+<td>连接或读取超时</td>
+<td>检查网络或增大超时时间</td>
+</tr>
+<tr>
+<td>TCP 客户端卡住不动</td>
+<td>服务端的 <code>while</code> 循环在等待 <code>-1</code>，但客户端没有调用 <code>shutdownOutput()</code></td>
+<td>文件传完后调用 <code>socket.shutdownOutput()</code></td>
+</tr>
+<tr>
+<td><code>EOFException</code> / 文件不完整</td>
+<td>读写过程中连接被中断</td>
+<td>加异常处理，网络不稳定时考虑断点续传</td>
+</tr>
+<tr>
+<td>乱码</td>
+<td>编码不一致（如发送用 UTF-8，接收用 GBK）</td>
+<td>统一双方的编码格式</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-21">8. 网络编程面试常问</h2>
+<p><strong>Q：TCP 和 UDP 的区别？</strong></p>
+<blockquote>
+<p>TCP 面向连接，可靠，有三次握手/四次挥手，速度慢；适合文件传输、HTTP、邮件等场景。<br/>
+UDP 面向无连接，不可靠，速度快；适合视频直播、DNS 查询、游戏实时数据等对速度要求高、允许少量丢包的场景。</p>
+</blockquote>
+<p><strong>Q：为什么 TCP 建立连接需要三次握手，而不是两次？</strong></p>
+<blockquote>
+<p>两次握手只能确保客户端发的能到服务器，但无法确认服务器发的能到客户端。三次握手才能保证双方都具备正常收发数据的能力。</p>
+</blockquote>
+<p><strong>Q：TCP 四次挥手中，为什么客户端最后要等待 2MSL 再关闭？</strong></p>
+<blockquote>
+<p>防止最后一个 ACK 包丢失导致服务器重发 FIN 包，客户端需要在等待时间内能够重新发送确认。</p>
+</blockquote>
+<p><strong>Q：<code>socket.shutdownOutput()</code> 和 <code>socket.close()</code> 的区别？</strong></p>
+<blockquote>
+<p><code>shutdownOutput()</code> 只关闭输出流，发送一个 FIN 包告诉对方"我发完了"，但连接还在，输入流还能继续读；<code>close()</code> 是完全关闭连接。文件传输完后先调用 <code>shutdownOutput()</code>，等读完响应再调 <code>close()</code>。</p>
+</blockquote>
+<hr/>
+<h1>第二部分：正则表达式</h1>
+<h2 id="section-22">1. 概述</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>1. 概述：正则表达式是一个具有特殊规则的字符串
+2. 作用：校验（验证手机号、身份证号、密码、用户名、邮箱等）
+3. String 中的校验方法：
+   boolean matches(String regex)  —— 校验字符串是否符合指定正则规则
+4. 示例：校验 QQ 号（不能以 0 开头，必须都是数字，5-15 位）
+</pre></div>
+</div><p><strong>生活类比：</strong> 正则表达式就像一个"模板"，输入的字符串要与这个模板匹配。就像身份证号必须符合特定格式一样（18位，前17位数字，最后一位是数字或X）。</p>
+<p><strong>对比演示：不用正则 vs 用正则校验 QQ 号：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Scanner</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RegexDemo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">scanner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scanner</span><span class="p">.</span><span class="na">next</span><span class="p">();</span><span class="w"> </span><span class="c1">// 读取用户输入</span>
+
+<span class="w">        </span><span class="c1">// 方式一：传统方式（代码冗长）</span>
+<span class="w">        </span><span class="c1">// boolean result01 = method01(data);</span>
+<span class="w">        </span><span class="c1">// System.out.println("result01 = " + result01);</span>
+
+<span class="w">        </span><span class="c1">// 方式二：使用正则表达式（简洁）</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result02</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method02</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result02 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result02</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 使用正则表达式校验 QQ 号：不能以0开头，5-15位纯数字</span>
+<span class="w">    </span><span class="c1">// [1-9] 表示第一位是1~9中的一个</span>
+<span class="w">    </span><span class="c1">// [0-9]{4,14} 表示后面4到14位都是0~9的数字，合计5~15位</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">method02</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[1-9][0-9]{4,14}"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 传统方式校验 QQ 号（对比用）</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">method01</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 检查是否以 0 开头</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">"0"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">// 检查是否全是数字</span>
+<span class="w">        </span><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">();</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">aChar</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">chars</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">aChar</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="sc">'0'</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">aChar</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="sc">'9'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">// 检查长度是否在 5-15 位</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-23">2. 字符类 <code>[]</code></h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>java.util.regex.Pattern：正则表达式的编译表示形式
+[] 表示一个区间，范围可以自己定义，代表其中的某一个字符
+
+语法示例：
+1. [abc]       → 代表 a 或者 b 或者 c 中的一个
+2. [^abc]      → 代表除 a、b、c 以外的任何字符（^ 在 [] 内表示非/取反）
+3. [a-z]       → 代表 a-z 的所有小写字母中的一个
+4. [A-Z]       → 代表 A-Z 的所有大写字母中的一个
+5. [0-9]       → 代表 0-9 之间的某一个数字字符
+6. [a-zA-Z0-9] → 代表 a-z 或 A-Z 或 0-9 中的任意一个
+7. [a-dm-p]    → a 到 d 或 m 到 p 中的任意一个
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 字符类示例</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method01</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 1. 验证字符串是否以 h 开头，d 结尾，中间是 aeiou 的某一个字符</span>
+<span class="w">    </span><span class="c1">//    [h] 匹配 'h'，[aeiou] 匹配元音字母，[d] 匹配 'd'</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"had"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[h][aeiou][d]"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result01 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result01</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 2. 验证字符串是否以 h 开头，d 结尾，中间不是 aeiou 的某个字符</span>
+<span class="w">    </span><span class="c1">//    [^aeiou] 匹配非元音字母</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result02</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hyd"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[h][^aeiou][d]"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result02 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result02</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 3. 验证字符串是否是以 a-z 任意小写字母开头，后面跟 ad</span>
+<span class="w">    </span><span class="c1">//    [a-z] 匹配任意小写字母</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result03</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"had"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[a-z][a][d]"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result03 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result03</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-24">3. 逻辑运算符</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>正则表达式中的逻辑运算符：
+1. &amp;&amp;  → 并且（交集）
+2. |   → 或者（并集）
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 逻辑运算符示例</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method02</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 1. 要求字符串是小写字母，且不以 [aeiou] 开头，后面跟 ad</span>
+<span class="w">    </span><span class="c1">//    [a-z] 是小写字母，[^aeiou] 是非元音，&amp;&amp; 求交集</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"yad"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[[a-z]&amp;&amp;[^aeiou]][a][d]"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result01 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result01</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 2. 要求字符是 aeiou 其中某一个字母开头，后面跟 ad</span>
+<span class="w">    </span><span class="c1">//    [a|e|i|o|u] 用 | 表示"或者"</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result02</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"had"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[a|e|i|o|u][a][d]"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result02 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result02</span><span class="p">);</span><span class="w">  </span><span class="c1">// false（h 不在 aeiou 中）</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-25">4. 预定义字符</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>预定义字符是常用字符类的简写（注意：在 Java 字符串中，\ 需要写成 \\）：
+
+1. "."   → 匹配任何字符（注意不能加 []，不能写成 [.]）
+2. "\\d" → 任何数字 [0-9] 的简写（digit，重点）
+3. "\\D" → 任何非数字 [^0-9] 的简写
+4. "\\s" → 空白字符（空格、制表符等）的简写
+5. "\\S" → 非空白字符的简写
+6. "\\w" → 单词字符 [a-zA-Z_0-9] 的简写（word，重点）
+7. "\\W" → 非单词字符 [^\w] 的简写
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 预定义字符示例</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method03</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 1. 验证字符串是否是三位数字</span>
+<span class="w">    </span><span class="c1">//    写法一：[0-9][0-9][0-9]（详细写法）</span>
+<span class="w">    </span><span class="c1">//    写法二：\\d\\d\\d（简写，推荐）</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"111"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"\\d\\d\\d"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result01 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result01</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 2. 验证手机号：1 开头，第二位是 3、5 或 8，后面 9 位都是 0-9 的数字</span>
+<span class="w">    </span><span class="c1">//    [1] 匹配 1，[358] 匹配 3/5/8，\\d 匹配一个数字，共 9 个 \\d</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result02</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"13838381438"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[1][358]\\d\\d\\d\\d\\d\\d\\d\\d\\d"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result02 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result02</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 3. 验证字符串以 h 开头，d 结尾，中间是任意一个字符</span>
+<span class="w">    </span><span class="c1">//    . 匹配任意单个字符</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result03</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"had"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[h].[d]"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result03 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result03</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-26">5. 数量词</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>数量词用来指定某个字符/模式出现的次数，x 代表前面的字符或表达式：
+
+1. X?     → x 出现 0 次或 1 次（可有可无）
+2. X*     → x 出现 0 次到多次（任意次）
+3. X+     → x 出现 1 次或多次（至少1次）
+4. X{n}   → x 恰好出现 n 次
+5. X{n,}  → x 至少出现 n 次（n 及 n 以上）
+6. X{n,m} → x 出现 n 到 m 次（包含两端：n &lt;= 次数 &lt;= m）
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 数量词示例</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method04</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 1. 验证字符串是否是三位数字</span>
+<span class="w">    </span><span class="c1">//    \\d{3} 表示数字恰好出现 3 次，等价于 \\d\\d\\d</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"111"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"\\d{3}"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result01 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result01</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 2. 验证手机号（用数量词简化）</span>
+<span class="w">    </span><span class="c1">//    [1] 第一位是1，[358] 第二位是3/5/8，\\d{9} 后面9位数字</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result02</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"13838381438"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[1][358]\\d{9}"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result02 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result02</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+
+<span class="w">    </span><span class="c1">// 3. 验证 QQ 号：不能以0开头，都是数字，长度 5-15</span>
+<span class="w">    </span><span class="c1">//    [1-9] 第一位是1~9，[0-9]{4,14} 后面4到14位数字，合计5~15位</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result03</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"111111"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"[1-9][0-9]{4,14}"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result03 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result03</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-27">6. 分组括号 <code>()</code></h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>() 表示分组，将括号内的内容视为一个整体，配合数量词使用
+(abc) 代表 "abc" 这个整体
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 分组括号示例</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method05</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 校验字符串是否是 abc 出现任意次（包括 0 次）</span>
+<span class="w">    </span><span class="c1">// (abc)* 表示 "abc" 这个整体出现 0 次到多次</span>
+<span class="w">    </span><span class="c1">// 匹配："" / "abc" / "abcabc" / "abcabcabc" ...</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"abcabc"</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="s">"(abc)*"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"result = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w">  </span><span class="c1">// true</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-28">7. String 类中的正则方法</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>String 类中与正则表达式相关的三个常用方法：
+
+1. boolean matches(String regex)
+   → 判断字符串是否完整匹配给定的正则表达式（从头到尾必须全部匹配）
+
+2. String[] split(String regex)
+   → 根据正则表达式拆分字符串，返回字符串数组
+
+3. String replaceAll(String regex, String replacement)
+   → 把满足正则表达式的所有子串替换为新字符串
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
+
+<span class="c1">// String 中正则方法的综合示例</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">method06</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// split 示例：按照一个或多个空格拆分字符串</span>
+<span class="w">    </span><span class="c1">// " +" 表示一个或多个连续空格</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"abc hahah  hehe   hdhshsh"</span><span class="p">;</span>
+<span class="w">    </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">arr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s1</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">" +"</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// 输出：[abc, hahah, hehe, hdhshsh]（多个空格被视为一个分隔符）</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">arr1</span><span class="p">));</span>
+
+<span class="w">    </span><span class="c1">// replaceAll 示例：把所有空格（一个或多个）替换为 "z"</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s1</span><span class="p">.</span><span class="na">replaceAll</span><span class="p">(</span><span class="s">" +"</span><span class="p">,</span><span class="w"> </span><span class="s">"z"</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// 输出：abczhahahzhehehdhshsh</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"s2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">s2</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-29">8. 正则表达式在线生成工具</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>https://www.sojson.com/regex/generate
+</pre></div>
+</div><p>可以在此网站上测试和生成正则表达式，推荐用于调试复杂规则。</p>
+<hr/>
+<h2 id="section-30">9. 正则表达式常见报错</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>情况</th>
+<th>说明</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PatternSyntaxException</code></td>
+<td>正则语法错误（比如括号不匹配、非法转义）</td>
+<td>检查正则表达式语法</td>
+</tr>
+<tr>
+<td>Java 中 <code>\d</code> 不生效</td>
+<td>Java 字符串中 <code>\</code> 是转义字符，需要写 <code>\\d</code></td>
+<td>把 <code>\d</code> 改成 <code>\\d</code></td>
+</tr>
+<tr>
+<td><code>matches</code> 返回 false，明明感觉对的</td>
+<td><code>matches</code> 要求整个字符串都符合规则，不是找子串</td>
+<td>在规则前后加 <code>.*</code> 或确认规则是完整匹配</td>
+</tr>
+<tr>
+<td><code>split</code> 结果数组多了空字符串</td>
+<td>字符串首尾有匹配到的分隔符</td>
+<td>过滤空字符串，或使用 <code>split(regex, -1)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-31">10. 正则表达式面试常问</h2>
+<p><strong>Q：Java 中 <code>\\d</code> 和 <code>\d</code> 的区别？</strong></p>
+<blockquote>
+<p>Java 字符串中 <code>\\</code> 才代表一个反斜杠 <code>\</code>，所以 <code>\\d</code> 才是正则中的 <code>\d</code>（匹配数字）。如果写 <code>\d</code>，编译时会报非法转义序列的错误。</p>
+</blockquote>
+<p><strong>Q：<code>matches</code> 和在字符串中搜索有什么区别？</strong></p>
+<blockquote>
+<p><code>matches</code> 要求整个字符串从头到尾完整匹配正则，相当于自动加了 <code>^</code> 和 <code>$</code>。如果只想找子串，需要用 <code>Pattern.matcher()</code> 配合 <code>find()</code> 方法。</p>
+</blockquote>
+<p><strong>Q：常见的手机号正则是什么？</strong></p>
+<blockquote>
+<p>简单版：<code>[1][3-9]\\d{9}</code>（1开头，第二位3~9，后面9位数字）
+完整版：<code>1[3-9]\\d{9}</code> 或更复杂的精确到运营商的规则。</p>
+</blockquote>
+<hr/>
+<h1>第三部分：设计模式</h1>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>设计模式（Design Pattern）：是一套被反复使用、经过分类编目的、代码设计经验的总结。
+使用设计模式的目的：可重用代码、保证代码可靠性、提高程序的重用性和稳定性。
+
+1995 年，GoF（Gang of Four，四人组）合作出版了《设计模式：可复用面向对象软件的基础》，
+共收录了 23 种设计模式。（推荐阅读《大话设计模式》）
+
+三大分类：
+1. 创建型模式（共5种）：工厂方法、抽象工厂、单例、建造者、原型 → 专注于创建对象
+2. 结构型模式（共7种）：适配器、装饰器、代理、外观、桥接、组合、享元 → 对功能进行增强
+3. 行为型模式（共11种）：策略、模板方法、观察者、迭代子、责任链、命令、备忘录、
+   状态、访问者、中介者、解释器
+</pre></div>
+</div><hr/>
+<h2 id="section-32">1. 模板方法设计模式（Template Method Pattern）</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>核心思想：定义一个操作中的算法骨架，把某些步骤的具体实现延迟到子类中。
+         父类明确了固定不变的部分，子类实现变化的部分。
+
+生活类比：饭店吃饭有三步：点菜 → 吃菜 → 买单
+  "点菜"和"买单"是固定的（父类实现）
+  "吃菜"是每家餐厅不同的（子类各自实现）
+</pre></div>
+</div><p><strong>抽象父类（骨架）：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 抽象类：定义算法骨架（饭店的通用流程）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Hotel</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 模板方法：定义了整体流程（固定不变）</span>
+<span class="w">    </span><span class="c1">// final 修饰可以防止子类重写整体流程（可选）</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eat</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"点菜"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 固定步骤1：每家餐厅都要点菜</span>
+<span class="w">        </span><span class="n">eatCai</span><span class="p">();</span><span class="w">                      </span><span class="c1">// 变化步骤：吃什么、怎么吃由子类决定</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"买单"</span><span class="p">);</span><span class="w">   </span><span class="c1">// 固定步骤2：每家餐厅都要买单</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 抽象方法：具体的"吃菜"方式由子类实现</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">abstract</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eatCai</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>子类（具体实现）：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 子类一：全聚德（烤鸭餐厅）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">QuanJuDe</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Hotel</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eatCai</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 全聚德的吃法：薄饼 + 鸭肉 + 酱 + 葱丝 + 黄瓜丝，卷着吃</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"薄饼"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"放鸭肉"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"酱"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"葱丝"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"黄瓜丝"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"卷着吃"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 子类二：张亮麻辣烫</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ZhangLiang</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Hotel</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">eatCai</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 张亮的吃法：调麻酱 + 辣椒油，倒到大碗里吃</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"调麻酱"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"放辣椒油"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"倒到大碗中吃"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>测试类：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">TemplateTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 多态：父类引用指向子类对象</span>
+<span class="w">        </span><span class="c1">// 调用 eat() 时，骨架流程（点菜、买单）是固定的，</span>
+<span class="w">        </span><span class="c1">// 中间的 eatCai() 会调用各自子类的实现</span>
+<span class="w">        </span><span class="n">QuanJuDe</span><span class="w"> </span><span class="n">quanJuDe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">QuanJuDe</span><span class="p">();</span>
+<span class="w">        </span><span class="n">quanJuDe</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="w">  </span><span class="c1">// 输出：点菜 → 全聚德吃法 → 买单</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"================"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">ZhangLiang</span><span class="w"> </span><span class="n">zhangLiang</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ZhangLiang</span><span class="p">();</span>
+<span class="w">        </span><span class="n">zhangLiang</span><span class="p">.</span><span class="na">eat</span><span class="p">();</span><span class="w">  </span><span class="c1">// 输出：点菜 → 张亮吃法 → 买单</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-33">2. 单例模式（Singleton Pattern）</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>目的：
+  单（一个）例（实例/对象）
+  让一个类只产生一个对象，供整个程序（全局）使用
+
+分类：
+  a. 饿汉式：迫不及待，类加载时就创建好对象
+  b. 懒汉式：懒得创建，第一次用到时才创建
+</pre></div>
+</div><p><strong>生活类比：</strong> 单例就像一个公司只有一个 CEO，不管谁来问"你们 CEO 是谁"，都是同一个人。</p>
+<h3 id="section-34">2.1 饿汉式</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>特点：类加载时就创建对象，不管用不用得到
+优点：线程安全（天然安全，JVM 保证类只加载一次）
+缺点：如果对象一直不用，会浪费内存（饿汉式说：管它，先创建了再说！）
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Singleton</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 1. 私有化构造方法，防止外部随意 new 对象</span>
+<span class="w">    </span><span class="c1">//    这是单例模式的第一步，让外界无法自己创建实例</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">Singleton</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// 2. 在类的内部创建一个唯一的实例（静态的，随着类的加载而创建）</span>
+<span class="w">    </span><span class="c1">//    private：不让外界直接访问这个对象（必须通过 get 方法拿）</span>
+<span class="w">    </span><span class="c1">//    static：属于类本身，不属于某个对象，保证只有一份</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Singleton</span><span class="w"> </span><span class="n">singleton</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Singleton</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 3. 提供一个公共的静态方法，让外界通过此方法获取唯一实例</span>
+<span class="w">    </span><span class="c1">//    static：让外界可以不创建对象就调用这个方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Singleton</span><span class="w"> </span><span class="nf">getSingleton</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">singleton</span><span class="p">;</span><span class="w">  </span><span class="c1">// 返回类内部唯一的那个实例</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>测试（无论调用多少次，都是同一个对象）：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SingletonTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 多次调用 getSingleton()，每次返回的都是同一个对象</span>
+<span class="w">        </span><span class="c1">// 打印地址都相同</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Singleton</span><span class="w"> </span><span class="n">singleton</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Singleton</span><span class="p">.</span><span class="na">getSingleton</span><span class="p">();</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">singleton</span><span class="p">);</span><span class="w">  </span><span class="c1">// 10 次打印同一个地址</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-35">2.2 懒汉式（双重检查锁）</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>特点：第一次用到时才创建对象
+优点：节省内存（不用的话不创建）
+缺点：多线程环境下需要加锁处理（否则可能创建出多个对象）
+     懒汉式说：我太懒了，等你真正用到我再说！
+     
+双重检查锁（DCL，Double-Checked Locking）：
+  为了兼顾线程安全和性能，先判断再加锁，加锁后再判断一次
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Singleton1</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// 1. 私有化构造方法</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="nf">Singleton1</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">// 2. 声明实例变量，初始值为 null（懒加载，暂不创建）</span>
+<span class="w">    </span><span class="c1">//    volatile 关键字：防止指令重排序（保证多线程下的可见性和有序性）</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Singleton1</span><span class="w"> </span><span class="n">singleton1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 3. 提供获取实例的公共静态方法（双重检查锁）</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Singleton1</span><span class="w"> </span><span class="nf">getSingleton1</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 第一次检查：如果已经创建了，直接返回（避免每次都抢锁，提升性能）</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">singleton1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1">// 加锁：同一时刻只允许一个线程进入</span>
+<span class="w">            </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">Singleton1</span><span class="p">.</span><span class="na">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                </span><span class="c1">// 第二次检查：防止多个线程同时通过第一次检查后，重复创建对象</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">singleton1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">singleton1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Singleton1</span><span class="p">();</span><span class="w">  </span><span class="c1">// 只创建一次</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">singleton1</span><span class="p">;</span><span class="w">  </span><span class="c1">// 返回唯一实例</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-36">2.3 单例模式小结</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>无论饿汉式还是懒汉式，核心都是两步：
+  1. 构造私有（private 构造方法）→ 外界无法随意 new 对象
+  2. 对象私有且静态（private static 成员变量）→ 类内部持有唯一实例，且不直接暴露
+
+区别对比：
+  饿汉式：static 变量直接初始化 → 类加载时创建 → 线程安全但可能浪费内存
+  懒汉式：static 变量初始为 null → 第一次使用时创建 → 节省内存但多线程需加锁
+</pre></div>
+</div><hr/>
+<h2 id="section-37">3. 设计模式常见报错</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>情况</th>
+<th>说明</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多线程下懒汉式创建了多个实例</td>
+<td>没有同步处理，多个线程同时通过了 <code>null</code> 检查</td>
+<td>使用双重检查锁，同时给变量加 <code>volatile</code></td>
+</tr>
+<tr>
+<td>单例被反射破坏</td>
+<td>通过反射可以访问私有构造方法</td>
+<td>在构造方法中加判断，如果已存在实例则抛出异常</td>
+</tr>
+<tr>
+<td>单例被反序列化破坏</td>
+<td>反序列化会创建新对象</td>
+<td>添加 <code>readResolve()</code> 方法返回已有实例</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-38">4. 设计模式面试常问</h2>
+<p><strong>Q：单例模式饿汉式和懒汉式的区别？</strong></p>
+<blockquote>
+<p>饿汉式在类加载时就创建对象，线程安全但可能浪费内存；懒汉式在第一次使用时创建对象，节省内存但多线程环境下需要加双重检查锁 + volatile。</p>
+</blockquote>
+<p><strong>Q：双重检查锁中为什么需要 volatile？</strong></p>
+<blockquote>
+<p><code>new Singleton1()</code> 在 JVM 底层分为三步：分配内存 → 初始化对象 → 将引用指向内存地址。JVM 可能对这三步进行指令重排序，导致另一个线程拿到的是未初始化完成的对象。<code>volatile</code> 禁止指令重排序，确保对象完全初始化后才对外可见。</p>
+</blockquote>
+<p><strong>Q：怎么防止单例被反射破坏？</strong></p>
+<blockquote>
+<p>在私有构造方法中加判断：如果实例已经存在，就抛出异常，拒绝通过反射创建新实例。</p>
+</blockquote>
+<p><strong>Q：模板方法模式的应用场景？</strong></p>
+<blockquote>
+<p>多个类有相同的流程骨架，只有某些步骤的实现不同时使用。常见于 JDK 中的 <code>AbstractList</code>（提供了通用骨架，具体 <code>get</code> 方法由子类实现）。</p>
+</blockquote>
+<hr/>
+<h1>第四部分：Lombok</h1>
+<h2 id="section-39">1. Lombok 介绍</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>1. 作用：简化 JavaBean 开发，自动生成样板代码
+2. 使用步骤：
+   a. 安装 Lombok 插件（IDEA 2022+ 自带，无需手动安装）
+   b. 在项目中导入 Lombok 的 jar 包（Maven 项目在 pom.xml 中添加依赖）
+   c. 修改 IDEA 设置：开启"注解处理器"（Annotation Processing）
+</pre></div>
+</div><p>[图示：Lombok 工作原理示意图——源码中只有注解，编译生成的字节码文件中自动包含 getter/setter/构造方法等]</p>
+<p><strong>原理：</strong> Lombok 在<strong>编译阶段</strong>通过注解处理器（APT）自动生成代码，注入到字节码文件中。<br/>
+源码（.java 文件）中看不到 getter/setter，但编译后的字节码（.class 文件）中有。</p>
+<p><strong>生活类比：</strong> Lombok 就像一个"代码速记员"，你只需要在黑板上写一个简单符号（注解），它就帮你自动扩写出完整的代码。</p>
+<hr/>
+<h2 id="section-40">2. Lombok 常用注解</h2>
+<h3 id="section-41">@Getter 和 @Setter</h3>
+<ul>
+<li>作用：自动生成成员变量的 <code>get</code> 和 <code>set</code> 方法</li>
+<li>写在成员变量上：只对当前变量有效</li>
+<li>写在类上：对类中所有成员变量有效</li>
+<li>注意：<strong>静态成员变量无效</strong>（静态变量不走 getter/setter 的逻辑）</li>
+</ul>
+<h3 id="section-42">@ToString</h3>
+<ul>
+<li>作用：自动生成 <code>toString()</code> 方法</li>
+<li>只能写在类上</li>
+<li>生成的 <code>toString()</code> 会包含类名和所有字段的值</li>
+</ul>
+<h3 id="section-43">@NoArgsConstructor 和 @AllArgsConstructor</h3>
+<ul>
+<li><code>@NoArgsConstructor</code>：生成<strong>无参数构造方法</strong></li>
+<li><code>@AllArgsConstructor</code>：生成<strong>全参数构造方法</strong>（所有字段都作为参数）</li>
+<li>只能写在类上</li>
+</ul>
+<h3 id="section-44">@EqualsAndHashCode</h3>
+<ul>
+<li>作用：自动生成 <code>hashCode()</code> 和 <code>equals()</code> 方法</li>
+<li>只能写在类上</li>
+<li>两个对象字段值相同时，<code>equals</code> 返回 <code>true</code></li>
+</ul>
+<h3 id="section-45">@Data</h3>
+<ul>
+<li>作用：<strong>一站式注解</strong>，相当于同时加了：<ul>
+<li><code>@Getter</code> + <code>@Setter</code>（所有字段）</li>
+<li><code>@ToString</code></li>
+<li><code>@EqualsAndHashCode</code></li>
+<li><code>@NoArgsConstructor</code>（无参构造）</li>
+</ul>
+</li>
+<li>只能写在类上</li>
+<li>注意：<code>@Data</code> 只生成无参构造，如果需要全参构造要额外加 <code>@AllArgsConstructor</code></li>
+</ul>
+<hr/>
+<h2 id="section-46">3. Lombok 代码示例</h2>
+<p><strong>JavaBean 实体类（使用 Lombok）：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">lombok.Data</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">lombok.AllArgsConstructor</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">lombok.NoArgsConstructor</span><span class="p">;</span>
+
+<span class="c1">// @Data：自动生成 getter/setter/toString/hashCode/equals/无参构造</span>
+<span class="nd">@Data</span>
+<span class="c1">// @AllArgsConstructor：自动生成全参构造（有几个字段就有几个参数）</span>
+<span class="nd">@AllArgsConstructor</span>
+<span class="c1">// @NoArgsConstructor：显式生成无参构造</span>
+<span class="c1">// （加了 @AllArgsConstructor 后如果还需要无参构造，需要加这个）</span>
+<span class="nd">@NoArgsConstructor</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Person</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w">   </span><span class="c1">// 姓名字段</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">age</span><span class="p">;</span><span class="w">   </span><span class="c1">// 年龄字段</span>
+<span class="w">    </span><span class="c1">// 不需要写 getter/setter/构造/toString，Lombok 自动生成</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>使用 Lombok 生成的 Person 类：</strong></p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LombokTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1">// 使用无参构造 + setter（@NoArgsConstructor + @Setter 生成）</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">person</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">();</span>
+<span class="w">        </span><span class="n">person</span><span class="p">.</span><span class="na">setName</span><span class="p">(</span><span class="s">"涛哥"</span><span class="p">);</span><span class="w">   </span><span class="c1">// Lombok 自动生成的 setter</span>
+<span class="w">        </span><span class="n">person</span><span class="p">.</span><span class="na">setAge</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">        </span><span class="c1">// Lombok 自动生成的 setter</span>
+
+<span class="w">        </span><span class="c1">// 使用 Lombok 自动生成的 getter 获取属性值</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"..."</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">person</span><span class="p">.</span><span class="na">getAge</span><span class="p">());</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"================"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// 使用全参构造（@AllArgsConstructor 生成）</span>
+<span class="w">        </span><span class="n">Person</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Person</span><span class="p">(</span><span class="s">"三上"</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"..."</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p1</span><span class="p">.</span><span class="na">getAge</span><span class="p">());</span>
+<span class="w">        </span><span class="c1">// toString() 也是 Lombok 自动生成的：</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">p1</span><span class="p">);</span><span class="w">  </span><span class="c1">// 输出：Person(name=三上, age=28)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-47">4. Lombok 常见报错</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>报错信息</th>
+<th>原因</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cannot find symbol: method getName()</code></td>
+<td>Lombok 插件未安装，编译时找不到 getter</td>
+<td>安装 Lombok 插件，或重新启用注解处理器</td>
+</tr>
+<tr>
+<td>加了 <code>@Data</code> 还是没有 setter</td>
+<td>字段是 <code>final</code> 修饰的（final 字段只有 getter，没有 setter）</td>
+<td>去掉 <code>final</code>，或不要对该字段生成 setter</td>
+</tr>
+<tr>
+<td>加了 <code>@AllArgsConstructor</code> 后无参构造消失了</td>
+<td>Java 默认只有在没有任何构造方法时才自动生成无参构造</td>
+<td>同时加 <code>@NoArgsConstructor</code></td>
+</tr>
+<tr>
+<td><code>@Data</code> 生成的 equals 比较结果不对</td>
+<td><code>@Data</code> 默认用所有字段比较，如果有字段不想参与比较需要排除</td>
+<td>使用 <code>@EqualsAndHashCode(exclude = "字段名")</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-48">5. Lombok 面试常问</h2>
+<p><strong>Q：Lombok 的原理是什么？</strong></p>
+<blockquote>
+<p>Lombok 利用 Java 的注解处理器（APT，Annotation Processing Tool）在编译期介入，分析注解并修改 AST（抽象语法树），从而在编译后的字节码中注入生成的代码。源码里没有这些方法，但字节码里有。</p>
+</blockquote>
+<p><strong>Q：生产环境推荐用 Lombok 吗？</strong></p>
+<blockquote>
+<p>有争议。优点是减少样板代码，提高开发效率；缺点是增加了对 Lombok 的依赖，调试时 IDE 需要插件支持，某些场景下（如继承）行为不直观。目前业界主流项目大量使用 Lombok，推荐使用。</p>
+</blockquote>
+<p><strong>Q：@Data 包含哪些注解的功能？</strong></p>
+<blockquote>
+<p>等价于 <code>@Getter + @Setter + @ToString + @EqualsAndHashCode + @RequiredArgsConstructor</code>（生成 final 字段的构造，如果没有 final 字段则是无参构造）。</p>
+</blockquote>
+<hr/>
+<h1>本章小结</h1>
+<h2 id="section-49">网络编程总结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>知识点</th>
+<th>核心内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>通信三要素</td>
+<td>IP（找到机器）、端口（找到程序）、协议（规定通信方式）</td>
+</tr>
+<tr>
+<td>TCP vs UDP</td>
+<td>TCP 可靠有连接（三次握手/四次挥手），UDP 快速无连接</td>
+</tr>
+<tr>
+<td>UDP 编程</td>
+<td><code>DatagramSocket</code> + <code>DatagramPacket</code>，发出去不管对方收没收</td>
+</tr>
+<tr>
+<td>TCP 编程</td>
+<td>客户端 <code>Socket</code>，服务端 <code>ServerSocket</code> + <code>accept()</code>，通过流通信</td>
+</tr>
+<tr>
+<td>文件上传关键点</td>
+<td>传完文件后调 <code>socket.shutdownOutput()</code> 通知服务端文件结束</td>
+</tr>
+<tr>
+<td>多线程服务端</td>
+<td>每个客户端连接开新线程处理，主线程继续 <code>accept()</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-50">正则表达式总结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>语法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符类</td>
+<td><code>[abc]</code> <code>[a-z]</code> <code>[^abc]</code></td>
+<td>匹配其中一个字符</td>
+</tr>
+<tr>
+<td>预定义字符</td>
+<td><code>\\d</code> <code>\\w</code> <code>\\s</code> <code>.</code></td>
+<td>常用字符集简写</td>
+</tr>
+<tr>
+<td>数量词</td>
+<td><code>?</code> <code>*</code> <code>+</code> <code>{n}</code> <code>{n,m}</code></td>
+<td>控制出现次数</td>
+</tr>
+<tr>
+<td>分组</td>
+<td><code>(abc)</code></td>
+<td>将内容视为整体</td>
+</tr>
+<tr>
+<td>String 方法</td>
+<td><code>matches</code> <code>split</code> <code>replaceAll</code></td>
+<td>正则在字符串中的应用</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-51">设计模式总结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>核心思想</th>
+<th>关键代码特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模板方法</td>
+<td>父类定骨架，子类填细节</td>
+<td>父类有 <code>final</code>/普通方法 + <code>abstract</code> 方法</td>
+</tr>
+<tr>
+<td>饿汉式单例</td>
+<td>类加载时就创建唯一实例</td>
+<td><code>private static Xxx = new Xxx()</code></td>
+</tr>
+<tr>
+<td>懒汉式单例</td>
+<td>第一次用到时才创建</td>
+<td>双重检查锁 + <code>volatile</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-52">Lombok 总结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>注解</th>
+<th>生成内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Getter</code> / <code>@Setter</code></td>
+<td>getter / setter 方法</td>
+</tr>
+<tr>
+<td><code>@ToString</code></td>
+<td>toString() 方法</td>
+</tr>
+<tr>
+<td><code>@NoArgsConstructor</code></td>
+<td>无参构造</td>
+</tr>
+<tr>
+<td><code>@AllArgsConstructor</code></td>
+<td>全参构造</td>
+</tr>
+<tr>
+<td><code>@EqualsAndHashCode</code></td>
+<td>hashCode() 和 equals()</td>
+</tr>
+<tr>
+<td><code>@Data</code></td>
+<td>以上所有（无参构造版本）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>本章学习了网络编程的 UDP/TCP 两种协议的使用，掌握了正则表达式的核心语法，了解了模板方法和单例两种常用设计模式，以及简化 JavaBean 开发的 Lombok 工具。这些知识是后续 Web 开发（Tomcat、Spring 等）的重要基础。</p>
+</blockquote>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="0173d6327acd426b.html"><small>← 上一篇</small><strong>06 · 继承多态抽象类接口内部类（extends / super / override / 多态 / abstract / interface）</strong></a><a href="2a943d8b1e978d56.html"><small>下一篇 →</small><strong>12 · JDK新特性（Lambda / 方法引用 / Stream流 / Optional / 新Date API）</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、模块22快速回顾</a><a class="toc-h2" href="#section-2">1. 概述与软件结构</a><a class="toc-h3" href="#section-3">1.1 软件结构</a><a class="toc-h2" href="#section-4">2. 服务器概念</a><a class="toc-h2" href="#section-5">3. 通信三要素</a><a class="toc-h3" href="#section-6">3.1 IP 地址</a><a class="toc-h3" href="#section-7">3.2 协议</a><a class="toc-h4" href="#section-8">TCP 三次握手（建立连接）</a><a class="toc-h4" href="#section-9">TCP 四次挥手（断开连接）</a><a class="toc-h3" href="#section-10">3.3 端口号</a><a class="toc-h2" href="#section-11">4. UDP 协议编程</a><a class="toc-h3" href="#section-12">4.1 客户端（发送端）</a><a class="toc-h3" href="#section-13">4.2 服务端（接收端）</a><a class="toc-h2" href="#section-14">5. TCP 协议编程</a><a class="toc-h3" href="#section-15">5.1 编写客户端</a><a class="toc-h3" href="#section-16">5.2 编写服务端</a><a class="toc-h2" href="#section-17">6. 文件上传</a><a class="toc-h3" href="#section-18">6.1 文件上传——单线程版本</a><a class="toc-h3" href="#section-19">6.2 文件上传服务端——多线程版本</a><a class="toc-h2" href="#section-20">7. 网络编程常见报错</a><a class="toc-h2" href="#section-21">8. 网络编程面试常问</a><a class="toc-h2" href="#section-22">1. 概述</a><a class="toc-h2" href="#section-23">2. 字符类 []</a><a class="toc-h2" href="#section-24">3. 逻辑运算符</a><a class="toc-h2" href="#section-25">4. 预定义字符</a><a class="toc-h2" href="#section-26">5. 数量词</a><a class="toc-h2" href="#section-27">6. 分组括号 ()</a><a class="toc-h2" href="#section-28">7. String 类中的正则方法</a><a class="toc-h2" href="#section-29">8. 正则表达式在线生成工具</a><a class="toc-h2" href="#section-30">9. 正则表达式常见报错</a><a class="toc-h2" href="#section-31">10. 正则表达式面试常问</a><a class="toc-h2" href="#section-32">1. 模板方法设计模式（Template Method Pattern）</a><a class="toc-h2" href="#section-33">2. 单例模式（Singleton Pattern）</a><a class="toc-h3" href="#section-34">2.1 饿汉式</a><a class="toc-h3" href="#section-35">2.2 懒汉式（双重检查锁）</a><a class="toc-h3" href="#section-36">2.3 单例模式小结</a><a class="toc-h2" href="#section-37">3. 设计模式常见报错</a><a class="toc-h2" href="#section-38">4. 设计模式面试常问</a><a class="toc-h2" href="#section-39">1. Lombok 介绍</a><a class="toc-h2" href="#section-40">2. Lombok 常用注解</a><a class="toc-h3" href="#section-41">@Getter 和 @Setter</a><a class="toc-h3" href="#section-42">@ToString</a><a class="toc-h3" href="#section-43">@NoArgsConstructor 和 @AllArgsConstructor</a><a class="toc-h3" href="#section-44">@EqualsAndHashCode</a><a class="toc-h3" href="#section-45">@Data</a><a class="toc-h2" href="#section-46">3. Lombok 代码示例</a><a class="toc-h2" href="#section-47">4. Lombok 常见报错</a><a class="toc-h2" href="#section-48">5. Lombok 面试常问</a><a class="toc-h2" href="#section-49">网络编程总结</a><a class="toc-h2" href="#section-50">正则表达式总结</a><a class="toc-h2" href="#section-51">设计模式总结</a><a class="toc-h2" href="#section-52">Lombok 总结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

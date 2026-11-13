@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL DQL 单表查询完整详解 · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/808a58512cfb7c56.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="../9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="../f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a aria-current="page" href="../808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="../d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL DQL 单表查询完整详解</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>DQL = Data Query Language</strong>，即数据查询语言
+专门用于<strong>查询</strong>表中的数据，核心关键字是 <code>SELECT</code>
+DQL 是开发中使用最频繁的操作，掌握好 DQL 是 MySQL 的核心竞争力</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架总览</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>DQL 单表查询
+├── SELECT 完整语法结构
+│   └── SELECT...FROM...WHERE...GROUP BY...HAVING...ORDER BY...LIMIT
+│
+├── 条件查询（WHERE）
+│   ├── 比较运算符：= != &gt; &lt; &gt;= &lt;=
+│   ├── 逻辑运算符：AND OR NOT
+│   ├── 范围查询：BETWEEN...AND
+│   ├── 集合查询：IN / NOT IN
+│   ├── 模糊查询：LIKE（% 和 _）
+│   └── 空值判断：IS NULL / IS NOT NULL
+│
+├── 聚合函数
+│   └── COUNT / SUM / AVG / MAX / MIN
+│
+├── 分组查询
+│   ├── GROUP BY（分组）
+│   ├── HAVING（分组后过滤）
+│   └── WHERE vs HAVING 区别
+│
+├── 排序（ORDER BY）
+│   ├── ASC 升序（默认）
+│   └── DESC 降序
+│
+├── 分页（LIMIT）
+│   └── LIMIT offset, count
+│
+└── SQL 执行顺序
+    └── FROM→WHERE→GROUP BY→HAVING→SELECT→ORDER BY→LIMIT
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、环境准备：示例表</h2>
+<blockquote>
+<p>以下所有示例基于这张员工表，请先执行</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建员工表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">         </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 员工ID</span>
+<span class="w">    </span><span class="n">name</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">            </span><span class="c1">-- 姓名</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span><span class="w">                     </span><span class="c1">-- 部门</span>
+<span class="w">    </span><span class="n">salary</span><span class="w">     </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w">                  </span><span class="c1">-- 工资</span>
+<span class="w">    </span><span class="n">age</span><span class="w">        </span><span class="nb">INT</span><span class="p">,</span><span class="w">                             </span><span class="c1">-- 年龄</span>
+<span class="w">    </span><span class="n">gender</span><span class="w">     </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w">                         </span><span class="c1">-- 性别：M/F</span>
+<span class="w">    </span><span class="n">hire_date</span><span class="w">  </span><span class="nb">DATE</span><span class="p">,</span><span class="w">                            </span><span class="c1">-- 入职日期</span>
+<span class="w">    </span><span class="n">city</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w">                      </span><span class="c1">-- 所在城市</span>
+<span class="p">);</span>
+
+<span class="c1">-- 插入测试数据</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">gender</span><span class="p">,</span><span class="w"> </span><span class="n">hire_date</span><span class="p">,</span><span class="w"> </span><span class="n">city</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'张三'</span><span class="p">,</span><span class="w">   </span><span class="s1">'技术部'</span><span class="p">,</span><span class="w">  </span><span class="mi">15000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2020-03-15'</span><span class="p">,</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'李四'</span><span class="p">,</span><span class="w">   </span><span class="s1">'技术部'</span><span class="p">,</span><span class="w">  </span><span class="mi">18000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2019-07-01'</span><span class="p">,</span><span class="w"> </span><span class="s1">'上海'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'王五'</span><span class="p">,</span><span class="w">   </span><span class="s1">'销售部'</span><span class="p">,</span><span class="w">   </span><span class="mi">8000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2022-01-10'</span><span class="p">,</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'赵六'</span><span class="p">,</span><span class="w">   </span><span class="s1">'销售部'</span><span class="p">,</span><span class="w">  </span><span class="mi">12000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="s1">'F'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2021-05-20'</span><span class="p">,</span><span class="w"> </span><span class="s1">'广州'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'孙七'</span><span class="p">,</span><span class="w">   </span><span class="s1">'技术部'</span><span class="p">,</span><span class="w">  </span><span class="mi">22000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">35</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2018-09-01'</span><span class="p">,</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'周八'</span><span class="p">,</span><span class="w">   </span><span class="s1">'HR部'</span><span class="p">,</span><span class="w">     </span><span class="mi">9000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w"> </span><span class="s1">'F'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2021-11-30'</span><span class="p">,</span><span class="w"> </span><span class="s1">'上海'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'吴九'</span><span class="p">,</span><span class="w">   </span><span class="s1">'技术部'</span><span class="p">,</span><span class="w">  </span><span class="mi">16500</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">29</span><span class="p">,</span><span class="w"> </span><span class="s1">'F'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2020-08-15'</span><span class="p">,</span><span class="w"> </span><span class="s1">'深圳'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'郑十'</span><span class="p">,</span><span class="w">   </span><span class="s1">'销售部'</span><span class="p">,</span><span class="w">   </span><span class="mi">7500</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2023-02-01'</span><span class="p">,</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'陈一'</span><span class="p">,</span><span class="w">   </span><span class="s1">'HR部'</span><span class="p">,</span><span class="w">    </span><span class="mi">10000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">31</span><span class="p">,</span><span class="w"> </span><span class="s1">'F'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2020-06-18'</span><span class="p">,</span><span class="w"> </span><span class="s1">'广州'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'刘二'</span><span class="p">,</span><span class="w">   </span><span class="s1">'技术部'</span><span class="p">,</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span><span class="w">     </span><span class="mi">26</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2023-05-10'</span><span class="p">,</span><span class="w"> </span><span class="s1">'上海'</span><span class="p">),</span><span class="w">  </span><span class="c1">-- 工资为NULL</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'林三'</span><span class="p">,</span><span class="w">   </span><span class="s1">'财务部'</span><span class="p">,</span><span class="w">  </span><span class="mi">13000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">33</span><span class="p">,</span><span class="w"> </span><span class="s1">'F'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2019-12-01'</span><span class="p">,</span><span class="w"> </span><span class="s1">'北京'</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s1">'黄四'</span><span class="p">,</span><span class="w">   </span><span class="s1">'财务部'</span><span class="p">,</span><span class="w">  </span><span class="mi">14000</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">36</span><span class="p">,</span><span class="w"> </span><span class="s1">'M'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2017-04-20'</span><span class="p">,</span><span class="w"> </span><span class="s1">'上海'</span><span class="p">);</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-2">三、SELECT 完整语法结构</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w">   </span><span class="p">[</span><span class="k">DISTINCT</span><span class="p">]</span><span class="w"> </span><span class="err">列名</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">列名</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="w">   </span><span class="c1">-- ① 选择哪些列</span>
+<span class="k">FROM</span><span class="w">     </span><span class="err">表名</span><span class="w">                           </span><span class="c1">-- ② 从哪张表</span>
+<span class="k">WHERE</span><span class="w">    </span><span class="err">条件</span><span class="w">                           </span><span class="c1">-- ③ 行过滤条件</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">列名</span><span class="w">                           </span><span class="c1">-- ④ 按哪列分组</span>
+<span class="k">HAVING</span><span class="w">   </span><span class="err">分组后条件</span><span class="w">                      </span><span class="c1">-- ⑤ 分组后过滤</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">列名</span><span class="w"> </span><span class="p">[</span><span class="k">ASC</span><span class="o">|</span><span class="k">DESC</span><span class="p">]</span><span class="w">                </span><span class="c1">-- ⑥ 排序</span>
+<span class="k">LIMIT</span><span class="w">    </span><span class="err">偏移量</span><span class="p">,</span><span class="w"> </span><span class="err">数量</span><span class="p">;</span><span class="w">                   </span><span class="c1">-- ⑦ 限制返回行数</span>
+</pre></div>
+</div><h3 id="section-3">3.1 基本 SELECT</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询所有列（* 代表所有列，实际生产中不推荐用 *，会影响性能）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+
+<span class="c1">-- 查询指定列</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w">   </span><span class="c1">-- 只查这三列</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+
+<span class="c1">-- 给列起别名（AS 可省略）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">name</span><span class="w">       </span><span class="k">AS</span><span class="w"> </span><span class="err">姓名</span><span class="p">,</span><span class="w">     </span><span class="c1">-- 显示时列名变成"姓名"</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span><span class="w">     </span><span class="c1">-- 显示时列名变成"部门"</span>
+<span class="w">    </span><span class="n">salary</span><span class="w">     </span><span class="k">AS</span><span class="w"> </span><span class="err">月薪</span><span class="w">      </span><span class="c1">-- 显示时列名变成"月薪"</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+
+<span class="c1">-- 计算列（查询时动态计算，不修改表数据）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">salary</span><span class="p">,</span>
+<span class="w">    </span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">年薪</span><span class="w">      </span><span class="c1">-- 计算年薪，结果显示为"年薪"列</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+
+<span class="c1">-- DISTINCT 去重（去除重复值）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">department</span><span class="w">    </span><span class="c1">-- 查询所有不重复的部门名称</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+<span class="c1">-- 结果：技术部、销售部、HR部、财务部（4行，不重复）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-4">四、条件查询（WHERE 子句）</h2>
+<h3 id="section-5">4.1 比较运算符</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- = 等于</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 查技术部员工</span>
+
+<span class="c1">-- != 或 &lt;&gt; 不等于</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 查非技术部员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 同上，两种写法都行</span>
+
+<span class="c1">-- &gt; 大于</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">15000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 查工资大于15000的</span>
+
+<span class="c1">-- &lt; 小于</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 查工资小于10000的</span>
+
+<span class="c1">-- &gt;= 大于等于</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">15000</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 工资大于等于15000</span>
+
+<span class="c1">-- &lt;= 小于等于</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">28</span><span class="p">;</span><span class="w">         </span><span class="c1">-- 年龄小于等于28</span>
+</pre></div>
+</div><h3 id="section-6">4.2 逻辑运算符</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- AND（同时满足两个条件）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="w">    </span><span class="c1">-- 条件1：技术部</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">15000</span><span class="p">;</span><span class="w">            </span><span class="c1">-- 条件2：工资大于15000</span>
+<span class="c1">-- 技术部且工资&gt;15000的员工</span>
+
+<span class="c1">-- OR（满足任意一个条件）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="w">   </span><span class="c1">-- 条件1：技术部</span>
+<span class="k">OR</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'销售部'</span><span class="p">;</span><span class="w">     </span><span class="c1">-- 或者：销售部</span>
+<span class="c1">-- 技术部或销售部的员工</span>
+
+<span class="c1">-- NOT（取反）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 不是技术部的员工</span>
+<span class="c1">-- 等价于：WHERE department != '技术部'</span>
+
+<span class="c1">-- 组合使用（注意括号！）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="p">(</span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'销售部'</span><span class="p">)</span><span class="w">    </span><span class="c1">-- 技术部或销售部</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w">                                        </span><span class="c1">-- 且工资大于10000</span>
+<span class="c1">-- 括号很重要，没有括号逻辑会不同</span>
+</pre></div>
+</div><h3 id="section-7">4.3 BETWEEN...AND 范围查询</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- BETWEEN 下限 AND 上限（包含两端，即闭区间 [下限, 上限]）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">10000</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">20000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 工资在 10000~20000 之间（含两端）</span>
+<span class="c1">-- 等价于：WHERE salary &gt;= 10000 AND salary &lt;= 20000</span>
+
+<span class="c1">-- 日期也可以用 BETWEEN</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">hire_date</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="s1">'2020-01-01'</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="s1">'2021-12-31'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 2020~2021年入职的</span>
+
+<span class="c1">-- NOT BETWEEN（不在范围内）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">10000</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">20000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 工资不在 10000~20000 之间</span>
+</pre></div>
+</div><h3 id="section-8">4.4 IN / NOT IN 集合查询</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- IN（在集合中）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">'技术部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'销售部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'HR部'</span><span class="p">);</span><span class="w">    </span><span class="c1">-- 在这三个部门之一</span>
+<span class="c1">-- 等价于：WHERE department='技术部' OR department='销售部' OR department='HR部'</span>
+
+<span class="c1">-- NOT IN（不在集合中）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">'技术部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'财务部'</span><span class="p">);</span><span class="w">    </span><span class="c1">-- 不在技术部和财务部</span>
+
+<span class="c1">-- IN 配合数字</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span><span class="w">    </span><span class="c1">-- 查询 id 为 1、3、5、7 的员工</span>
+</pre></div>
+</div><h3 id="section-9">4.5 LIKE 模糊查询</h3>
+<blockquote>
+<p><code>%</code> 匹配任意多个字符（包括0个）
+<code>_</code> 匹配任意单个字符</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- % 匹配任意多个字符</span>
+
+<span class="c1">-- 以"张"开头（姓张的）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'张%'</span><span class="p">;</span>
+
+<span class="c1">-- 以"部"结尾</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%部'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 所有带"部"字的部门</span>
+
+<span class="c1">-- 包含"技"字（任意位置）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%技%'</span><span class="p">;</span>
+
+<span class="c1">-- _ 匹配单个字符</span>
+
+<span class="c1">-- 名字是2个字（一个下划线匹配一个字符）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'__'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 两个下划线 = 名字2个字</span>
+<span class="c1">-- 注：中文一个字算一个字符（UTF8mb4下）</span>
+
+<span class="c1">-- 以"技"开头，后面跟两个字符</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'技__'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 匹配"技术部"等3字部门名</span>
+
+<span class="c1">-- 组合示例：邮箱包含 @gmail</span>
+<span class="c1">-- SELECT * FROM users WHERE email LIKE '%@gmail%';</span>
+
+<span class="c1">-- ⚠️ LIKE 注意：</span>
+<span class="c1">-- 1. 通配符在前面（如 '%张'）会导致索引失效，查询变慢</span>
+<span class="c1">-- 2. 推荐使用全文索引（FULLTEXT）来替代 LIKE '%关键词%'</span>
+</pre></div>
+</div><h3 id="section-10">4.6 IS NULL / IS NOT NULL</h3>
+<blockquote>
+<p><code>NULL</code> 表示未知值，不能用 <code>= NULL</code>，必须用 <code>IS NULL</code></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询工资为 NULL 的员工（刘二的工资是 NULL）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 工资为 NULL（注意：不能写 salary = NULL，查不到！）</span>
+
+<span class="c1">-- 查询工资不为 NULL 的员工</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 工资有值的员工</span>
+
+<span class="c1">-- ⚠️ 常见错误</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 错误写法！永远查不到结果</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 错误写法！永远查不到结果</span>
+<span class="c1">-- NULL 不能用 = 或 != 比较，只能用 IS NULL / IS NOT NULL</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-11">五、聚合函数</h2>
+<blockquote>
+<p>聚合函数对<strong>一组行</strong>进行计算，返回<strong>单个值</strong>
+<strong>注意：聚合函数自动忽略 NULL 值</strong>（COUNT(*) 除外）</p>
+</blockquote>
+<h3 id="section-12">5.1 COUNT 计数</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- COUNT(*) 统计总行数（包括 NULL 行）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">总员工数</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 结果：12（所有行）</span>
+
+<span class="c1">-- COUNT(列名) 统计该列非 NULL 的行数</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">有工资记录的人数</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 结果：11（刘二工资是NULL，不算）</span>
+
+<span class="c1">-- COUNT(DISTINCT 列名) 统计不重复的值的个数</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">department</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门数量</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 结果：4（技术部/销售部/HR部/财务部）</span>
+
+<span class="c1">-- 配合 WHERE 统计满足条件的行数</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">技术部人数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 只统计技术部</span>
+</pre></div>
+</div><h3 id="section-13">5.2 SUM 求和</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- SUM 计算总和（自动忽略 NULL）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">工资总额</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 所有非NULL工资之和</span>
+
+<span class="c1">-- 配合 WHERE 计算技术部工资总和</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">技术部工资总额</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span>
+
+<span class="c1">-- 计算年薪总额（动态计算）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">全公司年薪总额</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-14">5.3 AVG 平均值</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- AVG 计算平均值（自动忽略 NULL，所以只用11个人的工资算平均）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+
+<span class="c1">-- 配合条件</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">技术部平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="p">;</span>
+
+<span class="c1">-- 结合 ROUND 保留2位小数</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资（保留</span><span class="mi">2</span><span class="err">位小数）</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-15">5.4 MAX 和 MIN</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- MAX 最大值</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">最高工资</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 22000.00</span>
+
+<span class="c1">-- MIN 最小值（NULL 被忽略，不算最小值）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">MIN</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">最低工资</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 7500.00（NULL被忽略了）</span>
+
+<span class="c1">-- 同时查多个聚合函数</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">         </span><span class="k">AS</span><span class="w"> </span><span class="err">总人数</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="err">有薪资人数</span><span class="p">,</span>
+<span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="err">工资总额</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span><span class="p">,</span>
+<span class="w">    </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="err">最高工资</span><span class="p">,</span>
+<span class="w">    </span><span class="k">MIN</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="err">最低工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-16">六、分组查询（GROUP BY + HAVING）</h2>
+<h3 id="section-17">6.1 GROUP BY 分组</h3>
+<blockquote>
+<p><code>GROUP BY</code> 把相同值的行归为一组，再对每组进行聚合计算</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 语法</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="err">分组列</span><span class="p">,</span><span class="w"> </span><span class="err">聚合函数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="err">表名</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">分组列</span><span class="p">;</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：按部门统计人数</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span><span class="w">          </span><span class="c1">-- 分组依据列</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span><span class="w">              </span><span class="c1">-- 对每个分组统计行数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">;</span><span class="w">             </span><span class="c1">-- 按部门分组</span>
+<span class="c1">-- 结果：每个部门一行，显示部门名和人数</span>
+
+<span class="c1">-- 示例2：按部门统计工资情况</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">        </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span><span class="p">,</span>
+<span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">     </span><span class="k">AS</span><span class="w"> </span><span class="err">工资总额</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span><span class="p">,</span>
+<span class="w">    </span><span class="k">MAX</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">     </span><span class="k">AS</span><span class="w"> </span><span class="err">最高工资</span><span class="p">,</span>
+<span class="w">    </span><span class="k">MIN</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">     </span><span class="k">AS</span><span class="w"> </span><span class="err">最低工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 按部门分组，对每组分别计算</span>
+
+<span class="c1">-- 示例3：按性别统计平均年龄</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">gender</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="err">性别</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span><span class="p">,</span>
+<span class="w">    </span><span class="k">AVG</span><span class="p">(</span><span class="n">age</span><span class="p">)</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="err">平均年龄</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">gender</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 按性别分组</span>
+
+<span class="c1">-- 示例4：按多列分组（按部门+城市统计）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span>
+<span class="w">    </span><span class="n">city</span><span class="w">       </span><span class="k">AS</span><span class="w"> </span><span class="err">城市</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">   </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">city</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 按部门和城市两列同时分组</span>
+<span class="c1">-- 结果：每个（部门+城市）组合一行</span>
+
+<span class="c1">-- ⚠️ 重要规则：</span>
+<span class="c1">-- SELECT 中出现的列，要么在 GROUP BY 中，要么是聚合函数！</span>
+<span class="c1">-- 错误示例：</span>
+<span class="c1">-- SELECT name, department, COUNT(*) FROM employees GROUP BY department;</span>
+<span class="c1">-- name 没有在 GROUP BY 中，也不是聚合函数，MySQL 会报错（严格模式下）</span>
+</pre></div>
+</div><h3 id="section-18">6.2 HAVING：分组后过滤</h3>
+<blockquote>
+<p><code>HAVING</code> 是对 <code>GROUP BY</code> 分组后的结果进行过滤（相当于对分组结果的 WHERE）</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 语法</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="err">分组列</span><span class="p">,</span><span class="w"> </span><span class="err">聚合函数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="err">表名</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">分组列</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="err">聚合函数条件</span><span class="p">;</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 示例1：查询人数大于2的部门</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 分组后，只保留人数&gt;2的部门</span>
+
+<span class="c1">-- 示例2：查询平均工资超过12000的部门</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">12000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 只显示平均工资&gt;12000的部门</span>
+
+<span class="c1">-- 示例3：WHERE + GROUP BY + HAVING 同时使用</span>
+<span class="c1">-- 查询：技术部和销售部中，人数超过2人的部门的平均工资</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">'技术部'</span><span class="p">,</span><span class="w"> </span><span class="s1">'销售部'</span><span class="p">)</span><span class="w">    </span><span class="c1">-- ① 先过滤：只看技术部和销售部</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="w">                         </span><span class="c1">-- ② 按部门分组</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">                        </span><span class="c1">-- ③ 分组后，只保留人数&gt;2的部门</span>
+</pre></div>
+</div><h3 id="section-19">6.3 WHERE vs HAVING 核心区别</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>WHERE</th>
+<th>HAVING</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>执行时机</strong></td>
+<td>GROUP BY <strong>之前</strong>（对原始数据过滤）</td>
+<td>GROUP BY <strong>之后</strong>（对分组结果过滤）</td>
+</tr>
+<tr>
+<td><strong>能用聚合函数吗</strong></td>
+<td>❌ 不能（此时还没分组）</td>
+<td>✅ 能（已经分组，有聚合结果）</td>
+</tr>
+<tr>
+<td><strong>作用对象</strong></td>
+<td>原始表的每一行</td>
+<td>分组后的每一组</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>先过滤再分组（效率高）</td>
+<td>先分组再过滤（效率低一点）</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误示例：WHERE 中不能用聚合函数</span>
+<span class="c1">-- SELECT department, COUNT(*) FROM employees</span>
+<span class="c1">-- WHERE COUNT(*) &gt; 2    ← 错误！WHERE 在分组前执行，没有聚合结果</span>
+<span class="c1">-- GROUP BY department;</span>
+
+<span class="c1">-- 正确写法：用 HAVING</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 正确！HAVING 在分组后执行</span>
+
+<span class="c1">-- 能用 WHERE 的就用 WHERE（效率更高）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="w">       </span><span class="c1">-- 先用 WHERE 过滤掉工资≤10000的（原始行）</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">       </span><span class="c1">-- 再用 HAVING 过滤分组结果</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-20">七、排序（ORDER BY）</h2>
+<h3 id="section-21">7.1 单列排序</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 语法</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="err">列</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">列名</span><span class="w"> </span><span class="p">[</span><span class="k">ASC</span><span class="o">|</span><span class="k">DESC</span><span class="p">];</span>
+<span class="c1">-- ASC：升序（从小到大，默认值，可以不写）</span>
+<span class="c1">-- DESC：降序（从大到小）</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 升序（默认，ASC可以省略）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span><span class="w">      </span><span class="c1">-- 工资从低到高排序（ASC 可以省略）</span>
+
+<span class="c1">-- 降序</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">     </span><span class="c1">-- 工资从高到低排序</span>
+
+<span class="c1">-- 按日期排序（最新的在前）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">hire_date</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">hire_date</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 入职日期最新的排前面</span>
+
+<span class="c1">-- 按字符串排序（汉字按拼音/编码排序）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 按姓名拼音升序</span>
+</pre></div>
+</div><h3 id="section-22">7.2 多列排序</h3>
+<blockquote>
+<p>先按第一列排序，第一列相同时，再按第二列排序</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 先按部门升序，同部门内按工资降序</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">ASC</span><span class="p">,</span><span class="w">     </span><span class="c1">-- 第一排序字段：部门升序</span>
+<span class="w">    </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">        </span><span class="c1">-- 第二排序字段：工资降序（部门相同时）</span>
+
+<span class="c1">-- 先按城市排序，同城市按年龄升序</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">city</span><span class="p">,</span><span class="w"> </span><span class="n">age</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span>
+<span class="w">    </span><span class="n">city</span><span class="w"> </span><span class="k">ASC</span><span class="p">,</span><span class="w">           </span><span class="c1">-- 先按城市排</span>
+<span class="w">    </span><span class="n">age</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span><span class="w">            </span><span class="c1">-- 城市相同时按年龄排</span>
+
+<span class="c1">-- 按表达式排序（按年薪从高到低）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">年薪</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 按年薪降序，可以直接用表达式</span>
+<span class="c1">-- 也可以用别名：ORDER BY 年薪 DESC</span>
+
+<span class="c1">-- ⚠️ NULL 值排序：</span>
+<span class="c1">-- MySQL 中 NULL 在 ASC 排序时排在最前面</span>
+<span class="c1">-- NULL 在 DESC 排序时排在最后面</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span><span class="w">   </span><span class="c1">-- NULL 排最前</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">  </span><span class="c1">-- NULL 排最后</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-23">八、分页查询（LIMIT）</h2>
+<blockquote>
+<p>一次性返回所有数据太多，用 LIMIT 控制每次返回的行数
+常用于前端分页展示</p>
+</blockquote>
+<h3 id="section-24">8.1 LIMIT 语法</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 方式1：LIMIT count（只限制数量，从第1行开始）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 只返回前5行</span>
+
+<span class="c1">-- 方式2：LIMIT offset, count（跳过 offset 行，取 count 行）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 跳过0行，取5行（第1页）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 跳过5行，取5行（第2页）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 跳过10行，取5行（第3页）</span>
+
+<span class="c1">-- 方式3：LIMIT count OFFSET offset（MySQL 5.7+ 支持，更清晰）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="k">OFFSET</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 第1页</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="k">OFFSET</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 第2页</span>
+</pre></div>
+</div><h3 id="section-25">8.2 分页公式</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>第 N 页的查询（每页显示 pageSize 条）：
+LIMIT (N-1)*pageSize, pageSize
+
+例：每页5条，查第3页：
+LIMIT (3-1)*5, 5  →  LIMIT 10, 5
+</pre></div>
+</div><h3 id="section-26">8.3 完整分页示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 场景：员工列表分页，按工资降序，每页5条</span>
+
+<span class="c1">-- 第1页（第1~5条）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="w">    </span><span class="c1">-- 按工资降序</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">             </span><span class="c1">-- 偏移0，取5条</span>
+
+<span class="c1">-- 第2页（第6~10条）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">             </span><span class="c1">-- 偏移5，取5条</span>
+
+<span class="c1">-- 第3页（第11~12条，不足5条也没关系）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">            </span><span class="c1">-- 偏移10，取5条（实际只有2条）</span>
+
+<span class="c1">-- 结合 COUNT 实现前端分页</span>
+<span class="c1">-- 第1步：查总条数（前端用来计算总页数）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">总条数</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 结果：12</span>
+
+<span class="c1">-- 第2步：查当前页的数据</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 第1页数据</span>
+<span class="c1">-- 前端：总页数 = CEIL(12/5) = 3 页</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-27">九、SQL 执行顺序</h2>
+<blockquote>
+<p>理解执行顺序，才能正确写出复杂查询，也是面试高频考点</p>
+</blockquote>
+<h3 id="section-28">9.1 执行顺序图</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>书写顺序：SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT
+执行顺序：FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT
+
+① FROM      ：确定数据来源（从哪张表）
+② WHERE     ：过滤原始行（聚合前）
+③ GROUP BY  ：按列分组
+④ HAVING    ：过滤分组结果（聚合后）
+⑤ SELECT    ：选择输出的列（计算别名）
+⑥ ORDER BY  ：排序（此时可以用 SELECT 中定义的别名）
+⑦ LIMIT     ：截取指定行数
+</pre></div>
+</div><h3 id="section-29">9.2 执行顺序示例解析</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 完整示例：统计每个部门工资&gt;10000员工中，平均工资&gt;13000的部门</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span><span class="w">          </span><span class="c1">-- ⑤ SELECT：选择列，定义别名</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w">                   </span><span class="c1">-- ① FROM：先扫描 employees 表</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="w">             </span><span class="c1">-- ② WHERE：过滤工资&gt;10000的行</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="w">              </span><span class="c1">-- ③ GROUP BY：按部门分组</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">13000</span><span class="w">       </span><span class="c1">-- ④ HAVING：过滤平均工资&gt;13000的分组</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">平均工资</span><span class="w"> </span><span class="k">DESC</span><span class="w">            </span><span class="c1">-- ⑥ ORDER BY：按平均工资降序（可以用别名）</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">                         </span><span class="c1">-- ⑦ LIMIT：只取前3条</span>
+</pre></div>
+</div><h3 id="section-30">9.3 执行顺序的实际影响</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 问题1：ORDER BY 能用 SELECT 中定义的别名吗？</span>
+<span class="c1">-- 答：能！因为 ORDER BY 在 SELECT 之后执行</span>
+
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">年薪</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">年薪</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">    </span><span class="c1">-- ✅ 可以用别名"年薪"</span>
+
+<span class="c1">-- 问题2：WHERE 能用 SELECT 中定义的别名吗？</span>
+<span class="c1">-- 答：不能！因为 WHERE 在 SELECT 之前执行</span>
+
+<span class="c1">-- 错误写法：</span>
+<span class="c1">-- SELECT name, salary * 12 AS 年薪</span>
+<span class="c1">-- FROM employees</span>
+<span class="c1">-- WHERE 年薪 &gt; 100000;    -- ❌ 报错！WHERE 时别名还没定义</span>
+
+<span class="c1">-- 正确写法：用原始表达式</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">年薪</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- ✅ 用原始表达式，不用别名</span>
+
+<span class="c1">-- 问题3：HAVING 能用 SELECT 中定义的别名吗？</span>
+<span class="c1">-- 答：MySQL 中可以，但严格来说不规范（部分数据库不支持）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="err">平均工资</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- MySQL 中可以，但建议写成 HAVING AVG(salary) &gt; 10000</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-31">十、综合实战示例</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 实战1：查询技术部中工资前3名的员工信息</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'技术部'</span><span class="w">    </span><span class="c1">-- 只看技术部</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="w">            </span><span class="c1">-- 工资从高到低</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">                        </span><span class="c1">-- 只取前3名</span>
+
+<span class="c1">-- 实战2：统计各部门男女员工人数</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">department</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span>
+<span class="w">    </span><span class="n">gender</span><span class="w">     </span><span class="k">AS</span><span class="w"> </span><span class="err">性别</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">   </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">gender</span><span class="w">    </span><span class="c1">-- 按部门+性别分组</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">gender</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 排序</span>
+
+<span class="c1">-- 实战3：查询工资高于本公司平均工资的员工（子查询，DQL进阶用法）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w">    </span><span class="c1">-- 子查询：计算平均工资</span>
+<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="p">)</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+
+<span class="c1">-- 实战4：各城市平均工资排行（过滤掉人数不足2人的城市）</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">city</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">城市</span><span class="p">,</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">人数</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w">         </span><span class="c1">-- 排除工资为NULL的行</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">city</span><span class="w">                    </span><span class="c1">-- 按城市分组</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2</span><span class="w">             </span><span class="c1">-- 只保留人数&gt;=2的城市</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">平均工资</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">           </span><span class="c1">-- 按平均工资降序排列</span>
+
+<span class="c1">-- 实战5：分页查询，第2页，每页4条，按入职时间降序</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">id</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="p">,</span>
+<span class="w">    </span><span class="n">department</span><span class="p">,</span>
+<span class="w">    </span><span class="n">hire_date</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">hire_date</span><span class="w"> </span><span class="k">DESC</span><span class="w">    </span><span class="c1">-- 最新入职的排前面</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">                </span><span class="c1">-- 第2页：跳过4行，取4行</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-32">十一、常见报错及解决方法</h2>
+<h3 id="section-33">11.1 Expression not in GROUP BY</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1055 (42000): Expression #1 of SELECT list is not in GROUP BY clause
+and contains nonaggregated column...
+</pre></div>
+</div><p><strong>原因</strong>：SELECT 中的列没有在 GROUP BY 中，也没有用聚合函数</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 错误</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">;</span><span class="w">    </span><span class="c1">-- name 没有在 GROUP BY 中，报错（严格模式）</span>
+
+<span class="c1">-- 解决方法1：把 name 加到 GROUP BY</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w">    </span><span class="c1">-- name 也加入分组（但结果会变）</span>
+
+<span class="c1">-- 解决方法2：用聚合函数（如果想看任意一个name）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">MAX</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">代表姓名</span><span class="p">,</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="p">;</span>
+
+<span class="c1">-- 解决方法3：关闭严格模式（不推荐，会返回不确定的值）</span>
+<span class="c1">-- SET sql_mode = '';    -- 临时方案，不建议</span>
+</pre></div>
+</div><h3 id="section-34">11.2 Unknown column in HAVING</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1054 (42S22): Unknown column '平均工资' in 'having clause'
+</pre></div>
+</div><p><strong>原因</strong>：某些 MySQL 版本 HAVING 中不能用 SELECT 的别名</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 可能报错的写法</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="err">平均工资</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 某些版本报错</span>
+
+<span class="c1">-- 安全写法：直接用聚合表达式</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">平均工资</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 直接写 AVG(salary)，不用别名</span>
+</pre></div>
+</div><h3 id="section-35">11.3 LIKE 查不到中文</h3>
+<p><strong>原因</strong>：字符集设置问题，或通配符使用不当</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 检查字符集</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'character_set%'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 查看字符集设置</span>
+
+<span class="c1">-- 确保表和字段是 utf8mb4</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">CONVERT</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="nb">CHARACTER</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">COLLATE</span><span class="w"> </span><span class="n">utf8mb4_unicode_ci</span><span class="p">;</span>
+
+<span class="c1">-- LIKE 中文查询（确保字符集正确后正常使用）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'张%'</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 查姓张的</span>
+</pre></div>
+</div><h3 id="section-36">11.4 ORDER BY 结果不稳定（翻页数据重复）</h3>
+<p><strong>原因</strong>：排序字段有重复值时，MySQL 的排序结果是不确定的</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 不稳定的排序（salary 可能有相同值，每次查询顺序不同）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+
+<span class="c1">-- 加上唯一键作为二级排序，保证稳定</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">ASC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="c1">-- 工资相同时，按 id 升序排，保证每次结果一致</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-37">十二、面试常问</h2>
+<h3 id="section-38">12.1 WHERE vs HAVING 区别（极高频）</h3>
+<blockquote>
+<p>见第六节第三小节，记住这个核心结论：</p>
+<ul>
+<li>WHERE：分组前过滤，不能用聚合函数</li>
+<li>HAVING：分组后过滤，可以用聚合函数</li>
+</ul>
+</blockquote>
+<h3 id="section-39">12.2 COUNT(*) vs COUNT(列名) 区别</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>COUNT(*) ：统计所有行数，包括 NULL 行
+COUNT(列名)：统计该列非 NULL 的行数，自动忽略 NULL
+COUNT(1) ：等价于 COUNT(*)，统计所有行（1是常量，不会是NULL）
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SELECT</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">全部人数</span><span class="p">,</span><span class="w">           </span><span class="c1">-- 12（包含工资为NULL的刘二）</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">有薪资人数</span><span class="p">,</span><span class="w">    </span><span class="c1">-- 11（刘二被排除）</span>
+<span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">也是全部人数</span><span class="w">        </span><span class="c1">-- 12（COUNT(1) = COUNT(*)）</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-40">12.3 SQL 执行顺序（高频）</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT
+记忆口诀：
+"大家（FROM）围着（WHERE）桌子（GROUP BY）喝（HAVING）酒
+         选（SELECT）位置（ORDER BY）坐（LIMIT）下来"
+</pre></div>
+</div><h3 id="section-41">12.4 DISTINCT 注意事项</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- DISTINCT 作用于所有列（不是只作用于紧跟的那一列）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="n">gender</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+<span class="c1">-- 去重的是（department + gender）的组合，不是单独去重 department</span>
+
+<span class="c1">-- 聚合函数中的 DISTINCT</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">department</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 统计不重复的部门数</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span><span class="w">          </span><span class="c1">-- 只加不重复的工资值（奇怪用法，了解即可）</span>
+</pre></div>
+</div><h3 id="section-42">12.5 LIMIT 大偏移量性能问题</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 问题：LIMIT 100000, 10 很慢（要先扫描10万行再丢弃）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100000</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 慢！</span>
+
+<span class="c1">-- 优化方案：用 WHERE 替代大偏移量</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100000</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">    </span><span class="c1">-- 快！</span>
+<span class="c1">-- 前提：id 有索引，且用游标方式翻页</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-43">十三、本章小结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>语法</th>
+<th>作用</th>
+<th>关键点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SELECT 列</code></td>
+<td>选择输出列</td>
+<td>* 低效，推荐指定列名</td>
+</tr>
+<tr>
+<td><code>DISTINCT</code></td>
+<td>去重</td>
+<td>作用于所有列的组合</td>
+</tr>
+<tr>
+<td><code>WHERE 条件</code></td>
+<td>过滤行</td>
+<td>聚合前执行，不能用聚合函数</td>
+</tr>
+<tr>
+<td><code>BETWEEN</code></td>
+<td>范围查询</td>
+<td>闭区间，含两端</td>
+</tr>
+<tr>
+<td><code>IN</code></td>
+<td>集合查询</td>
+<td>可替代多个 OR</td>
+</tr>
+<tr>
+<td><code>LIKE</code></td>
+<td>模糊查询</td>
+<td>%多个字符，_单个字符</td>
+</tr>
+<tr>
+<td><code>IS NULL</code></td>
+<td>空值判断</td>
+<td>不能用 = NULL</td>
+</tr>
+<tr>
+<td><code>COUNT/SUM/AVG/MAX/MIN</code></td>
+<td>聚合函数</td>
+<td>自动忽略 NULL（COUNT* 除外）</td>
+</tr>
+<tr>
+<td><code>GROUP BY</code></td>
+<td>分组</td>
+<td>SELECT 列要在 GROUP BY 中或是聚合函数</td>
+</tr>
+<tr>
+<td><code>HAVING</code></td>
+<td>分组后过滤</td>
+<td>聚合后执行，可以用聚合函数</td>
+</tr>
+<tr>
+<td><code>ORDER BY</code></td>
+<td>排序</td>
+<td>ASC升序（默认），DESC降序</td>
+</tr>
+<tr>
+<td><code>LIMIT offset, count</code></td>
+<td>分页</td>
+<td>偏移量从0开始</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>SQL 执行顺序（最重要）：FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT</strong>
+理解了执行顺序，所有别名、聚合函数使用时机的问题都迎刃而解！</p>
+</blockquote>
+<hr/>
+<p><em>笔记结束 | 下一章：05-DQL多表查询（JOIN）</em></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="../f978c6e9910217b1.html"><small>← 上一篇</small><strong>MySQL DML（数据增删改）完整详解</strong></a><a href="021c5ead51bc463f.html"><small>下一篇 →</small><strong>MySQL 约束完整详解</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架总览</a><a class="toc-h2" href="#section-1">二、环境准备：示例表</a><a class="toc-h2" href="#section-2">三、SELECT 完整语法结构</a><a class="toc-h3" href="#section-3">3.1 基本 SELECT</a><a class="toc-h2" href="#section-4">四、条件查询（WHERE 子句）</a><a class="toc-h3" href="#section-5">4.1 比较运算符</a><a class="toc-h3" href="#section-6">4.2 逻辑运算符</a><a class="toc-h3" href="#section-7">4.3 BETWEEN...AND 范围查询</a><a class="toc-h3" href="#section-8">4.4 IN / NOT IN 集合查询</a><a class="toc-h3" href="#section-9">4.5 LIKE 模糊查询</a><a class="toc-h3" href="#section-10">4.6 IS NULL / IS NOT NULL</a><a class="toc-h2" href="#section-11">五、聚合函数</a><a class="toc-h3" href="#section-12">5.1 COUNT 计数</a><a class="toc-h3" href="#section-13">5.2 SUM 求和</a><a class="toc-h3" href="#section-14">5.3 AVG 平均值</a><a class="toc-h3" href="#section-15">5.4 MAX 和 MIN</a><a class="toc-h2" href="#section-16">六、分组查询（GROUP BY + HAVING）</a><a class="toc-h3" href="#section-17">6.1 GROUP BY 分组</a><a class="toc-h3" href="#section-18">6.2 HAVING：分组后过滤</a><a class="toc-h3" href="#section-19">6.3 WHERE vs HAVING 核心区别</a><a class="toc-h2" href="#section-20">七、排序（ORDER BY）</a><a class="toc-h3" href="#section-21">7.1 单列排序</a><a class="toc-h3" href="#section-22">7.2 多列排序</a><a class="toc-h2" href="#section-23">八、分页查询（LIMIT）</a><a class="toc-h3" href="#section-24">8.1 LIMIT 语法</a><a class="toc-h3" href="#section-25">8.2 分页公式</a><a class="toc-h3" href="#section-26">8.3 完整分页示例</a><a class="toc-h2" href="#section-27">九、SQL 执行顺序</a><a class="toc-h3" href="#section-28">9.1 执行顺序图</a><a class="toc-h3" href="#section-29">9.2 执行顺序示例解析</a><a class="toc-h3" href="#section-30">9.3 执行顺序的实际影响</a><a class="toc-h2" href="#section-31">十、综合实战示例</a><a class="toc-h2" href="#section-32">十一、常见报错及解决方法</a><a class="toc-h3" href="#section-33">11.1 Expression not in GROUP BY</a><a class="toc-h3" href="#section-34">11.2 Unknown column in HAVING</a><a class="toc-h3" href="#section-35">11.3 LIKE 查不到中文</a><a class="toc-h3" href="#section-36">11.4 ORDER BY 结果不稳定（翻页数据重复）</a><a class="toc-h2" href="#section-37">十二、面试常问</a><a class="toc-h3" href="#section-38">12.1 WHERE vs HAVING 区别（极高频）</a><a class="toc-h3" href="#section-39">12.2 COUNT(*) vs COUNT(列名) 区别</a><a class="toc-h3" href="#section-40">12.3 SQL 执行顺序（高频）</a><a class="toc-h3" href="#section-41">12.4 DISTINCT 注意事项</a><a class="toc-h3" href="#section-42">12.5 LIMIT 大偏移量性能问题</a><a class="toc-h2" href="#section-43">十三、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

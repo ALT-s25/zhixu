@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>02 · 流程控制（Scanner / if / switch / for / while） · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/627e1922662e46fd.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>黑马JavaSE详解</h2><nav aria-label="同专题笔记"><a href="../c4d82d2ecbe7239d.html">黑马程序员 JavaSE 课堂笔记 · 保姆级详解</a><a href="../da696b5c15eec7b5.html">12. JavaSE 第一阶段实战项目：学生管理系统</a><a href="../663d8dce41c9de31.html">Java入门与基础语法 · 保姆级详解</a><a aria-current="page" href="../627e1922662e46fd.html">02 · 流程控制（Scanner / if / switch / for / while）</a><a href="../b698d403e94b67c0.html">03 · 数组（一维数组 / 二维数组 / 内存图）</a><a href="../68cd2bab6f503260.html">04 · 方法（定义 / 重载 / 参数传递 / 递归）</a><a href="0086a4e3d2151a0f.html">07 · 异常处理与常用API（异常体系 / Object / Math / Date / 包装类）</a><a href="../8cd2529e780dbff1.html">03 — 面向对象基础（类 · 对象 · 封装）</a><a href="093a6372f7f27376.html">05 · 面向对象基础（类与对象 / 封装 / 构造方法 / this / static）</a><a href="0173d6327acd426b.html">06 · 继承多态抽象类接口内部类（extends / super / override / 多态 / abstract / interface）</a><a href="../7559b20ccd712917.html">第九章：网络编程、正则表达式与设计模式</a><a href="2a943d8b1e978d56.html">12 · JDK新特性（Lambda / 方法引用 / Stream流 / Optional / 新Date API）</a><a href="../b042d23174c3a83e.html">13 · 反射与注解（Class对象 / 获取构造方法字段方法 / 自定义注解）</a><a href="16dba041bd83aa9f.html">08 - IO流 保姆级详解笔记</a><a href="3cf636d3d26f8b64.html">09 · 多线程（Thread / Runnable / 线程状态 / synchronized / Lock / 线程池）</a><a href="../a5ef4afa16838c9d.html">10 · 集合框架（ArrayList / LinkedList / HashSet / TreeSet / HashMap / TreeMap）</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>黑马JavaSE详解</div><h1>02 · 流程控制（Scanner / if / switch / for / while）</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p>基于黑马程序员课堂讲义整理 · 知识点全面 · 每段代码均有注释</p>
+</blockquote>
+<hr/>
+<h1>模块四_流程控制</h1>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">模块三重点回顾</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">idea</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">自己看</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">算数运算符</span><span class="p">:</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">%</span><span class="p">(</span><span class="n">取余数</span><span class="p">)</span>
+<span class="w">    </span><span class="o">+</span><span class="p">:</span><span class="n">字符串拼接</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">内容直接往后拼接</span>
+<span class="w">        </span>
+<span class="w">    </span><span class="n">自增自减</span><span class="p">:</span><span class="o">++</span><span class="w"> </span><span class="o">--</span>
+<span class="w">        </span><span class="n">a</span><span class="p">.</span><span class="na">单独使用</span><span class="p">:</span><span class="n">符号在前在后都是先运算</span>
+<span class="w">        </span><span class="n">b</span><span class="p">.</span><span class="na">混合使用</span><span class="p">:</span><span class="n">符号在前先运算</span><span class="p">,</span><span class="n">再使用运算后的值</span>
+<span class="w">                  </span><span class="n">符号在后先使用原值</span><span class="p">,</span><span class="n">再运算</span>
+<span class="w">            </span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">赋值运算符</span><span class="p">:</span>
+<span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="o">%=</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">比较运算符</span><span class="p">:</span><span class="n">结果都是boolean型的</span>
+<span class="w">    </span><span class="o">==</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="o">!=</span><span class="w">    </span>
+<span class="w">      </span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">逻辑运算符</span><span class="p">:</span><span class="n">连接boolean结果的</span><span class="p">,</span><span class="n">结果还是boolean</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="p">(</span><span class="n">短路效果</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="p">(</span><span class="n">短路效果</span><span class="p">)</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">取反</span><span class="p">)</span><span class="w">  </span><span class="o">^</span>
+<span class="w">      </span>
+<span class="w">  </span><span class="mf">6.</span><span class="n">三元运算符</span><span class="p">:</span>
+<span class="w">    </span><span class="n">a</span><span class="p">.</span><span class="na">格式</span><span class="p">:</span>
+<span class="w">      </span><span class="n">boolean表达式</span><span class="o">?</span><span class="n">表达式1</span><span class="p">:</span><span class="n">表达式2</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="na">执行流程</span><span class="p">:</span><span class="n">先走boolean表达式</span><span class="p">,</span><span class="n">如果是true</span><span class="p">,</span><span class="n">就走</span><span class="o">?</span><span class="n">后面的表达式1</span><span class="p">,</span><span class="n">否则就走</span><span class="p">:</span><span class="n">后面的表达式2</span>
+<span class="w">        </span>
+<span class="nl">模块四重点</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">会使用Scanner和Random</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">会使用switch以及知道case的穿透性</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">会使用if</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">会使用for循环</span><span class="p">,</span><span class="n">while循环</span><span class="p">,</span><span class="n">嵌套循环</span>
+<span class="w">  </span>
+</pre></div>
+</div><h1>第一章.键盘录入_Scanner</h1>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">是java定义好的一个类</span>
+<span class="mf">2.</span><span class="n">作用</span><span class="p">:</span><span class="n">将数据通过键盘录入的形式放到代码中参与运行</span><span class="w"> </span>
+<span class="mf">3.</span><span class="n">位置</span><span class="p">:</span><span class="n">java</span><span class="p">.</span><span class="na">util</span>
+<span class="mf">4.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">导包</span><span class="p">:</span><span class="n">通过导包找到要使用的类</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">导包位置</span><span class="p">:</span><span class="n">类上</span>
+<span class="w">    </span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Scanner</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">导入的是哪个包下的哪个类</span>
+<span class="w">      </span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">创建对象</span>
+<span class="w">    </span><span class="n">Scanner</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">调用方法</span><span class="p">,</span><span class="n">实现键盘录入</span>
+<span class="w">    </span><span class="n">变量名</span><span class="p">.</span><span class="na">nextInt</span><span class="p">()</span><span class="w"> </span><span class="n">输入整数int型的</span>
+<span class="w">    </span><span class="n">变量名</span><span class="p">.</span><span class="na">next</span><span class="p">()</span><span class="w"> </span><span class="n">输入字符串</span><span class="w">  </span><span class="n">String型的</span><span class="w">  </span>
+</pre></div>
+</div><blockquote>
+<p>📌 <em>此处原图已省略，请参考原讲义配套图片</em></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Scanner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//创建对象</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//录入int型整数</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">data1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">//录入String型字符串</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">data2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">data2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">====================================================</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Scanner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//创建对象</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//录入int型整数</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">old1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">old2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">old3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">old1</span><span class="o">&gt;</span><span class="n">old2</span><span class="o">?</span><span class="n">old1</span><span class="p">:</span><span class="n">old2</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="o">&gt;</span><span class="n">old3</span><span class="o">?</span><span class="n">temp</span><span class="p">:</span><span class="n">old3</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">max</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="w">    </span>
+</pre></div>
+</div><blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">变量名</span><span class="p">.</span><span class="na">next</span><span class="p">():</span><span class="n">录入字符串</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">遇到空格和回车就结束录入了</span>
+<span class="n">变量名</span><span class="p">.</span><span class="na">nextLine</span><span class="p">():</span><span class="n">录入字符串</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">遇到回车就结束录入了</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Scanner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">data1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">data2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextLine</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">data1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">data2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Exception</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="s">"main"</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">InputMismatchException</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">输入类型不匹配异常</span>
+<span class="w">  </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="o">/</span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Scanner</span><span class="p">.</span><span class="na">throwFor</span><span class="p">(</span><span class="n">Scanner</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">939</span><span class="p">)</span>
+<span class="w">  </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="o">/</span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Scanner</span><span class="p">.</span><span class="na">next</span><span class="p">(</span><span class="n">Scanner</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">1594</span><span class="p">)</span>
+<span class="w">  </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="o">/</span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Scanner</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="n">Scanner</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">2258</span><span class="p">)</span>
+<span class="w">  </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="o">/</span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Scanner</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="n">Scanner</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">2212</span><span class="p">)</span>
+<span class="w">  </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">atguigu</span><span class="p">.</span><span class="na">a_scanner</span><span class="p">.</span><span class="na">Demo04Scanner</span><span class="p">.</span><span class="na">main</span><span class="p">(</span><span class="n">Demo04Scanner</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">8</span><span class="p">)</span>
+<span class="w">    </span>
+<span class="nl">原因</span><span class="p">:</span><span class="n">录入的数据和要求的数据类型不一致</span><span class="w">    </span>
+</pre></div>
+</div></blockquote>
+<h1>第二章.Random随机数</h1>
+<blockquote>
+<p>学习Random和学习Scanner方式方法一样</p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">java自带的一个类</span>
+<span class="mf">2.</span><span class="n">作用</span><span class="p">:</span><span class="n">可以在指定的范围内随机一个整数</span>
+<span class="mf">3.</span><span class="n">位置</span><span class="p">:</span><span class="n">java</span><span class="p">.</span><span class="na">util</span>
+<span class="mf">4.</span><span class="n">使用</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">导包</span><span class="p">:</span><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Random</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">创建对象</span><span class="p">:</span>
+<span class="w">    </span><span class="n">Random</span><span class="w"> </span><span class="n">变量名</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">()</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">调用方法</span><span class="p">,</span><span class="n">生成随机数</span><span class="p">:</span>
+<span class="w">    </span><span class="n">变量名</span><span class="p">.</span><span class="na">nextInt</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">在int的取值范围内随机一个整数</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Random</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//创建对象</span>
+<span class="w">        </span><span class="n">Random</span><span class="w"> </span><span class="n">rd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rd</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">在指定范围内随机一个数</span><span class="p">:</span>
+<span class="n">nextInt</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">bound</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">在0</span><span class="o">-</span><span class="p">(</span><span class="n">bound</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span>
+<span class="n">a</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span>
+<span class="n">b</span><span class="p">.</span><span class="na">在1</span><span class="o">-</span><span class="mi">10</span><span class="n">之间随机一个数</span><span class="p">:</span><span class="w"> </span><span class="n">nextInt</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="o">-</span><span class="mi">10</span>
+<span class="n">c</span><span class="p">.</span><span class="na">在1</span><span class="o">-</span><span class="mi">100</span><span class="n">之间随机一个数</span><span class="p">:</span><span class="n">nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">-</span><span class="mi">99</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="o">-</span><span class="mi">100</span>
+<span class="n">d</span><span class="p">.</span><span class="na">在100</span><span class="o">-</span><span class="mi">999</span><span class="n">之间随机一个数</span><span class="p">:</span><span class="w"> </span><span class="n">nextInt</span><span class="p">(</span><span class="mi">900</span><span class="p">)</span><span class="o">+</span><span class="mi">100</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">-</span><span class="mi">899</span><span class="p">)</span><span class="o">+</span><span class="mi">100</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">100</span><span class="o">-</span><span class="mi">999</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Random</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//创建对象</span>
+<span class="w">        </span><span class="n">Random</span><span class="w"> </span><span class="n">rd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//在1-100之间随机</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rd</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data1 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">data1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"====================="</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">//在100-999之间随机一个数</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rd</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">900</span><span class="p">)</span><span class="o">+</span><span class="mi">100</span><span class="p">;</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data2 = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">data2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h1>第三章.switch(选择语句)</h1>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">学switch</span><span class="w">  </span><span class="k">if</span><span class="w">  </span><span class="n">循环必须要先掌握定义格式</span><span class="p">,</span><span class="n">然后掌握执行流程</span><span class="p">(</span><span class="n">带一个数进去</span><span class="p">,</span><span class="n">根据执行流程观察值的变化</span><span class="p">)</span>
+</pre></div>
+</div><h2 id="section-0">1.switch基本使用</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">switch</span><span class="p">(</span><span class="n">变量</span><span class="p">){</span>
+<span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="n">常量值1</span><span class="p">:</span>
+<span class="w">          </span><span class="n">执行语句1</span><span class="p">;</span>
+<span class="w">          </span><span class="k">break</span><span class="p">;</span>
+<span class="w">          </span>
+<span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="n">常量值2</span><span class="p">:</span>
+<span class="w">          </span><span class="n">执行语句2</span><span class="p">;</span>
+<span class="w">          </span><span class="k">break</span><span class="p">;</span>
+<span class="w">          </span>
+<span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="n">常量值3</span><span class="p">:</span>
+<span class="w">          </span><span class="n">执行语句3</span><span class="p">;</span>
+<span class="w">          </span><span class="k">break</span><span class="p">;</span>
+<span class="w">          </span>
+<span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="n">常量值4</span><span class="p">:</span>
+<span class="w">          </span><span class="n">执行语句4</span><span class="p">;</span>
+<span class="w">          </span><span class="k">break</span><span class="p">;</span>
+<span class="w">          </span><span class="p">...</span>
+<span class="w">      </span><span class="k">default</span><span class="p">:</span>
+<span class="w">          </span><span class="n">执行语句n</span><span class="p">;</span>
+<span class="w">          </span><span class="k">break</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">用变量接收的值和下面case后面的常量值匹配</span><span class="p">,</span><span class="n">匹配上哪个case就执行哪个case对应的执行语句</span>
+<span class="w">  </span><span class="n">如果以上所有case都没有匹配上</span><span class="p">,</span><span class="n">就走default对应的执行语句n</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">break关键字</span><span class="p">:</span><span class="n">代表的是结束switch语句</span><span class="w"> </span>
+<span class="w">    </span>
+<span class="mf">4.</span><span class="n">注意</span><span class="p">:</span><span class="n">switch能匹配什么类型的数据</span><span class="p">:</span>
+<span class="w">  </span><span class="kt">byte</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">枚举类型</span><span class="w"> </span><span class="n">String类型</span>
+<span class="w">  </span>
+<span class="w">   </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Switch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"请您输入一个整数:"</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">){</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鹅鹅鹅"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"曲项向天歌"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">3</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"白毛浮绿水"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">4</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"红掌拨清波"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">default</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"下面没有了"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-1">2.case的穿透性</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">如果没有break</span><span class="p">,</span><span class="n">就会出现case的穿透性</span><span class="p">,</span><span class="n">程序就一直往下穿透执行</span><span class="p">,</span><span class="n">直到遇到了break或者switch代码执行完毕了</span><span class="p">,</span><span class="n">就停止了</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Switch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">){</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"鹅鹅鹅"</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"曲项向天歌"</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">3</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"白毛浮绿水"</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">4</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"红掌拨清波"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">default</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"下面没有了"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>📌 <em>此处原图已省略，请参考原讲义配套图片</em></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Switch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">switch</span><span class="p">(</span><span class="n">month</span><span class="p">){</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">12</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"冬季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"冬季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"冬季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">3</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"春季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">4</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"春季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">5</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"春季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">6</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"夏季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">7</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"夏季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">8</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"夏季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">9</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"秋季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">10</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"秋季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">11</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"秋季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">default</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"什么情况,你家有这个月份?"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Switch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">switch</span><span class="p">(</span><span class="n">month</span><span class="p">){</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">12</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"冬季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">3</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">4</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">5</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"春季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">6</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">7</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">8</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"夏季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">9</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">10</span><span class="p">:</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">11</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"秋季"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">default</span><span class="p">:</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"什么情况,你家有这个月份?"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h1>第四章.分支语句</h1>
+<h3 id="section-2">1.if的第一种格式</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">boolean表达式</span><span class="p">){</span>
+<span class="w">      </span><span class="n">执行语句</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">先走if后面的boolean表达式</span><span class="p">,</span><span class="n">如果是true</span><span class="p">,</span><span class="n">就走if后面大括号中的执行语句</span><span class="p">,</span><span class="n">否则就不走</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">注意</span><span class="p">:</span>
+<span class="w">  </span><span class="n">if后面跟的是boolean表达式</span><span class="p">,</span><span class="n">只要是结果为boolean型的</span><span class="p">,</span><span class="n">都可以放在小括号中</span><span class="p">,</span><span class="n">哪怕直接写一个true或者false</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01If</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data1</span><span class="o">==</span><span class="n">data2</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"两个整数相等"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-3">2.if的第二种格式</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">boolean表达式</span><span class="p">){</span>
+<span class="w">      </span><span class="n">执行语句1</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">      </span><span class="n">执行语句2</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">先走if后面的boolean表达式</span><span class="p">,</span><span class="n">如果是true</span><span class="p">,</span><span class="n">就走if后面的执行语句1</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">否则就走else后面的执行语句2</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02IfElse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data1</span><span class="o">==</span><span class="n">data2</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"两个整数相等"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"两个整数不相等"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-4">2.1 练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">任意给出一个整数</span><span class="err">，</span><span class="n">请用程序实现判断该整数是奇数还是偶数</span><span class="err">，</span><span class="n">并在控制台输出该整数是奇数还是偶数</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03IfElse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"偶数"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"奇数"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-5">2.2练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">需求</span><span class="p">.</span><span class="na">利用if</span><span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="n">求出两个数的较大值</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04IfElse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">&gt;</span><span class="n">j</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05IfElse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">//定义临时变量,接收前两个数的较大值</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">&gt;</span><span class="n">j</span><span class="p">){</span>
+<span class="w">            </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">temp</span><span class="o">&gt;</span><span class="n">k</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">temp</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">k</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-6">2.3练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">案例</span><span class="err">：</span><span class="n">从键盘输入年份</span><span class="err">，</span><span class="n">请输出该年的2月份的总天数</span><span class="err">。</span><span class="n">闰年2月份29天</span><span class="err">，</span><span class="n">平年28天</span><span class="err">。</span>
+<span class="nl">闰年</span><span class="p">:</span>
+<span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="na">能被4整除</span><span class="p">,</span><span class="n">但是不能被100整除</span><span class="w">  </span><span class="n">year</span><span class="o">%</span><span class="mi">4</span><span class="o">==</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">year</span><span class="o">%</span><span class="mi">100</span><span class="o">!=</span><span class="mi">0</span>
+<span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">或者能直接被400整除</span><span class="w">  </span><span class="n">year</span><span class="o">%</span><span class="mi">400</span><span class="o">==</span><span class="mi">0</span>
+
+<span class="nl">步骤</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">创建Scanner对象</span><span class="p">,</span><span class="n">调用nextInt键盘录入一个年份</span><span class="w"> </span><span class="n">year</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">判断</span><span class="p">(</span><span class="n">year</span><span class="o">%</span><span class="mi">4</span><span class="o">==</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">year</span><span class="o">%</span><span class="mi">100</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">year</span><span class="o">%</span><span class="mi">400</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">如果条件成立</span><span class="p">,</span><span class="n">就输出闰年2月29天</span><span class="p">,</span><span class="n">否则输出平年2月28天</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo06IfElse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.创建Scanner对象,调用nextInt键盘录入一个年份 year</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">scanner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scanner</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//2.判断(year%4==0 &amp;&amp; year%100!=0) || (year%400==0)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">year</span><span class="o">%</span><span class="mi">4</span><span class="o">==</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">year</span><span class="o">%</span><span class="mi">100</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">year</span><span class="o">%</span><span class="mi">400</span><span class="o">==</span><span class="mi">0</span><span class="p">)){</span>
+<span class="w">        </span><span class="c1">//3.如果条件成立,就输出闰年2月29天,否则输出平年2月28天</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"闰年2月29天"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"平年2月28天"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-7">2.4练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo07IfElse</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">num1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">num2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">           num1 = false</span>
+<span class="cm">           num2 = true</span>
+<span class="cm">           num1 = num2 -&gt; 相当于将num2的true赋值给了num1</span>
+<span class="cm">         */</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">num1</span><span class="o">=</span><span class="n">num2</span><span class="p">){</span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="c1">//2</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kc">false</span><span class="p">){</span>
+<span class="w">            </span><span class="o">--</span><span class="n">i</span><span class="p">;</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-8">3.if的第三种格式</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">boolean表达式</span><span class="p">){</span>
+<span class="w">      </span><span class="n">执行语句1</span>
+<span class="w">  </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">boolean表达式</span><span class="p">){</span>
+<span class="w">      </span><span class="n">执行语句2</span>
+<span class="w">  </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">boolean表达式</span><span class="p">){</span>
+<span class="w">      </span><span class="n">执行语句3</span>
+<span class="w">  </span><span class="p">}...</span><span class="na">else</span><span class="p">{</span>
+<span class="w">      </span><span class="n">执行语句n</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">从if开始往下挨个判断</span><span class="p">,</span><span class="n">哪个if判断结果为true</span><span class="p">,</span><span class="n">就走哪个if对应的执行语句</span><span class="p">,</span><span class="n">如果以上所有的判断都是false</span><span class="p">,</span><span class="n">就走else对应的执行语句n</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">使用场景</span><span class="p">:</span><span class="mi">2</span><span class="n">种情况以上的判断</span><span class="w">      </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo08ElseIf</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">       </span><span class="cm">/* if (data1&gt;data2){</span>
+<span class="cm">            System.out.println("data1大于data2");</span>
+<span class="cm">        }else if(data1&lt;data2){</span>
+<span class="cm">            System.out.println("data1小于data2");</span>
+<span class="cm">        }else{</span>
+<span class="cm">            System.out.println("data1等于data2");</span>
+<span class="cm">        }*/</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data1</span><span class="o">&gt;</span><span class="n">data2</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data1大于data2"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">data1</span><span class="o">&lt;</span><span class="n">data2</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data1小于data2"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data1</span><span class="o">==</span><span class="n">data2</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"data1等于data2"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">注意</span><span class="p">:</span><span class="n">最后一种情况</span><span class="p">,</span><span class="n">不一定非得用else</span><span class="p">,</span><span class="n">但是必须要保证所有的情况都判断了</span>
+</pre></div>
+</div><h4 id="section-9">3.1.练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span>
+<span class="w"> </span><span class="n">键盘录入一个星期数</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,..</span><span class="mf">.7</span><span class="p">)</span><span class="err">，</span><span class="n">输出对应的星期一</span><span class="err">，</span><span class="n">星期二</span><span class="err">，</span><span class="p">...</span><span class="na">星期日</span>
+
+<span class="n">输入</span><span class="w">  </span><span class="mi">1</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期一</span>
+<span class="n">输入</span><span class="w">  </span><span class="mi">2</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期二</span>
+<span class="n">输入</span><span class="w">  </span><span class="mi">3</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期三</span>
+<span class="n">输入</span><span class="w">  </span><span class="mi">4</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期四</span>
+<span class="n">输入</span><span class="w">  </span><span class="mi">5</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期五</span>
+<span class="n">输入</span><span class="w">  </span><span class="mi">6</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期六</span>
+<span class="n">输入</span><span class="w">  </span><span class="mi">7</span><span class="w">      </span><span class="n">输出</span><span class="w">	</span><span class="n">星期日</span>
+<span class="n">输入</span><span class="w">  </span><span class="n">其它数字</span><span class="w">   </span><span class="n">输出</span><span class="w">      </span><span class="n">数字有误</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo09ElseIf</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">        </span><span class="cm">/*if (week==1){</span>
+<span class="cm">            System.out.println("周一");</span>
+<span class="cm">        }else if (week==2){</span>
+<span class="cm">            System.out.println("周二");</span>
+<span class="cm">        }else if (week==3){</span>
+<span class="cm">            System.out.println("周三");</span>
+<span class="cm">        }else if (week==4){</span>
+<span class="cm">            System.out.println("周四");</span>
+<span class="cm">        }else if (week==5){</span>
+<span class="cm">            System.out.println("周五");</span>
+<span class="cm">        }else if (week==6){</span>
+<span class="cm">            System.out.println("周六");</span>
+<span class="cm">        }else if (week==7){</span>
+<span class="cm">            System.out.println("周日");</span>
+<span class="cm">        }else{</span>
+<span class="cm">            System.out.println("是不是有点大病,没有这个星期!");</span>
+<span class="cm">        }*/</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">&lt;</span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">week</span><span class="o">&gt;</span><span class="mi">7</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"是不是有点大病,没有这个星期!"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">1</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周一"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">2</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周二"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">3</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周三"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">4</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周四"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">5</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周五"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">6</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周六"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">week</span><span class="o">==</span><span class="mi">7</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"周日"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h4 id="section-10">3.2练习</h4>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">根据最新的年龄段划分标准</span><span class="p">:</span>
+<span class="w">  </span><span class="mi">0</span><span class="o">-</span><span class="mi">6</span><span class="n">岁为婴幼儿</span>
+<span class="w">  </span><span class="mi">7</span><span class="o">-</span><span class="mi">12</span><span class="n">岁为少儿</span>
+<span class="w">  </span><span class="mi">13</span><span class="o">-</span><span class="mi">17</span><span class="n">岁为青少年</span>
+<span class="w">  </span><span class="mi">18</span><span class="o">-</span><span class="mi">45</span><span class="n">岁为青年</span>
+<span class="w">  </span><span class="mi">46</span><span class="o">-</span><span class="mi">69</span><span class="n">岁为中年</span>
+<span class="w">  </span><span class="mi">69</span><span class="n">岁以上为老年</span>
+<span class="n">请键盘录入一个年龄</span><span class="p">,</span><span class="n">判断属于什么年龄段</span><span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo10ElseIf</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">       </span><span class="cm">/* if (age&gt;=0 &amp;&amp; age&lt;=6){</span>
+<span class="cm">            System.out.println("婴幼儿");</span>
+<span class="cm">        }else if (age&gt;=7 &amp;&amp; age&lt;=12){</span>
+<span class="cm">            System.out.println("少儿");</span>
+<span class="cm">        }else if (age&gt;=13 &amp;&amp; age&lt;=17){</span>
+<span class="cm">            System.out.println("青少年");</span>
+<span class="cm">        }else if(age&gt;=18 &amp;&amp; age&lt;=45){</span>
+<span class="cm">            System.out.println("青年");</span>
+<span class="cm">        }else if(age&gt;=46 &amp;&amp; age&lt;=69){</span>
+<span class="cm">            System.out.println("中年");</span>
+<span class="cm">        }else if (age&gt;69 &amp;&amp; age&lt;=130){</span>
+<span class="cm">            System.out.println("老年");</span>
+<span class="cm">        }else {</span>
+<span class="cm">            System.out.println("年龄不太符合实际");</span>
+<span class="cm">        }*/</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="o">&lt;</span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">age</span><span class="o">&gt;</span><span class="mi">130</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"年龄不太符合实际"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">age</span><span class="o">&lt;=</span><span class="mi">6</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"婴幼儿"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">7</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">age</span><span class="o">&lt;=</span><span class="mi">12</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"少儿"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">13</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">age</span><span class="o">&lt;=</span><span class="mi">17</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"青少年"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">18</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">age</span><span class="o">&lt;=</span><span class="mi">45</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"青年"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">46</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">age</span><span class="o">&lt;=</span><span class="mi">69</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"中年"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="o">&gt;</span><span class="mi">69</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">age</span><span class="o">&lt;=</span><span class="mi">130</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"老年"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>switch和if的区别:debug</p>
+<p>1.switch:会直接跳到相匹配的case</p>
+<p>2.if:从上到下挨个判断 -&gt; 实际开发主要用if做判断,灵活</p>
+</blockquote>
+<h1>第五章.循环语句</h1>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">什么时候使用循环语句</span><span class="p">:</span>
+<span class="w">  </span><span class="n">当我们发现一件事或者一段代码在反复执行</span><span class="p">,</span><span class="n">我们就可以考虑使用循环语句了</span>
+</pre></div>
+</div><h2 id="section-11">1.for循环</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="n">初始化变量</span><span class="p">;</span><span class="n">比较</span><span class="p">;</span><span class="n">步进表达式</span><span class="p">){</span>
+<span class="w">      </span><span class="n">循环语句</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">哪段代码循环执行</span><span class="p">,</span><span class="n">就将哪段代码放到此处</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">先走初始化变量</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">比较</span><span class="p">,</span><span class="n">如果是true</span><span class="p">,</span><span class="n">走循环语句</span><span class="p">,</span><span class="n">走步进表达式</span><span class="p">(</span><span class="n">初始化的变量的值进行变化</span><span class="p">)</span><span class="w"> </span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">再比较</span><span class="p">,</span><span class="n">如果还是true</span><span class="p">,</span><span class="n">继续走循环语句</span><span class="p">,</span><span class="n">走步进表达式</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">再比较</span><span class="p">,</span><span class="n">直到比较为false</span><span class="p">,</span><span class="n">循环结束了</span>
+</pre></div>
+</div><blockquote>
+<p>📌 <em>此处原图已省略，请参考原讲义配套图片</em></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01For</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我爱java"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>📌 <em>此处原图已省略，请参考原讲义配套图片</em></p>
+</blockquote>
+<blockquote>
+<p>快捷键: 次数.fori</p>
+</blockquote>
+<h3 id="section-12">1.1练习</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">for循环</span><span class="p">:</span><span class="n">求1</span><span class="o">-</span><span class="mi">3</span><span class="n">之间的数据和</span><span class="p">,</span><span class="n">并把求和结果输出到控制台上</span>
+<span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span>
+<span class="w">    </span>
+<span class="nl">步骤</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">定义一个变量</span><span class="p">,</span><span class="n">用来接受两个数的和</span><span class="w">  </span><span class="n">sum</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">利用for循环将1</span><span class="o">-</span><span class="mi">3</span><span class="n">表示出来</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">在循环的过程中</span><span class="p">,</span><span class="n">两两相加</span><span class="p">,</span><span class="n">将结果赋值给sum</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">输出sum</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02For</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.定义一个变量,用来接受两个数的和  sum</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//2.利用for循环将1-3表示出来</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//3.在循环的过程中,两两相加,将结果赋值给sum</span>
+<span class="w">            </span><span class="n">sum</span><span class="o">+=</span><span class="n">i</span><span class="p">;</span><span class="c1">//sum = sum+i;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">//4.输出sum</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>📌 <em>此处原图已省略，请参考原讲义配套图片</em></p>
+</blockquote>
+<h3 id="section-13">1.2练习</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">求出1</span><span class="o">-</span><span class="mi">100</span><span class="n">的偶数和</span>
+
+<span class="nl">步骤</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">定义一个变量sum</span><span class="p">,</span><span class="n">接受两个偶数的和</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">利用for循环将1</span><span class="o">-</span><span class="mi">100</span><span class="n">表示出来</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">判断</span><span class="p">,</span><span class="n">如果是偶数</span><span class="p">,</span><span class="n">相加</span><span class="p">,</span><span class="n">将加的结果赋值给sum</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">输出sum</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03For</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.定义一个变量sum,接受两个偶数的和</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//2.利用for循环将1-100表示出来</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//3.判断,如果是偶数,相加,将加的结果赋值给sum</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">//4.输出sum</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-14">1.3练习</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">统计一下1</span><span class="o">-</span><span class="mi">100</span><span class="n">之间的偶数个数</span>
+
+<span class="nl">步骤</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">定义一个变量count</span><span class="p">,</span><span class="n">用来计数</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">利用for循环将1</span><span class="o">-</span><span class="mi">100</span><span class="n">表示出来</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">判断</span><span class="p">,</span><span class="n">如果是偶数</span><span class="p">,</span><span class="n">count</span><span class="o">++</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">输出count</span><span class="w">    </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04For</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.定义一个变量count,用来计数</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//2.利用for循环将1-100表示出来</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//3.判断,如果是偶数,count++</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">//4.输出count</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"count = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-15">2.while循环</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="n">初始化变量</span><span class="p">;</span>
+<span class="w">  </span><span class="k">while</span><span class="p">(</span><span class="n">比较</span><span class="p">){</span>
+<span class="w">      </span><span class="n">循环语句</span><span class="p">;</span>
+<span class="w">      </span><span class="n">步进表达式</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">初始化变量</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">比较</span><span class="p">,</span><span class="n">如果是true</span><span class="p">,</span><span class="n">就走循环语句</span><span class="p">,</span><span class="n">走步进表达式</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">再比较</span><span class="p">,</span><span class="n">如果还是true</span><span class="p">,</span><span class="n">继续走循环语句</span><span class="p">,</span><span class="n">继续走步进表达式</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">再比较</span><span class="p">,</span><span class="n">直到比较为false</span><span class="p">,</span><span class="n">循环结束</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01While</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">){</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我爱java,我更爱钱"</span><span class="p">);</span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02While</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">3</span><span class="p">){</span>
+<span class="w">           </span><span class="n">sum</span><span class="o">+=</span><span class="n">i</span><span class="p">;</span>
+<span class="w">           </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03While</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"sum = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04While</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"count = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-16">1.1while练习</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">需求</span><span class="err">：</span><span class="n">世界最高山峰是珠穆朗玛峰</span><span class="p">(</span><span class="mf">8844.43</span><span class="n">米</span><span class="o">=</span><span class="mi">8844430</span><span class="n">毫米</span><span class="p">)</span><span class="err">，</span><span class="n">假如我有一张足够大的纸</span><span class="err">，</span><span class="n">它的厚度是0</span><span class="mf">.1</span><span class="n">毫米</span><span class="err">。</span><span class="n">请问</span><span class="err">，</span><span class="n">我折叠多少次</span><span class="err">，</span><span class="n">可以折成珠穆朗玛峰的高度</span><span class="o">?</span><span class="w"> </span><span class="mi">27</span>
+
+<span class="nl">步骤</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">1.</span><span class="n">定义一个变量表示山峰的高度</span><span class="w">  </span><span class="n">mountain</span>
+<span class="w">  </span><span class="mf">2.</span><span class="n">定义一个变量表示纸的厚度</span><span class="w">    </span><span class="n">paper</span>
+<span class="w">  </span><span class="mf">3.</span><span class="n">定义一个变量表示折纸的次数</span><span class="w">  </span><span class="n">count</span>
+<span class="w">  </span><span class="mf">4.</span><span class="n">利用while循环循环比较</span><span class="p">,</span><span class="n">如果paper</span><span class="o">&lt;</span><span class="n">mountain</span><span class="w"> </span><span class="n">就循环对折</span>
+<span class="w">    </span><span class="n">paper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">paper</span><span class="o">*</span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">  </span><span class="mf">5.</span><span class="n">输出count</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo05While</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.定义一个变量表示山峰的高度  mountain</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">mountain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8844430</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//2.定义一个变量表示纸的厚度    paper</span>
+<span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">paper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">//3.定义一个变量表示折纸的次数  count</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="cm">/*4.利用while循环循环比较,如果paper&lt;mountain 就循环对折</span>
+<span class="cm">          paper = paper*2;</span>
+<span class="cm">          count++;*/</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="n">paper</span><span class="o">&lt;</span><span class="n">mountain</span><span class="p">){</span>
+<span class="w">            </span><span class="n">paper</span><span class="o">*=</span><span class="mi">2</span><span class="p">;</span>
+<span class="w">            </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="c1">//5.输出count</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"count = "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-17">3.do...while循环(了解)</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
+<span class="w">  </span><span class="n">初始化变量</span><span class="p">;</span>
+<span class="w">  </span><span class="k">do</span><span class="p">{</span>
+<span class="w">      </span><span class="n">循环语句</span><span class="p">;</span>
+<span class="w">      </span><span class="n">步进表达式</span>
+<span class="w">  </span><span class="p">}</span><span class="k">while</span><span class="p">(</span><span class="n">比较</span><span class="p">);</span>
+
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">初始化变量</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">走循环语句</span>
+<span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="na">走步进表达式</span>
+<span class="w">  </span><span class="n">d</span><span class="p">.</span><span class="na">判断</span><span class="p">,</span><span class="n">如果是true</span><span class="p">,</span><span class="n">继续循环</span><span class="p">,</span><span class="n">直到比较为false</span><span class="p">,</span><span class="n">循环结束</span>
+<span class="w">      </span>
+<span class="mf">3.</span><span class="n">特点</span><span class="p">:</span>
+<span class="w">  </span><span class="n">至少循环一次</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01DoWhile</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">do</span><span class="p">{</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我爱java"</span><span class="p">);</span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="k">while</span><span class="p">(</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-18">4.循环控制关键字</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="k">break</span><span class="p">:</span>
+<span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">在switch中代表结束switch语句</span>
+<span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">在循环中代表结束循环</span><span class="w"> </span>
+<span class="w">      </span>
+<span class="mf">2.</span><span class="k">continue</span><span class="p">:</span>
+<span class="w">  </span><span class="n">结束当前本次循环</span><span class="p">,</span><span class="n">直接进入下一次循环</span><span class="p">,</span><span class="n">直到条件为false为止</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01BreakAndContinue</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">==</span><span class="mi">3</span><span class="p">){</span>
+<span class="w">                </span><span class="c1">//结束循环</span>
+<span class="w">                </span><span class="c1">//break;</span>
+<span class="w">                </span><span class="c1">//结束本次循环,进入下一次循环</span>
+<span class="w">                </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我爱java"</span><span class="o">+</span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-19">5.死循环</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span>
+<span class="w">  </span><span class="n">一直循环</span>
+<span class="mf">2.</span><span class="n">什么条件下一直循环</span><span class="p">:</span>
+<span class="w">  </span><span class="n">比较条件一直是true</span>
+<span class="w">  </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Endless</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"我爱java"</span><span class="o">+</span><span class="n">count</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+
+<span class="w">       </span><span class="cm">/* while(true){</span>
+<span class="cm">            count++;</span>
+<span class="cm">            System.out.println("我爱java"+count);</span>
+<span class="cm">        }*/</span>
+
+
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-20">6.嵌套循环</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">循环中还有循环</span>
+<span class="mf">2.</span><span class="n">执行流程</span><span class="p">:</span>
+<span class="w">  </span><span class="n">先执行外层循环</span><span class="p">,</span><span class="n">再进入内层循环</span><span class="p">,</span><span class="n">内层循环就一直循环</span><span class="p">,</span><span class="n">直到内层循环结束</span><span class="p">,</span><span class="n">外层循环进入下一次循环</span><span class="p">,</span><span class="n">直到外层循环都结束了</span><span class="p">,</span><span class="n">整体结束</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Nest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">fen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">fen</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"> </span><span class="n">fen</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">miao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">miao</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"> </span><span class="n">miao</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">fen</span><span class="o">+</span><span class="s">"分"</span><span class="o">+</span><span class="n">miao</span><span class="o">+</span><span class="s">"秒"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">练习</span><span class="p">:</span><span class="n">打印矩形</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo03Nest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//外层循环控制行</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">//内层循环控制列</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"* "</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">练习</span><span class="p">:</span><span class="n">打印直角三角形</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="o">*</span><span class="w"> </span>
+<span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span>
+<span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span>
+<span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">*</span><span class="w">   </span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04Nest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">i</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"* "</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h2 id="section-21">7.练习.猜数字小游戏</h2>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">创建Scanner和Random对象</span>
+<span class="mf">2.</span><span class="n">调用Random中的nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="n">在1</span><span class="o">-</span><span class="mi">100</span><span class="n">之间随机一个数</span><span class="w">  </span><span class="n">rdNumber</span>
+<span class="mf">3.</span><span class="n">调用Scanner中的nextInt</span><span class="p">()</span><span class="n">方法</span><span class="w"> </span><span class="n">键盘录入一个要猜的数</span><span class="w">   </span><span class="n">scNumber</span>
+<span class="mf">4.</span><span class="n">如果scNumber大于rdNumber</span><span class="p">,</span><span class="n">证明猜大了</span>
+<span class="mf">5.</span><span class="n">如果scNumber小于rdNumber</span><span class="p">,</span><span class="n">证明猜小了</span>
+<span class="mf">6.</span><span class="n">如果scNumber等于rdNumber</span><span class="p">,</span><span class="n">证明猜中了</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Exam</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">//1.创建Scanner和Random对象</span>
+<span class="w">        </span><span class="n">Scanner</span><span class="w"> </span><span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Random</span><span class="w"> </span><span class="n">rd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//2.调用Random中的nextInt(100)+1在1-100之间随机一个数  rdNumber</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">rdNumber</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rd</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="kc">true</span><span class="p">){</span>
+<span class="w">            </span><span class="c1">//3.调用Scanner中的nextInt()方法 键盘录入一个要猜的数   scNumber</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"请您猜一个数:"</span><span class="p">);</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">scNumber</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>
+<span class="w">            </span><span class="c1">//4.如果scNumber大于rdNumber,证明猜大了</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">scNumber</span><span class="o">&gt;</span><span class="n">rdNumber</span><span class="p">){</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"对不起,您猜大了!"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">scNumber</span><span class="o">&lt;</span><span class="n">rdNumber</span><span class="p">){</span>
+<span class="w">                </span><span class="c1">//5.如果scNumber小于rdNumber,证明猜小了</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"对不起,您猜小了!"</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">                </span><span class="c1">//6.如果scNumber等于rdNumber,证明猜中了</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"恭喜您,猜中了!"</span><span class="p">);</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div></article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="../663d8dce41c9de31.html"><small>← 上一篇</small><strong>Java入门与基础语法 · 保姆级详解</strong></a><a href="../b698d403e94b67c0.html"><small>下一篇 →</small><strong>03 · 数组（一维数组 / 二维数组 / 内存图）</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">1.switch基本使用</a><a class="toc-h2" href="#section-1">2.case的穿透性</a><a class="toc-h3" href="#section-2">1.if的第一种格式</a><a class="toc-h3" href="#section-3">2.if的第二种格式</a><a class="toc-h4" href="#section-4">2.1 练习</a><a class="toc-h4" href="#section-5">2.2练习</a><a class="toc-h4" href="#section-6">2.3练习</a><a class="toc-h4" href="#section-7">2.4练习</a><a class="toc-h3" href="#section-8">3.if的第三种格式</a><a class="toc-h4" href="#section-9">3.1.练习</a><a class="toc-h4" href="#section-10">3.2练习</a><a class="toc-h2" href="#section-11">1.for循环</a><a class="toc-h3" href="#section-12">1.1练习</a><a class="toc-h3" href="#section-13">1.2练习</a><a class="toc-h3" href="#section-14">1.3练习</a><a class="toc-h2" href="#section-15">2.while循环</a><a class="toc-h3" href="#section-16">1.1while练习</a><a class="toc-h2" href="#section-17">3.do...while循环(了解)</a><a class="toc-h2" href="#section-18">4.循环控制关键字</a><a class="toc-h2" href="#section-19">5.死循环</a><a class="toc-h2" href="#section-20">6.嵌套循环</a><a class="toc-h2" href="#section-21">7.练习.猜数字小游戏</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

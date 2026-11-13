@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL 01 · 入门与数据库概述 ⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/0db85597fce6d578.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a aria-current="page" href="../0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="../9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="../f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="../808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="../598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="../2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="../3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="../d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL 01 · 入门与数据库概述 ⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：入门 | <strong>学习建议</strong>：1 天
+对应黑马课件：01_数据库概述&amp;安装.pptx
+<strong>项目导向</strong>：数据库是每个项目的基础，MySQL 是后端开发必备技能</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>MySQL 入门
+├── 1.1 数据库是什么
+├── 1.2 数据库分类（关系型 vs 非关系型）
+├── 1.3 MySQL 安装与配置
+├── 1.4 MySQL 目录结构
+├── 1.5 常用命令行操作
+└── 1.6 图形化工具（Navicat / DataGrip）
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、为什么需要数据库</h2>
+<p><strong>没有数据库之前</strong>：数据存在文件（Excel、txt）里，查找慢、修改难、无法多人共享。</p>
+<p><strong>有数据库之后</strong>：</p>
+<ul>
+<li>数据结构化存储（表格形式）</li>
+<li>支持快速查询（SQL 语言）</li>
+<li>支持多用户并发访问</li>
+<li>支持事务（保证数据一致性）</li>
+</ul>
+<hr/>
+<h2 id="section-2">三、数据库分类</h2>
+<h3 id="section-3">3.1 关系型数据库（RDBMS）</h3>
+<p>数据以<strong>表格</strong>形式存储，表与表之间有关系。</p>
+<p>代表产品：<strong>MySQL</strong>、Oracle、SQL Server、PostgreSQL</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>用户表（user）          订单表（order）
++----+-------+         +----+---------+--------+
+| id | name  |         | id | user_id | amount |
++----+-------+         +----+---------+--------+
+| 1  | 张三  |         | 1  |    1    |  100   |
+| 2  | 李四  |         | 2  |    1    |  200   |
++----+-------+         +----+---------+--------+
+                       通过 user_id 关联用户表
+</pre></div>
+</div><h3 id="section-4">3.2 非关系型数据库（NoSQL）</h3>
+<p>数据以键值对、文档等形式存储。</p>
+<p>代表产品：<strong>Redis</strong>（键值）、MongoDB（文档）、Elasticsearch（搜索）</p>
+<h3 id="section-5">3.3 两者对比</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>关系型</th>
+<th>非关系型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据格式</td>
+<td>表格</td>
+<td>多种（KV/文档/图）</td>
+</tr>
+<tr>
+<td>事务</td>
+<td>完整 ACID</td>
+<td>部分支持</td>
+</tr>
+<tr>
+<td>查询</td>
+<td>SQL 标准</td>
+<td>各异</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>业务数据</td>
+<td>缓存、搜索</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-6">四、MySQL 安装</h2>
+<h3 id="section-7">4.1 Windows 安装（图形界面）</h3>
+<p><strong>注意事项（先看，避免翻车）</strong>：</p>
+<ul>
+<li>⚠ 安装目录<strong>不能有中文和空格</strong>（如 <code>D:\MySQL</code>）</li>
+<li>⚠ 用<strong>管理员身份</strong>运行安装程序</li>
+<li>安装完成后记住 <strong>root 密码</strong>（后面连不上很麻烦）</li>
+</ul>
+<p><strong>安装步骤</strong>：</p>
+<ol>
+<li>下载 MySQL Installer：<a href="https://dev.mysql.com/downloads/installer/" rel="noopener noreferrer" target="_blank">https://dev.mysql.com/downloads/installer/</a></li>
+<li>双击运行，选择 <code>Custom</code> 自定义安装</li>
+<li>选择 <code>MySQL Server 8.0.x</code></li>
+<li>设置安装目录（无中文无空格）</li>
+<li>设置 root 密码（建议 <code>root1234</code> 或自定义）</li>
+<li>完成安装</li>
+</ol>
+<p><strong>验证安装</strong>：</p>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 打开 cmd，输入：</span>
+mysql<span class="w"> </span>-uroot<span class="w"> </span>-p
+<span class="c1"># 输入密码，看到 mysql&gt; 提示符说明安装成功</span>
+</pre></div>
+</div><h3 id="section-8">4.2 Docker 安装（推荐）</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>mysql<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">3306</span>:3306<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span>root1234<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>/data/mysql:/var/lib/mysql<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>mysql:8.0
+</pre></div>
+</div><h3 id="section-9">4.3 常见安装报错</h3>
+<p><strong>报错 1：服务启动失败</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：安装目录有中文或空格
+解决：卸载重装，选择无中文无空格的路径
+</pre></div>
+</div><p><strong>报错 2：1045 Access denied</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：密码错误
+解决：
+1. 停止 MySQL 服务
+2. 以 --skip-grant-tables 启动
+3. 修改密码
+4. 重启服务
+</pre></div>
+</div><p><strong>报错 3：ERROR 2003 Can't connect to MySQL server</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：MySQL 服务未启动
+解决：services.msc 中启动 MySQL 服务
+     或命令行：net start mysql80
+</pre></div>
+</div><hr/>
+<h2 id="section-10">五、MySQL 目录结构</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>MySQL 安装目录（如 D:\MySQL\MySQL Server 8.0）
+├── bin/           ← 可执行文件（mysql.exe、mysqld.exe）
+├── data/          ← 数据文件（每个数据库一个文件夹）
+├── include/       ← 头文件
+├── lib/           ← 库文件
+└── share/         ← 字符集、语言等配置文件
+</pre></div>
+</div><hr/>
+<h2 id="section-11">六、基础 SQL 操作（连接 MySQL）</h2>
+<h3 id="section-12">6.1 命令行连接</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># 连接本地 MySQL</span>
+mysql<span class="w"> </span>-uroot<span class="w"> </span>-p
+
+<span class="c1"># 连接指定主机</span>
+mysql<span class="w"> </span>-h<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>-P<span class="w"> </span><span class="m">3306</span><span class="w"> </span>-uroot<span class="w"> </span>-p
+
+<span class="c1"># 连接并直接选择数据库</span>
+mysql<span class="w"> </span>-uroot<span class="w"> </span>-p<span class="w"> </span>test_db
+</pre></div>
+</div><h3 id="section-13">6.2 常用命令行操作</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查看所有数据库</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">DATABASES</span><span class="p">;</span>
+
+<span class="c1">-- 创建数据库</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydb</span><span class="w"> </span><span class="nb">CHARACTER</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">utf8mb4</span><span class="p">;</span>
+
+<span class="c1">-- 选择数据库</span>
+<span class="n">USE</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span>
+
+<span class="c1">-- 查看当前数据库</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">DATABASE</span><span class="p">();</span>
+
+<span class="c1">-- 查看所有表</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">TABLES</span><span class="p">;</span>
+
+<span class="c1">-- 退出</span>
+<span class="n">EXIT</span><span class="p">;</span>
+<span class="c1">-- 或</span>
+<span class="n">QUIT</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-14">七、图形化工具</h2>
+<h3 id="section-15">7.1 Navicat（推荐，收费）</h3>
+<p>功能强大，支持多种数据库，界面友好。</p>
+<h3 id="section-16">7.2 DataGrip（JetBrains 出品）</h3>
+<p>IDEA 系列，学生可免费申请，功能强大。</p>
+<h3 id="section-17">7.3 MySQL Workbench（官方免费）</h3>
+<p>MySQL 官方工具，功能齐全，免费。</p>
+<hr/>
+<h2 id="section-18">八、SQL 语言分类</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>分类</th>
+<th>全称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DDL</strong></td>
+<td>Data Definition Language</td>
+<td>数据定义：CREATE、DROP、ALTER</td>
+</tr>
+<tr>
+<td><strong>DML</strong></td>
+<td>Data Manipulation Language</td>
+<td>数据操作：INSERT、UPDATE、DELETE</td>
+</tr>
+<tr>
+<td><strong>DQL</strong></td>
+<td>Data Query Language</td>
+<td>数据查询：SELECT</td>
+</tr>
+<tr>
+<td><strong>DCL</strong></td>
+<td>Data Control Language</td>
+<td>权限控制：GRANT、REVOKE</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-19">九、面试常问</h2>
+<blockquote>
+<p>💡 <strong>MySQL 和 Oracle 的区别？</strong>
+MySQL：开源免费，轻量，互联网首选；Oracle：商业收费，功能强，企业级首选。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>数据库、数据库系统、数据库管理系统的区别？</strong></p>
+<ul>
+<li>数据库（DB）：存储数据的仓库</li>
+<li>数据库管理系统（DBMS）：管理数据库的软件（如 MySQL）</li>
+<li>数据库系统（DBS）：DB + DBMS + 管理员</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>MySQL 的默认端口？</strong>
+3306</p>
+</blockquote>
+<p>下一章：<a href="../9f88756ac2d869f3.html">02-DDL（数据库和表的定义）.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="../9f88756ac2d869f3.html"><small>下一篇 →</small><strong>MySQL 02 · DDL 数据定义语言 ⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、为什么需要数据库</a><a class="toc-h2" href="#section-2">三、数据库分类</a><a class="toc-h3" href="#section-3">3.1 关系型数据库（RDBMS）</a><a class="toc-h3" href="#section-4">3.2 非关系型数据库（NoSQL）</a><a class="toc-h3" href="#section-5">3.3 两者对比</a><a class="toc-h2" href="#section-6">四、MySQL 安装</a><a class="toc-h3" href="#section-7">4.1 Windows 安装（图形界面）</a><a class="toc-h3" href="#section-8">4.2 Docker 安装（推荐）</a><a class="toc-h3" href="#section-9">4.3 常见安装报错</a><a class="toc-h2" href="#section-10">五、MySQL 目录结构</a><a class="toc-h2" href="#section-11">六、基础 SQL 操作（连接 MySQL）</a><a class="toc-h3" href="#section-12">6.1 命令行连接</a><a class="toc-h3" href="#section-13">6.2 常用命令行操作</a><a class="toc-h2" href="#section-14">七、图形化工具</a><a class="toc-h3" href="#section-15">7.1 Navicat（推荐，收费）</a><a class="toc-h3" href="#section-16">7.2 DataGrip（JetBrains 出品）</a><a class="toc-h3" href="#section-17">7.3 MySQL Workbench（官方免费）</a><a class="toc-h2" href="#section-18">八、SQL 语言分类</a><a class="toc-h2" href="#section-19">九、面试常问</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

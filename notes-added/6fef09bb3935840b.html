@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Seata 分布式事务 · 保姆级详解 ⭐⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/6fef09bb3935840b.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>微服务高级详解</h2><nav aria-label="同专题笔记"><a href="../e4ebc0c1bd03f5db.html">Sentinel 服务保护 · 保姆级详解 ⭐⭐⭐</a><a aria-current="page" href="../6fef09bb3935840b.html">Seata 分布式事务 · 保姆级详解 ⭐⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>微服务高级详解</div><h1>Seata 分布式事务 · 保姆级详解 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：高 | <strong>学习建议</strong>：2 天
+对应黑马 SpringCloud 资料：day05-服务保护和分布式事务
+<strong>项目导向</strong>：微服务跨服务数据一致性问题的核心解决方案</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、为什么需要分布式事务</h2>
+<h3 id="section-1">1.1 单体事务 vs 分布式事务</h3>
+<p><strong>单体应用（本地事务）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Transactional</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">placeOrder</span><span class="p">(</span><span class="n">Order</span><span class="w"> </span><span class="n">order</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 扣减库存</span>
+<span class="w">    </span><span class="n">stockService</span><span class="p">.</span><span class="na">decreaseStock</span><span class="p">(</span><span class="n">order</span><span class="p">.</span><span class="na">getItemId</span><span class="p">(),</span><span class="w"> </span><span class="n">order</span><span class="p">.</span><span class="na">getNum</span><span class="p">());</span>
+<span class="w">    </span><span class="c1">// 2. 创建订单</span>
+<span class="w">    </span><span class="n">orderService</span><span class="p">.</span><span class="na">createOrder</span><span class="p">(</span><span class="n">order</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// 3. 扣减余额</span>
+<span class="w">    </span><span class="n">accountService</span><span class="p">.</span><span class="na">deductBalance</span><span class="p">(</span><span class="n">order</span><span class="p">.</span><span class="na">getUserId</span><span class="p">(),</span><span class="w"> </span><span class="n">order</span><span class="p">.</span><span class="na">getAmount</span><span class="p">());</span>
+<span class="w">    </span><span class="c1">// 以上三步在同一个数据库事务里，要么都成功要么都失败</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>微服务（分布式）</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>用户下单 → 订单服务（创建订单）
+         → 库存服务（扣库存）    ← 不同的数据库！
+         → 账户服务（扣余额）    ← 不同的数据库！
+
+问题：如果扣库存成功，但扣余额失败，订单数据就不一致了！
+</pre></div>
+</div><p><strong>分布式事务的难点</strong>：多个服务、多个数据库，无法用单机的 <code>@Transactional</code>。</p>
+<hr/>
+<h2 id="section-2">二、Seata 是什么</h2>
+<p>Seata（Simple Extensible Autonomous Transaction Architecture）是阿里开源的<strong>分布式事务解决方案</strong>。</p>
+<p><strong>Seata 三大角色</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>TC（Transaction Coordinator）事务协调者：Seata Server，协调全局事务
+TM（Transaction Manager）事务管理者：发起全局事务的服务（订单服务）
+RM（Resource Manager）资源管理者：参与全局事务的服务（库存、账户服务）
+</pre></div>
+</div><hr/>
+<h2 id="section-3">三、Seata 的四种模式</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>全称</th>
+<th>原理</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>XA</strong></td>
+<td>X/Open XA 协议</td>
+<td>两阶段提交</td>
+<td>强一致性，回滚安全</td>
+<td>锁表时间长，性能差</td>
+</tr>
+<tr>
+<td><strong>AT</strong></td>
+<td>Auto Transaction</td>
+<td>自动记录 undo log</td>
+<td><strong>无侵入，性能好</strong>（推荐）</td>
+<td>有短暂不一致</td>
+</tr>
+<tr>
+<td><strong>TCC</strong></td>
+<td>Try-Confirm-Cancel</td>
+<td>手动实现三阶段</td>
+<td>高性能，高定制</td>
+<td>实现复杂，代码量大</td>
+</tr>
+<tr>
+<td><strong>Saga</strong></td>
+<td>-</td>
+<td>长事务补偿</td>
+<td>适合长流程</td>
+<td>有补偿逻辑</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>生产推荐</strong>：<strong>AT 模式</strong>，无侵入，性能最好，满足大多数场景。</p>
+</blockquote>
+<hr/>
+<h2 id="section-4">四、AT 模式详解（重点）⭐⭐⭐</h2>
+<h3 id="section-5">4.1 原理</h3>
+<p>AT 模式在每次 DML 操作时，自动记录 undo log（回滚日志）。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>第一阶段（执行）：
+  1. 执行业务 SQL（扣库存）
+  2. 记录 undo log（原始数据快照）
+  3. 向 TC 报告：执行成功
+
+第二阶段（提交/回滚）：
+  - 全部成功：TC 通知 RM 删除 undo log，提交事务
+  - 任意失败：TC 通知 RM 根据 undo log 回滚
+</pre></div>
+</div><p><strong>好处</strong>：</p>
+<ul>
+<li>业务代码无需修改（无侵入）</li>
+<li>自动管理事务</li>
+</ul>
+<p><strong>坏处</strong>：</p>
+<ul>
+<li>存在"脏写"风险（全局锁解决）</li>
+<li>多读一次数据库（记录 undo log）</li>
+</ul>
+<h3 id="section-6">4.2 undo_log 表</h3>
+<p>每个参与 AT 模式的数据库需要建 undo_log 表：</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">undo_log</span><span class="o">`</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="o">`</span><span class="n">branch_id</span><span class="o">`</span><span class="w">     </span><span class="nb">BIGINT</span><span class="w">       </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'branch transaction id'</span><span class="p">,</span>
+<span class="w">  </span><span class="o">`</span><span class="n">xid</span><span class="o">`</span><span class="w">           </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'global transaction id'</span><span class="p">,</span>
+<span class="w">  </span><span class="o">`</span><span class="n">context</span><span class="o">`</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'undo_log context'</span><span class="p">,</span>
+<span class="w">  </span><span class="o">`</span><span class="n">rollback_info</span><span class="o">`</span><span class="w"> </span><span class="n">LONGBLOB</span><span class="w">     </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'rollback info'</span><span class="p">,</span>
+<span class="w">  </span><span class="o">`</span><span class="n">log_status</span><span class="o">`</span><span class="w">    </span><span class="nb">INT</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="w">      </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'0:normal status,1:defense status'</span><span class="p">,</span>
+<span class="w">  </span><span class="o">`</span><span class="n">log_created</span><span class="o">`</span><span class="w">   </span><span class="n">DATETIME</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w">  </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'create datetime'</span><span class="p">,</span>
+<span class="w">  </span><span class="o">`</span><span class="n">log_modified</span><span class="o">`</span><span class="w">  </span><span class="n">DATETIME</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w">  </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'modify datetime'</span><span class="p">,</span>
+<span class="w">  </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="o">`</span><span class="n">ux_undo_log</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">xid</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">branch_id</span><span class="o">`</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="n">ENGINE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InnoDB</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'AT transaction mode undo table'</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-7">五、快速入门 ⭐⭐</h2>
+<h3 id="section-8">5.1 部署 Seata Server</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># Docker 部署</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>seata<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">8099</span>:8099<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">7099</span>:7099<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>seataio/seata-server:1.5.2
+</pre></div>
+</div><p>或者使用 Nacos 作为注册中心，让各微服务发现 Seata Server。</p>
+<h3 id="section-9">5.2 引入依赖</h3>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">&lt;!-- 每个参与分布式事务的服务都要引入 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.alibaba.cloud<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-alibaba-seata<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><h3 id="section-10">5.3 配置</h3>
+<div class="code-block"><div class="code-top"><span>yaml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">seata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">registry</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nacos</span>
+<span class="w">    </span><span class="nt">nacos</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">server-addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">127.0.0.1:8848</span>
+<span class="w">      </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
+<span class="w">      </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DEFAULT_GROUP</span>
+<span class="w">      </span><span class="nt">application</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">seata</span><span class="w">    </span><span class="c1"># Seata Server 在 Nacos 的服务名</span>
+<span class="w">  </span><span class="nt">tx-service-group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hmall</span><span class="w">   </span><span class="c1"># 事务组名称，要与 Server 配置一致</span>
+<span class="w">  </span><span class="nt">service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">vgroup-mapping</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">hmall</span><span class="p">:</span><span class="w"> </span><span class="s">"default"</span><span class="w">       </span><span class="c1"># 映射到 Seata Server 的集群</span>
+<span class="w">  </span><span class="nt">data-source-proxy-mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AT</span><span class="w">  </span><span class="c1"># 数据源代理模式</span>
+</pre></div>
+</div><h3 id="section-11">5.4 使用（极简！）</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 在事务发起方（TM）的方法上加 @GlobalTransactional</span>
+<span class="nd">@GlobalTransactional</span><span class="w">  </span><span class="c1">// 开启全局事务（就这一个注解！）</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">placeOrder</span><span class="p">(</span><span class="n">OrderFormDTO</span><span class="w"> </span><span class="n">orderFormDTO</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 创建订单（本地事务）</span>
+<span class="w">    </span><span class="n">Order</span><span class="w"> </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createOrder</span><span class="p">(</span><span class="n">orderFormDTO</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 2. 扣减库存（Feign 调用库存服务）</span>
+<span class="w">    </span><span class="n">itemClient</span><span class="p">.</span><span class="na">deductStock</span><span class="p">(</span><span class="n">orderFormDTO</span><span class="p">.</span><span class="na">getItemId</span><span class="p">(),</span><span class="w"> </span><span class="n">orderFormDTO</span><span class="p">.</span><span class="na">getNum</span><span class="p">());</span>
+
+<span class="w">    </span><span class="c1">// 3. 扣减余额（Feign 调用账户服务）</span>
+<span class="w">    </span><span class="n">accountClient</span><span class="p">.</span><span class="na">deductBalance</span><span class="p">(</span><span class="n">orderFormDTO</span><span class="p">.</span><span class="na">getUserId</span><span class="p">(),</span><span class="w"> </span><span class="n">order</span><span class="p">.</span><span class="na">getPayAmount</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <strong>参与方（RM）不需要任何改动</strong>，Seata 自动代理数据源，拦截 SQL，记录 undo log。</p>
+</blockquote>
+<hr/>
+<h2 id="section-12">六、TCC 模式（进阶了解）</h2>
+<p>TCC 需要手动实现三个方法：</p>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@LocalTCC</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">AccountTCCService</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// Try：预留资源（冻结金额）</span>
+<span class="w">    </span><span class="nd">@TwoPhaseBusinessAction</span><span class="p">(</span>
+<span class="w">        </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"deductAccount"</span><span class="p">,</span>
+<span class="w">        </span><span class="n">commitMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"confirm"</span><span class="p">,</span>
+<span class="w">        </span><span class="n">rollbackMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"cancel"</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">tryDeductBalance</span><span class="p">(</span><span class="n">BusinessActionContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">,</span>
+<span class="w">                          </span><span class="nd">@BusinessActionContextParameter</span><span class="p">(</span><span class="s">"userId"</span><span class="p">)</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">,</span>
+<span class="w">                          </span><span class="nd">@BusinessActionContextParameter</span><span class="p">(</span><span class="s">"amount"</span><span class="p">)</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">amount</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Confirm：确认提交（真正扣除冻结金额）</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">confirm</span><span class="p">(</span><span class="n">BusinessActionContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Cancel：回滚（解冻金额）</span>
+<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="n">BusinessActionContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><strong>三个阶段</strong>：</p>
+<ol>
+<li><strong>Try</strong>：预留资源（不真正执行）</li>
+<li><strong>Confirm</strong>：确认执行（全部 Try 成功后调用）</li>
+<li><strong>Cancel</strong>：回滚（任意 Try 失败后调用）</li>
+</ol>
+<hr/>
+<h2 id="section-13">七、常见报错</h2>
+<p><strong>报错 1：could not find service provider for seata</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：Seata Server 没有注册到 Nacos，或服务名配置不一致
+解决：检查 seata.registry 配置，确认 application 名称正确
+</pre></div>
+</div><p><strong>报错 2：Failed to commit global transaction</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：undo_log 表不存在
+解决：在每个参与 AT 模式的数据库中创建 undo_log 表
+</pre></div>
+</div><p><strong>报错 3：GlobalTransactional 不生效</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：方法不是 public，或在同一个类中调用（Spring 代理失效）
+解决：确保方法是 public，跨类调用（注入后调用）
+</pre></div>
+</div><hr/>
+<h2 id="section-14">八、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>什么是分布式事务？</strong>
+跨多个服务/数据库的事务，要保证所有操作要么都成功，要么都回滚。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Seata 的 AT 模式原理？</strong>
+第一阶段：执行业务 SQL，记录 undo log（before image + after image）。
+第二阶段：全部成功删 undo log；任意失败根据 undo log 反向补偿回滚。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>AT 模式 vs TCC 模式的区别？</strong>
+| | AT | TCC |
+|-|-----|-----|
+| 侵入性 | 无侵入 | 有侵入（写三个方法）|
+| 性能 | 中等 | 高 |
+| 适用 | 通用场景 | 高性能要求 |</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>AT 模式的"脏写"问题？</strong>
+全局事务 A 修改数据，未提交；本地事务 B 也修改了同一数据，A 回滚时会覆盖 B 的修改。
+Seata 通过<strong>全局锁</strong>（GlobalLock）解决：RM 在 Try 阶段获取全局锁，其他事务必须等全局锁释放才能操作同一行。</p>
+</blockquote>
+<hr/>
+<h2 id="section-15">九、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>分布式事务的背景（本地事务 vs 分布式）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Seata 三大角色（TC / TM / RM）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>四种模式</strong>（XA / AT / TCC / Saga）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>AT 模式原理</strong>（undo log 两阶段）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>AT 模式快速使用（@GlobalTransactional）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>TCC 模式三阶段（Try / Confirm / Cancel）</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>AT 模式每个数据库都要建 undo_log 表</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>@GlobalTransactional 加在 TM（发起方），RM 无需改动</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>TCC 的 Cancel 要实现幂等（可能被调多次）</li>
+</ul>
+<hr/>
+<p><strong>微服务高级全套笔记总览</strong>：</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>D:\za\笔记整理\微服务高级详解\
+├── 01-Sentinel服务保护-保姆级详解.md   ← 限流 + 熔断降级
+└── 02-Seata分布式事务-保姆级详解.md   ← AT / TCC 模式
+</pre></div>
+</div><p>加油！这两章是面试高频考点，每个面试都会问到！🚀</p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="../e4ebc0c1bd03f5db.html"><small>← 上一篇</small><strong>Sentinel 服务保护 · 保姆级详解 ⭐⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、为什么需要分布式事务</a><a class="toc-h3" href="#section-1">1.1 单体事务 vs 分布式事务</a><a class="toc-h2" href="#section-2">二、Seata 是什么</a><a class="toc-h2" href="#section-3">三、Seata 的四种模式</a><a class="toc-h2" href="#section-4">四、AT 模式详解（重点）⭐⭐⭐</a><a class="toc-h3" href="#section-5">4.1 原理</a><a class="toc-h3" href="#section-6">4.2 undo_log 表</a><a class="toc-h2" href="#section-7">五、快速入门 ⭐⭐</a><a class="toc-h3" href="#section-8">5.1 部署 Seata Server</a><a class="toc-h3" href="#section-9">5.2 引入依赖</a><a class="toc-h3" href="#section-10">5.3 配置</a><a class="toc-h3" href="#section-11">5.4 使用（极简！）</a><a class="toc-h2" href="#section-12">六、TCC 模式（进阶了解）</a><a class="toc-h2" href="#section-13">七、常见报错</a><a class="toc-h2" href="#section-14">八、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-15">九、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

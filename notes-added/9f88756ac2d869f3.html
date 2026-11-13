@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL 02 · DDL 数据定义语言 ⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/9f88756ac2d869f3.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a aria-current="page" href="../9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="../f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="../d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL 02 · DDL 数据定义语言 ⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：入门 | <strong>学习建议</strong>：1 天
+对应黑马课件：02_数据库DDL.pptx
+<strong>项目导向</strong>：项目上线前必须建库建表，DDL 是第一步</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>DDL（Data Definition Language）
+├── 2.1 数据库操作（CREATE / DROP / USE）
+├── 2.2 数据类型
+│   ├── 数值类型
+│   ├── 字符串类型
+│   └── 日期时间类型
+├── 2.3 表操作（CREATE / DROP / ALTER）
+│   ├── 创建表
+│   ├── 查询表结构
+│   ├── 修改表
+│   └── 删除表
+└── 2.4 字段约束（见第 05 章）
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、数据库操作</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查询所有数据库</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">DATABASES</span><span class="p">;</span>
+
+<span class="c1">-- 查询当前数据库</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">DATABASE</span><span class="p">();</span>
+
+<span class="c1">-- 创建数据库</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span>
+<span class="c1">-- 指定字符集</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydb</span><span class="w"> </span><span class="nb">CHARACTER</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">COLLATE</span><span class="w"> </span><span class="n">utf8mb4_unicode_ci</span><span class="p">;</span>
+<span class="c1">-- 如果不存在才创建（推荐，不会报错）</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span>
+
+<span class="c1">-- 删除数据库（慎用！数据全没）</span>
+<span class="k">DROP</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span>
+<span class="k">DROP</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 存在才删</span>
+
+<span class="c1">-- 切换/使用数据库</span>
+<span class="n">USE</span><span class="w"> </span><span class="n">mydb</span><span class="p">;</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>生产环境一定要有备份才能执行 DROP！</strong></p>
+</blockquote>
+<hr/>
+<h2 id="section-2">三、数据类型 ⭐</h2>
+<h3 id="section-3">3.1 数值类型</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+<th>范围</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TINYINT</code></td>
+<td>1 byte</td>
+<td>-128~127</td>
+<td>状态（0/1）</td>
+</tr>
+<tr>
+<td><code>SMALLINT</code></td>
+<td>2 bytes</td>
+<td>-32768~32767</td>
+<td>小整数</td>
+</tr>
+<tr>
+<td><code>INT</code></td>
+<td>4 bytes</td>
+<td>-2³¹~2³¹-1</td>
+<td><strong>常用整数</strong></td>
+</tr>
+<tr>
+<td><code>BIGINT</code></td>
+<td>8 bytes</td>
+<td>-2⁶³~2⁶³-1</td>
+<td>大整数（订单ID）</td>
+</tr>
+<tr>
+<td><code>FLOAT</code></td>
+<td>4 bytes</td>
+<td>单精度</td>
+<td>浮点（少用）</td>
+</tr>
+<tr>
+<td><code>DOUBLE</code></td>
+<td>8 bytes</td>
+<td>双精度</td>
+<td>浮点（少用）</td>
+</tr>
+<tr>
+<td><code>DECIMAL(p,s)</code></td>
+<td>变长</td>
+<td>精确小数</td>
+<td><strong>金额必用</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠ <strong>金额类型必须用 <code>DECIMAL</code></strong>，不能用 float/double（精度丢失！）
+例：<code>price DECIMAL(10, 2)</code> 表示最多 10 位，小数 2 位，如 <code>99999999.99</code></p>
+</blockquote>
+<h3 id="section-4">3.2 字符串类型</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+<th>特点</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CHAR(n)</code></td>
+<td>0~255 字符</td>
+<td>定长，不足补空格</td>
+<td>手机号、身份证</td>
+</tr>
+<tr>
+<td><code>VARCHAR(n)</code></td>
+<td>0~65535 字符</td>
+<td>变长，按实际存储</td>
+<td><strong>最常用：姓名、地址</strong></td>
+</tr>
+<tr>
+<td><code>TEXT</code></td>
+<td>0~65535 字符</td>
+<td>长文本</td>
+<td>文章内容</td>
+</tr>
+<tr>
+<td><code>LONGTEXT</code></td>
+<td>0~4G 字符</td>
+<td>超长文本</td>
+<td>超长内容</td>
+</tr>
+<tr>
+<td><code>BLOB</code></td>
+<td>二进制</td>
+<td>二进制大对象</td>
+<td>图片（不推荐存图片）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>CHAR vs VARCHAR</strong>：</p>
+<ul>
+<li>CHAR(10) 存 "hi"，实际占 10 个字符空间（补空格），查询快</li>
+<li>VARCHAR(10) 存 "hi"，实际占 2 个字符空间，节省空间</li>
+</ul>
+</blockquote>
+<h3 id="section-5">3.3 日期时间类型</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>格式</th>
+<th>范围</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DATE</code></td>
+<td>YYYY-MM-DD</td>
+<td>1000~9999年</td>
+<td>生日</td>
+</tr>
+<tr>
+<td><code>TIME</code></td>
+<td>HH:MM:SS</td>
+<td>-</td>
+<td>时间</td>
+</tr>
+<tr>
+<td><code>DATETIME</code></td>
+<td>YYYY-MM-DD HH:MM:SS</td>
+<td>1000~9999年</td>
+<td><strong>创建时间、更新时间</strong></td>
+</tr>
+<tr>
+<td><code>TIMESTAMP</code></td>
+<td>YYYY-MM-DD HH:MM:SS</td>
+<td>1970~2038年</td>
+<td>时间戳（会自动更新）</td>
+</tr>
+<tr>
+<td><code>YEAR</code></td>
+<td>YYYY</td>
+<td>1901~2155</td>
+<td>年份</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>推荐用 DATETIME</strong> 存时间，TIMESTAMP 有 2038 年问题。</p>
+</blockquote>
+<hr/>
+<h2 id="section-6">四、表操作 ⭐⭐</h2>
+<h3 id="section-7">4.1 查询表</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查看当前数据库所有表</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">TABLES</span><span class="p">;</span>
+
+<span class="c1">-- 查看表结构（字段定义）</span>
+<span class="k">DESC</span><span class="w"> </span><span class="err">表名</span><span class="p">;</span>
+<span class="c1">-- 或</span>
+<span class="k">DESCRIBE</span><span class="w"> </span><span class="err">表名</span><span class="p">;</span>
+<span class="c1">-- 完整定义（含建表语句）</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="err">表名</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-8">4.2 创建表 ⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="err">字段名</span><span class="w"> </span><span class="err">数据类型</span><span class="w"> </span><span class="p">[</span><span class="err">约束</span><span class="p">],</span>
+<span class="w">    </span><span class="err">字段名</span><span class="w"> </span><span class="err">数据类型</span><span class="w"> </span><span class="p">[</span><span class="err">约束</span><span class="p">],</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'表注释'</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>示例：创建用户表</strong>：</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'主键ID'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">username</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'用户名'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">password</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'密码'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">nickname</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'昵称'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">phone</span><span class="w">       </span><span class="nb">CHAR</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'手机号'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">email</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'邮箱'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">gender</span><span class="w">      </span><span class="n">TINYINT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'性别：1男2女'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">avatar</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'头像URL'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">balance</span><span class="w">     </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'余额'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w">      </span><span class="n">TINYINT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'状态：1正常0禁用'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">create_time</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'创建时间'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">update_time</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'更新时间'</span>
+<span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'用户表'</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>各约束说明</strong>：</p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>约束</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PRIMARY KEY</code></td>
+<td>主键，唯一且非空</td>
+</tr>
+<tr>
+<td><code>AUTO_INCREMENT</code></td>
+<td>自动递增（配合整数主键）</td>
+</tr>
+<tr>
+<td><code>NOT NULL</code></td>
+<td>非空约束</td>
+</tr>
+<tr>
+<td><code>UNIQUE</code></td>
+<td>唯一约束</td>
+</tr>
+<tr>
+<td><code>DEFAULT 值</code></td>
+<td>默认值</td>
+</tr>
+<tr>
+<td><code>COMMENT '注释'</code></td>
+<td>字段注释</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠ <strong>生产规范</strong>：</p>
+<ul>
+<li>主键必须命名为 <code>id</code>，类型 <code>BIGINT AUTO_INCREMENT</code></li>
+<li>必须有 <code>create_time</code> 和 <code>update_time</code> 字段</li>
+<li>每个字段必须有 COMMENT 注释</li>
+<li>表名、字段名用小写 + 下划线（snake_case）</li>
+</ul>
+</blockquote>
+<h3 id="section-9">4.3 修改表</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 添加字段</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'年龄'</span><span class="p">;</span>
+
+<span class="c1">-- 修改字段类型</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">nickname</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+
+<span class="c1">-- 修改字段名和类型</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="n">CHANGE</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">nickname</span><span class="w"> </span><span class="n">nick_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'昵称'</span><span class="p">;</span>
+
+<span class="c1">-- 删除字段（慎用！数据会丢失）</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">DROP</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+
+<span class="c1">-- 修改表名</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">RENAME</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">sys_user</span><span class="p">;</span>
+<span class="c1">-- 或</span>
+<span class="k">RENAME</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">sys_user</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-10">4.4 删除表</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 删除表（慎用！）</span>
+<span class="k">DROP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="p">;</span>
+<span class="k">DROP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="k">user</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 推荐，存在才删</span>
+
+<span class="c1">-- 清空表数据（保留结构）</span>
+<span class="k">TRUNCATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="p">;</span><span class="w">         </span><span class="c1">-- 清空，自增 ID 重置</span>
+<span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">user</span><span class="p">;</span><span class="w">            </span><span class="c1">-- 清空，自增 ID 不重置（见 DML 章节）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-11">五、实战：设计订单系统表结构</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 商品表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">product</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w">        </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'商品名'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">price</span><span class="w">       </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'价格'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">stock</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'库存'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w">      </span><span class="n">TINYINT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'状态'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">create_time</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
+<span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'商品表'</span><span class="p">;</span>
+
+<span class="c1">-- 订单表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="k">order</span><span class="o">`</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">     </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'用户ID'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">total</span><span class="w">       </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'订单总额'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w">      </span><span class="n">TINYINT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'0待支付1已支付2已取消'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">create_time</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
+<span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'订单表'</span><span class="p">;</span>
+
+<span class="c1">-- 订单详情表</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">order_item</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">order_id</span><span class="w">    </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'订单ID'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">product_id</span><span class="w">  </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'商品ID'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">num</span><span class="w">         </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'数量'</span><span class="p">,</span>
+<span class="w">    </span><span class="n">price</span><span class="w">       </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'单价'</span>
+<span class="p">)</span><span class="w"> </span><span class="k">COMMENT</span><span class="w"> </span><span class="s1">'订单详情表'</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-12">六、常见报错</h2>
+<p><strong>报错 1：Table already exists</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：表已存在
+解决：DROP TABLE IF EXISTS 再 CREATE，或用 CREATE TABLE IF NOT EXISTS
+</pre></div>
+</div><p><strong>报错 2：Data too long for column</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：插入的数据超过字段长度限制
+解决：ALTER TABLE 修改字段长度
+</pre></div>
+</div><p><strong>报错 3：Incorrect datetime value</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>原因：日期格式不对
+解决：统一用 'YYYY-MM-DD HH:MM:SS' 格式
+</pre></div>
+</div><hr/>
+<h2 id="section-13">七、面试常问</h2>
+<blockquote>
+<p>💡 <strong>CHAR 和 VARCHAR 的区别？</strong></p>
+<ul>
+<li>CHAR 定长，不足补空格，查询快，适合固定长度（手机号）</li>
+<li>VARCHAR 变长，按实际长度存储，节省空间，适合可变长度（姓名）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>为什么不能用 FLOAT/DOUBLE 存金额？</strong>
+浮点数有精度问题，<code>0.1 + 0.2 ≠ 0.3</code>。金额必须用 <code>DECIMAL(p,s)</code> 精确存储。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>DATETIME 和 TIMESTAMP 的区别？</strong></p>
+<ul>
+<li>DATETIME：1000-9999年，不受时区影响，推荐</li>
+<li>TIMESTAMP：1970-2038年，自动换算时区，有 2038 问题</li>
+</ul>
+</blockquote>
+<p>下一章：<a href="../f978c6e9910217b1.html">03-DML（数据增删改）.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="0db85597fce6d578.html"><small>← 上一篇</small><strong>MySQL 01 · 入门与数据库概述 ⭐</strong></a><a href="../f978c6e9910217b1.html"><small>下一篇 →</small><strong>MySQL DML（数据增删改）完整详解</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、数据库操作</a><a class="toc-h2" href="#section-2">三、数据类型 ⭐</a><a class="toc-h3" href="#section-3">3.1 数值类型</a><a class="toc-h3" href="#section-4">3.2 字符串类型</a><a class="toc-h3" href="#section-5">3.3 日期时间类型</a><a class="toc-h2" href="#section-6">四、表操作 ⭐⭐</a><a class="toc-h3" href="#section-7">4.1 查询表</a><a class="toc-h3" href="#section-8">4.2 创建表 ⭐⭐</a><a class="toc-h3" href="#section-9">4.3 修改表</a><a class="toc-h3" href="#section-10">4.4 删除表</a><a class="toc-h2" href="#section-11">五、实战：设计订单系统表结构</a><a class="toc-h2" href="#section-12">六、常见报错</a><a class="toc-h2" href="#section-13">七、面试常问</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

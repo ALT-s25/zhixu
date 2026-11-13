@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL 事务与并发控制 — 保姆级详解 · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/2c22ea380678760b.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="../9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="../f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="../808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="../598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a aria-current="page" href="../2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a href="../3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="../d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL 事务与并发控制 — 保姆级详解</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<h2 id="section-0">知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>事务
+├── 什么是事务（银行转账类比）
+├── ACID 四大特性
+│   ├── 原子性（Atomicity）
+│   ├── 一致性（Consistency）
+│   ├── 隔离性（Isolation）
+│   └── 持久性（Durability）
+├── 事务操作语句
+│   ├── BEGIN / START TRANSACTION
+│   ├── COMMIT
+│   └── ROLLBACK
+├── 并发问题
+│   ├── 脏读（Dirty Read）
+│   ├── 不可重复读（Non-Repeatable Read）
+│   └── 幻读（Phantom Read）
+├── 四种隔离级别
+│   ├── READ UNCOMMITTED
+│   ├── READ COMMITTED
+│   ├── REPEATABLE READ（MySQL 默认）
+│   └── SERIALIZABLE
+├── 锁机制
+│   ├── 乐观锁
+│   └── 悲观锁
+└── 完整代码示例
+</pre></div>
+</div><hr/>
+<h2 id="section-1">一、什么是事务</h2>
+<h3 id="section-2">1.1 生活类比：银行转账</h3>
+<blockquote>
+<p>想象你从 A 账户向 B 账户转账 1000 元。
+整个操作需要两步：</p>
+<ul>
+<li>第一步：A 账户 <strong>减少</strong> 1000 元</li>
+<li>第二步：B 账户 <strong>增加</strong> 1000 元</li>
+</ul>
+<p>如果第一步成功，第二步因为系统崩溃失败了，A 的钱少了，B 的钱没有多，这显然是灾难性的。</p>
+<p><strong>事务</strong> 就是用来保证：这两步要么全部成功，要么全部失败回滚，永远不会出现中间状态。</p>
+</blockquote>
+<h3 id="section-3">1.2 事务的定义</h3>
+<p>事务（Transaction）是数据库中一组<strong>逻辑操作的集合</strong>，这些操作被当作一个不可分割的整体来执行。</p>
+<p><strong>通俗理解：</strong></p>
+<ul>
+<li>事务就是一个"任务包"，包里的操作要么全做，要么全不做。</li>
+<li>中途出错？自动"撤销"回到操作前的状态。</li>
+</ul>
+<hr/>
+<h2 id="section-4">二、ACID 四大特性</h2>
+<p>ACID 是事务必须满足的四个核心特性，是数据库保证数据正确性的基石。</p>
+<h3 id="section-5">2.1 原子性（Atomicity）</h3>
+<blockquote>
+<p><strong>一个事务中的所有操作，要么全部完成，要么全部不完成。</strong></p>
+</blockquote>
+<p><strong>生活类比：</strong> 就像你下单购物，系统要么同时完成"扣你的钱"和"减商品库存"，要么一件都不做，不会只扣了你的钱却没减库存。</p>
+<p><strong>技术说明：</strong></p>
+<ul>
+<li>通过 <strong>undo log（回滚日志）</strong> 实现</li>
+<li>事务执行前，MySQL 会记录每个操作的"反向操作"</li>
+<li>一旦事务失败，就按照 undo log 逐步撤销</li>
+</ul>
+<h3 id="section-6">2.2 一致性（Consistency）</h3>
+<blockquote>
+<p><strong>事务执行前后，数据库的状态必须保持一致，所有规则（约束）都不能被破坏。</strong></p>
+</blockquote>
+<p><strong>生活类比：</strong> 转账前，A 有 500 元，B 有 500 元，总计 1000 元。转账后，A 有 200 元，B 有 800 元，总计仍然是 1000 元。总金额必须守恒，这就是一致性。</p>
+<p><strong>技术说明：</strong></p>
+<ul>
+<li>一致性是事务的目的，原子性、隔离性、持久性是手段</li>
+<li>违反约束（如外键约束、唯一约束）会导致事务回滚，以保证一致性</li>
+</ul>
+<h3 id="section-7">2.3 隔离性（Isolation）</h3>
+<blockquote>
+<p><strong>多个事务并发执行时，每个事务都感觉不到其他事务的存在，互不干扰。</strong></p>
+</blockquote>
+<p><strong>生活类比：</strong> 两个收银员同时查看仓库库存，你正在下单减库存，但收银员 B 看到的库存不应该是你操作到一半的"中间状态"。</p>
+<p><strong>技术说明：</strong></p>
+<ul>
+<li>通过<strong>锁机制</strong>和 <strong>MVCC（多版本并发控制）</strong> 实现</li>
+<li>隔离程度由"隔离级别"控制（见后文）</li>
+</ul>
+<h3 id="section-8">2.4 持久性（Durability）</h3>
+<blockquote>
+<p><strong>事务一旦提交，它对数据库的改变就是永久的，即使系统崩溃也不会丢失。</strong></p>
+</blockquote>
+<p><strong>生活类比：</strong> 转账成功后，哪怕银行服务器立刻断电，你的转账记录也不会消失，因为已经写入了磁盘。</p>
+<p><strong>技术说明：</strong></p>
+<ul>
+<li>通过 <strong>redo log（重做日志）</strong> 实现</li>
+<li>事务提交时，先写入 redo log（磁盘），再修改数据文件</li>
+<li>即使崩溃，重启后可以通过 redo log 恢复数据</li>
+</ul>
+<hr/>
+<h2 id="section-9">三、事务操作语句</h2>
+<h3 id="section-10">3.1 基本语法</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ===== 开启事务 =====</span>
+<span class="k">BEGIN</span><span class="p">;</span><span class="w">              </span><span class="c1">-- 推荐写法</span>
+<span class="c1">-- 或者</span>
+<span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 效果相同，更明确</span>
+
+<span class="c1">-- ===== 提交事务（确认所有操作永久生效）=====</span>
+<span class="k">COMMIT</span><span class="p">;</span>
+
+<span class="c1">-- ===== 回滚事务（撤销所有操作回到事务开始前）=====</span>
+<span class="k">ROLLBACK</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-11">3.2 自动提交模式</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查看当前是否开启自动提交（默认是 ON）</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'autocommit'</span><span class="p">;</span>
+<span class="c1">-- 结果：ON 表示每条 SQL 自动提交，不需要手动 COMMIT</span>
+
+<span class="c1">-- 关闭自动提交（当前 session 生效）</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">autocommit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 0 = OFF，1 = ON</span>
+
+<span class="c1">-- 注意：关闭自动提交后，每次操作都需要手动 COMMIT 或 ROLLBACK</span>
+</pre></div>
+</div><blockquote>
+<p><strong>小提示：</strong> 实际项目中，大多数驱动/框架会自动管理事务，你只需要在需要的地方显式开启事务。</p>
+</blockquote>
+<h3 id="section-12">3.3 保存点（SAVEPOINT）</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 在事务中设置"检查点"，可以回滚到某个检查点而不是回滚整个事务</span>
+<span class="k">BEGIN</span><span class="p">;</span>
+
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">);</span>
+<span class="n">SAVEPOINT</span><span class="w"> </span><span class="n">sp1</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 设置保存点 sp1</span>
+
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">300</span><span class="p">);</span>
+<span class="n">SAVEPOINT</span><span class="w"> </span><span class="n">sp2</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 设置保存点 sp2</span>
+
+<span class="c1">-- 假设后续操作出错，只回滚到 sp1（保留第一条插入）</span>
+<span class="k">ROLLBACK</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">SAVEPOINT</span><span class="w"> </span><span class="n">sp1</span><span class="p">;</span>
+
+<span class="c1">-- 最终提交（只有第一条插入生效）</span>
+<span class="k">COMMIT</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-13">四、事务并发问题</h2>
+<p>当多个事务<strong>同时运行</strong>时，可能会出现以下问题（隔离性不够时才会出现）。</p>
+<h3 id="section-14">4.1 脏读（Dirty Read）</h3>
+<blockquote>
+<p><strong>一个事务读到了另一个事务"尚未提交"的数据。</strong></p>
+</blockquote>
+<p><strong>图解：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>时间线：
+事务A                           事务B
+                                BEGIN;
+                                UPDATE accounts SET balance=0 WHERE id=1;
+                                -- 未提交！
+BEGIN;
+SELECT balance FROM accounts WHERE id=1;
+-- 读到了 0（脏数据！）
+                                ROLLBACK; -- B 回滚了，数据其实还是原来的值
+-- 但 A 读到的是错误的 0
+COMMIT;
+</pre></div>
+</div><p><strong>危害：</strong> 读到了不真实的数据，可能基于错误数据做出错误决策。</p>
+<p><strong>类比：</strong> 你同事在草稿纸上写了一个未确认的方案给你看，你直接按草稿实施，结果同事后来删掉了草稿，说那是错误方案。</p>
+<h3 id="section-15">4.2 不可重复读（Non-Repeatable Read）</h3>
+<blockquote>
+<p><strong>同一事务中，两次读取同一条数据，结果不一样（因为其他事务在期间修改并提交了）。</strong></p>
+</blockquote>
+<p><strong>图解：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>时间线：
+事务A                           事务B
+BEGIN;
+SELECT balance FROM accounts WHERE id=1;
+-- 结果：1000
+                                BEGIN;
+                                UPDATE accounts SET balance=500 WHERE id=1;
+                                COMMIT; -- B 提交了修改
+SELECT balance FROM accounts WHERE id=1;
+-- 结果：500（和第一次读的不一样！）
+COMMIT;
+</pre></div>
+</div><p><strong>危害：</strong> 同一事务内数据前后不一致，逻辑混乱。</p>
+<p><strong>与脏读的区别：</strong></p>
+<ul>
+<li>脏读：读到的是未提交的数据</li>
+<li>不可重复读：读到的是已提交的数据，但同一事务内两次读结果不同</li>
+</ul>
+<p><strong>类比：</strong> 你上午查了一下银行余额是 1000 元，下午同一笔查询结果变成 500 元，因为你老婆中间取了 500 元。同一次查询，结果变了。</p>
+<h3 id="section-16">4.3 幻读（Phantom Read）</h3>
+<blockquote>
+<p><strong>同一事务中，两次查询返回的行数不一样（因为其他事务在期间插入或删除了数据）。</strong></p>
+</blockquote>
+<p><strong>图解：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>时间线：
+事务A                           事务B
+BEGIN;
+SELECT * FROM orders WHERE user_id=1;
+-- 返回 3 行
+                                BEGIN;
+                                INSERT INTO orders (user_id, amount) VALUES (1, 100);
+                                COMMIT; -- B 插入了一行
+SELECT * FROM orders WHERE user_id=1;
+-- 返回 4 行（多了一行"幻影"数据！）
+COMMIT;
+</pre></div>
+</div><p><strong>危害：</strong> 同一事务内，查询出来的数据集不稳定，像"见鬼"一样多了行数据。</p>
+<p><strong>与不可重复读的区别：</strong></p>
+<ul>
+<li>不可重复读：同一行数据，两次读取<strong>值</strong>不同（UPDATE 导致）</li>
+<li>幻读：同一条件查询，两次读取<strong>行数</strong>不同（INSERT/DELETE 导致）</li>
+</ul>
+<p><strong>类比：</strong></p>
+<ul>
+<li>不可重复读：你数钱，数了两次，第一次 100 张，第二次 50 张，张数变了（有人拿走了）</li>
+<li>幻读：你数人头，数了两次，第一次 10 人，第二次 11 人，人数变了（有人悄悄进来了）</li>
+</ul>
+<hr/>
+<h2 id="section-17">五、四种隔离级别</h2>
+<p>SQL 标准定义了四种事务隔离级别，隔离级别越高，并发能力越低，但数据越安全。</p>
+<h3 id="section-18">5.1 READ UNCOMMITTED（读未提交）</h3>
+<ul>
+<li><strong>能读到未提交的数据</strong></li>
+<li><strong>问题：</strong> 脏读 ✓、不可重复读 ✓、幻读 ✓（三个问题都有）</li>
+<li><strong>使用场景：</strong> 几乎不用，仅对数据准确性要求极低时使用</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">ISOLATION</span><span class="w"> </span><span class="k">LEVEL</span><span class="w"> </span><span class="k">READ</span><span class="w"> </span><span class="k">UNCOMMITTED</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-19">5.2 READ COMMITTED（读已提交）</h3>
+<ul>
+<li><strong>只能读到已提交的数据</strong>（解决了脏读）</li>
+<li><strong>问题：</strong> 不可重复读 ✓、幻读 ✓</li>
+<li><strong>使用场景：</strong> Oracle/SQL Server 的默认级别，适合读多写少场景</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">ISOLATION</span><span class="w"> </span><span class="k">LEVEL</span><span class="w"> </span><span class="k">READ</span><span class="w"> </span><span class="k">COMMITTED</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-20">5.3 REPEATABLE READ（可重复读）⭐ MySQL 默认</h3>
+<ul>
+<li><strong>同一事务内多次读取结果一致</strong>（解决了脏读、不可重复读）</li>
+<li><strong>理论上有幻读问题，但 MySQL 通过 MVCC + 间隙锁基本解决了幻读</strong></li>
+<li><strong>使用场景：</strong> MySQL 默认，大多数业务场景适用</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">ISOLATION</span><span class="w"> </span><span class="k">LEVEL</span><span class="w"> </span><span class="k">REPEATABLE</span><span class="w"> </span><span class="k">READ</span><span class="p">;</span>
+<span class="c1">-- 查看当前隔离级别</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">@@</span><span class="n">transaction_isolation</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-21">5.4 SERIALIZABLE（串行化）</h3>
+<ul>
+<li><strong>最高隔离级别，所有事务串行执行</strong>（所有问题都解决）</li>
+<li><strong>问题：</strong> 性能极差，高并发下大量锁等待</li>
+<li><strong>使用场景：</strong> 对数据一致性要求极高且并发量很低的场景</li>
+</ul>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">ISOLATION</span><span class="w"> </span><span class="k">LEVEL</span><span class="w"> </span><span class="k">SERIALIZABLE</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-22">六、隔离级别 vs 并发问题对照表</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>性能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>❌ 存在</td>
+<td>❌ 存在</td>
+<td>❌ 存在</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>✅ 解决</td>
+<td>❌ 存在</td>
+<td>❌ 存在</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>REPEATABLE READ（默认）</td>
+<td>✅ 解决</td>
+<td>✅ 解决</td>
+<td>⚠️ 基本解决</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>✅ 解决</td>
+<td>✅ 解决</td>
+<td>✅ 解决</td>
+<td>⭐</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ MySQL 在 REPEATABLE READ 级别下，通过 MVCC + 间隙锁（Gap Lock）基本解决了幻读问题。</p>
+</blockquote>
+<hr/>
+<h2 id="section-23">七、乐观锁 vs 悲观锁</h2>
+<h3 id="section-24">7.1 悲观锁（Pessimistic Lock）</h3>
+<blockquote>
+<p><strong>假设冲突一定会发生，每次操作前都先加锁。</strong></p>
+</blockquote>
+<p><strong>类比：</strong> 你去图书馆借书，不管有没有人要借这本书，你直接把书锁进抽屉，别人就借不到了，等你还回来才能借。</p>
+<p><strong>实现方式：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 使用 SELECT ... FOR UPDATE 加排他锁</span>
+<span class="k">BEGIN</span><span class="p">;</span>
+
+<span class="c1">-- 查询并锁定这一行（其他事务无法修改此行，直到本事务提交）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span>
+
+<span class="c1">-- 执行修改</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+
+<span class="k">COMMIT</span><span class="p">;</span>
+<span class="c1">-- 锁释放，其他事务才能操作 id=1 的行</span>
+</pre></div>
+</div><p><strong>特点：</strong></p>
+<ul>
+<li>安全性高，不会出现并发冲突</li>
+<li>性能较低，高并发下锁竞争严重</li>
+<li>适合<strong>写多读少</strong>、冲突概率高的场景</li>
+</ul>
+<h3 id="section-25">7.2 乐观锁（Optimistic Lock）</h3>
+<blockquote>
+<p><strong>假设冲突很少发生，操作完成后检查是否有冲突，有冲突则重试。</strong></p>
+</blockquote>
+<p><strong>类比：</strong> 你和同事同时编辑同一个文档，你们各自修改，提交时系统检查"你修改时文档的版本"和"现在的版本"是否一致，不一致就提示你重新编辑。</p>
+<p><strong>实现方式（版本号机制）：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 表结构（增加 version 字段）</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">    </span><span class="n">stock</span><span class="w">    </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="k">version</span><span class="w">  </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="c1">-- 版本号，每次更新 +1</span>
+<span class="p">);</span>
+
+<span class="c1">-- ===== 乐观锁操作流程 =====</span>
+
+<span class="c1">-- 第一步：读取数据，记录当前版本号</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">stock</span><span class="p">,</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- 假设返回：id=1, stock=100, version=5</span>
+
+<span class="c1">-- 第二步：更新时，携带版本号作为条件</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span>
+<span class="k">SET</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 关键！版本号必须匹配</span>
+<span class="c1">-- 如果返回影响行数 = 1，说明更新成功（无并发冲突）</span>
+<span class="c1">-- 如果返回影响行数 = 0，说明有其他事务已经修改了数据，需要重试</span>
+
+<span class="c1">-- 应用层检查更新结果</span>
+<span class="c1">-- affected_rows == 1 → 成功</span>
+<span class="c1">-- affected_rows == 0 → 冲突，重新读取并重试</span>
+</pre></div>
+</div><p><strong>特点：</strong></p>
+<ul>
+<li>不加锁，性能高</li>
+<li>适合<strong>读多写少</strong>、冲突概率低的场景</li>
+<li>需要在应用层处理冲突重试逻辑</li>
+</ul>
+<h3 id="section-26">7.3 两者对比</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>乐观锁</th>
+<th>悲观锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>锁机制</td>
+<td>无锁（版本号/CAS）</td>
+<td>数据库锁</td>
+</tr>
+<tr>
+<td>并发性能</td>
+<td>高</td>
+<td>低</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>读多写少</td>
+<td>写多读少</td>
+</tr>
+<tr>
+<td>冲突处理</td>
+<td>应用层重试</td>
+<td>等待锁释放</td>
+</tr>
+<tr>
+<td>实现方式</td>
+<td>版本号/时间戳字段</td>
+<td>SELECT FOR UPDATE</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-27">八、完整代码示例：转账业务事务</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ===== 准备工作：创建账户表 =====</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 账户ID</span>
+<span class="w">    </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">            </span><span class="c1">-- 用户名</span>
+<span class="w">    </span><span class="n">balance</span><span class="w">  </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="c1">-- 余额（精确到分）</span>
+<span class="w">    </span><span class="k">version</span><span class="w">  </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="w">           </span><span class="c1">-- 乐观锁版本号</span>
+<span class="p">);</span>
+
+<span class="c1">-- 插入测试数据</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">balance</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="p">(</span><span class="s1">'Alice'</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">.</span><span class="mi">00</span><span class="p">),</span><span class="w">  </span><span class="c1">-- Alice 有 1000 元</span>
+<span class="p">(</span><span class="s1">'Bob'</span><span class="p">,</span><span class="w">   </span><span class="mi">500</span><span class="p">.</span><span class="mi">00</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Bob 有 500 元</span>
+
+<span class="c1">-- ===== 转账事务：Alice 向 Bob 转 300 元 =====</span>
+
+<span class="k">BEGIN</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 开启事务</span>
+
+<span class="c1">-- 第一步：检查 Alice 余额是否足够（使用悲观锁，防止并发超扣）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span>
+<span class="c1">-- 假设返回 1000.00，满足条件</span>
+
+<span class="c1">-- 第二步：扣减 Alice 账户</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span>
+<span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">300</span><span class="p">.</span><span class="mi">00</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">300</span><span class="p">.</span><span class="mi">00</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 加余额条件，双重保险</span>
+
+<span class="c1">-- 检查是否成功（在实际代码中用 affected_rows 判断）</span>
+<span class="c1">-- 如果 affected_rows = 0，说明余额不足，需要 ROLLBACK</span>
+
+<span class="c1">-- 第三步：增加 Bob 账户</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span>
+<span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">300</span><span class="p">.</span><span class="mi">00</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+
+<span class="c1">-- 第四步：提交事务（两步操作全部成功才提交）</span>
+<span class="k">COMMIT</span><span class="p">;</span>
+
+<span class="c1">-- ===== 验证结果 =====</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="p">;</span>
+<span class="c1">-- 期望：Alice=700, Bob=800</span>
+
+
+<span class="c1">-- ===== 模拟失败场景：余额不足时回滚 =====</span>
+
+<span class="k">BEGIN</span><span class="p">;</span>
+
+<span class="k">SELECT</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span>
+<span class="c1">-- 假设余额是 100，但要转 500，不够</span>
+
+<span class="c1">-- 检查余额</span>
+<span class="k">SET</span><span class="w"> </span><span class="o">@</span><span class="n">alice_balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">-- 余额不足，回滚</span>
+<span class="c1">-- （实际代码中由应用层判断并执行 ROLLBACK）</span>
+<span class="k">ROLLBACK</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 撤销所有操作，数据恢复原样</span>
+
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 数据不变</span>
+</pre></div>
+</div><div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ===== 使用存储过程封装转账逻辑（生产推荐）=====</span>
+
+<span class="k">DELIMITER</span><span class="w"> </span><span class="err">$$</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">transfer</span><span class="p">(</span>
+<span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">from_id</span><span class="w">  </span><span class="nb">INT</span><span class="p">,</span><span class="w">      </span><span class="c1">-- 转出账户ID</span>
+<span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">to_id</span><span class="w">    </span><span class="nb">INT</span><span class="p">,</span><span class="w">      </span><span class="c1">-- 转入账户ID</span>
+<span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">amount</span><span class="w">   </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="w">  </span><span class="c1">-- 转账金额</span>
+<span class="w">    </span><span class="k">OUT</span><span class="w"> </span><span class="k">result</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 结果信息</span>
+<span class="p">)</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">from_balance</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w">  </span><span class="c1">-- 转出方余额</span>
+<span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">EXIT</span><span class="w"> </span><span class="k">HANDLER</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">SQLEXCEPTION</span><span class="w">  </span><span class="c1">-- 异常处理器</span>
+<span class="w">    </span><span class="k">BEGIN</span>
+<span class="w">        </span><span class="k">ROLLBACK</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 出现任何 SQL 异常，自动回滚</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ERROR: 转账失败，已回滚'</span><span class="p">;</span>
+<span class="w">    </span><span class="k">END</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">-- 开启事务</span>
+<span class="w">    </span><span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">-- 锁定转出账户，读取余额</span>
+<span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">from_balance</span><span class="w"> </span>
+<span class="w">    </span><span class="k">FROM</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span>
+<span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">from_id</span><span class="w"> </span>
+<span class="w">    </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">-- 检查余额是否充足</span>
+<span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="n">from_balance</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">THEN</span>
+<span class="w">        </span><span class="k">ROLLBACK</span><span class="p">;</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ERROR: 余额不足'</span><span class="p">;</span>
+<span class="w">    </span><span class="k">ELSE</span>
+<span class="w">        </span><span class="c1">-- 扣减转出账户</span>
+<span class="w">        </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">from_id</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">-- 增加转入账户</span>
+<span class="w">        </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">to_id</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">COMMIT</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 提交事务</span>
+<span class="w">        </span><span class="k">SET</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CONCAT</span><span class="p">(</span><span class="s1">'SUCCESS: 成功转账 '</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">,</span><span class="w"> </span><span class="s1">' 元'</span><span class="p">);</span>
+<span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<span class="k">END</span><span class="err">$$</span>
+
+<span class="k">DELIMITER</span><span class="w"> </span><span class="p">;</span>
+
+<span class="c1">-- 调用存储过程</span>
+<span class="k">CALL</span><span class="w"> </span><span class="n">transfer</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">300</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="o">@</span><span class="k">result</span><span class="p">);</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">@</span><span class="k">result</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 查看结果</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-28">九、常见报错</h2>
+<h3 id="section-29">9.1 死锁（Deadlock）</h3>
+<p><strong>报错信息：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction
+</pre></div>
+</div><p><strong>原因：</strong> 两个事务互相等待对方释放锁。</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>事务A 锁定了 row1，等待 row2
+事务B 锁定了 row2，等待 row1
+→ 相互等待，形成死锁
+</pre></div>
+</div><p><strong>解决方案：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 1. 保持固定的加锁顺序（如：总是先锁 id 小的再锁 id 大的）</span>
+<span class="c1">-- 2. 缩短事务执行时间，减少持锁时长</span>
+<span class="c1">-- 3. 查看死锁日志</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">ENGINE</span><span class="w"> </span><span class="n">INNODB</span><span class="w"> </span><span class="n">STATUS</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 查看最近一次死锁信息</span>
+</pre></div>
+</div><h3 id="section-30">9.2 锁等待超时</h3>
+<p><strong>报错信息：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+</pre></div>
+</div><p><strong>原因：</strong> 事务等待锁的时间超过了 <code>innodb_lock_wait_timeout</code>（默认 50 秒）。</p>
+<p><strong>解决方案：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查看锁等待超时时间</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'innodb_lock_wait_timeout'</span><span class="p">;</span>
+
+<span class="c1">-- 临时调整超时时间（当前 session）</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="n">innodb_lock_wait_timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 30秒</span>
+
+<span class="c1">-- 查看当前有哪些锁等待</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">INNODB_TRX</span><span class="p">;</span><span class="w">         </span><span class="c1">-- 当前活跃事务</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">INNODB_LOCK_WAITS</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 锁等待情况</span>
+</pre></div>
+</div><h3 id="section-31">9.3 事务未提交导致的问题</h3>
+<p><strong>现象：</strong> 操作了数据但别的会话看不到变化。</p>
+<p><strong>原因：</strong> 忘记执行 <code>COMMIT</code>，或者 <code>autocommit=0</code> 时每次都要手动提交。</p>
+<p><strong>解决方案：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 检查 autocommit 设置</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'autocommit'</span><span class="p">;</span>
+
+<span class="c1">-- 如果忘记提交，查看当前事务状态</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">INNODB_TRX</span><span class="p">;</span>
+<span class="c1">-- 找到对应事务后，在对应连接执行 COMMIT 或 ROLLBACK</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-32">十、面试常问</h2>
+<h3 id="section-33">Q1：ACID 分别是什么？用自己的话解释</h3>
+<p><strong>参考回答：</strong></p>
+<ul>
+<li><strong>原子性（A）：</strong> 事务是最小执行单元，要么全部成功，要么全部回滚，不存在"做了一半"的状态。底层由 undo log 保证。</li>
+<li><strong>一致性（C）：</strong> 事务前后，数据库数据符合所有预定义规则（约束、业务逻辑），不会出现违反规则的状态。是事务的最终目的。</li>
+<li><strong>隔离性（I）：</strong> 并发执行的事务互不干扰，每个事务感觉像是在独占数据库。由锁机制和 MVCC 保证。</li>
+<li><strong>持久性（D）：</strong> 已提交的事务，其修改永久保存，即使系统崩溃也不丢失。由 redo log 保证。</li>
+</ul>
+<h3 id="section-34">Q2：MySQL 默认隔离级别是什么？为什么？</h3>
+<p><strong>参考回答：</strong>
+MySQL InnoDB 默认使用 <strong>REPEATABLE READ（可重复读）</strong>。</p>
+<p>原因：</p>
+<ol>
+<li>解决了脏读和不可重复读，兼顾了数据安全性和并发性能</li>
+<li>MySQL 通过 MVCC 实现了无锁的快照读，性能比 SERIALIZABLE 高很多</li>
+<li>通过 Gap Lock（间隙锁）和 Next-Key Lock 在很大程度上解决了幻读问题</li>
+</ol>
+<h3 id="section-35">Q3：幻读和不可重复读有什么区别？</h3>
+<p><strong>参考回答：</strong></p>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>现象</td>
+<td>同一行数据两次读取值不同</td>
+<td>同一条件两次查询行数不同</td>
+</tr>
+<tr>
+<td>原因</td>
+<td>其他事务执行了 UPDATE</td>
+<td>其他事务执行了 INSERT/DELETE</td>
+</tr>
+<tr>
+<td>解决方式</td>
+<td>REPEATABLE READ</td>
+<td>SERIALIZABLE 或 Gap Lock</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>类比：</strong> 不可重复读是"同一个苹果，昨天是红的，今天是黄的"；幻读是"昨天数了 10 个苹果，今天数了 11 个，多了一个幻影苹果"。</p>
+<h3 id="section-36">Q4：什么时候用乐观锁，什么时候用悲观锁？</h3>
+<p><strong>参考回答：</strong></p>
+<ul>
+<li><strong>乐观锁：</strong> 适用于读多写少、冲突概率低的场景（如用户信息更新、文章编辑）。用版本号或时间戳实现，无数据库锁，并发性能高。</li>
+<li><strong>悲观锁：</strong> 适用于写多读少、冲突概率高的场景（如库存扣减、余额转账）。用 <code>SELECT FOR UPDATE</code> 加锁，安全但性能低。</li>
+</ul>
+<h3 id="section-37">Q5：MVCC 是什么？（进阶）</h3>
+<p><strong>参考回答：</strong>
+MVCC（Multi-Version Concurrency Control，多版本并发控制）是 MySQL InnoDB 在 REPEATABLE READ 和 READ COMMITTED 级别下实现事务隔离的核心机制。</p>
+<p>核心思想：</p>
+<ul>
+<li>不直接修改数据，而是保留数据的<strong>多个历史版本</strong></li>
+<li>读操作读取的是事务开始时刻的<strong>快照版本</strong>（快照读）</li>
+<li>写操作创建数据的新版本，不影响正在读取旧版本的事务</li>
+</ul>
+<p>好处：<strong>读写不相互阻塞</strong>，大幅提升并发性能。</p>
+<hr/>
+<h2 id="section-38">本章小结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>知识点</th>
+<th>核心内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>事务定义</td>
+<td>一组操作的集合，全成功或全回滚</td>
+</tr>
+<tr>
+<td>ACID</td>
+<td>原子性/一致性/隔离性/持久性</td>
+</tr>
+<tr>
+<td>操作语句</td>
+<td>BEGIN → 操作 → COMMIT/ROLLBACK</td>
+</tr>
+<tr>
+<td>并发问题</td>
+<td>脏读（未提交）→ 不可重复读（值变）→ 幻读（行数变）</td>
+</tr>
+<tr>
+<td>隔离级别</td>
+<td>由低到高：RU → RC → RR（默认）→ S</td>
+</tr>
+<tr>
+<td>乐观锁</td>
+<td>版本号，适合读多写少，无锁</td>
+</tr>
+<tr>
+<td>悲观锁</td>
+<td>FOR UPDATE，适合写多读少，有锁</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>记忆口诀：</strong></p>
+<ul>
+<li>脏读读未提，重复读值变，幻读行数变</li>
+<li>隔离越高越安全，并发越低要权衡</li>
+<li>MySQL 默认 RR，MVCC 加持更强大</li>
+</ul>
+</blockquote>
+<hr/>
+<p><em>笔记整理日期：2026-11-12 | MySQL 版本：8.0+</em></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="../598ff9279b0513a8.html"><small>← 上一篇</small><strong>MySQL 多表查询完整详解（连接 &amp; 子查询）</strong></a><a href="../3b62987a0315e0e3.html"><small>下一篇 →</small><strong>MySQL 索引与性能优化 — 保姆级详解</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">知识框架</a><a class="toc-h2" href="#section-1">一、什么是事务</a><a class="toc-h3" href="#section-2">1.1 生活类比：银行转账</a><a class="toc-h3" href="#section-3">1.2 事务的定义</a><a class="toc-h2" href="#section-4">二、ACID 四大特性</a><a class="toc-h3" href="#section-5">2.1 原子性（Atomicity）</a><a class="toc-h3" href="#section-6">2.2 一致性（Consistency）</a><a class="toc-h3" href="#section-7">2.3 隔离性（Isolation）</a><a class="toc-h3" href="#section-8">2.4 持久性（Durability）</a><a class="toc-h2" href="#section-9">三、事务操作语句</a><a class="toc-h3" href="#section-10">3.1 基本语法</a><a class="toc-h3" href="#section-11">3.2 自动提交模式</a><a class="toc-h3" href="#section-12">3.3 保存点（SAVEPOINT）</a><a class="toc-h2" href="#section-13">四、事务并发问题</a><a class="toc-h3" href="#section-14">4.1 脏读（Dirty Read）</a><a class="toc-h3" href="#section-15">4.2 不可重复读（Non-Repeatable Read）</a><a class="toc-h3" href="#section-16">4.3 幻读（Phantom Read）</a><a class="toc-h2" href="#section-17">五、四种隔离级别</a><a class="toc-h3" href="#section-18">5.1 READ UNCOMMITTED（读未提交）</a><a class="toc-h3" href="#section-19">5.2 READ COMMITTED（读已提交）</a><a class="toc-h3" href="#section-20">5.3 REPEATABLE READ（可重复读）⭐ MySQL 默认</a><a class="toc-h3" href="#section-21">5.4 SERIALIZABLE（串行化）</a><a class="toc-h2" href="#section-22">六、隔离级别 vs 并发问题对照表</a><a class="toc-h2" href="#section-23">七、乐观锁 vs 悲观锁</a><a class="toc-h3" href="#section-24">7.1 悲观锁（Pessimistic Lock）</a><a class="toc-h3" href="#section-25">7.2 乐观锁（Optimistic Lock）</a><a class="toc-h3" href="#section-26">7.3 两者对比</a><a class="toc-h2" href="#section-27">八、完整代码示例：转账业务事务</a><a class="toc-h2" href="#section-28">九、常见报错</a><a class="toc-h3" href="#section-29">9.1 死锁（Deadlock）</a><a class="toc-h3" href="#section-30">9.2 锁等待超时</a><a class="toc-h3" href="#section-31">9.3 事务未提交导致的问题</a><a class="toc-h2" href="#section-32">十、面试常问</a><a class="toc-h3" href="#section-33">Q1：ACID 分别是什么？用自己的话解释</a><a class="toc-h3" href="#section-34">Q2：MySQL 默认隔离级别是什么？为什么？</a><a class="toc-h3" href="#section-35">Q3：幻读和不可重复读有什么区别？</a><a class="toc-h3" href="#section-36">Q4：什么时候用乐观锁，什么时候用悲观锁？</a><a class="toc-h3" href="#section-37">Q5：MVCC 是什么？（进阶）</a><a class="toc-h2" href="#section-38">本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

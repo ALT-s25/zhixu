@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MySQL 索引与性能优化 — 保姆级详解 · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/3b62987a0315e0e3.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>MySQL详解</h2><nav aria-label="同专题笔记"><a href="0db85597fce6d578.html">MySQL 01 · 入门与数据库概述 ⭐</a><a href="../9f88756ac2d869f3.html">MySQL 02 · DDL 数据定义语言 ⭐⭐</a><a href="../f978c6e9910217b1.html">MySQL DML（数据增删改）完整详解</a><a href="../808a58512cfb7c56.html">MySQL DQL 单表查询完整详解</a><a href="021c5ead51bc463f.html">MySQL 约束完整详解</a><a href="../598ff9279b0513a8.html">MySQL 多表查询完整详解（连接 &amp; 子查询）</a><a href="2c22ea380678760b.html">MySQL 事务与并发控制 — 保姆级详解</a><a aria-current="page" href="../3b62987a0315e0e3.html">MySQL 索引与性能优化 — 保姆级详解</a><a href="../d88a39a488d6e59d.html">MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>MySQL详解</div><h1>MySQL 索引与性能优化 — 保姆级详解</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<h2 id="section-0">知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>索引
+├── 什么是索引（书的目录类比）
+├── 索引的分类
+│   ├── 主键索引（PRIMARY KEY）
+│   ├── 唯一索引（UNIQUE）
+│   ├── 普通索引（INDEX）
+│   ├── 全文索引（FULLTEXT）
+│   └── 组合索引（Composite Index）
+├── 索引底层结构
+│   ├── B+ 树原理
+│   └── 为什么不用哈希/B树
+├── 索引操作
+│   ├── 创建索引
+│   ├── 查看索引
+│   └── 删除索引
+├── 最左前缀原则
+├── 索引失效的 8 种场景
+├── EXPLAIN 执行计划分析
+├── 慢查询优化思路
+└── 完整代码示例
+</pre></div>
+</div><hr/>
+<h2 id="section-1">一、什么是索引</h2>
+<h3 id="section-2">1.1 生活类比：书的目录</h3>
+<blockquote>
+<p>假设你有一本 1000 页的《MySQL 技术内幕》，你想找"InnoDB 锁机制"这个章节。</p>
+<p><strong>没有目录：</strong> 你只能从第 1 页翻到第 1000 页，直到找到为止 → 全表扫描</p>
+<p><strong>有目录：</strong> 你翻到目录页，查到"InnoDB 锁机制"在第 523 页，直接翻到 523 页 → 索引查找</p>
+<p><strong>索引就是数据库的"目录"</strong>，让查询不用遍历所有数据，直接定位到目标行。</p>
+</blockquote>
+<h3 id="section-3">1.2 索引的本质</h3>
+<p>索引是一种<strong>数据结构</strong>，存储了某列（或多列）的值及其对应数据行的物理位置（主键或行地址）。</p>
+<p><strong>有索引 vs 无索引：</strong></p>
+<ul>
+<li>无索引：<code>SELECT * FROM users WHERE name='张三'</code> → 扫描全部 100 万行</li>
+<li>有索引：MySQL 通过 B+ 树直接定位到"张三"所在的 1~2 行 → 极快</li>
+</ul>
+<p><strong>代价：</strong></p>
+<ul>
+<li>索引占用额外磁盘空间</li>
+<li>写操作（INSERT/UPDATE/DELETE）需要维护索引，略有性能损耗</li>
+<li>因此，不是索引越多越好</li>
+</ul>
+<hr/>
+<h2 id="section-4">二、索引的分类</h2>
+<h3 id="section-5">2.1 主键索引（PRIMARY KEY）</h3>
+<blockquote>
+<p><strong>表的主键自动创建主键索引，是最重要、最高效的索引。</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建表时指定主键（自动创建主键索引）</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w">  </span><span class="c1">-- 主键，自动创建索引</span>
+<span class="w">    </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">age</span><span class="w">      </span><span class="nb">INT</span>
+<span class="p">);</span>
+
+<span class="c1">-- 也可以单独定义</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 明确指定主键</span>
+<span class="p">);</span>
+</pre></div>
+</div><p><strong>特点：</strong></p>
+<ul>
+<li>一张表只能有一个主键索引</li>
+<li>主键值必须唯一且不能为 NULL</li>
+<li>InnoDB 表按主键顺序存储数据（聚簇索引）</li>
+</ul>
+<h3 id="section-6">2.2 唯一索引（UNIQUE INDEX）</h3>
+<blockquote>
+<p><strong>保证列中所有值都唯一，允许有 NULL（但只能有一个 NULL）。</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建时添加唯一索引</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">email</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="p">,</span><span class="w">       </span><span class="c1">-- 写法1：列定义时</span>
+<span class="w">    </span><span class="n">phone</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_phone</span><span class="w"> </span><span class="p">(</span><span class="n">phone</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 写法2：单独定义</span>
+<span class="p">);</span>
+
+<span class="c1">-- 已有表，添加唯一索引</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_email</span><span class="w"> </span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+</pre></div>
+</div><p><strong>使用场景：</strong> 邮箱、手机号、身份证号等需要唯一的字段。</p>
+<h3 id="section-7">2.3 普通索引（INDEX）</h3>
+<blockquote>
+<p><strong>最基本的索引类型，没有唯一性约束，单纯为了加速查询。</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建时添加普通索引</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">         </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+<span class="w">    </span><span class="n">author_id</span><span class="w">  </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="p">,</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_author</span><span class="w"> </span><span class="p">(</span><span class="n">author_id</span><span class="p">),</span><span class="w">      </span><span class="c1">-- 普通索引</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_created</span><span class="w"> </span><span class="p">(</span><span class="n">created_at</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 时间索引</span>
+<span class="p">);</span>
+
+<span class="c1">-- 已有表，添加普通索引</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_author</span><span class="w"> </span><span class="p">(</span><span class="n">author_id</span><span class="p">);</span>
+<span class="c1">-- 或</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_author</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="p">(</span><span class="n">author_id</span><span class="p">);</span>
+</pre></div>
+</div><p><strong>使用场景：</strong> 经常出现在 WHERE、JOIN、ORDER BY 子句中的字段。</p>
+<h3 id="section-8">2.4 全文索引（FULLTEXT）</h3>
+<blockquote>
+<p><strong>用于全文搜索，支持对文本内容进行关键词搜索，比 LIKE 高效得多。</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建全文索引</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">      </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="w">   </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+<span class="w">    </span><span class="n">content</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">FULLTEXT</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">ft_content</span><span class="w"> </span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 全文索引</span>
+<span class="p">);</span>
+
+<span class="c1">-- 使用全文索引搜索（MATCH...AGAINST 语法）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="k">MATCH</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="w"> </span><span class="n">AGAINST</span><span class="p">(</span><span class="s1">'MySQL 事务'</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">MODE</span><span class="p">);</span>
+<span class="c1">-- IN BOOLEAN MODE：支持 +词（必须包含）、-词（必须排除）</span>
+</pre></div>
+</div><p><strong>注意：</strong> 中文全文搜索需要使用 <code>ngram</code> 解析器，或者考虑使用 Elasticsearch。</p>
+<h3 id="section-9">2.5 组合索引（Composite Index）</h3>
+<blockquote>
+<p><strong>在多个列上创建的索引，遵循最左前缀原则（见第五节）。</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 创建组合索引</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">  </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w">   </span><span class="n">TINYINT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">amount</span><span class="w">   </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">-- 组合索引：user_id 和 status 两列</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_status</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- 能用到 idx_user_status 的查询：</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="w">                     </span><span class="c1">-- ✅ 用到</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">status</span><span class="o">=</span><span class="mi">2</span><span class="p">;</span><span class="w">        </span><span class="c1">-- ✅ 用到</span>
+<span class="c1">-- 不能用到的查询：</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="o">=</span><span class="mi">2</span><span class="p">;</span><span class="w">                      </span><span class="c1">-- ❌ 不用（违反最左前缀）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-10">三、索引底层结构：B+ 树</h2>
+<h3 id="section-11">3.1 B+ 树是什么</h3>
+<p>B+ 树（B-Plus Tree）是索引的核心数据结构。理解它才能真正理解索引的原理。</p>
+<p><strong>B+ 树结构特点：</strong></p>
+<ol>
+<li><strong>多叉树：</strong> 每个节点可以有多个子节点（比二叉树矮，层数少，IO 少）</li>
+<li><strong>所有数据在叶子节点：</strong> 非叶子节点只存索引（键值），不存实际数据</li>
+<li><strong>叶子节点链表：</strong> 所有叶子节点通过链表相连，支持范围查询</li>
+<li><strong>有序：</strong> 叶子节点中的数据按键值有序排列</li>
+</ol>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>                    B+ 树示意图
+
+               [10 | 30 | 50]           ← 根节点（非叶子，只存键）
+              /    |    |    \
+     [1|5|9] [12|20] [32|40] [55|70]   ← 中间节点
+        |       |       |       |
+    [1][5][9]-[12][20]-[32][40]-[55][70]  ← 叶子节点（存实际数据，链表相连）
+</pre></div>
+</div><h3 id="section-12">3.2 为什么用 B+ 树，而不用哈希表？</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>B+ 树</th>
+<th>哈希表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>等值查询</td>
+<td>O(log n)</td>
+<td>O(1) ✅ 更快</td>
+</tr>
+<tr>
+<td>范围查询</td>
+<td>O(log n + k) ✅ 支持</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td>排序（ORDER BY）</td>
+<td>✅ 天然有序</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td>LIKE 前缀查询</td>
+<td>✅ 支持</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td>存储效率</td>
+<td>较高</td>
+<td>高（但有哈希冲突）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>结论：</strong> 哈希表等值查询很快，但不支持范围查询、排序、前缀查询。数据库中这些操作非常常见，所以 B+ 树更适合作为索引结构。</p>
+<blockquote>
+<p><strong>MySQL 的 Memory 引擎支持哈希索引</strong>，但 InnoDB（最常用的引擎）默认使用 B+ 树。</p>
+</blockquote>
+<h3 id="section-13">3.3 聚簇索引 vs 非聚簇索引</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>聚簇索引（主键索引）：
+叶子节点存储的是实际数据行
+     [主键] → [整行数据]
+     好处：通过主键查询，一次就能拿到数据
+
+非聚簇索引（二级索引/辅助索引）：
+叶子节点存储的是主键值
+     [索引列值] → [主键值]
+     需要回表：先查到主键，再通过主键查整行数据
+</pre></div>
+</div><p><strong>回表（Back to Table）：</strong>
+使用非主键索引查询时，先在二级索引找到主键，再用主键去聚簇索引找整行数据，这个过程叫回表。回表有额外开销，所以覆盖索引（见面试题）可以避免回表。</p>
+<hr/>
+<h2 id="section-14">四、索引操作</h2>
+<h3 id="section-15">4.1 创建索引</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ===== 方式1：CREATE TABLE 时创建 =====</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">         </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">dept_id</span><span class="w">    </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">hire_date</span><span class="w">  </span><span class="nb">DATE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">salary</span><span class="w">     </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">-- 普通索引</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_dept</span><span class="w"> </span><span class="p">(</span><span class="n">dept_id</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">-- 组合索引</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_dept_hire</span><span class="w"> </span><span class="p">(</span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">hire_date</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- ===== 方式2：ALTER TABLE 添加索引 =====</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name_unique</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+
+<span class="c1">-- ===== 方式3：CREATE INDEX 语句 =====</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_salary</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="p">(</span><span class="n">salary</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-16">4.2 查看索引</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查看表的所有索引</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+<span class="c1">-- 返回字段：Table/Key_name/Column_name/Non_unique/Seq_in_index 等</span>
+
+<span class="c1">-- 也可以用 SHOW CREATE TABLE 查看</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-17">4.3 删除索引</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 方式1：DROP INDEX</span>
+<span class="k">DROP</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">employees</span><span class="p">;</span>
+
+<span class="c1">-- 方式2：ALTER TABLE</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">DROP</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_dept</span><span class="p">;</span>
+
+<span class="c1">-- 删除主键索引（特殊）</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">DROP</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">;</span>
+<span class="c1">-- 注意：删除主键前需要先去掉 AUTO_INCREMENT，否则报错</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-18">五、最左前缀原则（组合索引必看）</h2>
+<h3 id="section-19">5.1 什么是最左前缀原则</h3>
+<blockquote>
+<p><strong>使用组合索引时，查询条件必须从索引的最左边列开始，不能跳过中间列。</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 假设有组合索引：INDEX idx_a_b_c (a, b, c)</span>
+<span class="c1">-- 可以把这个索引想象成电话簿：先按姓排序，再按名排序，再按生日排序</span>
+
+<span class="c1">-- ✅ 能用到索引</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="w">              </span><span class="c1">-- 用到 a</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">;</span><span class="w">      </span><span class="c1">-- 用到 a, b</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="o">=</span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="c1">-- 用到 a, b, c</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="o">=</span><span class="mi">3</span><span class="p">;</span><span class="w">      </span><span class="c1">-- 用到 a（c 跳过了 b，c 不走索引）</span>
+
+<span class="c1">-- ❌ 不能用到索引（没有从最左列开始）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">;</span><span class="w">              </span><span class="c1">-- 不走索引</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="o">=</span><span class="mi">3</span><span class="p">;</span><span class="w">              </span><span class="c1">-- 不走索引</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="o">=</span><span class="mi">3</span><span class="p">;</span><span class="w">      </span><span class="c1">-- 不走索引</span>
+</pre></div>
+</div><h3 id="section-20">5.2 生活类比：字典排序</h3>
+<blockquote>
+<p>字典里的词是先按第一个字母排序，再按第二个字母排序...</p>
+<ul>
+<li>你想找"apple"：先找"a"，再找"ap"，再找"app"... ✅（从头开始，能用索引）</li>
+<li>你想找所有以"le"结尾的词：没法用字典顺序找... ❌（不从头开始，不走索引）</li>
+</ul>
+</blockquote>
+<h3 id="section-21">5.3 范围查询对后续列的影响</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 假设索引：INDEX idx_a_b_c (a, b, c)</span>
+
+<span class="c1">-- a 是范围查询时，b 和 c 无法走索引</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="c1">-- a 走了范围查询，b 不能走索引</span>
+
+<span class="c1">-- 解决方案：把等值查询列放在前面</span>
+<span class="c1">-- 建索引时：INDEX idx_b_a (b, a)  把 b 放前面</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">a</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="c1">-- b 走索引，a 也能部分走索引</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-22">六、索引失效的 8 种常见情况</h2>
+<blockquote>
+<p><strong>重点！面试必考！</strong></p>
+</blockquote>
+<h3 id="section-23">情况1：LIKE 以通配符开头</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ❌ 索引失效（% 在开头，无法确定从哪里开始查）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%张%'</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%张'</span><span class="p">;</span>
+
+<span class="c1">-- ✅ 有效（% 在末尾，可以从头开始匹配）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'张%'</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>原因：</strong> B+ 树是按前缀排序的，<code>%张%</code> 无法从树根开始按序查找。</p>
+<h3 id="section-24">情况2：对索引列使用函数</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ❌ 索引失效（对索引列 created_at 使用了函数）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">YEAR</span><span class="p">(</span><span class="n">created_at</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2024</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">DATE_FORMAT</span><span class="p">(</span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="s1">'%Y'</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'2024'</span><span class="p">;</span>
+
+<span class="c1">-- ✅ 改写为范围查询</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="s1">'2024-01-01'</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="s1">'2025-01-01'</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>原因：</strong> MySQL 无法预知函数的结果，必须对每行计算，只能全表扫描。</p>
+<h3 id="section-25">情况3：对索引列做数学运算</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ❌ 索引失效（对索引列 id 做了运算）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="mi">1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+
+<span class="c1">-- ✅ 把运算移到等号右边</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">price</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-26">情况4：隐式类型转换</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 假设 phone 字段是 VARCHAR 类型，且有索引</span>
+
+<span class="c1">-- ❌ 索引失效（传入的是数字 13800138000，VARCHAR 和 INT 类型不匹配）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13800138000</span><span class="p">;</span>
+<span class="c1">-- MySQL 会对 phone 列做隐式转换：CAST(phone AS INT)，导致索引失效</span>
+
+<span class="c1">-- ✅ 传字符串</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'13800138000'</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>原因：</strong> 类型不一致时，MySQL 对索引列做类型转换，相当于对索引列用了函数。</p>
+<h3 id="section-27">情况5：OR 连接的条件有非索引列</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 假设 name 有索引，address 没有索引</span>
+
+<span class="c1">-- ❌ 索引失效（OR 中 address 没有索引，MySQL 只能全表扫描）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s1">'张三'</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">address</span><span class="o">=</span><span class="s1">'北京'</span><span class="p">;</span>
+
+<span class="c1">-- ✅ 解决方案1：给 address 也加索引</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_address</span><span class="w"> </span><span class="p">(</span><span class="n">address</span><span class="p">);</span>
+
+<span class="c1">-- ✅ 解决方案2：用 UNION 代替 OR</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s1">'张三'</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">address</span><span class="o">=</span><span class="s1">'北京'</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-28">情况6：NOT IN / NOT EXISTS</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ❌ 索引可能失效（NOT IN 有时走不了索引）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+
+<span class="c1">-- ✅ 改写思路：用 LEFT JOIN 代替 NOT EXISTS</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">exclude_list</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">user_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</pre></div>
+</div><p><strong>注意：</strong> <code>IN</code> 本身是可以走索引的，<code>NOT IN</code> 要根据数据分布判断。</p>
+<h3 id="section-29">情况7：索引列参与 IS NULL / IS NOT NULL（视数据分布）</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 视情况而定（当 NULL 值很多时，MySQL 可能放弃索引）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">deleted_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+<span class="c1">-- 如果 90% 的数据 deleted_at 都是 NULL，全表扫描反而更快</span>
+
+<span class="c1">-- 建议：尽量设计字段为 NOT NULL，用默认值代替 NULL</span>
+</pre></div>
+</div><h3 id="section-30">情况8：数据量少，MySQL 认为全表扫描更快</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 即使 name 有索引，MySQL 也可能不走</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s1">'张三'</span><span class="p">;</span>
+<span class="c1">-- 如果表只有 10 行，MySQL 优化器会认为全表扫描比走索引更快（减少 IO 次数）</span>
+<span class="c1">-- 这是正常行为，不用担心</span>
+</pre></div>
+</div><blockquote>
+<p><strong>总结口诀：</strong> 模糊左开头，函数运算别对列，类型要匹配，OR 有非索引全失效</p>
+</blockquote>
+<hr/>
+<h2 id="section-31">七、EXPLAIN 执行计划分析</h2>
+<h3 id="section-32">7.1 什么是 EXPLAIN</h3>
+<p><code>EXPLAIN</code> 是 MySQL 提供的<strong>查询分析工具</strong>，可以查看 MySQL 如何执行一条 SQL，是否用到了索引，扫描了多少行。</p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 基本用法：在 SELECT 前加 EXPLAIN</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s1">'张三'</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-33">7.2 重要字段详解</h3>
+<p><strong>执行 EXPLAIN 后会返回以下列：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+</pre></div>
+</div><h4 id="section-34">type 字段（最重要！）</h4>
+<blockquote>
+<p>type 表示查询的访问类型，性能从好到差排列：</p>
+</blockquote>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>type 值</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>system</strong></td>
+<td>表只有一行（最优）</td>
+<td>系统表</td>
+</tr>
+<tr>
+<td><strong>const</strong></td>
+<td>主键或唯一索引等值查询（极快）</td>
+<td>WHERE id=1</td>
+</tr>
+<tr>
+<td><strong>eq_ref</strong></td>
+<td>JOIN 时主键或唯一索引匹配</td>
+<td>JOIN ON a.id=b.id</td>
+</tr>
+<tr>
+<td><strong>ref</strong></td>
+<td>非唯一索引等值查询</td>
+<td>WHERE name='张三'</td>
+</tr>
+<tr>
+<td><strong>range</strong></td>
+<td>索引范围查询</td>
+<td>WHERE id&gt;10</td>
+</tr>
+<tr>
+<td><strong>index</strong></td>
+<td>全索引扫描（比全表快）</td>
+<td>只查索引列</td>
+</tr>
+<tr>
+<td><strong>ALL</strong></td>
+<td>全表扫描（最差）⚠️</td>
+<td>无索引条件</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>目标：</strong> type 至少要达到 <strong>ref</strong> 级别，<strong>range</strong> 也可以接受，<strong>ALL</strong> 通常需要优化。</p>
+<h4 id="section-35">key 字段</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- key：实际使用的索引名称</span>
+<span class="c1">-- key 为 NULL → 没有用到任何索引 → 需要优化</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="c1">-- 如果 age 没有索引，key 显示 NULL</span>
+</pre></div>
+</div><h4 id="section-36">rows 字段</h4>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- rows：MySQL 预估需要扫描的行数</span>
+<span class="c1">-- 越小越好，行数很大说明索引效率低或未命中索引</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%张%'</span><span class="p">;</span>
+<span class="c1">-- rows 可能等于全表行数，说明走了全表扫描</span>
+</pre></div>
+</div><h4 id="section-37">Extra 字段（重要提示）</h4>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>Extra 值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Using index</strong></td>
+<td>✅ 覆盖索引，无需回表，非常高效</td>
+</tr>
+<tr>
+<td><strong>Using where</strong></td>
+<td>在存储引擎层之外过滤，可能有优化空间</td>
+</tr>
+<tr>
+<td><strong>Using filesort</strong></td>
+<td>⚠️ 文件排序，ORDER BY 未走索引，需优化</td>
+</tr>
+<tr>
+<td><strong>Using temporary</strong></td>
+<td>⚠️ 使用了临时表，GROUP BY/ORDER BY 时出现</td>
+</tr>
+<tr>
+<td><strong>Using index condition</strong></td>
+<td>索引条件下推（ICP），较好</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-38">7.3 EXPLAIN 实战示例</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 建表和索引</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">dept_id</span><span class="w">  </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">salary</span><span class="w">   </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_dept_salary</span><span class="w"> </span><span class="p">(</span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- 案例1：走组合索引</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">5000</span><span class="p">;</span>
+<span class="c1">-- type: range, key: idx_dept_salary ✅</span>
+
+<span class="c1">-- 案例2：索引失效</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">5000</span><span class="p">;</span>
+<span class="c1">-- type: ALL, key: NULL ❌（违反最左前缀，dept_id 没出现）</span>
+
+<span class="c1">-- 案例3：覆盖索引（避免回表）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">dept_id</span><span class="p">,</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">dept_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- type: ref, key: idx_dept_salary, Extra: Using index ✅（只查索引列，不回表）</span>
+
+<span class="c1">-- 案例4：文件排序（需优化）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="p">;</span>
+<span class="c1">-- type: ALL, Extra: Using filesort ❌（salary 单独排序没有索引）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-39">八、慢查询优化思路</h2>
+<h3 id="section-40">8.1 开启慢查询日志</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 查看慢查询日志配置</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'slow_query%'</span><span class="p">;</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'long_query_time'</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 默认 10 秒</span>
+
+<span class="c1">-- 开启慢查询日志（临时，当前 session）</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">slow_query_log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="p">;</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">long_query_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 超过 1 秒的查询记录到日志</span>
+
+<span class="c1">-- 查看慢查询日志位置</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'slow_query_log_file'</span><span class="p">;</span>
+</pre></div>
+</div><h3 id="section-41">8.2 优化思路（五步法）</h3>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Step 1: 发现慢查询
+        → 慢查询日志 / SHOW PROCESSLIST / 监控工具
+
+Step 2: 分析 SQL
+        → EXPLAIN 查看执行计划
+        → 关注 type / key / rows / Extra
+
+Step 3: 是否命中索引？
+        → NO → 添加合适的索引
+        → YES → 看索引是否高效（rows 是否很大）
+
+Step 4: 优化 SQL 写法
+        → 避免 SELECT *，只查需要的列
+        → 避免索引失效的写法
+        → 大偏移分页用 WHERE id &gt; 上次最大id 代替 LIMIT offset
+
+Step 5: 考虑业务优化
+        → 读多写少 → 加缓存（Redis）
+        → 大表 → 分库分表
+        → 冷热数据 → 归档
+</pre></div>
+</div><h3 id="section-42">8.3 常见优化手段</h3>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ===== 1. 只查需要的列，避免 SELECT * =====</span>
+<span class="c1">-- ❌</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- ✅（如果只需要 id 和 amount）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">-- ===== 2. 大偏移分页优化 =====</span>
+<span class="c1">-- ❌ LIMIT 大偏移极慢（需要扫描 1000000 行后丢弃）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="c1">-- ✅ 利用主键索引，从上次查到的最大 id 开始</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">999999</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+
+<span class="c1">-- ===== 3. 避免 SELECT COUNT(*) 大表全扫描 =====</span>
+<span class="c1">-- ❌ 大表 COUNT(*) 很慢</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">big_table</span><span class="p">;</span>
+<span class="c1">-- ✅ 通过索引列 COUNT（更快）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">big_table</span><span class="p">;</span>
+<span class="c1">-- ✅ 或使用 information_schema（近似值，极快）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">TABLE_ROWS</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">TABLES</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="k">TABLE_NAME</span><span class="o">=</span><span class="s1">'big_table'</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">TABLE_SCHEMA</span><span class="o">=</span><span class="s1">'your_db'</span><span class="p">;</span>
+
+<span class="c1">-- ===== 4. 利用覆盖索引避免回表 =====</span>
+<span class="c1">-- 假设有索引 INDEX idx_user_amount (user_id, amount)</span>
+<span class="c1">-- ❌ 要回表（SELECT * 包含不在索引里的列）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- ✅ 覆盖索引，不回表</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- Extra 显示 Using index，不需要回到主键索引取数据</span>
+
+<span class="c1">-- ===== 5. 强制使用指定索引（调试用）=====</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="n">USE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="p">(</span><span class="n">idx_user_amount</span><span class="p">)</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">FORCE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="p">(</span><span class="n">idx_user_amount</span><span class="p">)</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-43">九、完整代码示例</h2>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- ===== 创建电商订单表，演示索引最佳实践 =====</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span><span class="w"> </span><span class="c1">-- 主键，自动有主键索引</span>
+<span class="w">    </span><span class="n">order_no</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">UNIQUE</span><span class="p">,</span><span class="w">       </span><span class="c1">-- 订单号，唯一索引</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">     </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">                      </span><span class="c1">-- 用户ID</span>
+<span class="w">    </span><span class="n">status</span><span class="w">      </span><span class="n">TINYINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">        </span><span class="c1">-- 订单状态：0待付款 1已付款 2已发货 3完成 4取消</span>
+<span class="w">    </span><span class="n">amount</span><span class="w">      </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">            </span><span class="c1">-- 订单金额</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">  </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">                 </span><span class="c1">-- 创建时间</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w">  </span><span class="n">DATETIME</span><span class="p">,</span><span class="w">                          </span><span class="c1">-- 更新时间</span>
+<span class="w">    </span><span class="n">remark</span><span class="w">      </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">                              </span><span class="c1">-- 备注（文本，不适合建索引）</span>
+
+<span class="w">    </span><span class="c1">-- 普通索引：按用户查订单</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_id</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">-- 组合索引：按用户+状态查（符合最左前缀）</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_status</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">-- 时间索引：按时间范围查</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_created_at</span><span class="w"> </span><span class="p">(</span><span class="n">created_at</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">-- 组合索引：用于统计（用户+时间范围+状态）</span>
+<span class="w">    </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_created_status</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8mb4</span><span class="p">;</span>
+
+<span class="c1">-- ===== 插入测试数据 =====</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">order_no</span><span class="p">,</span><span class="w"> </span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">,</span><span class="w"> </span><span class="n">created_at</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+<span class="p">(</span><span class="s1">'ORD20241201001'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">299</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="s1">'2024-12-01 10:00:00'</span><span class="p">),</span>
+<span class="p">(</span><span class="s1">'ORD20241201002'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">599</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="s1">'2024-12-01 11:00:00'</span><span class="p">),</span>
+<span class="p">(</span><span class="s1">'ORD20241202001'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1299</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="s1">'2024-12-02 09:00:00'</span><span class="p">),</span>
+<span class="p">(</span><span class="s1">'ORD20241202002'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">89</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="s1">'2024-12-02 14:00:00'</span><span class="p">),</span>
+<span class="p">(</span><span class="s1">'ORD20241203001'</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">399</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="s1">'2024-12-03 16:00:00'</span><span class="p">);</span>
+
+<span class="c1">-- ===== 各种查询场景及索引使用 =====</span>
+
+<span class="c1">-- 场景1：按订单号查（唯一索引，type=const）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">order_no</span><span class="o">=</span><span class="s1">'ORD20241201001'</span><span class="p">;</span>
+<span class="c1">-- type: const ✅</span>
+
+<span class="c1">-- 场景2：按用户ID查所有订单（普通索引）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- type: ref, key: idx_user_id ✅</span>
+
+<span class="c1">-- 场景3：按用户+状态查（组合索引完整匹配）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">status</span><span class="o">=</span><span class="mi">3</span><span class="p">;</span>
+<span class="c1">-- type: ref, key: idx_user_status ✅</span>
+
+<span class="c1">-- 场景4：按时间范围查（范围查询）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="s1">'2024-12-01'</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="s1">'2024-12-03'</span><span class="p">;</span>
+<span class="c1">-- type: range, key: idx_created_at ✅</span>
+
+<span class="c1">-- 场景5：覆盖索引（只查 user_id 和 status）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- type: ref, key: idx_user_id, Extra: Using index ✅</span>
+
+<span class="c1">-- 场景6：索引失效演示</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">YEAR</span><span class="p">(</span><span class="n">created_at</span><span class="p">)</span><span class="o">=</span><span class="mi">2024</span><span class="p">;</span>
+<span class="c1">-- type: ALL, key: NULL ❌（函数导致索引失效）</span>
+
+<span class="c1">-- ===== 分页查询最佳实践 =====</span>
+
+<span class="c1">-- ❌ 传统分页（第 1000 页，每页 20 条）—— 超慢</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">19980</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+
+<span class="c1">-- ✅ 游标分页（需要客户端传入上一页最后的 id）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">19999</span><span class="w">  </span><span class="c1">-- 上一页最后一条的 id</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="c1">-- 利用主键索引，直接从 id=19999 之后开始，极快</span>
+
+<span class="c1">-- ===== 查看索引统计信息 =====</span>
+<span class="k">SHOW</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="p">;</span>
+<span class="c1">-- Key_name: 索引名称</span>
+<span class="c1">-- Cardinality: 索引列的不重复值数量（越大，索引效率越高）</span>
+<span class="c1">-- Column_name: 索引所在列</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-44">十、常见报错</h2>
+<h3 id="section-45">10.1 Duplicate entry（唯一索引冲突）</h3>
+<p><strong>报错信息：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1062 (23000): Duplicate entry 'ORD20241201001' for key 'orders.order_no'
+</pre></div>
+</div><p><strong>原因：</strong> 插入或更新的值违反了唯一索引约束。</p>
+<p><strong>解决方案：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 方案1：INSERT IGNORE（忽略重复，静默失败）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">IGNORE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">order_no</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'ORD20241201001'</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+
+<span class="c1">-- 方案2：ON DUPLICATE KEY UPDATE（冲突时执行更新）</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">order_no</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'ORD20241201001'</span><span class="p">,</span><span class="w"> </span><span class="mi">599</span><span class="p">.</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">amount</span><span class="o">=</span><span class="mi">599</span><span class="p">.</span><span class="mi">00</span><span class="p">;</span>
+
+<span class="c1">-- 方案3：先查后插（应用层判断）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">order_no</span><span class="o">=</span><span class="s1">'ORD20241201001'</span><span class="p">;</span>
+<span class="c1">-- count=0 才执行 INSERT</span>
+</pre></div>
+</div><h3 id="section-46">10.2 Too many keys（索引数量超限）</h3>
+<p><strong>报错信息：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1069 (42000): Too many keys specified; max 64 keys allowed
+</pre></div>
+</div><p><strong>解决方案：</strong> 一张表索引不要超过 5~7 个，检查是否有冗余索引。</p>
+<h3 id="section-47">10.3 Specified key was too long（索引键太长）</h3>
+<p><strong>报错信息：</strong></p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>ERROR 1071 (42000): Specified key was too long; max key length is 767 bytes
+</pre></div>
+</div><p><strong>解决方案：</strong></p>
+<div class="code-block"><div class="code-top"><span>sql</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">-- 对长文本字段建索引时，指定索引前缀长度</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">(</span><span class="mi">50</span><span class="p">));</span><span class="w">  </span><span class="c1">-- 只索引前 50 个字符</span>
+<span class="c1">-- 或修改 ROW_FORMAT 为 DYNAMIC（InnoDB 支持更长的索引键）</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-48">十一、面试常问</h2>
+<h3 id="section-49">Q1：B+ 树和哈希索引的区别？什么情况用哈希？</h3>
+<p><strong>参考回答：</strong></p>
+<p>B+ 树适合大多数场景（等值、范围、排序、前缀查询均支持）；哈希索引只适合等值查询（<code>WHERE key=value</code>），不支持范围查询、排序、LIKE 前缀。</p>
+<p>哈希索引适合：内存引擎（MEMORY）、极少范围查询的场景。</p>
+<p>实际生产中，InnoDB 使用自适应哈希（Adaptive Hash Index），对频繁访问的索引页自动在内存中建哈希索引加速等值查询，无需手动设置。</p>
+<h3 id="section-50">Q2：索引失效的常见场景？</h3>
+<p><strong>参考回答：</strong></p>
+<ol>
+<li>LIKE 以 <code>%</code> 开头（<code>%关键词</code>）</li>
+<li>对索引列使用函数（<code>YEAR(date_col)</code>）</li>
+<li>对索引列做数学运算（<code>id+1=100</code>）</li>
+<li>隐式类型转换（字段是 VARCHAR，查询传 INT）</li>
+<li>OR 条件中有非索引列</li>
+<li>索引选择性低，MySQL 认为全扫更快</li>
+<li>NOT IN / NOT EXISTS（部分情况）</li>
+<li>违反最左前缀原则（组合索引）</li>
+</ol>
+<h3 id="section-51">Q3：什么是覆盖索引？有什么好处？</h3>
+<p><strong>参考回答：</strong></p>
+<p>覆盖索引（Covering Index）是指查询所需的所有列都包含在索引中，不需要回表。</p>
+<p>例如：有索引 <code>INDEX idx(user_id, amount)</code>，执行 <code>SELECT user_id, amount FROM orders WHERE user_id=1</code> 时，只需要访问索引树就能拿到所有数据，不需要回到主键索引（聚簇索引）取整行数据。</p>
+<p>好处：</p>
+<ul>
+<li>减少一次 IO（避免回表）</li>
+<li>EXPLAIN 中 Extra 显示 <code>Using index</code></li>
+<li>对读密集型查询性能提升显著</li>
+</ul>
+<h3 id="section-52">Q4：什么是回表？如何减少回表？</h3>
+<p><strong>参考回答：</strong></p>
+<p>回表是指使用非主键索引查询时，先在二级索引中找到主键值，再用主键值去聚簇索引（主键索引）中取完整行数据的过程，需要两次 B+ 树查询。</p>
+<p>减少回表的方法：</p>
+<ol>
+<li><strong>覆盖索引：</strong> 把查询需要的列都放入索引，避免回表</li>
+<li><strong>只查需要的列：</strong> 不用 <code>SELECT *</code>，减少需要回表的场景</li>
+<li><strong>主键查询：</strong> 直接用主键查询天然不需要回表</li>
+</ol>
+<h3 id="section-53">Q5：联合索引（组合索引）的最左前缀原则是什么？</h3>
+<p><strong>参考回答：</strong></p>
+<p>最左前缀原则是指：使用组合索引时，查询条件必须包含索引定义中最左侧的列，才能用到该索引。</p>
+<p>例如索引 <code>(a, b, c)</code>：</p>
+<ul>
+<li><code>WHERE a=1</code> → 走索引（只用 a）</li>
+<li><code>WHERE a=1 AND b=2</code> → 走索引（用 a 和 b）</li>
+<li><code>WHERE a=1 AND b=2 AND c=3</code> → 走索引（全部用到）</li>
+<li><code>WHERE b=2</code> → 不走索引（跳过了 a）</li>
+<li><code>WHERE a=1 AND c=3</code> → a 走索引，c 不走（跳过了 b）</li>
+</ul>
+<p>原理：组合索引的 B+ 树按最左列排序，次列在最左列相同时才有序，跳过最左列无法按序查找。</p>
+<h3 id="section-54">Q6：EXPLAIN 中 type=ALL 是什么意思？如何优化？</h3>
+<p><strong>参考回答：</strong></p>
+<p><code>type=ALL</code> 表示全表扫描，MySQL 需要遍历每一行数据，是最差的访问类型。</p>
+<p>优化方向：</p>
+<ol>
+<li>检查 WHERE 条件中的列是否有索引</li>
+<li>如果是 <code>LIKE '%关键词%'</code> 导致的，改用全文索引或搜索引擎</li>
+<li>检查是否有索引失效的情况（函数、类型不匹配等）</li>
+<li>如果表很小（&lt;几百行），<code>ALL</code> 是正常且合理的</li>
+</ol>
+<hr/>
+<h2 id="section-55">本章小结</h2>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>知识点</th>
+<th>核心内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>索引本质</td>
+<td>加速查询的数据结构（书的目录）</td>
+</tr>
+<tr>
+<td>底层结构</td>
+<td>B+ 树（支持范围查询、排序、前缀匹配）</td>
+</tr>
+<tr>
+<td>索引分类</td>
+<td>主键/唯一/普通/全文/组合</td>
+</tr>
+<tr>
+<td>最左前缀</td>
+<td>组合索引必须从最左列开始使用</td>
+</tr>
+<tr>
+<td>索引失效</td>
+<td>LIKE %前缀、函数运算、类型不匹配、OR 有非索引列...</td>
+</tr>
+<tr>
+<td>EXPLAIN</td>
+<td>type/key/rows/Extra 四个关键字段</td>
+</tr>
+<tr>
+<td>覆盖索引</td>
+<td>查询列都在索引中，无需回表，Extra=Using index</td>
+</tr>
+<tr>
+<td>优化思路</td>
+<td>慢查询日志 → EXPLAIN 分析 → 加索引/改写SQL</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>记忆口诀：</strong></p>
+<ul>
+<li>索引是目录，B+树来支撑，范围排序都支持</li>
+<li>最左原则要记牢，函数运算索引跑</li>
+<li>EXPLAIN 是神器，type=ALL 要优化</li>
+<li>覆盖索引省回表，只查需要的列最好</li>
+</ul>
+</blockquote>
+<hr/>
+<p><em>笔记整理日期：2026-11-12 | MySQL 版本：8.0+</em></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="2c22ea380678760b.html"><small>← 上一篇</small><strong>MySQL 事务与并发控制 — 保姆级详解</strong></a><a href="../d88a39a488d6e59d.html"><small>下一篇 →</small><strong>MySQL 09 · 高级特性（视图 / 存储过程 / 函数 / 触发器 / 锁）⭐⭐</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">知识框架</a><a class="toc-h2" href="#section-1">一、什么是索引</a><a class="toc-h3" href="#section-2">1.1 生活类比：书的目录</a><a class="toc-h3" href="#section-3">1.2 索引的本质</a><a class="toc-h2" href="#section-4">二、索引的分类</a><a class="toc-h3" href="#section-5">2.1 主键索引（PRIMARY KEY）</a><a class="toc-h3" href="#section-6">2.2 唯一索引（UNIQUE INDEX）</a><a class="toc-h3" href="#section-7">2.3 普通索引（INDEX）</a><a class="toc-h3" href="#section-8">2.4 全文索引（FULLTEXT）</a><a class="toc-h3" href="#section-9">2.5 组合索引（Composite Index）</a><a class="toc-h2" href="#section-10">三、索引底层结构：B+ 树</a><a class="toc-h3" href="#section-11">3.1 B+ 树是什么</a><a class="toc-h3" href="#section-12">3.2 为什么用 B+ 树，而不用哈希表？</a><a class="toc-h3" href="#section-13">3.3 聚簇索引 vs 非聚簇索引</a><a class="toc-h2" href="#section-14">四、索引操作</a><a class="toc-h3" href="#section-15">4.1 创建索引</a><a class="toc-h3" href="#section-16">4.2 查看索引</a><a class="toc-h3" href="#section-17">4.3 删除索引</a><a class="toc-h2" href="#section-18">五、最左前缀原则（组合索引必看）</a><a class="toc-h3" href="#section-19">5.1 什么是最左前缀原则</a><a class="toc-h3" href="#section-20">5.2 生活类比：字典排序</a><a class="toc-h3" href="#section-21">5.3 范围查询对后续列的影响</a><a class="toc-h2" href="#section-22">六、索引失效的 8 种常见情况</a><a class="toc-h3" href="#section-23">情况1：LIKE 以通配符开头</a><a class="toc-h3" href="#section-24">情况2：对索引列使用函数</a><a class="toc-h3" href="#section-25">情况3：对索引列做数学运算</a><a class="toc-h3" href="#section-26">情况4：隐式类型转换</a><a class="toc-h3" href="#section-27">情况5：OR 连接的条件有非索引列</a><a class="toc-h3" href="#section-28">情况6：NOT IN / NOT EXISTS</a><a class="toc-h3" href="#section-29">情况7：索引列参与 IS NULL / IS NOT NULL（视数据分布）</a><a class="toc-h3" href="#section-30">情况8：数据量少，MySQL 认为全表扫描更快</a><a class="toc-h2" href="#section-31">七、EXPLAIN 执行计划分析</a><a class="toc-h3" href="#section-32">7.1 什么是 EXPLAIN</a><a class="toc-h3" href="#section-33">7.2 重要字段详解</a><a class="toc-h4" href="#section-34">type 字段（最重要！）</a><a class="toc-h4" href="#section-35">key 字段</a><a class="toc-h4" href="#section-36">rows 字段</a><a class="toc-h4" href="#section-37">Extra 字段（重要提示）</a><a class="toc-h3" href="#section-38">7.3 EXPLAIN 实战示例</a><a class="toc-h2" href="#section-39">八、慢查询优化思路</a><a class="toc-h3" href="#section-40">8.1 开启慢查询日志</a><a class="toc-h3" href="#section-41">8.2 优化思路（五步法）</a><a class="toc-h3" href="#section-42">8.3 常见优化手段</a><a class="toc-h2" href="#section-43">九、完整代码示例</a><a class="toc-h2" href="#section-44">十、常见报错</a><a class="toc-h3" href="#section-45">10.1 Duplicate entry（唯一索引冲突）</a><a class="toc-h3" href="#section-46">10.2 Too many keys（索引数量超限）</a><a class="toc-h3" href="#section-47">10.3 Specified key was too long（索引键太长）</a><a class="toc-h2" href="#section-48">十一、面试常问</a><a class="toc-h3" href="#section-49">Q1：B+ 树和哈希索引的区别？什么情况用哈希？</a><a class="toc-h3" href="#section-50">Q2：索引失效的常见场景？</a><a class="toc-h3" href="#section-51">Q3：什么是覆盖索引？有什么好处？</a><a class="toc-h3" href="#section-52">Q4：什么是回表？如何减少回表？</a><a class="toc-h3" href="#section-53">Q5：联合索引（组合索引）的最左前缀原则是什么？</a><a class="toc-h3" href="#section-54">Q6：EXPLAIN 中 type=ALL 是什么意思？如何优化？</a><a class="toc-h2" href="#section-55">本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>08 · Elasticsearch 搜索引擎 ⭐⭐⭐ · 知序书房</title><link href="../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes-added/b024350084c2cebd.html"><header class="desk-header"><a class="desk-brand" href="../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../import.html">导入资料</a><a href="../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../notes.html">← 全部笔记</a><h2>后端复习与路线</h2><nav aria-label="同专题笔记"><a href="54477528d302620b.html">01 · RabbitMQ 基础 ⭐⭐⭐</a><a href="206542e38dd22c89.html">02 · RabbitMQ 高级 ⭐⭐⭐</a><a href="90a36f0e87c0e9f2.html">03 · Redis 入门 ⭐⭐⭐</a><a href="842df3b73dd46ca0.html">04 · Redis 实战（黑马点评项目）⭐⭐⭐⭐</a><a href="../bdd7a14efe9ef984.html">05 · Redis 高级与原理 ⭐⭐⭐⭐</a><a href="0ae96682439409b1.html">06 · SpringCloud 微服务 ⭐⭐⭐⭐</a><a href="600b65140adc614a.html">07 · Docker 入门 ⭐⭐⭐</a><a aria-current="page" href="../b024350084c2cebd.html">08 · Elasticsearch 搜索引擎 ⭐⭐⭐</a><a href="0c840c43a3afe14b.html">后端复习与路线 · 学习指南</a><a href="../bc10de1a27d66030.html">D:\za 全部学习笔记总览</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../notes.html">学习笔记</a><span>/</span>后端复习与路线</div><h1>08 · Elasticsearch 搜索引擎 ⭐⭐⭐</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<blockquote>
+<p><strong>难度</strong>：中高 | <strong>学习建议</strong>：3 天
+对应视频：黑马 SpringCloud ES 实用篇 01~03
+<strong>项目导向</strong>：电商搜索、日志分析、数据可视化——ES 是搜索领域首选</p>
+</blockquote>
+<hr/>
+<h2 id="section-0">一、知识框架</h2>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>Elasticsearch
+├── 1. 基础概念 ⭐
+│   ├── 正向 vs 倒排索引
+│   └── ES vs MySQL
+├── 2. 索引库操作（mapping）⭐⭐
+├── 3. 文档 CRUD ⭐
+├── 4. DSL 查询 ⭐⭐⭐
+│   ├── 全文检索（match）
+│   ├── 精准查询（term/range）
+│   ├── 地理查询
+│   └── 复合查询（bool）
+├── 5. 搜索结果处理 ⭐⭐
+│   ├── 排序、分页、高亮
+├── 6. 数据聚合 ⭐⭐
+├── 7. 自动补全 ⭐
+├── 8. Java 客户端（RestClient）⭐⭐⭐
+└── 9. 数据同步（es 与 mysql）⭐⭐
+</pre></div>
+</div><hr/>
+<h2 id="section-1">二、基础概念 ⭐</h2>
+<h3 id="section-2">2.1 倒排索引</h3>
+<p><strong>正向索引</strong>：从文档找关键词（MySQL B+ 树）</p>
+<p><strong>倒排索引</strong>：从关键词找文档</p>
+<div class="code-block"><div class="code-top"><span>text</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span>文档 1: "Hello World"
+文档 2: "Hello Java"
+
+词条 → 文档列表
+"hello" → [1, 2]
+"world" → [1]
+"java"  → [2]
+</pre></div>
+</div><p><strong>搜索 "hello"</strong> → 直接查词条，返回 [1, 2]，O(1)。</p>
+<h3 id="section-3">2.2 ES vs MySQL</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>MySQL</th>
+<th>Elasticsearch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Table（表）</td>
+<td>Index（索引库）</td>
+</tr>
+<tr>
+<td>Row（行）</td>
+<td>Document（文档）</td>
+</tr>
+<tr>
+<td>Column（列）</td>
+<td>Field（字段）</td>
+</tr>
+<tr>
+<td>Schema</td>
+<td>Mapping（映射）</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>DSL（JSON）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 ES 适合<strong>搜索 + 统计分析</strong>；MySQL 适合<strong>事务、复杂关联</strong>。两者互补。</p>
+</blockquote>
+<h3 id="section-4">2.3 安装（Docker）</h3>
+<div class="code-block"><div class="code-top"><span>bash</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1"># ES</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>es<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">9200</span>:9200<span class="w"> </span>-p<span class="w"> </span><span class="m">9300</span>:9300<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="s2">"discovery.type=single-node"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">ES_JAVA_OPTS</span><span class="o">=</span><span class="s2">"-Xms512m -Xmx512m"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>elasticsearch:7.12.1
+
+<span class="c1"># Kibana（可视化）</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>kibana<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">5601</span>:5601<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">ELASTICSEARCH_HOSTS</span><span class="o">=</span>http://es:9200<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>kibana:7.12.1
+
+<span class="c1"># IK 分词器（中文）</span>
+<span class="c1"># 将 ik 分词器插件放入 ES 插件目录</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-5">三、索引库操作（mapping）⭐⭐</h2>
+<h3 id="section-6">3.1 mapping 映射属性</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>字段类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text</code></td>
+<td>可分词的文本（参与全文检索）</td>
+</tr>
+<tr>
+<td><code>keyword</code></td>
+<td>不可分词（精确匹配，如品牌、ID）</td>
+</tr>
+<tr>
+<td><code>long/integer/short/byte</code></td>
+<td>整数</td>
+</tr>
+<tr>
+<td><code>float/double</code></td>
+<td>浮点</td>
+</tr>
+<tr>
+<td><code>boolean</code></td>
+<td>布尔</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>日期</td>
+</tr>
+<tr>
+<td><code>geo_point</code></td>
+<td>地理坐标</td>
+</tr>
+<tr>
+<td><code>object</code> / <code>nested</code></td>
+<td>嵌套对象</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-7">3.2 创建索引库</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"mappings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"analyzer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ik_max_word"</span><span class="p">,</span><span class="w">        </span><span class="c1">// 分词器</span>
+<span class="w">        </span><span class="nt">"copy_to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="w">                  </span><span class="c1">// 拷贝到 all 字段</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"starName"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"geo_point"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"analyzer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ik_max_word"</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-8">3.3 索引库 CRUD</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 查看</span>
+<span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+
+<span class="c1">// 修改（只能追加字段，不能修改已有字段）</span>
+<span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_mappi</span><span class="kc">n</span><span class="err">g</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"newField"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keyword"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 删除</span>
+<span class="err">DELETE</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ mapping 字段<strong>一旦定义不能修改</strong>，只能追加新字段。要修改必须重建索引。</p>
+</blockquote>
+<hr/>
+<h2 id="section-9">四、文档 CRUD ⭐</h2>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 新增（指定 ID）</span>
+<span class="err">POST</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家酒店"</span><span class="p">,</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 查询</span>
+<span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+
+<span class="c1">// 修改（全量覆盖）</span>
+<span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家酒店"</span><span class="p">,</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">250</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 局部修改</span>
+<span class="err">POST</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_upda</span><span class="kc">te</span><span class="err">/</span><span class="mi">1</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"doc"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 删除</span>
+<span class="err">DELETE</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_doc/</span><span class="mi">1</span>
+
+<span class="c1">// 批量操作</span>
+<span class="err">POST</span><span class="w"> </span><span class="err">/_bulk</span>
+<span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">}}</span>
+<span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"酒店1"</span><span class="p">,</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">}}</span>
+<span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"酒店2"</span><span class="p">,</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-10">五、DSL 查询 ⭐⭐⭐</h2>
+<h3 id="section-11">5.1 查询语法结构</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_search</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* 查询条件 */</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"from"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">              </span><span class="c1">// 分页</span>
+<span class="w">  </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="cm">/* 排序 */</span><span class="w"> </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"highlight"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* 高亮 */</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-12">5.2 全文检索（match）⭐</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 单字段查询</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"外滩如家"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 多字段查询（multi_match）</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"multi_match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"business"</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>💡 <code>match</code> 会分词后查询；<code>multi_match</code> 参与字段越多得分越低，性能越差，建议用 <code>copy_to</code> 合并到单字段。</p>
+</blockquote>
+<h3 id="section-13">5.3 精准查询</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// term：精确匹配（不分词）</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"上海"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// range：范围查询</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gte"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nt">"lte"</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <code>text</code> 类型字段不能用 term 精确匹配（已被分词）。精确匹配用 <code>keyword</code>。</p>
+</blockquote>
+<h3 id="section-14">5.4 地理查询</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 矩形范围</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"geo_bounding_box"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"top_left"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">31.1</span><span class="p">,</span><span class="w"> </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">121.5</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">"bottom_right"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">31.0</span><span class="p">,</span><span class="w"> </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">121.4</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 附近（按距离排序）</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"geo_distance"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"distance"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5km"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31.21,121.5"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"_geo_distance"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31.21,121.5"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asc"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"unit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"km"</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-15">5.5 复合查询（bool）⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"bool"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"must"</span><span class="p">:</span><span class="w">     </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">],</span><span class="w">     </span><span class="c1">// 必须匹配（参与算分）</span>
+<span class="w">      </span><span class="nt">"should"</span><span class="p">:</span><span class="w">   </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"starName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"五"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">],</span><span class="w">    </span><span class="c1">// 可选匹配（加分）</span>
+<span class="w">      </span><span class="nt">"must_not"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gt"</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">],</span><span class="w"> </span><span class="c1">// 必须不匹配（过滤，不算分）</span>
+<span class="w">      </span><span class="nt">"filter"</span><span class="p">:</span><span class="w">   </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"gte"</span><span class="p">:</span><span class="w"> </span><span class="mi">45</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="c1">// 过滤（不算分，性能好）</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>子句</th>
+<th>是否算分</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>must</code></td>
+<td>✅</td>
+<td>必须匹配</td>
+</tr>
+<tr>
+<td><code>should</code></td>
+<td>✅</td>
+<td>满足即加分（无 must 时至少满足一个）</td>
+</tr>
+<tr>
+<td><code>must_not</code></td>
+<td>❌</td>
+<td>必须不匹配（过滤）</td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td>❌</td>
+<td>必须匹配（过滤，性能好）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>💡 <strong>相关性算分</strong>：must 和 should 参与打分；filter 和 must_not 仅过滤，性能更好。</p>
+</blockquote>
+<h3 id="section-16">5.6 算分函数（function_score）</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"function_score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"外滩"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"functions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"filter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"isAD"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">// 广告位</span>
+<span class="w">          </span><span class="nt">"weight"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">                              </span><span class="c1">// 加权 10 倍</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"boost_mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"multiply"</span><span class="w">   </span><span class="c1">// 原始分 × 权重</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-17">六、搜索结果处理 ⭐⭐</h2>
+<h3 id="section-18">6.1 排序</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 普通字段排序</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asc"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// 地理坐标排序</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">"sort"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"_geo_distance"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31.2,121.5"</span><span class="p">,</span><span class="w"> </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asc"</span><span class="p">,</span><span class="w"> </span><span class="nt">"unit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"km"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div><h3 id="section-19">6.2 分页</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"match_all"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"from"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">    </span><span class="c1">// 起始位置</span>
+<span class="w">  </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="w">    </span><span class="c1">// 每页大小</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ <strong>深度分页问题</strong>：from + size 超过 10000 时性能急剧下降。大数据量用 <code>search_after</code> 或 <code>scroll</code>。</p>
+</blockquote>
+<h3 id="section-20">6.3 高亮 ⭐</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"match"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"如家"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"highlight"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"pre_tags"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;em style='color:red'&gt;"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"post_tags"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;/em&gt;"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"require_field_match"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">   </span><span class="c1">// 不要求字段匹配</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-21">七、数据聚合 ⭐⭐</h2>
+<h3 id="section-22">7.1 三种聚合类型</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+<th>DSL 关键字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bucket</strong></td>
+<td>桶聚合（分组）</td>
+<td><code>terms</code></td>
+</tr>
+<tr>
+<td><strong>Metric</strong></td>
+<td>指标聚合（求 max/avg）</td>
+<td><code>avg/max/stats</code></td>
+</tr>
+<tr>
+<td><strong>Pipeline</strong></td>
+<td>管道聚合（基于其他聚合结果）</td>
+<td>-</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-23">7.2 DSL 示例</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="err">GET</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span><span class="err">/_search</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">    </span><span class="c1">// 不返回文档，只要聚合结果</span>
+<span class="w">  </span><span class="nt">"query"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"price"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"lte"</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">// 限定聚合范围</span>
+<span class="w">  </span><span class="nt">"aggs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"brandAgg"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"brand"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="w">                </span><span class="c1">// 返回前 20 个桶</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"aggs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"scoreAvg"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"avg"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"score"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">"scoreMax"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"max"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"score"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-24">八、自动补全 ⭐</h2>
+<h3 id="section-25">8.1 拼音分词器</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 自定义分词器（拼音 + 中文）</span>
+<span class="err">PUT</span><span class="w"> </span><span class="err">/ho</span><span class="kc">tel</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"analysis"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"analyzer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"pinyin_analyzer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"tokenizer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ik_max_word"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"filter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pinyin_filter"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"filter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"pinyin_filter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pinyin"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"keep_full_pinyin"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"keep_joined_full_pinyin"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-26">8.2 自动补全查询（completion suggester）</h3>
+<div class="code-block"><div class="code-top"><span>json</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"suggest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"titleSuggest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sh"</span><span class="p">,</span><span class="w">                  </span><span class="c1">// 用户输入</span>
+<span class="w">      </span><span class="nt">"completion"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"title.suggest"</span><span class="p">,</span><span class="w">    </span><span class="c1">// 必须是 completion 类型</span>
+<span class="w">        </span><span class="nt">"skip_duplicates"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><blockquote>
+<p>⚠ 自动补全字段必须是 <code>completion</code> 类型，数据按特定格式写入。</p>
+</blockquote>
+<hr/>
+<h2 id="section-27">九、Java 客户端（RestClient）⭐⭐⭐</h2>
+<h3 id="section-28">9.1 依赖</h3>
+<div class="code-block"><div class="code-top"><span>xml</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.elasticsearch.client<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>elasticsearch-rest-high-level-client<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div><h3 id="section-29">9.2 配置</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nd">@Configuration</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ElasticSearchConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Bean</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">RestHighLevelClient</span><span class="w"> </span><span class="nf">client</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RestHighLevelClient</span><span class="p">(</span>
+<span class="w">            </span><span class="n">RestClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">HttpHost</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">"http://192.168.150.101:9200"</span><span class="p">))</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-30">9.3 索引库操作</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 创建索引库</span>
+<span class="n">CreateIndexRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CreateIndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">);</span>
+<span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">(</span><span class="n">MAPPING_TEMPLATE</span><span class="p">,</span><span class="w"> </span><span class="n">XContentType</span><span class="p">.</span><span class="na">JSON</span><span class="p">);</span>
+<span class="n">client</span><span class="p">.</span><span class="na">indices</span><span class="p">().</span><span class="na">create</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="c1">// 删除索引库</span>
+<span class="n">client</span><span class="p">.</span><span class="na">indices</span><span class="p">().</span><span class="na">delete</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">DeleteIndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">),</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="c1">// 查询索引库</span>
+<span class="n">GetIndexResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">indices</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">GetIndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">),</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-31">9.4 文档操作</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 新增/修改文档</span>
+<span class="n">IndexRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">).</span><span class="na">id</span><span class="p">(</span><span class="s">"1"</span><span class="p">);</span>
+<span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">(</span><span class="n">JSON</span><span class="p">.</span><span class="na">toJSONString</span><span class="p">(</span><span class="n">hotelDoc</span><span class="p">),</span><span class="w"> </span><span class="n">XContentType</span><span class="p">.</span><span class="na">JSON</span><span class="p">);</span>
+<span class="n">client</span><span class="p">.</span><span class="na">index</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="c1">// 查询文档</span>
+<span class="n">GetRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GetRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">,</span><span class="w"> </span><span class="s">"1"</span><span class="p">);</span>
+<span class="n">GetResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getSourceAsString</span><span class="p">();</span>
+<span class="n">HotelDoc</span><span class="w"> </span><span class="n">hotelDoc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">HotelDoc</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="c1">// 批量新增</span>
+<span class="n">BulkRequest</span><span class="w"> </span><span class="n">bulk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BulkRequest</span><span class="p">();</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">HotelDoc</span><span class="w"> </span><span class="n">doc</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">docs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">bulk</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">IndexRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">).</span><span class="na">id</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="na">getId</span><span class="p">())</span>
+<span class="w">        </span><span class="p">.</span><span class="na">source</span><span class="p">(</span><span class="n">JSON</span><span class="p">.</span><span class="na">toJSONString</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span><span class="w"> </span><span class="n">XContentType</span><span class="p">.</span><span class="na">JSON</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="n">client</span><span class="p">.</span><span class="na">bulk</span><span class="p">(</span><span class="n">bulk</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+</pre></div>
+</div><h3 id="section-32">9.5 搜索文档 ⭐⭐⭐</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">// 构建 DSL 查询</span>
+<span class="n">SearchRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SearchRequest</span><span class="p">(</span><span class="s">"hotel"</span><span class="p">);</span>
+
+<span class="c1">// 1. match 查询</span>
+<span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">matchQuery</span><span class="p">(</span><span class="s">"all"</span><span class="p">,</span><span class="w"> </span><span class="s">"如家"</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="na">size</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+
+<span class="c1">// 2. bool 查询</span>
+<span class="n">BoolQueryBuilder</span><span class="w"> </span><span class="n">boolQuery</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">boolQuery</span><span class="p">();</span>
+<span class="n">boolQuery</span><span class="p">.</span><span class="na">must</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">matchQuery</span><span class="p">(</span><span class="s">"all"</span><span class="p">,</span><span class="w"> </span><span class="s">"如家"</span><span class="p">));</span>
+<span class="n">boolQuery</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">QueryBuilders</span><span class="p">.</span><span class="na">rangeQuery</span><span class="p">(</span><span class="s">"price"</span><span class="p">).</span><span class="na">lte</span><span class="p">(</span><span class="mi">500</span><span class="p">));</span>
+<span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">().</span><span class="na">query</span><span class="p">(</span><span class="n">boolQuery</span><span class="p">);</span>
+
+<span class="c1">// 3. 高亮</span>
+<span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">highlighter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">HighlightBuilder</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">field</span><span class="p">(</span><span class="s">"name"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">requireFieldMatch</span><span class="p">(</span><span class="kc">false</span><span class="p">));</span>
+
+<span class="c1">// 4. 排序 + 分页</span>
+<span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">SortBuilders</span><span class="p">.</span><span class="na">fieldSort</span><span class="p">(</span><span class="s">"price"</span><span class="p">).</span><span class="na">order</span><span class="p">(</span><span class="n">SortOrder</span><span class="p">.</span><span class="na">ASC</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="na">size</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+
+<span class="c1">// 执行查询</span>
+<span class="n">SearchResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">search</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+
+<span class="c1">// 解析结果</span>
+<span class="n">SearchHits</span><span class="w"> </span><span class="n">hits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getHits</span><span class="p">();</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hits</span><span class="p">.</span><span class="na">getTotalHits</span><span class="p">().</span><span class="na">value</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">SearchHit</span><span class="w"> </span><span class="n">hit</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hits</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hit</span><span class="p">.</span><span class="na">getSourceAsString</span><span class="p">();</span>
+<span class="w">    </span><span class="n">HotelDoc</span><span class="w"> </span><span class="n">doc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSON</span><span class="p">.</span><span class="na">parseObject</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">HotelDoc</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// 高亮结果处理</span>
+<span class="w">    </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">HighlightField</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hlf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hit</span><span class="p">.</span><span class="na">getHighlightFields</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hlf</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="s">"name"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">highlightName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hlf</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">"name"</span><span class="p">).</span><span class="na">getFragments</span><span class="p">()</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">.</span><span class="na">string</span><span class="p">();</span>
+<span class="w">        </span><span class="n">doc</span><span class="p">.</span><span class="na">setName</span><span class="p">(</span><span class="n">highlightName</span><span class="p">);</span><span class="w">  </span><span class="c1">// 替换为高亮后的名称</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div><h3 id="section-33">9.6 聚合查询</h3>
+<div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">request</span><span class="p">.</span><span class="na">source</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">   </span><span class="c1">// 不返回文档</span>
+<span class="w">    </span><span class="p">.</span><span class="na">aggregation</span><span class="p">(</span><span class="n">AggregationBuilders</span><span class="p">.</span><span class="na">terms</span><span class="p">(</span><span class="s">"brandAgg"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">field</span><span class="p">(</span><span class="s">"brand"</span><span class="p">).</span><span class="na">size</span><span class="p">(</span><span class="mi">20</span><span class="p">));</span>
+
+<span class="n">SearchResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">search</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">RequestOptions</span><span class="p">.</span><span class="na">DEFAULT</span><span class="p">);</span>
+<span class="n">Aggregations</span><span class="w"> </span><span class="n">aggregations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getAggregations</span><span class="p">();</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">brandList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aggregations</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">"brandAgg"</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">getBuckets</span><span class="p">().</span><span class="na">stream</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">bucket</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">bucket</span><span class="p">.</span><span class="na">getKeyAsString</span><span class="p">())</span>
+<span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">());</span>
+</pre></div>
+</div><hr/>
+<h2 id="section-34">十、数据同步（MySQL ↔ ES）⭐⭐</h2>
+<h3 id="section-35">10.1 三种方案</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>说明</th>
+<th>优缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>同步调用</strong></td>
+<td>微服务修改 DB 后直接调 ES API</td>
+<td>简单，但耦合高、性能差</td>
+</tr>
+<tr>
+<td><strong>异步通知</strong></td>
+<td>修改 DB 发 MQ，ES 服务消费</td>
+<td>解耦，但引入 MQ</td>
+</tr>
+<tr>
+<td><strong>监听 binlog</strong></td>
+<td>用 Canal 监听 MySQL binlog 推到 ES</td>
+<td>完全解耦，但增加 Canal</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-36">10.2 对比</h3>
+<div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>同步调用</th>
+<th>异步通知</th>
+<th>监听 binlog</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>耦合度</td>
+<td>高</td>
+<td>中</td>
+<td>低</td>
+</tr>
+<tr>
+<td>实时性</td>
+<td>高</td>
+<td>中</td>
+<td>低</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>低</td>
+<td>中</td>
+<td>高</td>
+</tr>
+</tbody>
+</table></div>
+<hr/>
+<h2 id="section-37">十一、面试常问 ⭐⭐</h2>
+<blockquote>
+<p>💡 <strong>ES 为什么搜索快？</strong>
+基于<strong>倒排索引</strong>：从词条直接定位文档，O(1)。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>ES 和 MySQL 的区别？</strong>
+ES 基于倒排索引，适合搜索和聚合分析；MySQL 基于 B+ 树，适合事务和复杂关联。两者互补。</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>text 和 keyword 的区别？</strong></p>
+<ul>
+<li>text：分词后建倒排索引（参与全文搜索）</li>
+<li>keyword：不分词（精确匹配）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>match 和 term 的区别？</strong></p>
+<ul>
+<li>match：先分词再查询</li>
+<li>term：不分词直接查询（keyword 字段用）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>bool 查询中 must 和 filter 的区别？</strong></p>
+<ul>
+<li>must：参与相关性算分，性能略差</li>
+<li>filter：只过滤不算分，性能更好</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>💡 <strong>ES 深度分页怎么解决？</strong>
+from + size 超过 1 万性能差，改用 <code>search_after</code> 或 <code>scroll</code> 游标。</p>
+</blockquote>
+<hr/>
+<h2 id="section-38">十二、本章小结</h2>
+<p>✅ 已掌握：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>倒排索引原理</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>ES vs MySQL 对应关系</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>mapping 映射</strong>（字段定义不能改，只能追加）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>文档 CRUD</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>DSL 查询</strong>（match/term/range/geo/bool）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>bool 查询 must/should/filter 区别</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>排序、分页、高亮</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>聚合查询</strong>（Bucket / Metric）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>Java RestClient</strong> 操作 ES</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/><strong>MySQL → ES 数据同步</strong> 三种方案</li>
+</ul>
+<p>✅ 易错点：</p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>text 类型不能用 term 精确查询（要先看分词结果）</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>mapping 字段定义后不能修改，只能追加</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>filter 不参与算分，性能优于 must</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>自动补全字段必须是 completion 类型</li>
+</ul>
+<p>下一章：<a href="0c840c43a3afe14b.html">README.md</a></p>
+</article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="600b65140adc614a.html"><small>← 上一篇</small><strong>07 · Docker 入门 ⭐⭐⭐</strong></a><a href="0c840c43a3afe14b.html"><small>下一篇 →</small><strong>后端复习与路线 · 学习指南</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h2" href="#section-0">一、知识框架</a><a class="toc-h2" href="#section-1">二、基础概念 ⭐</a><a class="toc-h3" href="#section-2">2.1 倒排索引</a><a class="toc-h3" href="#section-3">2.2 ES vs MySQL</a><a class="toc-h3" href="#section-4">2.3 安装（Docker）</a><a class="toc-h2" href="#section-5">三、索引库操作（mapping）⭐⭐</a><a class="toc-h3" href="#section-6">3.1 mapping 映射属性</a><a class="toc-h3" href="#section-7">3.2 创建索引库</a><a class="toc-h3" href="#section-8">3.3 索引库 CRUD</a><a class="toc-h2" href="#section-9">四、文档 CRUD ⭐</a><a class="toc-h2" href="#section-10">五、DSL 查询 ⭐⭐⭐</a><a class="toc-h3" href="#section-11">5.1 查询语法结构</a><a class="toc-h3" href="#section-12">5.2 全文检索（match）⭐</a><a class="toc-h3" href="#section-13">5.3 精准查询</a><a class="toc-h3" href="#section-14">5.4 地理查询</a><a class="toc-h3" href="#section-15">5.5 复合查询（bool）⭐⭐</a><a class="toc-h3" href="#section-16">5.6 算分函数（function_score）</a><a class="toc-h2" href="#section-17">六、搜索结果处理 ⭐⭐</a><a class="toc-h3" href="#section-18">6.1 排序</a><a class="toc-h3" href="#section-19">6.2 分页</a><a class="toc-h3" href="#section-20">6.3 高亮 ⭐</a><a class="toc-h2" href="#section-21">七、数据聚合 ⭐⭐</a><a class="toc-h3" href="#section-22">7.1 三种聚合类型</a><a class="toc-h3" href="#section-23">7.2 DSL 示例</a><a class="toc-h2" href="#section-24">八、自动补全 ⭐</a><a class="toc-h3" href="#section-25">8.1 拼音分词器</a><a class="toc-h3" href="#section-26">8.2 自动补全查询（completion suggester）</a><a class="toc-h2" href="#section-27">九、Java 客户端（RestClient）⭐⭐⭐</a><a class="toc-h3" href="#section-28">9.1 依赖</a><a class="toc-h3" href="#section-29">9.2 配置</a><a class="toc-h3" href="#section-30">9.3 索引库操作</a><a class="toc-h3" href="#section-31">9.4 文档操作</a><a class="toc-h3" href="#section-32">9.5 搜索文档 ⭐⭐⭐</a><a class="toc-h3" href="#section-33">9.6 聚合查询</a><a class="toc-h2" href="#section-34">十、数据同步（MySQL ↔ ES）⭐⭐</a><a class="toc-h3" href="#section-35">10.1 三种方案</a><a class="toc-h3" href="#section-36">10.2 对比</a><a class="toc-h2" href="#section-37">十一、面试常问 ⭐⭐</a><a class="toc-h2" href="#section-38">十二、本章小结</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../notes-reader.js"></script></body></html>
