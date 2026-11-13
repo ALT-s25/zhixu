@@ -2,7 +2,7 @@
    Public project key + server-side RLS; passwords are sent only to Supabase Auth. */
 (function(){
   'use strict';
-  const G=ZhixuGrowth,ids=new Set(GROUPS.flatMap(g=>g.items).map(i=>i.id)),config=window.ZHIXU_CLOUD||{};
+  const G=ZhixuGrowth,ids=new Set(GROUPS.flatMap(g=>g.items).map(i=>i.id)),config=window.ZHIXU_CLOUD||{},readOnly=window.ZHIXU_ACCOUNT_READONLY===true;
   let privilegedKey=(config.publishableKey||'').startsWith('sb_secret_');
   try{privilegedKey ||= JSON.parse(atob(config.publishableKey.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role==='service_role'}catch{}
   const enabled=/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(config.url||'')&&!!config.publishableKey&&!privilegedKey;
@@ -16,6 +16,7 @@
   const emit=()=>{drawAccount();document.dispatchEvent(new CustomEvent('zhixu:record',{detail:{record:copy(record)}}))};
   function apply(next){record=G.clean(next,ids);host.set(copy(record));host.render();emit()}
   function cache(){
+    if(readOnly)return true;
     try{
       if(session)localStorage.setItem('zhixu-user-'+session.user.id,JSON.stringify({record,revision,dirty}));
       else{localStorage.setItem('zhixu-progress-v1',JSON.stringify(record.progress));localStorage.setItem('zhixu-camp-v1',JSON.stringify(record.camp));localStorage.setItem(GUEST_ACTIVITY,JSON.stringify(record.activity))}
@@ -44,6 +45,7 @@
   async function connect(s){
     generation++;session={...s,expires_at:s.expires_at??Date.now()/1000+(s.expires_in||3600)};storeSession();
     revision=0;ready=false;dirty=false;conflict=false;status='正在读取个人云端记录…';apply({});
+    if(readOnly){ready=true;status='已登录 · 资料工作台';emit();return}
     const epoch=generation;
     try{
       const remote=await cloudRead();if(epoch!==generation)return;
@@ -53,6 +55,7 @@
     }catch(error){if(epoch!==generation)return;const saved=read('zhixu-user-'+session.user.id,null);if(saved){revision=saved.revision;dirty=!!saved.dirty;apply(saved.record)}status='读取失败 · '+friendly(error)+'；重连前只读';emit()}
   }
   function save(options={}){
+    if(readOnly)return;
     if(!ready){host.set(copy(record));host.render();return}
     const next=G.clean({...host.get(),activity:record.activity},ids);
     if(options.track!==false){
@@ -63,7 +66,7 @@
     if(session){clearTimeout(timer);timer=setTimeout(sync,700)}
   }
   async function sync(){
-    if(!session||!ready||busy||conflict)return;
+    if(readOnly||!session||!ready||busy||conflict)return;
     busy=true;const epoch=generation;
     try{
       while(dirty&&epoch===generation){
@@ -93,7 +96,8 @@
     signed.hidden=!session;form.hidden=!!session;
     document.querySelector('#account-email').textContent=session?.user.email||'';
     document.querySelector('#cloud-conflict').hidden=!conflict;
-    document.querySelector('#cloud-import').disabled=!ready||busy;
+    document.querySelector('#cloud-import').disabled=readOnly||!ready||busy;
+    document.querySelector('#cloud-download').hidden=readOnly;
     document.querySelector('#cloud-logout').disabled=busy;
     document.querySelector('#cloud-retry').disabled=busy;
     document.querySelector('#auth-submit').disabled=!enabled;
@@ -165,6 +169,7 @@
     request('/auth/v1/logout?scope=local',{},old.access_token).catch(()=>{});$('#account-dialog').close();
   };
   $('#cloud-import').onclick=()=>{
+    if(readOnly)return;
     if(!ready||busy||!confirm('将此设备的游客完成状态、收藏、笔记合并到当前账号？原游客记录会保留。'))return;
     const local=guest();for(const [id,p] of Object.entries(local.progress)){const current=record.progress[id]||{};record.progress[id]={done:!!(current.done||p.done),star:!!(current.star||p.star),note:[...new Set([current.note,p.note].filter(Boolean))].join('\n\n—— 游客记录 ——\n\n')}}
     for(const [date,list] of Object.entries(local.activity))record.activity[date]=[...new Set([...(record.activity[date]||[]),...list])];
@@ -185,7 +190,13 @@
     if(epoch!==generation||session?.user.id!==uid)throw Error('账号已切换，请重新打开个人资料');
     if(user?.id!==uid)throw Error('资料保存未完成，请重试');
     session.user=user;storeSession();emit();return copy(user);
-  },save,get:()=>copy(record),user:()=>session?.user||null,download,importRecord(next){if(!ready)return;apply(next);dirty=!!session;cache();emit();if(session)sync()}};
+  },async authorizedFetch(path,options={}){
+    if(!/^\/(rest|storage)\/v1\//.test(path))throw Error('不支持的云端地址');
+    const epoch=generation,access=await token();
+    const response=await fetch(url+path,{...options,headers:{...options.headers,apikey:config.publishableKey,Authorization:'Bearer '+access},signal:options.signal||AbortSignal.timeout(45000)});
+    if(epoch!==generation)throw Error('账号已切换，请重试');
+    return response;
+  },save,get:()=>copy(record),user:()=>session?.user||null,download,importRecord(next){if(readOnly||!ready)return;apply(next);dirty=!!session;cache();emit();if(session)sync()}};
   window.addEventListener('online',()=>{if(dirty)sync()});
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
   // Callback fragment is removed before any application navigation or network call.
@@ -198,6 +209,6 @@
     if(enabled&&restored?.user&&restored?.access_token){await connect(restored);if(recovery)$('#password-dialog').showModal()}else apply(record);
     if(hash.has('error_description')){history.replaceState(null,'',location.pathname+location.search);message('邮件链接无效或已过期，请重新发送。');$('#account-dialog').showModal()}
   }
-  boot();
+  window.ZhixuAccount.ready=boot();
 })();
 
