@@ -48,7 +48,7 @@
 <span class="w">  </span><span class="mf">4.</span><span class="n">知道哈希表结构存储元素过程</span><span class="w">    </span>
 </pre></div>
 </div><h3 id="section-1">第一章.Map集合</h3>
-<p><img alt="1706585149924" decoding="async" loading="lazy" src="../../course-assets/d70462587fb0307e06be.png"/></p>
+<p><img alt="1706585149924" decoding="async" loading="lazy" src="../assets/images/notes/d70462587fb0307e06be.png"/></p>
 <h4 id="section-2">1.Map的介绍</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">是双列集合的顶级接口</span>
 <span class="mf">2.</span><span class="n">元素特点</span><span class="p">:</span>
@@ -151,7 +151,7 @@
 <span class="p">}</span>
 </pre></div>
 </div><h5>3.2.方式2:同时获取key和value</h5>
-<p><img alt="1706592915292" decoding="async" loading="lazy" src="../../course-assets/06fa310c7fce6f82238d.png"/></p>
+<p><img alt="1706592915292" decoding="async" loading="lazy" src="../assets/images/notes/06fa310c7fce6f82238d.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Map</span><span class="p">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="p">,</span><span class="n">V</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">entrySet</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">获取Map集合中的键值对</span><span class="p">,</span><span class="n">转存到Set集合中</span>
 </pre></div>
 </div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo04HashMap</span><span class="w"> </span><span class="p">{</span>
@@ -252,7 +252,7 @@
 <span class="w">  </span><span class="mf">6.</span><span class="n">将此字符和改变后的value重新保存到map集合中</span>
 <span class="w">  </span><span class="mf">7.</span><span class="n">输出</span>
 </pre></div>
-</div><p><img alt="1706596100270" decoding="async" loading="lazy" src="../../course-assets/002bb1eec2ad871863ec.png"/></p>
+</div><p><img alt="1706596100270" decoding="async" loading="lazy" src="../assets/images/notes/002bb1eec2ad871863ec.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo06HashMap</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">//1.创建Scanner和HashMap</span>
@@ -282,7 +282,7 @@
 <span class="p">}</span>
 </pre></div>
 </div><h4 id="section-7">3.斗地主_Map版本</h4>
-<p><img alt="1706597217319" decoding="async" loading="lazy" src="../../course-assets/6257dd8d5003059c2fda.png"/></p>
+<p><img alt="1706597217319" decoding="async" loading="lazy" src="../assets/images/notes/6257dd8d5003059c2fda.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo07Poker</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">//1.创建数组-&gt; color -&gt; 专门存花色</span>
@@ -357,7 +357,7 @@
 <span class="p">}</span>
 </pre></div>
 </div><h3 id="section-8">第二章.哈希表结构存储过程</h3>
-<p><img alt="1706607216391" decoding="async" loading="lazy" src="../../course-assets/acb50797e527b3f36893.png"/></p>
+<p><img alt="1706607216391" decoding="async" loading="lazy" src="../assets/images/notes/acb50797e527b3f36893.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">HashMap底层数据数据结构</span><span class="p">:</span><span class="n">哈希表</span>
 <span class="mf">2.</span><span class="n">jdk7</span><span class="p">:</span><span class="n">哈希表</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">数组</span><span class="o">+</span><span class="n">链表</span>
 <span class="w">  </span><span class="n">jdk8</span><span class="p">:</span><span class="n">哈希表</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">数组</span><span class="o">+</span><span class="n">链表</span><span class="o">+</span><span class="n">红黑树</span>
@@ -388,9 +388,9 @@
 <p>​            哈希表中虽然有数组,但是set和map却没有索引,因为存数据的时候有可能在同一个索引下形成链表,如果2索引上有一条链表,那么我们要是按照索引2获取,咱们获取哪个元素呢?所以就取消了按照索引操作的机制</p>
 <p>2.问题:为啥说HashMap是无序的,LinkedHashMap是有序的呢?</p>
 <p>​    原因:HashMap底层哈希表为单向链表</p>
-<p>​             <img alt="1706609679824" decoding="async" loading="lazy" src="../../course-assets/719ad25eeafb8d89fd4a.png"/></p>
+<p>​             <img alt="1706609679824" decoding="async" loading="lazy" src="../assets/images/notes/719ad25eeafb8d89fd4a.png"/></p>
 <p>​             LinkedHashMap底层在哈希表的基础上加了一条双向链表</p>
-<p><img alt="1706609878497" decoding="async" loading="lazy" src="../../course-assets/1d9be0a681dfe8131317.png"/></p>
+<p><img alt="1706609878497" decoding="async" loading="lazy" src="../assets/images/notes/1d9be0a681dfe8131317.png"/></p>
 </blockquote>
 <h4 id="section-9">1.HashMap无参数构造方法的分析</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="c1">//HashMap中的静态成员变量</span>

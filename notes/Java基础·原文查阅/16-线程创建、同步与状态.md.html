@@ -95,13 +95,13 @@
 <h4 id="section-2">1.多线程_线程和进程</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">进程</span><span class="p">:</span><span class="n">在内存中执行的应用程序</span>
 </pre></div>
-</div><p><img alt="1704794074520" decoding="async" loading="lazy" src="../../course-assets/473608b34e29432dbeca.png"/></p>
+</div><p><img alt="1704794074520" decoding="async" loading="lazy" src="../../assets/images/notes/473608b34e29432dbeca.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">线程</span><span class="p">:</span><span class="n">是进程中最小的执行单元</span>
 <span class="nl">线程作用</span><span class="p">:</span><span class="n">负责当前进程中程序的运行</span><span class="p">.</span><span class="na">一个进程中至少有一个线程</span><span class="p">,</span><span class="n">一个进程还可以有多个线程</span><span class="p">,</span><span class="n">这样的应用程序就称之为多线程程序</span>
 <span class="w">    </span>
 <span class="nl">简单理解</span><span class="p">:</span><span class="n">一个功能就需要一条线程取去执行</span><span class="w">    </span>
 </pre></div>
-</div><p><img alt="1704794373872" decoding="async" loading="lazy" src="../../course-assets/5dc7ae9a482d8325f76b.png"/></p>
+</div><p><img alt="1704794373872" decoding="async" loading="lazy" src="../../assets/images/notes/5dc7ae9a482d8325f76b.png"/></p>
 <blockquote>
 <p>1.使用场景: 软件中的耗时操作 -&gt; 拷贝大文件, 加载大量的资源</p>
 <p>​                     所有的聊天软件</p>
@@ -112,11 +112,11 @@
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">并行</span><span class="p">:</span><span class="n">在同一个时刻</span><span class="p">,</span><span class="n">有多个执行在多个CPU上</span><span class="p">(</span><span class="n">同时</span><span class="p">)</span><span class="n">执行</span><span class="p">(</span><span class="n">好比是多个人做不同的事儿</span><span class="p">)</span>
 <span class="w">    </span><span class="n">比如</span><span class="p">:</span><span class="n">多个厨师在炒多个菜</span>
 </pre></div>
-</div><p><img alt="1704854500727" decoding="async" loading="lazy" src="../../course-assets/3d0a40013e986e9bbcce.png"/></p>
+</div><p><img alt="1704854500727" decoding="async" loading="lazy" src="../../assets/images/notes/3d0a40013e986e9bbcce.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">并发</span><span class="p">:</span><span class="n">在同一个时刻</span><span class="p">,</span><span class="n">有多个指令在单个CPU上</span><span class="p">(</span><span class="n">交替</span><span class="p">)</span><span class="n">执行</span>
 <span class="w">    </span><span class="n">比如</span><span class="p">:</span><span class="n">一个厨师在炒多个菜</span>
 </pre></div>
-</div><p><img alt="1704854621153" decoding="async" loading="lazy" src="../../course-assets/26c54035fc2c6b7a6471.png"/></p>
+</div><p><img alt="1704854621153" decoding="async" loading="lazy" src="../../assets/images/notes/26c54035fc2c6b7a6471.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">细节</span><span class="p">:</span>
 <span class="w">  </span><span class="mf">1.</span><span class="n">之前CPU是单核</span><span class="p">,</span><span class="n">但是在执行多个程序的时候好像是在同时执行</span><span class="p">,</span><span class="n">原因是CPU在多个线程之间做高速切换</span>
 <span class="w">  </span><span class="mf">2.</span><span class="n">现在咱们的CPU都是多核多线程的了</span><span class="p">,</span><span class="n">比如2核4线程</span><span class="p">,</span><span class="n">那么CPU可以同时运行4个线程</span><span class="p">,</span><span class="n">此时不同切换</span><span class="p">,</span><span class="n">但是如果多了</span><span class="p">,</span><span class="n">CPU就要切换了</span><span class="p">,</span><span class="n">所以现在CPU在执行程序的时候并发和并行都存在</span><span class="w">    </span>
@@ -128,7 +128,7 @@
 </div><h4 id="section-5">4.主线程介绍</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">主线程</span><span class="p">:</span><span class="n">CPU和内存之间开辟的转门为main方法服务的线程</span>
 </pre></div>
-</div><p><img alt="1704855402301" decoding="async" loading="lazy" src="../../course-assets/bfcda866f8e907f6e1dc.png"/></p>
+</div><p><img alt="1704855402301" decoding="async" loading="lazy" src="../../assets/images/notes/bfcda866f8e907f6e1dc.png"/></p>
 <h3 id="section-6">第二章.创建线程的方式(重点)</h3>
 <h4 id="section-7">1.第一种方式_extends Thread</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">定义一个类</span><span class="p">,</span><span class="n">继承Thread</span>
@@ -159,7 +159,7 @@
 <span class="p">}</span>
 </pre></div>
 </div><h4 id="section-8">2.多线程在内存中的运行原理</h4>
-<p><img alt="1704870248866" decoding="async" loading="lazy" src="../../course-assets/b7d7461514c718ce2d7b.png"/></p>
+<p><img alt="1704870248866" decoding="async" loading="lazy" src="../../assets/images/notes/b7d7461514c718ce2d7b.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">注意</span><span class="p">:</span><span class="n">同一个线程对象不能连续调用多次start</span><span class="p">,</span><span class="n">如果想要再次调用start</span><span class="p">,</span><span class="n">那么咱们就new一个新的线程对象</span>
 </pre></div>
 </div><h4 id="section-9">3.Thread类中的方法</h4>
@@ -289,7 +289,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1704874912976" decoding="async" loading="lazy" src="../../course-assets/b4aa8aca5f1d0c3f75a3.png"/></p>
+</div><p><img alt="1704874912976" decoding="async" loading="lazy" src="../../assets/images/notes/b4aa8aca5f1d0c3f75a3.png"/></p>
 <h5>4.3.礼让线程</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">场景说明</span><span class="p">:</span><span class="n">如果两个线程一起执行</span><span class="p">,</span><span class="n">可能会执行一会儿线程A</span><span class="p">,</span><span class="n">再执行一会线程B</span><span class="p">,</span><span class="n">或者可能线程A执行完毕了</span><span class="p">,</span><span class="n">线程B在执行</span>
 <span class="w">        </span><span class="n">那么我们能不能让两个线程尽可能的平衡一点</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">尽量让两个线程交替执行</span>
@@ -423,7 +423,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1704880631303" decoding="async" loading="lazy" src="../../course-assets/36497f4fa247376b4448.png"/></p>
+</div><p><img alt="1704880631303" decoding="async" loading="lazy" src="../../assets/images/notes/36497f4fa247376b4448.png"/></p>
 <h3 id="section-14">第三章.线程安全</h3>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">什么时候发生</span><span class="p">:</span><span class="n">当多个线程访问同一个资源时</span><span class="p">,</span><span class="n">导致了数据有问题</span>
 </pre></div>
@@ -459,7 +459,7 @@
 </pre></div>
 </div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">原因</span><span class="p">:</span><span class="n">CPU在多个线程之间做高速切换导致的</span>
 </pre></div>
-</div><p><img alt="1704938564769" decoding="async" loading="lazy" src="../../course-assets/fc48987dc962ed6389b3.png"/></p>
+</div><p><img alt="1704938564769" decoding="async" loading="lazy" src="../../assets/images/notes/fc48987dc962ed6389b3.png"/></p>
 <h4 id="section-16">2.解决线程安全问题的第一种方式(使用同步代码块)</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span>
 <span class="w">  </span><span class="kd">synchronized</span><span class="p">(</span><span class="n">任意对象</span><span class="p">){</span>
@@ -629,13 +629,13 @@
 <h4 id="section-19">1.死锁介绍(锁嵌套就有可能产生死锁)</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">指的是两个或者两个以上的线程在执行的过程中由于竞争同步锁而产生的一种阻塞现象</span><span class="p">;</span><span class="n">如果没有外力的作用</span><span class="p">,</span><span class="n">他们将无法继续执行下去</span><span class="p">,</span><span class="n">这种情况称之为死锁</span>
 </pre></div>
-</div><p><img alt="1704799768219" decoding="async" loading="lazy" src="../../course-assets/7823b2137766e2646279.png"/></p>
+</div><p><img alt="1704799768219" decoding="async" loading="lazy" src="../../assets/images/notes/7823b2137766e2646279.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">根据上图所示</span><span class="p">:</span><span class="n">线程1正在持有锁1</span><span class="p">,</span><span class="n">但是线程1必须再拿到锁2</span><span class="p">,</span><span class="n">才能继续执行</span>
 <span class="n">而线程2正在持有锁2</span><span class="p">,</span><span class="n">但是线程2需要再拿到锁1</span><span class="p">,</span><span class="n">才能继续执行</span>
 <span class="n">此时两个线程处于互相等待的状态</span><span class="p">,</span><span class="n">就是死锁</span><span class="p">,</span><span class="n">在程序中的死锁将出现在同步代码块的嵌套中</span>
 </pre></div>
 </div><h4 id="section-20">2.死锁的分析</h4>
-<p><img alt="1704954269751" decoding="async" loading="lazy" src="../../course-assets/3ab918474ebe07aa25ff.png"/></p>
+<p><img alt="1704954269751" decoding="async" loading="lazy" src="../../assets/images/notes/3ab918474ebe07aa25ff.png"/></p>
 <h4 id="section-21">3.代码实现</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LockA</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">LockA</span><span class="w"> </span><span class="n">lockA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LockA</span><span class="p">();</span>
@@ -725,5 +725,5 @@
 </tbody>
 </table></div>
 <h4 id="section-24">2.线程状态图</h4>
-<p><img alt="1704958460617" decoding="async" loading="lazy" src="../../course-assets/4798bd9175f72faf6c0d.png"/></p>
+<p><img alt="1704958460617" decoding="async" loading="lazy" src="../../assets/images/notes/4798bd9175f72faf6c0d.png"/></p>
 </article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html"><small>← 上一篇</small><strong>数值、日期与包装类 API · 课程原文</strong></a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html"><small>下一篇 →</small><strong>等待唤醒、Lock 与线程池 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块16.多线程</a><a class="toc-h3" href="#section-1">第一章.多线程基本了解</a><a class="toc-h4" href="#section-2">1.多线程_线程和进程</a><a class="toc-h4" href="#section-3">2.并发和并行</a><a class="toc-h4" href="#section-4">3.CPU调度</a><a class="toc-h4" href="#section-5">4.主线程介绍</a><a class="toc-h3" href="#section-6">第二章.创建线程的方式(重点)</a><a class="toc-h4" href="#section-7">1.第一种方式_extends Thread</a><a class="toc-h4" href="#section-8">2.多线程在内存中的运行原理</a><a class="toc-h4" href="#section-9">3.Thread类中的方法</a><a class="toc-h4" href="#section-10">4.Thread中其他的方法</a><a class="toc-h4" href="#section-11">5.第二种方式_实现Runnable接口</a><a class="toc-h4" href="#section-12">6.两种实现多线程的方式区别</a><a class="toc-h4" href="#section-13">7.第三种方式_匿名内部类创建多线程</a><a class="toc-h3" href="#section-14">第三章.线程安全</a><a class="toc-h4" href="#section-15">1.线程安全问题--&gt;线程不安全的代码</a><a class="toc-h4" href="#section-16">2.解决线程安全问题的第一种方式(使用同步代码块)</a><a class="toc-h4" href="#section-17">3.解决线程安全问题的第二种方式:同步方法</a><a class="toc-h3" href="#section-18">第四章.死锁(了解)</a><a class="toc-h4" href="#section-19">1.死锁介绍(锁嵌套就有可能产生死锁)</a><a class="toc-h4" href="#section-20">2.死锁的分析</a><a class="toc-h4" href="#section-21">3.代码实现</a><a class="toc-h3" href="#section-22">第五章.线程状态</a><a class="toc-h4" href="#section-23">1.线程状态介绍</a><a class="toc-h4" href="#section-24">2.线程状态图</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

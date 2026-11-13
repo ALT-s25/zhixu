@@ -141,7 +141,7 @@
 <p>问题2:缓冲流底层有数组(缓冲区),都是在内存之间进行读写,那么缓冲流读写的过程是啥样的呢?</p>
 <p>​             注意:先依靠基本流将数据读出来,然后交给缓冲流,由于缓冲流缓冲区是8192,所以每次读取8192个字节放到缓冲区中,然后再将输入流缓冲区中的数据交给输出流缓冲区,然后再利用基本流将数据写到硬盘上</p>
 <p>​            那么在操作代码时len是干啥的呢?其实主要是在两个缓冲区中倒腾数据,将输入流缓冲区中的数据读到,然后写到输出流缓冲区中,等待输出流缓冲区满了,再依靠基本流写到硬盘上;如果输入流缓冲区中的数据读不到了,重新从硬盘上读8192个字节,进入到输入流缓冲区中,继续利用len在两个缓冲区中来回倒腾数据</p>
-<p><img alt="1705655059803" decoding="async" loading="lazy" src="../../course-assets/6366c98fb1fc4e285dca.png"/></p>
+<p><img alt="1705655059803" decoding="async" loading="lazy" src="../assets/images/notes/6366c98fb1fc4e285dca.png"/></p>
 </blockquote>
 <h3 id="section-2">第二章.字符缓冲流</h3>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">我们知道</span><span class="p">,</span><span class="n">字符流的基本流底层是有缓冲区的</span><span class="p">,</span><span class="n">所以在效率这一块效果不是特别明显</span><span class="p">,</span><span class="n">但是不代表不重要</span><span class="p">,</span><span class="n">因为我们应该主要学字符缓冲流的两个特有方法</span>
@@ -207,7 +207,7 @@
 </div><h3 id="section-5">第三章.转换流</h3>
 <h4 id="section-6">1.字符编码</h4>
 <p>计算机中储存的信息都是用二进制数表示的，而我们在屏幕上看到的数字、英文、标点符号、汉字等字符是二进制数转换之后的结果。[按照某种规则，将字符存储到计算机中，称为<strong>编码</strong>] 。反之，将存储在计算机中的二进制数按照某种规则解析显示出来，称为<strong>解码</strong> 。比如说，按照A规则存储，同样按照A规则解析，那么就能显示正确的文本f符号。反之，按照A规则存储，再按照B规则解析，就会导致乱码现象。</p>
-<p><img alt="1705659950492" decoding="async" loading="lazy" src="../../course-assets/7d41a5be20f2d56eefbc.png"/></p>
+<p><img alt="1705659950492" decoding="async" loading="lazy" src="../assets/images/notes/7d41a5be20f2d56eefbc.png"/></p>
 <ul>
 <li><strong>字符编码<code>Character Encoding</code></strong> : 就是一套自然语言的字符与二进制数之间的对应规则。</li>
 </ul>
@@ -216,7 +216,7 @@
 <li><strong>字符集 <code>Charset</code></strong>：也叫编码表。是一个系统支持的所有字符的集合，包括各国家文字、标点符号、图形符号、数字等。</li>
 </ul>
 <p>计算机要准确的存储和识别各种字符集符号，需要进行字符编码，一套字符集必然至少有一套字符编码。常见字符集有ASCII字符集、GBK字符集、Unicode字符集等。</p>
-<p><img alt="1705487375594" decoding="async" loading="lazy" src="../../course-assets/d3369d8c572cfb812fa8.png"/></p>
+<p><img alt="1705487375594" decoding="async" loading="lazy" src="../assets/images/notes/d3369d8c572cfb812fa8.png"/></p>
 <p>可见，当指定了<strong>编码</strong>，它所对应的<strong>字符集</strong>自然就指定了，所以<strong>编码</strong>才是我们最终要关心的。</p>
 <ul>
 <li><strong>ASCII字符集</strong> ：<ul>
@@ -308,7 +308,7 @@
 <span class="w">      </span>
 <span class="w">  </span><span class="n">应用场景</span><span class="p">:</span><span class="n">比如玩儿游戏会对英雄存档</span><span class="p">,</span><span class="n">那么退出的时候英雄变成对象</span><span class="p">,</span><span class="n">将人物的属性变成对象的成员变量值</span><span class="p">,</span><span class="n">然后存到文件中</span><span class="p">,</span><span class="n">再次打开游戏</span><span class="p">,</span><span class="n">直接从文件中将这些人物对象读回来</span><span class="p">,</span><span class="n">将对象以及对象中的属性还原</span><span class="w">    </span>
 </pre></div>
-</div><p><img alt="1705889673213" decoding="async" loading="lazy" src="../../course-assets/4e0ccb5d408f3b7c1b6e.png"/></p>
+</div><p><img alt="1705889673213" decoding="async" loading="lazy" src="../assets/images/notes/4e0ccb5d408f3b7c1b6e.png"/></p>
 <h4 id="section-12">二.序列化流_ObjectOutputStream</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">作用</span><span class="p">:</span><span class="n">写对象</span>
 <span class="mf">2.</span><span class="n">构造</span><span class="p">:</span>
@@ -387,7 +387,7 @@
 <span class="w">   </span><span class="n">序列化之后</span><span class="p">,</span><span class="n">修改源码</span><span class="p">,</span><span class="n">修改完之后没有重新序列化</span><span class="p">,</span><span class="n">直接反序列化了</span><span class="p">,</span><span class="n">就会出现了序列号冲突问题</span><span class="p">:</span>
 <span class="w">   </span><span class="n">InvalidClassException</span>
 </pre></div>
-</div><p><img alt="1705904683397" decoding="async" loading="lazy" src="../../course-assets/e07a2fc23bed276aa4ff.png"/></p>
+</div><p><img alt="1705904683397" decoding="async" loading="lazy" src="../assets/images/notes/e07a2fc23bed276aa4ff.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">解决</span><span class="p">:</span><span class="n">将序列号定死</span><span class="p">,</span><span class="n">后面不管怎么修改源码</span><span class="p">,</span><span class="n">序列号都是这一个</span>
 <span class="w">    </span><span class="n">在被序列化的对象中加上一个public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">的变量</span><span class="p">,</span><span class="n">并为其赋值</span>
 </pre></div>
@@ -476,7 +476,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1705905384409" decoding="async" loading="lazy" src="../../course-assets/a30a4c900e53f79709eb.png"/></p>
+</div><p><img alt="1705905384409" decoding="async" loading="lazy" src="../assets/images/notes/a30a4c900e53f79709eb.png"/></p>
 <h3 id="section-17">第五章.打印流_PrintStream(了解)</h3>
 <h4 id="section-18">1.PrintStream打印流基本使用</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w"> </span><span class="mf">1.</span><span class="n">构造</span><span class="p">:</span>
@@ -585,7 +585,7 @@
 </div><div class="code-block"><div class="code-top"><span>properties</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="na">jdbc.username</span><span class="o">=</span><span class="s">root</span>
 <span class="na">jdbc.password</span><span class="o">=</span><span class="s">1234</span>
 </pre></div>
-</div><p><img alt="1705910391332" decoding="async" loading="lazy" src="../../course-assets/db20e2b83f019fd2ebc7.png"/></p>
+</div><p><img alt="1705910391332" decoding="async" loading="lazy" src="../assets/images/notes/db20e2b83f019fd2ebc7.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo02Properties</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">Properties</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Properties</span><span class="p">();</span>
@@ -672,5 +672,5 @@
 <span class="p">}</span>
 </pre></div>
 </div><h3 id="section-25">第八章.如何快速记忆IO流</h3>
-<p><img alt="1705913137595" decoding="async" loading="lazy" src="../../course-assets/2dd48f3e09c666e444bd.png"/></p>
+<p><img alt="1705913137595" decoding="async" loading="lazy" src="../assets/images/notes/2dd48f3e09c666e444bd.png"/></p>
 </article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html"><small>← 上一篇</small><strong>File 与字节、字符 IO · 课程原文</strong></a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html"><small>下一篇 →</small><strong>网络编程、正则与设计模式 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块22.IO流</a><a class="toc-h3" href="#section-1">第一章.字节缓冲流</a><a class="toc-h3" href="#section-2">第二章.字符缓冲流</a><a class="toc-h4" href="#section-3">1.字符缓冲输出流_BufferedWriter</a><a class="toc-h4" href="#section-4">2.字符缓冲输入流_BufferedReader</a><a class="toc-h3" href="#section-5">第三章.转换流</a><a class="toc-h4" href="#section-6">1.字符编码</a><a class="toc-h4" href="#section-7">2.字符集</a><a class="toc-h4" href="#section-8">3.转换流_InputStreamReader</a><a class="toc-h4" href="#section-9">4.转换流_OutputStreamWriter</a><a class="toc-h3" href="#section-10">第四章.序列化流</a><a class="toc-h4" href="#section-11">一.序列化流和反序列化流介绍</a><a class="toc-h4" href="#section-12">二.序列化流_ObjectOutputStream</a><a class="toc-h4" href="#section-13">三.反序列化_ObjectInputStream</a><a class="toc-h4" href="#section-14">四.不想被序列化操作(了解)</a><a class="toc-h4" href="#section-15">五.反序列化时出现的问题以及分析以及解决</a><a class="toc-h4" href="#section-16">六.经验问题</a><a class="toc-h3" href="#section-17">第五章.打印流_PrintStream(了解)</a><a class="toc-h4" href="#section-18">1.PrintStream打印流基本使用</a><a class="toc-h4" href="#section-19">2.PrintStream打印流完成续写</a><a class="toc-h3" href="#section-20">第六章.Properties集合</a><a class="toc-h3" href="#section-21">第七章.Commons-io工具包</a><a class="toc-h4" href="#section-22">一.介绍</a><a class="toc-h4" href="#section-23">二.添加第三方jar包</a><a class="toc-h4" href="#section-24">三.工具包的使用</a><a class="toc-h3" href="#section-25">第八章.如何快速记忆IO流</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>

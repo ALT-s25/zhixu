@@ -78,7 +78,7 @@
 <blockquote>
 <p>wait和notify方法需要锁对象调用,所以需要用到同步代码块中,而且必须是同一个锁对象</p>
 </blockquote>
-<p><img alt="1705301228993" decoding="async" loading="lazy" src="../../course-assets/f99f5506161fda8f7e8d.png"/><img alt="1705304702403" decoding="async" loading="lazy" src="../../course-assets/ac338f1ba690a1de39d3.png"/></p>
+<p><img alt="1705301228993" decoding="async" loading="lazy" src="../assets/images/notes/f99f5506161fda8f7e8d.png"/><img alt="1705304702403" decoding="async" loading="lazy" src="../assets/images/notes/ac338f1ba690a1de39d3.png"/></p>
 <h4 id="section-3">2.等待唤醒案例实现</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">/*</span>
 <span class="cm">   count和flag可以定义成包装类</span>
@@ -216,7 +216,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1705304707790" decoding="async" loading="lazy" src="../../course-assets/ac338f1ba690a1de39d3.png"/></p>
+</div><p><img alt="1705304707790" decoding="async" loading="lazy" src="../assets/images/notes/ac338f1ba690a1de39d3.png"/></p>
 <h4 id="section-4">3.用同步方法改造等待唤醒案例</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="cm">/*</span>
 <span class="cm">   count和flag可以定义成包装类</span>
@@ -589,7 +589,7 @@
 <span class="p">}</span>
 </pre></div>
 </div><h3 id="section-10">第五章.线程池_实现多线程方式四</h3>
-<p><img alt="1705317722345" decoding="async" loading="lazy" src="../../course-assets/ced85d74515a7ac22609.png"/></p>
+<p><img alt="1705317722345" decoding="async" loading="lazy" src="../assets/images/notes/ced85d74515a7ac22609.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">问题</span><span class="p">:</span><span class="n">之前来一个线程任务</span><span class="p">,</span><span class="n">就需要创建一个线程对象去执行</span><span class="p">,</span><span class="n">用完还要销毁线程对象</span><span class="p">,</span><span class="n">如果线程任务多了</span><span class="p">,</span><span class="n">就需要频繁创建线程对象和销毁线程对象</span><span class="p">,</span><span class="n">这样会耗费内存资源</span><span class="p">,</span><span class="n">所以我们就想线程对象能不能循环利用</span><span class="p">,</span><span class="n">用的时候直接拿线程对象</span><span class="p">,</span><span class="n">用完还回去</span>
 </pre></div>
 </div><div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">如何创建线程池对象</span><span class="p">:</span><span class="n">用具类</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Executors</span>

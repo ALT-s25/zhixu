@@ -59,16 +59,16 @@
 <span class="w">                 </span>
 <span class="mf">3.</span><span class="n">API文档作用</span><span class="p">:</span><span class="n">查询我们要使用的对象</span><span class="p">,</span><span class="n">以及方法</span><span class="p">,</span><span class="n">是我们程序员的</span><span class="s">"字典"</span><span class="w">  </span>
 </pre></div>
-</div><p><img alt="1704185036101" decoding="async" loading="lazy" src="../../course-assets/ad109eaf3ac1737f8545.png"/></p>
-<p><img alt="1704185224910" decoding="async" loading="lazy" src="../../course-assets/dd319d381b98289525a8.png"/></p>
-<p><img alt="1704185319987" decoding="async" loading="lazy" src="../../course-assets/bb7842150e5e6cf300c3.png"/></p>
-<p><img alt="1704185443350" decoding="async" loading="lazy" src="../../course-assets/d328a1b7b2dbc4709568.png"/></p>
+</div><p><img alt="1704185036101" decoding="async" loading="lazy" src="../assets/images/notes/ad109eaf3ac1737f8545.png"/></p>
+<p><img alt="1704185224910" decoding="async" loading="lazy" src="../assets/images/notes/dd319d381b98289525a8.png"/></p>
+<p><img alt="1704185319987" decoding="async" loading="lazy" src="../assets/images/notes/bb7842150e5e6cf300c3.png"/></p>
+<p><img alt="1704185443350" decoding="async" loading="lazy" src="../assets/images/notes/d328a1b7b2dbc4709568.png"/></p>
 <h3 id="section-2">第二章.异常</h3>
 <h4 id="section-3">1.异常介绍</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">代码出现了不正常的现象</span><span class="p">;</span><span class="n">在java中</span><span class="p">,</span><span class="n">异常都是一个一个的类</span><span class="w">                </span>
 </pre></div>
-</div><p><img alt="1704188467029" decoding="async" loading="lazy" src="../../course-assets/0e272d39e50566f961ab.png"/></p>
-<p><img alt="1704188437280" decoding="async" loading="lazy" src="../../course-assets/373f1fd321c12ca739ec.png"/></p>
+</div><p><img alt="1704188467029" decoding="async" loading="lazy" src="../assets/images/notes/0e272d39e50566f961ab.png"/></p>
+<p><img alt="1704188437280" decoding="async" loading="lazy" src="../assets/images/notes/373f1fd321c12ca739ec.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Demo01Exception</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">ParseException</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">//错误Error -&gt; StackOverflowError</span>
@@ -97,7 +97,7 @@
 <span class="p">}</span>
 </pre></div>
 </div><h4 id="section-4">2.异常出现的过程</h4>
-<p><img alt="1704189581288" decoding="async" loading="lazy" src="../../course-assets/dfdb306a75776cc2e5f8.png"/></p>
+<p><img alt="1704189581288" decoding="async" loading="lazy" src="../assets/images/notes/dfdb306a75776cc2e5f8.png"/></p>
 <h4 id="section-5">3.创建异常对象(了解)</h4>
 <blockquote>
 <p>创建异常对象,只是为了后面学习如何处理异常,其他的暂时没有啥意义</p>
@@ -157,7 +157,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1704192622348" decoding="async" loading="lazy" src="../../course-assets/7c7db45204cf54289aeb.png"/></p>
+</div><p><img alt="1704192622348" decoding="async" loading="lazy" src="../assets/images/notes/7c7db45204cf54289aeb.png"/></p>
 <h5>4.2 异常处理方式一_throws多个异常</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">格式</span><span class="p">:</span><span class="kd">throws</span><span class="w"> </span><span class="n">异常1</span><span class="p">,</span><span class="n">异常2</span>
 <span class="w">    </span>
@@ -429,7 +429,7 @@
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">如果处理异常之后</span><span class="p">,</span><span class="n">还想让后续的代码正常执行</span><span class="p">,</span><span class="n">我们使用try</span><span class="p">...</span><span class="na">catch</span>
 <span class="mf">2.</span><span class="n">如果方法之间是递进关系</span><span class="p">(</span><span class="n">调用</span><span class="p">),</span><span class="n">我们可以先throws</span><span class="p">,</span><span class="n">但是到了最后需要用try</span><span class="p">...</span><span class="na">catch做一个统一的异常处理</span>
 </pre></div>
-</div><p><img alt="1704269702465" decoding="async" loading="lazy" src="../../course-assets/ca7feaf3ebae4d9ac5ad.png"/></p>
+</div><p><img alt="1704269702465" decoding="async" loading="lazy" src="../assets/images/notes/ca7feaf3ebae4d9ac5ad.png"/></p>
 <blockquote>
 <p>1.编译时期异常是必须要处理的,不处理爆红,没法往下写</p>
 <p>a.throws</p>
@@ -688,7 +688,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1704276772548" decoding="async" loading="lazy" src="../../course-assets/38bf55856d5f7bbf21d4.png"/></p>
+</div><p><img alt="1704276772548" decoding="async" loading="lazy" src="../assets/images/notes/38bf55856d5f7bbf21d4.png"/></p>
 <blockquote>
 <p>小结:</p>
 <p>1.如果直接输出对象名不想输出地址值,重写toString方法</p>

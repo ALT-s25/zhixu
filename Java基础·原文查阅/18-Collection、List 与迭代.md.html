@@ -44,7 +44,7 @@
 <span class="w">    </span><span class="n">map</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">"涛哥"</span><span class="p">,</span><span class="s">"金莲"</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="n">value叫做键值对</span><span class="w">  </span>
 <span class="w">    </span>
 </pre></div>
-</div><p><img alt="1706361293128" decoding="async" loading="lazy" src="../../course-assets/8ca05f5e829324ba25de.png"/></p>
+</div><p><img alt="1706361293128" decoding="async" loading="lazy" src="../assets/images/notes/8ca05f5e829324ba25de.png"/></p>
 <h3 id="section-2">第二章.Collection接口</h3>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">单列集合的顶级接口</span>
 <span class="mf">2.</span><span class="n">使用</span><span class="p">:</span>
@@ -162,20 +162,20 @@
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">cursor</span><span class="p">;</span><span class="w"> </span><span class="c1">//下一个元素索引位置</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">lastRet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="c1">//上一个元素索引位置</span>
 </pre></div>
-</div><p><img alt="1706257256564" decoding="async" loading="lazy" src="../../course-assets/795782bfa778ae334ead.png"/></p>
+</div><p><img alt="1706257256564" decoding="async" loading="lazy" src="../assets/images/notes/795782bfa778ae334ead.png"/></p>
 <h4 id="section-6">3.迭代器底层原理</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">获取Iterator的时候怎么获取的</span><span class="p">:</span>
 <span class="w">  </span><span class="n">Iterator</span><span class="w"> </span><span class="n">iterator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">.</span><span class="na">iterator</span><span class="p">()</span>
 <span class="w">  </span><span class="n">我们知道Iterator是一个接口</span><span class="p">,</span><span class="n">等号右边一定是它的实现类对象</span>
 <span class="w">  </span><span class="n">问题</span><span class="p">:</span><span class="n">Iterator接收的到底是哪个实现类对象呢</span><span class="o">?</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ArrayList中的内部类Itr对象</span><span class="w">    </span>
 </pre></div>
-</div><p><img alt="1706260053699" decoding="async" loading="lazy" src="../../course-assets/867fec0e5d2d5a933748.png"/></p>
+</div><p><img alt="1706260053699" decoding="async" loading="lazy" src="../assets/images/notes/867fec0e5d2d5a933748.png"/></p>
 <blockquote>
 <p>注意:只有ArrayList使用迭代器的时候Iterator接口才会指向Itr,其他的集合使用迭代器Iterator就指向的不是Itr了</p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">HashSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashSet</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">iterator1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">set</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
 </pre></div>
-</div><p><img alt="1706260349562" decoding="async" loading="lazy" src="../../course-assets/4555299f7f1f986a185c.png"/></p>
+</div><p><img alt="1706260349562" decoding="async" loading="lazy" src="../assets/images/notes/4555299f7f1f986a185c.png"/></p>
 </blockquote>
 <h4 id="section-7">4.并发修改异常</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="nl">需求</span><span class="p">:</span><span class="n">定义一个集合</span><span class="p">,</span><span class="n">存储</span><span class="w"> </span><span class="n">唐僧</span><span class="p">,</span><span class="n">孙悟空</span><span class="p">,</span><span class="n">猪八戒</span><span class="p">,</span><span class="n">沙僧</span><span class="p">,</span><span class="n">遍历集合</span><span class="p">,</span><span class="n">如果遍历到猪八戒</span><span class="p">,</span><span class="n">往集合中添加一个白龙马</span>
@@ -200,7 +200,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1706260567430" decoding="async" loading="lazy" src="../../course-assets/031f9838964ecfce929e.png"/></p>
+</div><p><img alt="1706260567430" decoding="async" loading="lazy" src="../assets/images/notes/031f9838964ecfce929e.png"/></p>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">String</span><span class="w"> </span><span class="n">element</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iterator</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
 <span class="o">=========================================</span>
 <span class="kd">private</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Itr</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
@@ -267,8 +267,8 @@
 </div><h5>为什么需要数据结构</h5>
 <div class="code-block"><div class="code-top"><span>properties</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="na">随着应用程序变得越来越复杂和数据越来越丰富，几百万、几十亿甚至几百亿的数据就会出现，而对这么大对数据进行搜索、插入或者排序等的操作就越来越慢，数据结构就是用来解</span><span class="w">	</span><span class="s">决这些问题的。</span>
 </pre></div>
-</div><p><img alt="" decoding="async" loading="lazy" src="../../course-assets/8a3013afa9a159a99391.png"/></p>
-<p><img alt="" decoding="async" loading="lazy" src="../../course-assets/12087e396f333b9af619.png"/></p>
+</div><p><img alt="" decoding="async" loading="lazy" src="../assets/images/notes/8a3013afa9a159a99391.png"/></p>
+<p><img alt="" decoding="async" loading="lazy" src="../assets/images/notes/12087e396f333b9af619.png"/></p>
 <p>数据的逻辑结构指反映数据元素之间的逻辑关系，而与他们在计算机中的存储位置无关：</p>
 <ul>
 <li>集合（数学中集合的概念）：数据结构中的元素之间除了“同属一个集合” 的相互关系外，别无其他关系；</li>
@@ -276,7 +276,7 @@
 <li>树形结构：数据结构中的元素存在一对多的相互关系；</li>
 <li>图形结构：数据结构中的元素存在多对多的相互关系。</li>
 </ul>
-<p><img alt="" decoding="async" loading="lazy" src="../../course-assets/26497f8f9245e08b8fce.png"/></p>
+<p><img alt="" decoding="async" loading="lazy" src="../assets/images/notes/26497f8f9245e08b8fce.png"/></p>
 <p>数据的物理结构/存储结构：是描述数据具体在内存中的存储（如：顺序结构、链式结构、索引结构、哈希结构）等，一种数据逻辑结构可表示成一种或多种物理存储结构。</p>
 <p>数据结构是一门完整并且复杂的课程，那么我们今天只是简单的讨论常见的几种数据结构，让我们对数据结构与算法有一个初步的了解。</p>
 <h4 id="section-9">1.栈</h4>
@@ -284,12 +284,12 @@
 <span class="w">  </span><span class="n">先进后出</span>
 <span class="mf">2.</span><span class="n">好比</span><span class="p">:</span><span class="n">手枪压子弹</span><span class="w">      </span>
 </pre></div>
-</div><p><img alt="1706263593679" decoding="async" loading="lazy" src="../../course-assets/6510b2975b07555dd09b.png"/></p>
+</div><p><img alt="1706263593679" decoding="async" loading="lazy" src="../assets/images/notes/6510b2975b07555dd09b.png"/></p>
 <h4 id="section-10">2.队列</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">特点</span><span class="p">:</span><span class="n">先进先出</span>
 <span class="mf">2.</span><span class="n">好比</span><span class="p">:</span><span class="n">过安检</span><span class="w">    </span>
 </pre></div>
-</div><p><img alt="1706263718210" decoding="async" loading="lazy" src="../../course-assets/39feebbd35cf7adadf46.png"/></p>
+</div><p><img alt="1706263718210" decoding="async" loading="lazy" src="../assets/images/notes/39feebbd35cf7adadf46.png"/></p>
 <h4 id="section-11">3.数组</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">特点</span><span class="p">:</span><span class="n">查询快</span><span class="p">,</span><span class="n">增删慢</span>
 <span class="mf">2.</span><span class="n">查询快</span><span class="p">:</span><span class="n">因为有索引</span><span class="p">,</span><span class="n">我们可以直接通过索引操作元素</span>
@@ -323,7 +323,7 @@
 <span class="w">  </span><span class="n">第二部分</span><span class="p">:</span><span class="n">指针域</span><span class="p">(</span><span class="n">保存下一个节点地址</span><span class="p">)</span>
 <span class="n">b</span><span class="p">.</span><span class="na">特点</span><span class="p">:</span><span class="n">前面节点记录后面节点的地址</span><span class="p">,</span><span class="n">但是后面节点地址不记录前面节点地址</span>
 </pre></div>
-</div><p><img alt="1706264310477" decoding="async" loading="lazy" src="../../course-assets/4e022fc7ceb9b68c6065.png"/></p>
+</div><p><img alt="1706264310477" decoding="async" loading="lazy" src="../assets/images/notes/4e022fc7ceb9b68c6065.png"/></p>
 <h5>4.2双向链表</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="w">  </span><span class="n">a</span><span class="p">.</span><span class="na">节点</span><span class="p">:</span><span class="n">一个节点分为三部分</span>
 <span class="w">    </span><span class="n">第一部分</span><span class="p">:</span><span class="n">指针域</span><span class="p">(</span><span class="n">保存上一个节点地址</span><span class="p">)</span>
@@ -332,7 +332,7 @@
 <span class="w">  </span><span class="n">b</span><span class="p">.</span><span class="na">特点</span><span class="p">:</span>
 <span class="w">    </span><span class="n">前面节点记录后面节点地址</span><span class="p">,</span><span class="n">后面节点也记录前面节点地址</span>
 </pre></div>
-</div><p><img alt="1706264487008" decoding="async" loading="lazy" src="../../course-assets/0de96926d24a0ed81617.png"/></p>
+</div><p><img alt="1706264487008" decoding="async" loading="lazy" src="../assets/images/notes/0de96926d24a0ed81617.png"/></p>
 <h3 id="section-13">第五章.List接口</h3>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">概述</span><span class="p">:</span><span class="n">是Collection接口的子接口</span>
 <span class="mf">2.</span><span class="n">常见的实现类</span><span class="p">:</span>
@@ -667,7 +667,7 @@
 <span class="w">        </span><span class="n">modCount</span><span class="o">++</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1706363140003" decoding="async" loading="lazy" src="../../course-assets/8a203831eda3f9cd0a04.png"/></p>
+</div><p><img alt="1706363140003" decoding="async" loading="lazy" src="../assets/images/notes/8a203831eda3f9cd0a04.png"/></p>
 <h4 id="section-19">1.3.LinkedList中get方法源码分析</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">checkElementIndex</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
@@ -727,7 +727,7 @@
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">增强for遍历集合时</span><span class="p">,</span><span class="n">底层实现原理为迭代器</span>
 <span class="mf">2.</span><span class="n">增强for遍历数组时</span><span class="p">,</span><span class="n">底层实现原理为普通for</span>
 </pre></div>
-</div><p><img alt="1706363822310" decoding="async" loading="lazy" src="../../course-assets/7a78cf7064940c7bdd1d.png"/></p>
+</div><p><img alt="1706363822310" decoding="async" loading="lazy" src="../assets/images/notes/7a78cf7064940c7bdd1d.png"/></p>
 <blockquote>
 <p>所以不管是用迭代器还是使用增强for,在遍历集合的过程中都不要随意修改集合长度,否则会出现并发修改异常</p>
 </blockquote>
