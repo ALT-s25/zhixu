@@ -51,3 +51,5 @@ if(cards.length){const status=document.createElement('div');status.className='sh
 document.querySelector('#mark-read')?.addEventListener('click',e=>{if(paused||e.currentTarget.getAttribute('aria-pressed')!=='true')return;const layer=document.createElement('div');layer.className='reading-celebration';layer.setAttribute('aria-hidden','true');for(let i=0;i<24;i++){const p=document.createElement('i');const a=Math.PI*2*i/24;p.style.setProperty('--x',Math.cos(a)*(100+Math.random()*160)+'px');p.style.setProperty('--y',Math.sin(a)*180-160+'px');p.style.setProperty('--r',(Math.random()*500)+'deg');p.style.setProperty('--particle',palette[i%palette.length]);layer.append(p)}document.body.append(layer);setTimeout(()=>layer.remove(),1000)});
 })();
 ;(()=>{if(document.body.dataset.note)return;const b=[...document.querySelectorAll('.shelf-tabs button')].find(x=>x.dataset.category==='后端详细课程');if(b)b.click()})();
+
+;(()=>{if(document.body.dataset.note){const module=document.createElement("script");module.type="module";module.src=new URL("ai-assistant.mjs",document.currentScript.src);document.head.append(module)}})();

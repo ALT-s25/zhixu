@@ -190,6 +190,14 @@
     if(epoch!==generation||session?.user.id!==uid)throw Error('账号已切换，请重新打开个人资料');
     if(user?.id!==uid)throw Error('资料保存未完成，请重试');
     session.user=user;storeSession();emit();return copy(user);
+  },async authorizedBackendFetch(path,options={}){
+    const base=window.ZHIXU_AI?.apiBaseUrl;if(!base)throw Error('AI 尚未配置，请管理员连接后端服务');
+    const endpoint=new URL(base);
+    if(endpoint.protocol!=='https:'&&!(endpoint.protocol==='http:'&&['localhost','127.0.0.1'].includes(endpoint.hostname)))throw Error('AI 后端需要 HTTPS 地址');
+    if(!/^\/api\/v1\/[a-z/]+$/.test(path))throw Error('不支持的接口');
+    const epoch=generation,access=await token();
+    const response=await fetch(endpoint.origin+path,{...options,credentials:'omit',redirect:'error',headers:{...options.headers,Authorization:'Bearer '+access},signal:options.signal||AbortSignal.timeout(65000)});
+    if(epoch!==generation)throw Error('账号已切换，请重试');return response;
   },async authorizedFetch(path,options={}){
     if(!/^\/(rest|storage)\/v1\//.test(path))throw Error('不支持的云端地址');
     const epoch=generation,access=await token();
