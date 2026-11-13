@@ -1,0 +1,13 @@
+问题原因
+搜索索引要求 notes-added/、notes/ 下的笔记，但仓库中笔记被平铺在根目录。本次工具按索引复制回正确位置，保留根目录原文件，不改索引，不删除笔记。
+
+操作顺序
+1. 在 GitHub 仓库根目录 Add file → Upload files，把本包的 .github 和 scripts 两个文件夹整体拖进去（不要点进文件夹后只上传文件）。提交。
+2. Actions → Restore note paths → Run workflow → main → Run workflow。
+3. 等绿色成功，查看运行 Summary 的 Missing source 是否为 0。如有缺失，把报告发我。
+4. 再回仓库根目录上传 ai-assistant.mjs 和 ai-assistant.css 两个文件并提交。这次手动提交也会触发 Pages 部署，让新恢复的笔记一起上线。
+5. 等 pages build and deployment 成功，Ctrl+F5 刷新网页，再打开原先的 404 链接。
+
+不要上传本说明覆盖 README。不需要重新上传 Java 后端，也不用重新配置密钥。
+
+本地小芽排版已更新：中性正文颜色、适度加粗、标题间距、深色代码块、语言标签、基础语法高亮、复制按钮。当前本地刷新即可查看。
