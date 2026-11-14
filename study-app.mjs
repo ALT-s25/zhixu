@@ -46,3 +46,8 @@ function editResource(r=null){resourceId=r?.id||null;$('#resource-title').value=
 $('#new-resource').onclick=()=>editResource();$('#cancel-resource').onclick=()=>$('#resource-editor').close();
 $('#resource-form').onsubmit=e=>{e.preventDefault();const url=safeUrl($('#resource-url').value.trim());if(!url){$('#resource-url').setCustomValidity('请填写不含账号密码的 HTTP 或 HTTPS 链接');$('#resource-url').reportValidity();return;}const next=structuredClone(data);next.custom=(next.custom||[]).filter(r=>r.id!==resourceId);next.custom.push({id:resourceId||'custom-'+crypto.randomUUID(),title:$('#resource-title').value.trim(),url,topic:$('#resource-topic').value.trim(),description:$('#resource-description').value.trim(),updated:Date.now()});if(commit(validate(next))){$('#resource-editor').close();render();}};
 $('#resource-url').oninput=()=>$('#resource-url').setCustomValidity('');
+
+if(page==='study'){
+ const id=new URL(location.href).searchParams.get('experiment');
+ if(id){const {experiments}=await import('./experiments-data.mjs');const item=experiments.find(x=>x.id===id);if(item)openTask({title:item.title,url:item.source,category:item.topic,start:'步骤：\n'+item.steps.map((x,i)=>`${i+1}. ${x}`).join('\n')+'\n\n验收：\n'+item.acceptance.join('\n')+'\n\n结果 / 卡点：'});}
+}
