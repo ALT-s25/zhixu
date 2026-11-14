@@ -1,10 +1,11 @@
+import {StudyCloud} from './study-cloud.mjs';
 import {resources} from './resources-data.mjs';
 import {KEY,empty,validate,merge,safeUrl} from './study-core.mjs';
 const $=s=>document.querySelector(s), page=document.body.dataset.page;
-let data=empty(),broken=false,editing=null;
+let data=empty(),broken=false,editing=null,cloud=null;
 const message=(text,error=false)=>{$('#message').textContent=text;$('#message').classList.toggle('error',error);};
 try{const raw=localStorage.getItem(KEY);if(raw)data=validate(JSON.parse(raw));}catch{broken=true;message('本机记录无法读取。为保护原记录，暂不覆盖；请先导出原始备份。',true);}
-function commit(next){if(broken){message('记录无法读取，请先导出原始备份，再恢复有效备份。',true);return false;}try{localStorage.setItem(KEY,JSON.stringify(validate(next)));data=next;message('已保存在当前浏览器。');return true;}catch{message('保存失败，浏览器空间可能不足。请导出备份后重试。',true);return false;}}
+function commit(next){if(cloud?.owner){if(cloud.save(next)){data=next;return true;}return false;}if(broken){message('记录无法读取，请先导出原始备份，再恢复有效备份。',true);return false;}try{localStorage.setItem(KEY,JSON.stringify(validate(next)));data=next;message('已保存在当前浏览器。');return true;}catch{message('保存失败，浏览器空间可能不足。请导出备份后重试。',true);return false;}}
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 const button=(text,fn)=>{const n=el('button',text);n.type='button';n.onclick=fn;return n;};
 function link(text,url){const a=el('a',text);a.href=safeUrl(url);a.target='_blank';a.rel='noopener noreferrer';return a;}
@@ -20,8 +21,22 @@ function render(){page==='resources'?renderResources():renderTasks();}
 $('#search').addEventListener('input',render);document.querySelectorAll('[data-filter]').forEach(n=>n.addEventListener('change',render));
 $('#new-task').onclick=()=>openTask();$('#close-editor').onclick=()=>$('#editor').close();
 $('#task-form').onsubmit=e=>{e.preventDefault();const title=$('#task-title').value.trim(),raw=$('#task-url').value.trim();if(!title)return;if(raw&&!safeUrl(raw)){message('链接需使用 http 或 https，且不能包含账号密码。',true);return;}const task={id:editing||crypto.randomUUID(),title,url:safeUrl(raw),topic:$('#task-topic').value.trim(),next:$('#task-next').value.trim(),state:$('#task-state').value,updated:Date.now()};const next=structuredClone(data);next.tasks=next.tasks.filter(t=>t.id!==task.id);next.tasks.push(task);if(commit(next)){$('#editor').close();render();}};
-$('#backup').onclick=()=>{const raw=broken?localStorage.getItem(KEY):JSON.stringify(data,null,2);const url=URL.createObjectURL(new Blob([raw||''],{type:'application/json'}));const a=el('a');a.href=url;a.download='知序-学习工作台备份.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('#backup').onclick=()=>{const raw=broken&&!cloud?.owner?localStorage.getItem(KEY):JSON.stringify(data,null,2);const url=URL.createObjectURL(new Blob([raw||''],{type:'application/json'}));const a=el('a');a.href=url;a.download='知序-学习工作台备份.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('#restore').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('备份不能超过 5 MB');const incoming=validate(JSON.parse(await file.text()));if(!confirm(`导入 ${incoming.tasks.length} 条任务和 ${incoming.favorites.length} 项收藏？同编号任务保留较新版本。`))return;const next=merge(data,incoming);const old=broken;broken=false;if(!commit(next))broken=old;render();}catch(err){message('恢复失败：'+err.message,true);}finally{e.target.value='';}};
-window.addEventListener('storage',e=>{if(e.key===KEY){try{data=e.newValue?validate(JSON.parse(e.newValue)):empty();broken=false;render();message('已更新其他标签页的修改。');}catch{broken=true;message('其他标签页记录异常，暂停写入。',true);}}});
+window.addEventListener('storage',e=>{if(e.key===KEY&&!cloud?.owner){try{data=e.newValue?validate(JSON.parse(e.newValue)):empty();broken=false;render();message('已更新其他标签页的修改。');}catch{broken=true;message('其他标签页记录异常，暂停写入。',true);}}});
 if(page==='resources'){for(const [selector,key] of [['#category','category'],['#type','type'],['#level','level']]){for(const value of new Set(resources.map(r=>r[key]))){const o=el('option',value);o.value=value;$(selector).append(o);}}$('#compact').onchange=e=>$('#results').classList.toggle('compact',e.target.checked);$('#clear').onclick=()=>{$('#search').value='';document.querySelectorAll('[data-filter]').forEach(n=>n.type==='checkbox'?n.checked=false:n.value='');render();};}
 render();
+
+if(window.ZhixuAccount){
+ const A=window.ZhixuAccount;
+ cloud=new StudyCloud(A,localStorage,next=>{data=next;editing=null;$('#editor').close();render();},message);
+ async function accountChanged(){await cloud.connect();if(!cloud.owner){try{data=validate(JSON.parse(localStorage.getItem(KEY)||JSON.stringify(empty())));broken=false;}catch{data=empty();broken=true;}render();}$('#migrate').hidden=!cloud.owner;}
+ document.addEventListener('zhixu:record',accountChanged);
+ await A.ready;await accountChanged();
+ $('#sync-retry').onclick=()=>cloud.retry();
+ $('#use-cloud').onclick=async()=>{await cloud.retry();if(cloud.conflict&&confirm('使用云端版本会替换此设备的待同步副本，建议先导出备份。继续？'))await cloud.resolve(false);};
+ $('#use-local').onclick=async()=>{await cloud.retry();if(cloud.conflict&&confirm('将用本机副本替换云端版本，包括任务删除。继续？'))await cloud.resolve(true);};
+ $('#migrate').onclick=()=>{try{const guest=validate(JSON.parse(localStorage.getItem(KEY)||JSON.stringify(empty())));if(confirm(`将本机游客的 ${guest.tasks.length} 条任务及收藏合并到当前账号？游客原记录保留。`)){if(commit(merge(data,guest)))render();}}catch(e){message(e.message,true);}};
+ window.addEventListener('online',()=>cloud.retry());
+ window.addEventListener('storage',e=>{if(cloud.owner&&e.key===cloud.key()){cloud.ready=false;message('另一个标签页修改了个人缓存。请刷新页面后继续编辑，避免覆盖。',true);}});
+}
