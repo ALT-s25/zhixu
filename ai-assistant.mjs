@@ -7,7 +7,7 @@ let authPromise;
 async function account(){if(!window.ZhixuAccount){authPromise??=(async()=>{style('account.css');window.ZHIXU_ACCOUNT_READONLY=true;if(typeof GROUPS==='undefined')await script('data.js');if(!window.ZhixuGrowth)await script('growth-core.js');if(!window.ZHIXU_CLOUD)await script('cloud-config.js');await script('account.js?v=ai-1')})();await authPromise}await window.ZhixuAccount.ready;return window.ZhixuAccount}
 const launch=document.createElement('button');launch.className='ai-launch';launch.textContent='🌱 和小芽聊聊';launch.setAttribute('aria-controls','ai-panel');launch.setAttribute('aria-expanded','false');
 const pane=document.createElement('aside');pane.id='ai-panel';pane.className='ai-panel';pane.hidden=true;pane.setAttribute('aria-label','小芽笔记对话');
-pane.innerHTML=`<header class="ai-header"><div class="ai-brand"><span class="ai-avatar" aria-hidden="true">🌱</span><div><h2>小芽讲解室</h2><p>把不懂的，慢慢聊懂。</p></div></div><div class="ai-header-actions"><button class="ai-wide" aria-label="展开对话面板" aria-pressed="false">展开</button><button class="ai-close" aria-label="关闭讲解助手">关闭</button></div></header>
+pane.innerHTML=`<header class="ai-header"><div class="ai-brand"><span class="ai-avatar" aria-hidden="true">🌱</span><div><h2>小芽讲解室</h2><p>把不懂的，慢慢聊懂。</p></div></div><div class="ai-header-actions"><button class="ai-map-open">学习地图</button><button class="ai-wide" aria-label="展开对话面板" aria-pressed="false">展开</button><button class="ai-close" aria-label="关闭讲解助手">关闭</button></div></header>
 <details class="ai-reference"><summary>正在聊的笔记 <span class="ai-reference-hint">先选中一段正文</span></summary><blockquote class="ai-selection">在笔记正文中选中 5–5000 字，再来提问。</blockquote></details>
 <div class="ai-thread" aria-label="对话记录"><div class="ai-welcome"><span aria-hidden="true">🌱</span><h3>这里，可以多问一个为什么。</h3><p>选中笔记里没看懂的一段。<br>我帮你拆解概念，举个例子，再一起想明白。</p></div></div>
 <div class="ai-bottom"><div class="ai-suggestions"><button data-prompt="请用生活中的类比讲解这段内容，并说明类比的局限。">打个比方</button><button data-prompt="请用一个带注释的最小代码例子解释这段内容。">举个例子</button><button data-prompt="请针对这段内容出一道自测题，先不要给答案。">考考我</button></div><label class="ai-consent-label"><input type="checkbox" class="ai-consent"> 同意发送所选段落与问题给模型服务</label><div class="ai-composer"><label class="ai-sr" for="ai-question">输入关于所选段落的问题</label><textarea id="ai-question" class="ai-question" maxlength="300" rows="2" placeholder="哪里不明白？也可以直接点发送…"></textarea><div class="ai-composer-bar"><select class="ai-mode" aria-label="讲解方式"><option value="plain">类比讲透</option><option value="example">代码例子</option><option value="steps">逐步拆解</option></select><span class="ai-count">0 / 300</span><button class="ai-send" aria-label="发送问题">发送 ↑</button></div></div><button data-auth-open class="ai-login" hidden>登录 / 注册</button><p class="ai-status" role="status" aria-live="polite"></p><p class="ai-footnote">AI 内容请核实 · 对话仅保留在当前页面<br>每次以原文和本次问题回答，不携带历史消息；调用失败也可能计入额度。</p></div>`;
@@ -49,3 +49,15 @@ $('.ai-send').onclick=async()=>{if(busy)return;busy=true;const button=$('.ai-sen
  const response=await a.authorizedBackendFetch('/api/v1/ai/explain',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,requestId:request.requestId})});const data=await response.json();if(start!==epoch)return;if(!response.ok){request=null;throw Error(data.message||'讲解失败，请稍后重试')}
  pending.row.classList.remove('ai-pending');await answer(pending.content,data.explanation);if(start!==epoch)return;$('.ai-status').textContent=`今日剩余 ${data.remaining} 次 · ${data.sourceTitle}`;$('.ai-question').value='';$('.ai-question').oninput();scrollBottom();
  }catch(e){if(start===undefined||start===epoch){$('.ai-status').textContent=e.message||'连接失败，请稍后重试';if(pending){pending.row.classList.remove('ai-pending');pending.row.classList.add('ai-failed');pending.content.textContent='这次没有收到回答。你的问题已保留，可以重新发送。'}}}finally{busy=false;button.disabled=false;button.textContent='发送 ↑'}};
+
+// A separate account-owned workspace offers persistent multi-turn branches.
+$('.ai-map-open').onclick=async()=>{
+ if(busy)return;
+ try{
+  const a=await account();
+  if(!a.user()){$('.ai-login').hidden=false;throw Error('请先登录，再打开学习地图');}
+  if(selected){sessionStorage.setItem('zhixu-map-seed-v1',JSON.stringify({...selected,userId:a.user().id,createdAt:Date.now()}));}
+  else sessionStorage.removeItem('zhixu-map-seed-v1');
+  location.href=new URL('learning-map.html',root).href;
+ }catch(e){$('.ai-status').textContent=e.message||'无法打开学习地图';}
+};

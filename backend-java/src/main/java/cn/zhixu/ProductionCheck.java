@@ -14,5 +14,7 @@ class ProductionCheck implements ApplicationRunner {
     ProductionCheck(JdbcTemplate db) { this.db=db; }
     public void run(ApplicationArguments args) {
         db.queryForObject("SELECT count(*) FROM zhixu_backend.ai_calls",Long.class);
+        db.queryForObject("SELECT count(*) FROM zhixu_backend.ai_conversations",Long.class);
+        db.queryForObject("SELECT count(*) FROM zhixu_backend.ai_turns",Long.class);
     }
 }

@@ -196,7 +196,9 @@
     if(endpoint.protocol!=='https:'&&!(endpoint.protocol==='http:'&&['localhost','127.0.0.1'].includes(endpoint.hostname)))throw Error('AI 后端需要 HTTPS 地址');
     if(!/^\/api\/v1\/[a-z/]+$/.test(path))throw Error('不支持的接口');
     const epoch=generation,access=await token();
-    const response=await fetch(endpoint.origin+path,{...options,credentials:'omit',redirect:'error',headers:{...options.headers,Authorization:'Bearer '+access},signal:options.signal||AbortSignal.timeout(65000)});
+    let response;
+    try{response=await fetch(endpoint.origin+path,{...options,credentials:'omit',redirect:'error',headers:{...options.headers,Authorization:'Bearer '+access},signal:options.signal||AbortSignal.timeout(65000)})}
+    catch(error){throw Error(error.name==='TimeoutError'?'讲解请求超时，请稍后重试':'浏览器未能连接讲解接口：'+endpoint.origin+'。请强制刷新页面，并确认 Java 后端仍在运行。')}
     if(epoch!==generation)throw Error('账号已切换，请重试');return response;
   },async authorizedFetch(path,options={}){
     if(!/^\/(rest|storage)\/v1\//.test(path))throw Error('不支持的云端地址');

@@ -52,4 +52,4 @@ document.querySelector('#mark-read')?.addEventListener('click',e=>{if(paused||e.
 })();
 ;(()=>{if(document.body.dataset.note)return;const b=[...document.querySelectorAll('.shelf-tabs button')].find(x=>x.dataset.category==='后端详细课程');if(b)b.click()})();
 
-;(()=>{if(document.body.dataset.note){const module=document.createElement("script");module.type="module";module.src=new URL("ai-assistant.mjs",document.currentScript.src);document.head.append(module)}})();
+;(()=>{if(document.body.dataset.note){const module=document.createElement("script");module.type="module";module.src=new URL("ai-assistant.mjs?v=map-1",document.currentScript.src);document.head.append(module)}})();
