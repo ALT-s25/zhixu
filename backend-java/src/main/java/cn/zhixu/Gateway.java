@@ -38,7 +38,8 @@ class Gateway {
         catch(Exception e) { throw new ApiError(502,"上游服务连接失败，请稍后重试"); }
     }
     UUID user(String authorization) {
-        if(authorization==null || !authorization.startsWith("Bearer ") || authorization.length()>8192) throw new ApiError(401,"请先登录");
+        if(authorization==null || !authorization.startsWith("Bearer ")) throw new ApiError(401,"请先登录");
+        if(authorization.length()>32768) throw new ApiError(431,"账号资料过大，请更换预设头像并重新登录后重试");
         var data=request(supabase+"/auth/v1/user",authorization.substring(7),null,true);
         try { return UUID.fromString(data.path("id").asText()); }
         catch(Exception e) { throw new ApiError(401,"无法验证登录身份"); }
