@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>IDEA 与运算符 · 课程原文 · 知序书房</title><link href="../../notes-reader.css?v=20261111-java" rel="stylesheet"/><link href="../../favicon.ico?v=20261111-java" rel="icon"/></head><body data-note="notes/Java基础·原文查阅/03-IDEA 与运算符.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg aria-hidden="true" viewbox="0 0 32 32"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"></path></svg>知序<span>小芽书房</span></a><nav><a href="../../index.html">返回冒险营</a><button aria-label="切换深浅主题" id="reader-theme">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a aria-current="page" href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>IDEA 与运算符 · 课程原文</h1><div class="article-meta"><span>约 21 分钟阅读</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button aria-pressed="false" id="mark-read">标记已读</button><button id="font-size">放大字号</button><button aria-pressed="false" id="focus-reading">专注阅读</button></div><article class="prose">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IDEA 与运算符 · 课程原文 · 知序书房</title><link rel="stylesheet" href="../../notes-reader.css?v=20261111-java"><link rel="icon" href="../../favicon.ico?v=20261111-java"><link rel="stylesheet" href="../../site-design.css?v=20261116"></head><body data-note="notes/Java基础·原文查阅/03-IDEA 与运算符.md.html"><header class="desk-header"><a class="desk-brand" href="../../notes.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 28V14M16 18C4 19 3 8 5 6c8-1 13 6 11 12ZM16 14C16 5 24 3 28 5c1 8-6 11-12 9Z"/></svg>知序<span>小芽书房</span></a><nav><a href="../../import.html">导入资料</a><a href="../../index.html">返回冒险营</a><button id="reader-theme" aria-label="切换深浅主题">夜间阅读</button></nav></header><div class="reading-track"><i id="reading-progress"></i></div><div class="reading-layout"><aside class="chapter-rail"><a class="back-library" href="../../notes.html">← 全部笔记</a><h2>Java基础·原文查阅</h2><nav aria-label="同专题笔记"><a href="01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F.md.html">环境准备与第一个程序 · 课程原文</a><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html">变量、类型转换与进制 · 课程原文</a><a aria-current="page" href="03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">IDEA 与运算符 · 课程原文</a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html">输入、分支与循环 · 课程原文</a><a href="05-%E6%95%B0%E7%BB%84%E3%80%81%E7%B4%A2%E5%BC%95%E4%B8%8E%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB.md.html">数组、索引与内存关系 · 课程原文</a><a href="06-%E6%96%B9%E6%B3%95%E4%B8%8E%E9%87%8D%E8%BD%BD.md.html">方法与重载 · 课程原文</a><a href="07-%E7%B1%BB%E3%80%81%E5%AF%B9%E8%B1%A1%E4%B8%8E%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F.md.html">类、对象与成员变量 · 课程原文</a><a href="08-%E5%B0%81%E8%A3%85%E3%80%81this%20%E4%B8%8E%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95.md.html">封装、this 与构造方法 · 课程原文</a><a href="09-static%E3%80%81%E9%80%92%E5%BD%92%E3%80%81%E6%95%B0%E7%BB%84%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B0%83%E8%AF%95.md.html">static、递归、数组算法与调试 · 课程原文</a><a href="09a-%E9%98%B6%E6%AE%B5%E9%A1%B9%E7%9B%AE-%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F.md.html">阶段项目：学生管理系统 · 课程原文</a><a href="10-%E7%BB%A7%E6%89%BF%E3%80%81%E9%87%8D%E5%86%99%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.md.html">继承、重写与抽象类 · 课程原文</a><a href="11-%E6%8E%A5%E5%8F%A3%E3%80%81%E5%A4%9A%E6%80%81%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2.md.html">接口、多态与类型转换 · 课程原文</a><a href="12-%E6%9D%83%E9%99%90%E3%80%81final%E3%80%81%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B8%8E%E5%86%85%E9%83%A8%E7%B1%BB.md.html">权限、final、代码块与内部类 · 课程原文</a><a href="13-%E5%BC%82%E5%B8%B8%E3%80%81Object%20%E4%B8%8E%E6%AF%94%E8%BE%83%E8%A7%84%E5%88%99.md.html">异常、Object 与比较规则 · 课程原文</a><a href="14-String%20%E4%B8%8E%20StringBuilder.md.html">String 与 StringBuilder · 课程原文</a><a href="15-%E6%95%B0%E5%80%BC%E3%80%81%E6%97%A5%E6%9C%9F%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%20API.md.html">数值、日期与包装类 API · 课程原文</a><a href="16-%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E3%80%81%E5%90%8C%E6%AD%A5%E4%B8%8E%E7%8A%B6%E6%80%81.md.html">线程创建、同步与状态 · 课程原文</a><a href="17-%E7%AD%89%E5%BE%85%E5%94%A4%E9%86%92%E3%80%81Lock%20%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0.md.html">等待唤醒、Lock 与线程池 · 课程原文</a><a href="18-Collection%E3%80%81List%20%E4%B8%8E%E8%BF%AD%E4%BB%A3.md.html">Collection、List 与迭代 · 课程原文</a><a href="19-%E6%B3%9B%E5%9E%8B%E3%80%81Set%20%E4%B8%8E%E5%8E%BB%E9%87%8D.md.html">泛型、Set 与去重 · 课程原文</a><a href="20-Map%E3%80%81%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%A1%88%E4%BE%8B.md.html">Map、哈希表与统计案例 · 课程原文</a><a href="21-File%20%E4%B8%8E%E5%AD%97%E8%8A%82%E3%80%81%E5%AD%97%E7%AC%A6%20IO.md.html">File 与字节、字符 IO · 课程原文</a><a href="22-%E7%BC%93%E5%86%B2%E6%B5%81%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%B5%81.md.html">缓冲流、序列化与工具流 · 课程原文</a><a href="23-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E3%80%81%E6%AD%A3%E5%88%99%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md.html">网络编程、正则与设计模式 · 课程原文</a><a href="24-Lambda%E3%80%81Stream%20%E4%B8%8E%20JDK%20%E6%96%B0%E7%89%B9%E6%80%A7.md.html">Lambda、Stream 与 JDK 新特性 · 课程原文</a><a href="25-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E3%80%81%E5%8F%8D%E5%B0%84%E4%B8%8E%E6%B3%A8%E8%A7%A3.md.html">单元测试、反射与注解 · 课程原文</a></nav></aside><main class="paper" id="article-top"><div class="article-context"><a href="../../notes.html">学习笔记</a><span>/</span>Java基础·原文查阅</div><h1>IDEA 与运算符 · 课程原文</h1><div class="article-meta"><span>按章节学习</span><span>你的知识，慢慢成林</span></div><div class="reader-tools"><button id="mark-read" aria-pressed="false">标记已读</button><button id="font-size">放大字号</button><button id="focus-reading" aria-pressed="false">专注阅读</button></div><article class="prose">
 <p>来源：用户提供的 <code>笔记(1).zip / 03_笔记/day03_idea_运算符/day03_idea_运算符.md</code>。保留原课程内容，历史环境、示例错误和故意报错的教学代码应结合上下文阅读。</p>
 <p><a href="../Java%E5%9F%BA%E7%A1%80%C2%B7%E8%AF%BE%E7%A8%8B%E7%B2%BE%E8%AF%BB/03-IDEA%20%E4%B8%8E%E8%BF%90%E7%AE%97%E7%AC%A6.md.html">返回本章速学总结</a></p>
 <h3 id="section-0">模块三 idea_运算符</h3>
@@ -43,54 +42,54 @@
 <span class="w">    </span>
 <span class="mf">4.</span><span class="n">作用</span><span class="p">:</span><span class="n">加速我们的开发</span><span class="w">    </span>
 </pre></div>
-</div><p><img alt="1698654549891" decoding="async" loading="lazy" src="../../assets/images/notes/1d80c6402d1a02eb2b5e.png"/></p>
+</div><p><img alt="1698654549891" src="../../course-assets/1d80c6402d1a02eb2b5e.png"/></p>
 <h4 id="section-3">2.idea的目录结构</h4>
-<p><img alt="1698655258798" decoding="async" loading="lazy" src="../../assets/images/notes/b43ae486a2811a936541.png"/></p>
+<p><img alt="1698655258798" src="../../course-assets/b43ae486a2811a936541.png"/></p>
 <blockquote>
 <p>先创建project,在project下创建module,在module下创建package -&gt; 必须记住</p>
 </blockquote>
 <h4 id="section-4">3.Project的操作</h4>
 <h5>3.1.project的创建</h5>
-<p><img alt="1698656313192" decoding="async" loading="lazy" src="../../assets/images/notes/45372c54d7ae3923d177.png"/></p>
+<p><img alt="1698656313192" src="../../course-assets/45372c54d7ae3923d177.png"/></p>
 <h5>3.2再次创建一个新的Project</h5>
-<p><img alt="1698656369654" decoding="async" loading="lazy" src="../../assets/images/notes/eb76740ad32874ce39a1.png"/></p>
-<p><img alt="1698656431983" decoding="async" loading="lazy" src="../../assets/images/notes/3e9131e90cf5289f366d.png"/></p>
-<p><img alt="1698656486848" decoding="async" loading="lazy" src="../../assets/images/notes/9b1323f631c57afc0ef3.png"/></p>
+<p><img alt="1698656369654" src="../../course-assets/eb76740ad32874ce39a1.png"/></p>
+<p><img alt="1698656431983" src="../../course-assets/3e9131e90cf5289f366d.png"/></p>
+<p><img alt="1698656486848" src="../../course-assets/9b1323f631c57afc0ef3.png"/></p>
 <h5>3.3.关闭Project</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">file</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">close</span><span class="w"> </span><span class="n">project</span>
 </pre></div>
-</div><p><img alt="1698656529824" decoding="async" loading="lazy" src="../../assets/images/notes/a2cef642e61133303a3d.png"/></p>
+</div><p><img alt="1698656529824" src="../../course-assets/a2cef642e61133303a3d.png"/></p>
 <h5>3.4.打开project</h5>
-<p><img alt="1698656643041" decoding="async" loading="lazy" src="../../assets/images/notes/a0dd1c12e50b720246ba.png"/></p>
+<p><img alt="1698656643041" src="../../course-assets/a0dd1c12e50b720246ba.png"/></p>
 <h4 id="section-5">4.module的操作</h4>
 <h5>4.1.创建module</h5>
-<p><img alt="1698657956849" decoding="async" loading="lazy" src="../../assets/images/notes/4b66bad3e59679083a85.png"/></p>
-<p><img alt="1698658056821" decoding="async" loading="lazy" src="../../assets/images/notes/dfba5288615e485bbdc6.png"/></p>
+<p><img alt="1698657956849" src="../../course-assets/4b66bad3e59679083a85.png"/></p>
+<p><img alt="1698658056821" src="../../course-assets/dfba5288615e485bbdc6.png"/></p>
 <h5>4.2.关闭module</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">.</span><span class="na">对着要关闭的module右键</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">remove</span><span class="w"> </span><span class="kd">module</span> <span class="err">-&gt;</span> <span class="nc">此时是关闭</span><span class="p">,</span><span class="n">不是真正的删除module</span>
 <span class="n">b</span><span class="p">.</span><span class="na">再对着关闭的module右键</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">delete</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">从本地上真正删除</span>
 </pre></div>
-</div><p><img alt="1698658178382" decoding="async" loading="lazy" src="../../assets/images/notes/b86d2dd0ab9f55a9e63b.png"/></p>
-<p><img alt="1698658250143" decoding="async" loading="lazy" src="../../assets/images/notes/b504ea0c1254225ca641.png"/><img alt="1698658413831" decoding="async" loading="lazy" src="../../assets/images/notes/4ac0a801bc2472c192f0.png"/></p>
+</div><p><img alt="1698658178382" src="../../course-assets/b86d2dd0ab9f55a9e63b.png"/></p>
+<p><img alt="1698658250143" src="../../course-assets/b504ea0c1254225ca641.png"/><img alt="1698658413831" src="../../course-assets/4ac0a801bc2472c192f0.png"/></p>
 <h5>4.3.导入已有的module</h5>
-<p><img alt="1698658424190" decoding="async" loading="lazy" src="../../assets/images/notes/4ac0a801bc2472c192f0.png"/></p>
-<p><img alt="1698658530931" decoding="async" loading="lazy" src="../../assets/images/notes/43648f72732d0dcc7767.png"/></p>
+<p><img alt="1698658424190" src="../../course-assets/4ac0a801bc2472c192f0.png"/></p>
+<p><img alt="1698658530931" src="../../course-assets/43648f72732d0dcc7767.png"/></p>
 <h4 id="section-6">5.package的操作</h4>
 <h5>5.1创建</h5>
-<p><img alt="1698659767078" decoding="async" loading="lazy" src="../../assets/images/notes/30371a70a459ccf4c1b7.png"/></p>
+<p><img alt="1698659767078" src="../../course-assets/30371a70a459ccf4c1b7.png"/></p>
 <h5>5.2 package的删除</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">右键</span><span class="o">-&gt;</span><span class="w"> </span><span class="n">delete</span>
 </pre></div>
-</div><p><img alt="1698659832251" decoding="async" loading="lazy" src="../../assets/images/notes/6fab274d7321e9a8776e.png"/></p>
+</div><p><img alt="1698659832251" src="../../course-assets/6fab274d7321e9a8776e.png"/></p>
 <h5>5.3 package取名字规范</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">公司域名倒着写</span><span class="p">:</span>
 <span class="w">  </span><span class="n">比如</span><span class="p">:</span><span class="n">尚硅谷</span><span class="w">  </span><span class="n">域名为</span><span class="p">:</span><span class="n">www</span><span class="p">.</span><span class="na">atguigu</span><span class="p">.</span><span class="na">com</span>
 <span class="w">  </span><span class="n">我们写代码创建包</span><span class="p">:</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">atguigu</span>
 </pre></div>
-</div><p><img alt="1698660235926" decoding="async" loading="lazy" src="../../assets/images/notes/d614279ac3156cfcf23c.png"/></p>
+</div><p><img alt="1698660235926" src="../../course-assets/d614279ac3156cfcf23c.png"/></p>
 <h4 id="section-7">6.创建类以及基本语句生成快捷键</h4>
-<p><img alt="1698660395965" decoding="async" loading="lazy" src="../../assets/images/notes/9cc1db5d710c0c11b15d.png"/></p>
-<p><img alt="1698660554481" decoding="async" loading="lazy" src="../../assets/images/notes/eea2468074c17cd526d7.png"/></p>
+<p><img alt="1698660395965" src="../../course-assets/9cc1db5d710c0c11b15d.png"/></p>
+<p><img alt="1698660554481" src="../../course-assets/eea2468074c17cd526d7.png"/></p>
 <blockquote>
 <p>1.生成main方法:输入main -&gt; 回车</p>
 <p>2.生成输出语句:sout -&gt; 回车</p>
@@ -102,13 +101,13 @@
 <h5>7.1设置字体</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">file</span><span class="o">-</span><span class="n">settings</span>
 </pre></div>
-</div><p><img alt="1698660971384" decoding="async" loading="lazy" src="../../assets/images/notes/b84ff1ef30fef17f4eb7.png"/></p>
+</div><p><img alt="1698660971384" src="../../course-assets/b84ff1ef30fef17f4eb7.png"/></p>
 <h5>7.2设置提示的快捷键</h5>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="n">file</span><span class="o">-</span><span class="n">settings</span>
 </pre></div>
-</div><p><img alt="1698661137410" decoding="async" loading="lazy" src="../../assets/images/notes/7308bd67bfef6389a5ec.png"/><img alt="1698661320028" decoding="async" loading="lazy" src="../../assets/images/notes/bef5eb0cf58144261ead.png"/></p>
+</div><p><img alt="1698661137410" src="../../course-assets/7308bd67bfef6389a5ec.png"/><img alt="1698661320028" src="../../course-assets/bef5eb0cf58144261ead.png"/></p>
 <h5>7.3 设置注释字体</h5>
-<p><img alt="1698661320028" decoding="async" loading="lazy" src="../../assets/images/notes/bef5eb0cf58144261ead.png"/></p>
+<p><img alt="1698661320028" src="../../course-assets/bef5eb0cf58144261ead.png"/></p>
 <h4 id="section-9">8.快捷键</h4>
 <div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
@@ -150,11 +149,11 @@
 </table></div>
 <blockquote>
 <p>先写等号右边的,可以自动生成等号左边的变量</p>
-<p><img alt="1698662119415" decoding="async" loading="lazy" src="../../assets/images/notes/729ecbd524d15aa12e9b.png"/></p>
+<p><img alt="1698662119415" src="../../course-assets/729ecbd524d15aa12e9b.png"/></p>
 </blockquote>
 <p>或者</p>
 <blockquote>
-<p><img alt="1698662152111" decoding="async" loading="lazy" src="../../assets/images/notes/2d8cdea2ef3835641a6a.png"/></p>
+<p><img alt="1698662152111" src="../../course-assets/2d8cdea2ef3835641a6a.png"/></p>
 </blockquote>
 <h4 id="section-10">9.出现的问题</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">在运行代码时会出现</span><span class="s">"找不到对应的发行源"</span><span class="n">或者</span><span class="s">"不支持发行版本"</span><span class="n">或者</span><span class="s">"无效的发行源版本"</span><span class="p">,</span><span class="n">证明本地jdk版本和idea中的language</span><span class="w"> </span><span class="n">level不匹配</span>
@@ -168,8 +167,8 @@
 <span class="w">    </span>
 <span class="mf">4.</span><span class="n">刚使用</span><span class="p">,</span><span class="n">jdk没有配置</span>
 </pre></div>
-</div><p><img alt="1698663293553" decoding="async" loading="lazy" src="../../assets/images/notes/0b542f37d1d2f52d70c3.png"/></p>
-<p><img alt="1698663426985" decoding="async" loading="lazy" src="../../assets/images/notes/5a94370e4c5211196e07.png"/></p>
+</div><p><img alt="1698663293553" src="../../course-assets/0b542f37d1d2f52d70c3.png"/></p>
+<p><img alt="1698663426985" src="../../course-assets/5a94370e4c5211196e07.png"/></p>
 <h3 id="section-11">第二章.运算符</h3>
 <h4 id="section-12">1.算数运算符</h4>
 <div aria-label="可横向滚动的表格" class="table-scroll" role="region" tabindex="0"><table>
@@ -308,7 +307,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div><p><img alt="1698743122044" decoding="async" loading="lazy" src="../../assets/images/notes/f420ecf0c1e30b6333fa.png"/></p>
+</div><p><img alt="1698743122044" src="../../course-assets/f420ecf0c1e30b6333fa.png"/></p>
 <h4 id="section-13">3.赋值运算符</h4>
 <div class="code-block"><div class="code-top"><span>java</span><button class="copy-code" type="button">复制代码</button></div><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">基本赋值运算符</span><span class="p">:</span>
 <span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">先看等号右边的</span><span class="p">,</span><span class="n">再将右边的数据赋值给等号左边的变量</span>
@@ -524,4 +523,4 @@ false^false -&gt; false |</p>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-</div></article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav aria-label="上一篇和下一篇" class="article-pagination"><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html"><small>← 上一篇</small><strong>变量、类型转换与进制 · 课程原文</strong></a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html"><small>下一篇 →</small><strong>输入、分支与循环 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open=""><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块三 idea_运算符</a><a class="toc-h3" href="#section-1">第一章.IDEA的使用</a><a class="toc-h4" href="#section-2">1.idea的介绍</a><a class="toc-h4" href="#section-3">2.idea的目录结构</a><a class="toc-h4" href="#section-4">3.Project的操作</a><a class="toc-h4" href="#section-5">4.module的操作</a><a class="toc-h4" href="#section-6">5.package的操作</a><a class="toc-h4" href="#section-7">6.创建类以及基本语句生成快捷键</a><a class="toc-h4" href="#section-8">7.基本设置</a><a class="toc-h4" href="#section-9">8.快捷键</a><a class="toc-h4" href="#section-10">9.出现的问题</a><a class="toc-h3" href="#section-11">第二章.运算符</a><a class="toc-h4" href="#section-12">1.算数运算符</a><a class="toc-h4" href="#section-13">3.赋值运算符</a><a class="toc-h4" href="#section-14">4.关系运算符(比较运算符)</a><a class="toc-h4" href="#section-15">5.逻辑运算符</a><a class="toc-h4" href="#section-16">6.三元运算符</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
+</div></article><div class="reading-end"><span>读懂一小节，也是一次进步。</span><a href="../../index.html#practice">去题单练一练 →</a></div><nav class="article-pagination" aria-label="上一篇和下一篇"><a href="02-%E5%8F%98%E9%87%8F%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%BF%9B%E5%88%B6.md.html"><small>← 上一篇</small><strong>变量、类型转换与进制 · 课程原文</strong></a><a href="04-%E8%BE%93%E5%85%A5%E3%80%81%E5%88%86%E6%94%AF%E4%B8%8E%E5%BE%AA%E7%8E%AF.md.html"><small>下一篇 →</small><strong>输入、分支与循环 · 课程原文</strong></a></nav></main><aside class="toc-rail"><details open><summary>这篇笔记的目录</summary><nav aria-label="文章目录"><a class="toc-h3" href="#section-0">模块三 idea_运算符</a><a class="toc-h3" href="#section-1">第一章.IDEA的使用</a><a class="toc-h4" href="#section-2">1.idea的介绍</a><a class="toc-h4" href="#section-3">2.idea的目录结构</a><a class="toc-h4" href="#section-4">3.Project的操作</a><a class="toc-h4" href="#section-5">4.module的操作</a><a class="toc-h4" href="#section-6">5.package的操作</a><a class="toc-h4" href="#section-7">6.创建类以及基本语句生成快捷键</a><a class="toc-h4" href="#section-8">7.基本设置</a><a class="toc-h4" href="#section-9">8.快捷键</a><a class="toc-h4" href="#section-10">9.出现的问题</a><a class="toc-h3" href="#section-11">第二章.运算符</a><a class="toc-h4" href="#section-12">1.算数运算符</a><a class="toc-h4" href="#section-13">3.赋值运算符</a><a class="toc-h4" href="#section-14">4.关系运算符(比较运算符)</a><a class="toc-h4" href="#section-15">5.逻辑运算符</a><a class="toc-h4" href="#section-16">6.三元运算符</a></nav></details><a class="back-top" href="#article-top">回到顶部 ↑</a></aside></div><div id="reading-toast" role="status"></div><script src="../../notes-reader.js"></script></body></html>
